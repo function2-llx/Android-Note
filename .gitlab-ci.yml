@@ -2,8 +2,8 @@ image: openjdk:8-jdk
 
 cache:
   paths:
-    - .m2/
     - .gradle/
+    - android-sdk-linux
 
 variables:
   ANDROID_COMPILE_SDK: "27"
@@ -17,7 +17,7 @@ before_script:
   - mkdir android-sdk-linux
   - mkdir android-sdk-linux/log
   - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip > android-sdk-linux/log/installSdk.log
-  - unzip -q android-sdk.zip -d android-sdk-linux
+  - unzip -q -o android-sdk.zip -d android-sdk-linux
 
   - mkdir android-sdk-linux/licenses
   - printf "d56f5187479451eabf01fb78af6dfcb131a6481e" > android-sdk-linux/licenses/android-sdk-license
@@ -39,7 +39,7 @@ stages:
 build:
   stage: build
   script:
-    - ./gradlew assembleDebug
+    - ./gradlew assembleDebug  > android-sdk-linux/log/installGradle.log
   artifacts:
     paths:
     - app/build/outputs/
@@ -60,7 +60,7 @@ connected-android-tests:
     - chmod +x android-wait-for-emulator
     - echo y | android-sdk-linux/tools/bin/sdkmanager "system-images;android-${ANDROID_COMPILE_SDK};google_apis;x86" > android-sdk-linux/log/installSystemImage.log
     - echo no | android-sdk-linux/tools/bin/avdmanager create avd -n test -k "system-images;android-${ANDROID_COMPILE_SDK};google_apis;x86" > android-sdk-linux/log/createAvd.log
-    - android-sdk-linux/emulator/emulator -avd test -no-window -no-audio &
+    - android-sdk-linux/emulator/emulator -avd test -no-window -no-audio -no-snapshot-load &
     - ./android-wait-for-emulator
     - adb shell input keyevent 82
     - ./gradlew connectedAndroidtest
