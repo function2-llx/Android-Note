@@ -39,7 +39,7 @@ stages:
 build:
   stage: build
   script:
-    - ./gradlew assembleDebug  > android-sdk-linux/log/installGradle.log
+    - ./gradlew assembleDebug > android-sdk-linux/log/installGradle.log
   artifacts:
     paths:
     - app/build/outputs/
@@ -47,7 +47,7 @@ build:
 unit-tests:
   stage: test
   script:
-    - ./gradlew test
+    - ./gradlew test > android-sdk-linux/log/installGradle.log
   artifacts:
     paths:
     - app/build/reports/tests/
@@ -63,7 +63,7 @@ connected-android-tests:
     - android-sdk-linux/emulator/emulator -avd test -no-window -no-audio -no-snapshot-load &
     - ./android-wait-for-emulator
     - adb shell input keyevent 82
-    - ./gradlew connectedAndroidtest
+    - ./gradlew connectedAndroidtest > android-sdk-linux/log/installGradle.log
   artifacts:
     paths:
     - app/build/reports/androidTests/connected
