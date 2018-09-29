@@ -14,16 +14,17 @@ before_script:
   - apt-get --quiet update --yes
   - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
   
-  - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip
   - mkdir android-sdk-linux
+  - mkdir android-sdk-linux/log
+  - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip > android-sdk-linux/log/installSdk.log
   - unzip -q android-sdk.zip -d android-sdk-linux
 
   - mkdir android-sdk-linux/licenses
   - printf "d56f5187479451eabf01fb78af6dfcb131a6481e" > android-sdk-linux/licenses/android-sdk-license
   - printf "84831b9409646a918e30573bab4c9c91346d8abd" > android-sdk-linux/licenses/android-sdk-preview-license
 
-  - android-sdk-linux/tools/bin/sdkmanager --update
-  - echo y | android-sdk-linux/tools/bin/sdkmanager "platforms;android-${ANDROID_COMPILE_SDK}" "platform-tools" "build-tools;${ANDROID_BUILD_TOOLS}" "extras;google;m2repository" "extras;android;m2repository"
+  - android-sdk-linux/tools/bin/sdkmanager --update > android-sdk-linux/log/update.log
+  - echo y | android-sdk-linux/tools/bin/sdkmanager "platforms;android-${ANDROID_COMPILE_SDK}" "platform-tools" "build-tools;${ANDROID_BUILD_TOOLS}" "extras;google;m2repository" "extras;android;m2repository" > android-sdk-linux/log/installPlatform.log
 
   - export ANDROID_HOME=$PWD/android-sdk-linux
   - export ANDROID_SDK_ROOT=$PWD/android-sdk-linux
@@ -47,18 +48,23 @@ unitTests:
   stage: test
   script:
     - ./gradlew test
+  artifacts:
+    paths:
+    - app/build/reports/tests/
+    - app/build/test-results/ 
 
 functionalTests:
   stage: test
   script:
-    - wget --quiet --output-document=android-wait-for-emulator https://raw.githubusercontent.com/travis-ci/travis-cookbooks/master/community-cookbooks/android-sdk/files/default/android-wait-for-emulator
+    - wget --quiet --output-document=android-wait-for-emulator https://raw.githubusercontent.com/travis-ci/travis-cookbooks/master/community-cookbooks/android-sdk/files/default/android-wait-for-emulator > android-sdk-linux/log/installEmulator.log
     - chmod +x android-wait-for-emulator
     - echo y | android-sdk-linux/tools/bin/sdkmanager "system-images;android-${ANDROID_COMPILE_SDK};google_apis;x86" > android-sdk-linux/log/installSystemImage.log
-    - echo no | android-sdk-linux/tools/bin/avdmanager create avd -n test -k "system-images;android-${ANDROID_COMPILE_SDK};google_apis;x86"
+    - echo no | android-sdk-linux/tools/bin/avdmanager create avd -n test -k "system-images;android-${ANDROID_COMPILE_SDK};google_apis;x86" > android-sdk-linux/log/createAvd.log
     - android-sdk-linux/emulator/emulator -avd test -no-window -no-audio &
     - ./android-wait-for-emulator
     - adb shell input keyevent 82
     - ./gradlew connectedAndroidtest
   artifacts:
     paths:
-    - app/build/reports/androidTests/
+    - app/build/reports/androidTests/connected
+    - app/build/outputs/androidTest-results/connected
