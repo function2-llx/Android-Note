@@ -5,12 +5,16 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Toast;
 
+import com.se.npe.androidnote.interfaces.IEditor;
 import com.se.npe.androidnote.models.Note;
+import com.se.npe.androidnote.temperary.TestEditor;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 public class EditorActivity extends AppCompatActivity {
+    IEditor editor;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -21,6 +25,7 @@ public class EditorActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        EventBus.getDefault().removeAllStickyEvents();
         EventBus.getDefault().unregister(this);
     }
 

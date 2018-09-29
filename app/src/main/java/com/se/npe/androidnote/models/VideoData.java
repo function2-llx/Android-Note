@@ -11,9 +11,4 @@ import com.se.npe.androidnote.interfaces.IData;
  * */
 
 public class VideoData implements IData {
-
-    @Override
-    public View renderAsView() {
-        return null;
-    }
 }

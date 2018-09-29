@@ -12,9 +12,4 @@ import com.se.npe.androidnote.interfaces.IData;
 
 public class TextData implements IData{
     private String text;
-
-    @Override
-    public View renderAsView() {
-        return null;
-    }
 }

@@ -13,6 +13,8 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 public class MainActivity extends AppCompatActivity {
+    private Note selectedNote;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,8 +32,11 @@ public class MainActivity extends AppCompatActivity {
     // receive the note sent back from EditorActivity
     @Subscribe
     public void getNoteFromEditor(Note note) {
+        if (note == selectedNote) { // the note sent by self
+            return;
+        }
         if (note != null) {
-            Toast.makeText(this, "get a note " + note.getTitle(), Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "get a note from editor, title = " + note.getTitle(), Toast.LENGTH_SHORT).show();
         } else {
             Toast.makeText(this, "get a null note", Toast.LENGTH_SHORT).show();
         }
@@ -56,8 +61,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 // in the real app, generateNoteForTest() will be replaced by the selected note in the list
-                Note note = generateNoteForTest();
-                EventBus.getDefault().postSticky(note);
+                selectedNote = generateNoteForTest();
+                EventBus.getDefault().postSticky(selectedNote);
                 Intent intent = new Intent(MainActivity.this, EditorActivity.class);
                 startActivity(intent);
             }

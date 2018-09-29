@@ -14,8 +14,4 @@ public class SoundData implements IData {
     private String uri;
     private String text;
 
-    @Override
-    public View renderAsView() {
-        return null;
-    }
 }

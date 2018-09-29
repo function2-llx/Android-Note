@@ -21,19 +21,19 @@ public class Note {
         public @NonNull
         String text;
         public @NonNull
-        String imgUri;
+        String picturePath;
 
-        public PreviewData(@NonNull String title, @NonNull String text, @NonNull String imgUri) {
+        public PreviewData(@NonNull String title, @NonNull String text, @NonNull String picturePath) {
             this.title = title;
             this.text = text;
-            this.imgUri = imgUri;
+            this.picturePath = picturePath;
         }
     }
 
     private String title;
-    private List<? extends IData> content;
+    private List<IData> content;
 
-    public Note(String title, List<? extends IData> content) {
+    public Note(String title, List<IData> content) {
         this.title = title;
         this.content = content;
     }
@@ -42,7 +42,7 @@ public class Note {
         return title;
     }
 
-    public List<? extends IData> getContent() {
+    public List<IData> getContent() {
         return content;
     }
 
