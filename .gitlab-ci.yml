@@ -14,12 +14,12 @@ before_script:
   - apt-get --quiet update --yes
   - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
   
-  - mkdir android-sdk-linux
-  - mkdir android-sdk-linux/log
+  - mkdir -p android-sdk-linux
+  - mkdir -p android-sdk-linux/log
   - wget --quiet --output-document=android-sdk.zip https://dl.google.com/android/repository/sdk-tools-linux-4333796.zip > android-sdk-linux/log/installSdk.log
-  - unzip -q -o android-sdk.zip -d android-sdk-linux
+  - unzip -q -n android-sdk.zip -d android-sdk-linux
 
-  - mkdir android-sdk-linux/licenses
+  - mkdir -p android-sdk-linux/licenses
   - printf "d56f5187479451eabf01fb78af6dfcb131a6481e" > android-sdk-linux/licenses/android-sdk-license
   - printf "84831b9409646a918e30573bab4c9c91346d8abd" > android-sdk-linux/licenses/android-sdk-preview-license
 
@@ -30,6 +30,7 @@ before_script:
   - export ANDROID_SDK_ROOT=$PWD/android-sdk-linux
   - export PATH=$PATH:$PWD/android-sdk-linux/platform-tools/
   - chmod +x ./gradlew
+  - ./gradlew > android-sdk-linux/log/installGradle.log
 
 
 stages:
@@ -39,7 +40,7 @@ stages:
 build:
   stage: build
   script:
-    - ./gradlew assembleDebug > android-sdk-linux/log/installGradle.log
+    - ./gradlew assembleDebug
   artifacts:
     paths:
     - app/build/outputs/
@@ -47,7 +48,7 @@ build:
 unit-tests:
   stage: test
   script:
-    - ./gradlew test > android-sdk-linux/log/installGradle.log
+    - ./gradlew test
   artifacts:
     paths:
     - app/build/reports/tests/
@@ -63,7 +64,7 @@ connected-android-tests:
     - android-sdk-linux/emulator/emulator -avd test -no-window -no-audio -no-snapshot-load &
     - ./android-wait-for-emulator
     - adb shell input keyevent 82
-    - ./gradlew connectedAndroidtest > android-sdk-linux/log/installGradle.log
+    - ./gradlew connectedAndroidtest
   artifacts:
     paths:
     - app/build/reports/androidTests/connected
