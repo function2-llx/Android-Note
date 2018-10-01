@@ -1,4 +1,4 @@
-package com.se.npe.androidnote.temperary;
+package com.se.npe.androidnote.temporary;
 
 import android.util.Log;
 
@@ -23,24 +23,8 @@ public class TestEditor implements IEditor {
     }
 
     @Override
-    public void addPictures(List<String> picturePaths) {
-        Log.d(TAG, "I am adding " + picturePaths.size() + " picture(s)");
-        for (int i = 0; i < picturePaths.size(); ++i) {
-            Log.d(TAG, "picture" + i + " " + picturePaths.get(i));
-        }
-    }
-
-    @Override
     public void addVideo(String videoPath) {
         Log.d(TAG, "I am adding video " + videoPath);
-    }
-
-    @Override
-    public void addVideos(List<String> videoPaths) {
-        Log.d(TAG, "I am adding " + videoPaths.size() + " video(s)");
-        for (int i = 0; i < videoPaths.size(); ++i) {
-            Log.d(TAG, "video" + i + " " + videoPaths.get(i));
-        }
     }
 
     @Override

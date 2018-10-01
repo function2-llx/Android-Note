@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">AndroidNote</string>
+    <string name="title_capacity">%d/%d</string>
 </resources>

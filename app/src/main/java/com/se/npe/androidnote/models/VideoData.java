@@ -11,4 +11,13 @@ import com.se.npe.androidnote.interfaces.IData;
  * */
 
 public class VideoData implements IData {
+    String videoPath;
+
+    public VideoData(String videoPath) {
+        this.videoPath = videoPath;
+    }
+
+    public String getVideoPath() {
+        return videoPath;
+    }
 }

@@ -6,11 +6,16 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Toast;
+import android.widget.VideoView;
 
+import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.models.Note;
+import com.se.npe.androidnote.temporary.VideoActivity;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private Note selectedNote;
@@ -35,11 +40,8 @@ public class MainActivity extends AppCompatActivity {
         if (note == selectedNote) { // the note sent by self
             return;
         }
-        if (note != null) {
-            Toast.makeText(this, "get a note from editor, title = " + note.getTitle(), Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "get a null note", Toast.LENGTH_SHORT).show();
-        }
+        Toast.makeText(this, "get a note from editor, title = " + note.getTitle(), Toast.LENGTH_SHORT).show();
+        selectedNote = note;
     }
 
     private void initListener() {
@@ -67,9 +69,18 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        findViewById(R.id.launch_video_activity).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, VideoActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private Note generateNoteForTest() {
-        return new Note("hello from MainActivity", null);
+        if (selectedNote == null)
+            return new Note("hello from MainActivity", new ArrayList<IData>());
+        return selectedNote;
     }
 }
