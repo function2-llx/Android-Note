@@ -80,7 +80,7 @@ public class MainActivity extends AppCompatActivity {
 
     private Note generateNoteForTest() {
         if (selectedNote == null)
-            return new Note("hello from MainActivity", new ArrayList<IData>());
+            return new Note("hello from MainActivity", new ArrayList<>());
         return selectedNote;
     }
 }

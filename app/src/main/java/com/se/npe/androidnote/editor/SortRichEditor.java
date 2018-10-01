@@ -13,7 +13,6 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -49,17 +48,16 @@ import cn.jzvd.JzvdStd;
 public class SortRichEditor extends ScrollView implements IEditor {
     private static final int TITLE_WORD_LIMIT_COUNT = 30;
 
-    private final int DEFAULT_IMAGE_HEIGHT = dip2px(170);
+    // height of an image
+    private final int DEFAULT_MEDIA_HEIGHT = dip2px(170);
 
     // when sorting, the default height that text and media reduce to
     private final int SIZE_REDUCE_VIEW = dip2px(75);
 
-    /**
-     * 出发ScrollView滚动时，顶部与底部的偏移量
-     */
-    //
-    private final int SCROLL_OFFSET = (int) (SIZE_REDUCE_VIEW * .3);
+    // the offset between top and bottom
+    private final int SCROLL_OFFSET = (int) (SIZE_REDUCE_VIEW * 0.3);
 
+    // margin of all items in the scroll view
     private final int DEFAULT_MARGIN = dip2px(15);
 
     // when sorting and reached the edge of ScrollView, the default scroll speed
@@ -68,41 +66,33 @@ public class SortRichEditor extends ScrollView implements IEditor {
     // the dash line marking a text out when sorting
     private final GradientDrawable dashDrawable;
 
-    /**
-     * 因为排序状态下会修改EditText的Background，所以这里保存默认EditText
-     * 的Background, 当排序完成后用于还原EditText默认的Background
-     */
+    // save the background of edit text before sorting(because sorting will change it)
     private Drawable editTextBackground;
 
     // unique id of a child(of containerLayout), stored in the 'tag' of view
     // (store by setTag, retrieve by getTag)
     private int viewTagID = 1;
 
-    /**
-     * The layout structure is like:
-     * ScrollView {
-     * parentLayout {
-     * titleLayout {
-     * EditText,
-     * TextView
-     * },
-     * LineView,
-     * containerLayout{
-     * child1,
-     * child2,
-     * child3,
-     * ...
-     * }
-     * }
-     * }
-     */
+    // The layout structure is like:
+    // ScrollView {
+    //      parentLayout {
+    //          titleLayout {
+    //              EditText,
+    //              TextView
+    //          },
+    //          LineView,
+    //          containerLayout{
+    //              child1,
+    //              child2,
+    //              child3,
+    //              ...
+    //          }
+    //      }
+    // }
     private LinearLayout parentLayout, containerLayout;
 
     private OnKeyListener editTextKeyListener;
 
-    /**
-     * 图片右上角删除按钮监听器
-     */
     private OnClickListener deleteListener;
 
     private OnFocusChangeListener focusListener;
@@ -119,32 +109,22 @@ public class SortRichEditor extends ScrollView implements IEditor {
     // a helper class to implement drag-and-sort
     private ViewDragHelper viewDragHelper;
 
-    /**
-     * 因为文字长短不一（过长换行让EditText高度增大），导致EditText高度不一，
-     * 所以需要一个集合存储排序之前未缩小/放大的EditText高度
-     */
+    // save the height of edit text
     private SparseIntArray editTextHeightArray = new SparseIntArray();
 
-    /**
-     * 准备排序时，缩小各个child，并存放缩小的child的top作为该child的position值
-     */
+    // before sorting, save the original 'top' value as the position of a child
     private SparseIntArray preSortPositionArray = new SparseIntArray();
 
-    /**
-     * 排序完成后，子child位置下标
-     */
+    // after sorting, the index of children
     private SparseIntArray indexArray = new SparseIntArray();
 
     private boolean isSort;
 
-    /**
-     * 容器相对于屏幕顶部和底部的长度值，用于排序拖动Child的时候判定ScrollView是否滚动
-     */
+    // the top and bottom of containerLayout in the screen
+    // it is intended to judge whether the scroll view needs to scroll when sorting
     private int containerTopVal, containerBottomVal;
 
-    /**
-     * 循环线程执行器，用于拖动view到边缘时ScrollView自动滚动功能
-     */
+    // use thread to implement auto scroll
     private ScheduledExecutorService scheduledExecutorService;
 
     private boolean isAutoScroll;
@@ -176,7 +156,6 @@ public class SortRichEditor extends ScrollView implements IEditor {
         dashDrawable.setColor(Color.parseColor("#ffffff"));
 
         imageLoader = ImageLoader.getInstance(3, ImageLoader.Type.LIFO);
-
         viewDragHelper = ViewDragHelper.create(containerLayout, 1.5f, new ViewDragHelperCallBack());
     }
 
@@ -203,7 +182,6 @@ public class SortRichEditor extends ScrollView implements IEditor {
 
         parentLayout.addView(titleLayout);
 
-        // 标题栏的ViewGroup中添加一个显示字数限制的提醒TextView(先创建，待先插入标题栏EditText之后再插入textLimit)
         final TextView textLimit = new TextView(getContext());
         textLimit.setText(getResources().getString(R.string.title_capacity,
                 0, TITLE_WORD_LIMIT_COUNT));
@@ -276,12 +254,12 @@ public class SortRichEditor extends ScrollView implements IEditor {
         // delete a media
         deleteListener = (v) -> {
             RelativeLayout parentView = (RelativeLayout) v.getParent();
-            onImageDeleteClick(parentView);
+            onMediaDeleteClick(parentView);
         };
 
         focusListener = (v, hasFocus) -> {
             if (v instanceof RelativeLayout) { // media
-                processSoftKeyBoard(false);
+                showOrHideKeyboard(false);
             } else if (v instanceof EditText) {
                 if (hasFocus) {
                     lastFocusEdit = (EditText) v;
@@ -290,15 +268,19 @@ public class SortRichEditor extends ScrollView implements IEditor {
         };
     }
 
+    private EditText getFirstText() {
+        EditText firstEdit = createEditText("Please Input");
+        editTextHeightArray.put(Integer.parseInt(firstEdit.getTag().toString()), ViewGroup.LayoutParams.WRAP_CONTENT);
+        editTextBackground = firstEdit.getBackground();
+        lastFocusEdit = firstEdit;
+        return firstEdit;
+    }
+
     private void initContainerLayout() {
         containerLayout = createContainer();
         parentLayout.addView(containerLayout);
 
-        EditText firstEdit = createEditText("Please Input");
-        editTextHeightArray.put(Integer.parseInt(firstEdit.getTag().toString()), ViewGroup.LayoutParams.WRAP_CONTENT);
-        editTextBackground = firstEdit.getBackground();
-        containerLayout.addView(firstEdit);
-        lastFocusEdit = firstEdit;
+        containerLayout.addView(getFirstText());
     }
 
     // stop the auto scroll of ScrollView
@@ -370,21 +352,19 @@ public class SortRichEditor extends ScrollView implements IEditor {
         return containerLayout;
     }
 
-    /**
-     * 获取排序之前子View的LayoutParams用于还原子View大小
-     */
+    // restore the size of child view
     private ViewGroup.LayoutParams resetChildLayoutParams(View child) {
         ViewGroup.LayoutParams layoutParams = child.getLayoutParams();
-        if (child instanceof RelativeLayout) { // 图片
-            layoutParams.height = DEFAULT_IMAGE_HEIGHT;
+        if (child instanceof RelativeLayout) { 
+            layoutParams.height = DEFAULT_MEDIA_HEIGHT;
         }
-        if (child instanceof EditText) { // 文本编辑框
+        if (child instanceof EditText) { 
             child.setFocusable(true);
             child.setFocusableInTouchMode(true);
             if (child == lastFocusEdit) {
                 child.requestFocus();
             }
-            child.setBackgroundDrawable(editTextBackground);
+            child.setBackground(editTextBackground);
             layoutParams.height = editTextHeightArray.get(Integer.parseInt(child.getTag().toString()));
         }
         return layoutParams;
@@ -396,7 +376,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
         if (isSort) {
             prepareSortUI();
             prepareSortConfig();
-            processSoftKeyBoard(false);
+            showOrHideKeyboard(false);
             int num = containerLayout.getChildCount();
             for (int i = 0; i < num; ++i) {
                 View itemView = containerLayout.getChildAt(i);
@@ -417,11 +397,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
         containerLayout.setLayoutTransition(mTransition);
     }
 
-    /**
-     * 开始图文排序
-     * 图片与文字段落高度缩小为默认高度{@link #SIZE_REDUCE_VIEW}
-     * 且图片与文字可以上下拖动
-     */
+    // start sort, reduce the height of media and text
     private void prepareSortUI() {
         int childCount = containerLayout.getChildCount();
 
@@ -430,31 +406,26 @@ public class SortRichEditor extends ScrollView implements IEditor {
         }
 
         List<View> removeChildList = new ArrayList<>();
-
         View child;
         int pos, preIndex = 0;
         for (int i = 0; i < childCount; ++i) {
             child = containerLayout.getChildAt(i);
-
             if (child instanceof ImageView) {
                 removeChildList.add(child);
                 continue;
             }
-
             if (child instanceof RelativeLayout) {
                 ((RelativeLayout) child).getChildAt(1).setVisibility(View.GONE);
                 setFocusOnView(child, false);
             }
-
             int tagID = Integer.parseInt(child.getTag().toString());
             ViewGroup.LayoutParams layoutParams = child.getLayoutParams();
-            if (child instanceof EditText) { // 文本编辑框
+            if (child instanceof EditText) {
                 EditText editText = ((EditText) child);
                 editTextHeightArray.put(tagID, layoutParams.height);
                 editText.setFocusable(false);
                 editText.setBackground(dashDrawable);
             }
-
             layoutParams.height = SIZE_REDUCE_VIEW;
             child.setLayoutParams(layoutParams);
             if (i == 0) {
@@ -462,54 +433,49 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 pos = DEFAULT_MARGIN;
             } else {
                 pos = SIZE_REDUCE_VIEW + DEFAULT_MARGIN + preSortPositionArray.get(preIndex);
-
                 preIndex = tagID;
             }
             preSortPositionArray.put(tagID, pos);
         }
 
-        if (!removeChildList.isEmpty()) { // 移除所有的“可编辑文本”图标
+        if (!removeChildList.isEmpty()) { // remove all placeholders
             for (View removeChild : removeChildList) {
                 containerLayout.removeView(removeChild);
             }
         }
     }
 
-    /**
-     * 结束图文排序，图片还原为默认高度{@link #DEFAULT_IMAGE_HEIGHT}，文字还原为原本高度
-     * （其文字排序前的高度值保存在{@link #editTextHeightArray}中）
-     * 且图片文字不再可以上下拖动
-     */
+    // end sorting, restore the original height
     private void endSortUI() {
-        int childCount = containerLayout.getChildCount();
-        View child;
-        if (indexArray.size() == childCount) { // 重新排列过
+        int num = containerLayout.getChildCount();
+        if (indexArray.size() == num) { // rearranged
             int sortIndex;
-            View[] childArray = new View[childCount];
-            // 1、先按重新排列的顺序调整子View的位置，放入数组childArray中
-            for (int i = 0; i < childCount; ++i) {
-                if (indexArray.size() != childCount) break;
-                // 代表原先在i的位置上的view，换到了sortIndex位置上
+            View[] childArray = new View[num];
+            // 1. adjust the positions of the children in the new order
+            // and put them into the array childArray.
+            for (int i = 0; i < num; ++i) {
+                // The view at position i was moved to position sortIndex
                 sortIndex = indexArray.get(i);
-                child = containerLayout.getChildAt(i);
+                View child = containerLayout.getChildAt(i);
                 childArray[sortIndex] = child;
             }
 
-            //2、依据顺序已排列好的childArray，插入一个“将来用于编辑文字的图片”
+            // 2. insert a placeholders according to the childArray
+            // that has been arranged in new order
             List<View> sortViewList = new ArrayList<>();
             View preChild = childArray[0];
             sortViewList.add(preChild);
-            for (int i = 1; i < childCount; ++i) {
-                child = childArray[i];
+            for (int i = 1; i < num; ++i) {
+                View child = childArray[i];
                 if (preChild instanceof RelativeLayout && child instanceof RelativeLayout) {
-                    ImageView placeholder = createInsertEditTextImageView();
+                    ImageView placeholder = createPlaceholder();
                     sortViewList.add(placeholder);
                 }
                 sortViewList.add(child);
                 preChild = child;
             }
 
-            // 3、依据顺序已排好并且“用于编辑文字的图片”也插入完毕的sortViewList，依次往containerLayout中添加子View
+            // 3, according to the new order add them to the containerLayout
             containerLayout.removeAllViews();
             for (View sortChild : sortViewList) {
                 if (sortChild instanceof RelativeLayout) {
@@ -520,25 +486,25 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 containerLayout.addView(sortChild);
             }
 
-        } else { // 没有重新排列
-            View preChild = containerLayout.getChildAt(childCount - 1);
+        } else {
+            View preChild = containerLayout.getChildAt(num - 1);
             preChild.setLayoutParams(resetChildLayoutParams(preChild));
-            for (int i = childCount - 2; i >= 0; i--) {
-                child = containerLayout.getChildAt(i);
+            for (int i = num - 2; i >= 0; i--) {
+                View child = containerLayout.getChildAt(i);
                 if (child instanceof RelativeLayout) {
                     ((RelativeLayout) child).getChildAt(1).setVisibility(View.VISIBLE);
                     setFocusOnView(child, true);
                 }
-                // 紧邻的两个View都是ImageView
+                // The two adjacent views are both image view, need a placeholder
                 if (preChild instanceof RelativeLayout && child instanceof RelativeLayout) {
-                    insertEditTextImageView(i + 1);
+                    insertPlaceholder(i + 1);
                 }
                 child.setLayoutParams(resetChildLayoutParams(child));
                 preChild = child;
             }
         }
 
-        // 如果最后一个View不是EditText,那么再添加一个EditText
+        // if the last view is not an edit text, add one
         int lastIndex = containerLayout.getChildCount() - 1;
         View view = containerLayout.getChildAt(lastIndex);
         if (!(view instanceof EditText)) {
@@ -546,35 +512,25 @@ public class SortRichEditor extends ScrollView implements IEditor {
         }
     }
 
-    /**
-     * 处理软键盘backSpace回退事件
-     *
-     * @param editTxt 光标所在的文本输入框
-     */
     private void onBackspacePress(EditText editTxt) {
         int startSelection = editTxt.getSelectionStart();
-        // 只有在光标已经顶到文本输入框的最前方，在判定是否删除之前的图片，或两个View合并
-        if (startSelection == 0) {
+        if (startSelection == 0) { // the cursor is at 0, now deleted the view before it
             int editIndex = containerLayout.indexOfChild(editTxt);
-            View preView = containerLayout.getChildAt(editIndex - 1); // 如果editIndex-1<0,
-            // 则返回的是null
-            if (null != preView) {
-                if (preView instanceof RelativeLayout || preView instanceof ImageView) {
-                    // 光标EditText的上一个view对应的是图片或者是一个“将来可编辑文本”的图标
-                    onImageDeleteClick(preView);
-                } else if (preView instanceof EditText) {
-                    // 光标EditText的上一个view对应的还是文本框EditText
+            if (editIndex >= 1) {
+                View pre = containerLayout.getChildAt(editIndex - 1);
+                if (pre instanceof RelativeLayout || pre instanceof ImageView) {
+                    onMediaDeleteClick(pre);
+                } else if (pre instanceof EditText) { // concat content of the two text views
                     String str1 = editTxt.getText().toString();
-                    EditText preEdit = (EditText) preView;
+                    EditText preEdit = (EditText) pre;
                     String str2 = preEdit.getText().toString();
 
-                    // 合并文本view时，不需要transition动画
                     containerLayout.setLayoutTransition(null);
                     containerLayout.removeView(editTxt);
-                    containerLayout.setLayoutTransition(mTransition); // 恢复transition动画
+                    containerLayout.setLayoutTransition(mTransition); 
 
-                    // 文本合并
-                    preEdit.setText(str2 + str1);
+                    // hack android studio's check(it gives a warning for str2 + str1)
+                    preEdit.setText(str2.concat(str1));
                     preEdit.requestFocus();
                     preEdit.setSelection(str2.length(), str2.length());
                     lastFocusEdit = preEdit;
@@ -583,22 +539,22 @@ public class SortRichEditor extends ScrollView implements IEditor {
         }
     }
 
-    /**
-     * 处理图片删除击事件
-     *
-     * @param view 整个image对应的relativeLayout view
-     */
-    private void onImageDeleteClick(View view) {
+    // delete the view containing media(triggered by the delete button)
+    // @param view is the whole RelativeLayout
+    private void onMediaDeleteClick(View view) {
         if (!mTransition.isRunning()) {
             int index = containerLayout.indexOfChild(view);
             int nextIndex = index + 1;
             int lastIndex = index - 1;
 
             View child;
-            if (index == 0) { // 删除图片位于第一个位置，只检查下一个位置的View是否为“可编辑文本”的图标
+            if (index == 0) {
+                // the media is at position 0
+                // only need to check if the view in nextIndex is a placeholder
                 child = containerLayout.getChildAt(nextIndex);
             } else {
-                // 先检查上一个位置的View是否为“可编辑文本”的图标，如果不是就检查下一个位置的View
+                // the media is not at position 0
+                // need to check last and next
                 child = containerLayout.getChildAt(lastIndex);
                 if (!(child instanceof ImageView)) {
                     child = containerLayout.getChildAt(nextIndex);
@@ -606,18 +562,15 @@ public class SortRichEditor extends ScrollView implements IEditor {
             }
 
             if (child instanceof ImageView) {
-                // 如果该View是“可编辑文本”的图标，则一并删除
+                // if the view here is a placeholder, delete it together
                 containerLayout.removeView(child);
             }
             containerLayout.removeView(view);
         }
     }
 
-    /**
-     * 生成一个“将来用于编辑文字的图片”ImageView
-     * 只是一个占位用的图片
-     */
-    private ImageView createInsertEditTextImageView() {
+    // the placeholder between two media, for future text insert
+    private ImageView createPlaceholder() {
         final ImageView placeholder = new ImageView(getContext());
         placeholder.setTag(viewTagID++);
         placeholder.setImageResource(R.mipmap.icon_add_text);
@@ -631,7 +584,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
             editText.setFocusableInTouchMode(true);
             editText.requestFocus();
             lastFocusEdit = editText;
-            processSoftKeyBoard(true);
+            showOrHideKeyboard(true);
         });
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
@@ -685,7 +638,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
         closeImage.setOnClickListener(deleteListener);
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LayoutParams.MATCH_PARENT, DEFAULT_IMAGE_HEIGHT);
+                LayoutParams.MATCH_PARENT, DEFAULT_MEDIA_HEIGHT);
         lp.bottomMargin = DEFAULT_MARGIN;
         lp.leftMargin = DEFAULT_MARGIN;
         lp.rightMargin = DEFAULT_MARGIN;
@@ -728,7 +681,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
             lastFocusEdit = (EditText) firstView;
             lastFocusEdit.setHint("");
         }
-        if (isSort) { // 如果是排序模式，需要退出排序模式
+        if (isSort) {
             isSort = false;
             endSortUI();
             containerLayout.setLayoutTransition(mTransition);
@@ -742,10 +695,11 @@ public class SortRichEditor extends ScrollView implements IEditor {
         int lastEditIndex = containerLayout.indexOfChild(lastFocusEdit);
 
         if (lastEditStr.length() == 0 || lastStr.length() == 0) {
-            // 如果EditText为空，或者光标已经顶在了editText的最前面，则直接插入图片，并且EditText下移即可
+            // If the edit text is empty, or the cursor is at 0
+            // insert the image directly, and the edit text can be moved down.
             indexInsert.accept(lastEditIndex);
         } else {
-            // 如果EditText非空且光标不在最顶端，则需要添加新的imageView和EditText
+            // or the edit text needs to be split
             lastFocusEdit.setText(lastStr);
             String editStr2 = lastEditStr.substring(cursorIndex).trim();
             if (containerLayout.getChildCount() - 1 == lastEditIndex || editStr2.length() > 0) {
@@ -755,7 +709,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
             }
             indexInsert.accept(lastEditIndex + 1);
         }
-        processSoftKeyBoard(false);
+        showOrHideKeyboard(false);
     }
 
     private void insertPicture(final String picturePath) {
@@ -771,12 +725,12 @@ public class SortRichEditor extends ScrollView implements IEditor {
             View currChild = containerLayout.getChildAt(index);
             // a placeholder for future text inset
             if (currChild instanceof RelativeLayout) {
-                insertEditTextImageView(index);
+                insertPlaceholder(index);
             }
             int lastIndex = index - 1;
             View child = containerLayout.getChildAt(lastIndex);
             if (child instanceof RelativeLayout) {
-                insertEditTextImageView(index++);
+                insertPlaceholder(index++);
             }
         }
         containerLayout.addView(mediaLayout, index);
@@ -785,30 +739,27 @@ public class SortRichEditor extends ScrollView implements IEditor {
     private void insertPictureAtIndex(int index, String picturePath) {
         final RelativeLayout pictureLayout = createPictureLayout();
         ImageView imageView = (ImageView) pictureLayout.getChildAt(0);
-        PointF pointF = new PointF(getWidth() - 2 * DEFAULT_MARGIN, DEFAULT_IMAGE_HEIGHT);
+        PointF pointF = new PointF(getWidth() - 2 * DEFAULT_MARGIN, DEFAULT_MEDIA_HEIGHT);
         imageLoader.loadImage(picturePath, imageView, pointF);
         imageView.setTag(picturePath);
 
         insertMediaAtIndex(index, pictureLayout);
     }
 
+
     private void insertVideoAtIndex(int index, String videoPath) {
         RelativeLayout videoLayout = createVideoLayout();
         JzvdStd video = (JzvdStd) videoLayout.getChildAt(0);
         video.setUp(videoPath, "", Jzvd.SCREEN_WINDOW_LIST);
         video.setTag(videoPath);
+        new ThumbnailLoader(video.thumbImageView).execute(videoPath);
         insertMediaAtIndex(index, videoLayout);
     }
 
-    /**
-     * 隐藏或者显示软键盘
-     *
-     * @param isShow true:显示，false:隐藏
-     */
-    public void processSoftKeyBoard(boolean isShow) {
+    public void showOrHideKeyboard(boolean show) {
         InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
         if (imm != null) {
-            if (isShow) {
+            if (show) {
                 imm.showSoftInput(lastFocusEdit, InputMethodManager.SHOW_FORCED);
             } else {
                 imm.hideSoftInputFromWindow(lastFocusEdit.getWindowToken(), 0);
@@ -816,20 +767,11 @@ public class SortRichEditor extends ScrollView implements IEditor {
         }
     }
 
-    /**
-     * 添加一个“将来用于编辑文字的图片”
-     */
-    private void insertEditTextImageView(int index) {
-        ImageView placeholder = createInsertEditTextImageView();
+    private void insertPlaceholder(int index) {
+        ImageView placeholder = createPlaceholder();
         containerLayout.addView(placeholder, index);
     }
 
-    /**
-     * 在指定位置插入EditText
-     *
-     * @param index   位置
-     * @param editStr EditText显示的文字
-     */
     private EditText insertEditTextAtIndex(final int index, String editStr) {
         EditText editText = createEditText("");
         editText.setText(editStr);
@@ -840,9 +782,6 @@ public class SortRichEditor extends ScrollView implements IEditor {
         return editText;
     }
 
-    /**
-     * 初始化transition动画
-     */
     private void setupLayoutTransitions(LinearLayout containerLayout) {
         mTransition = new LayoutTransition();
         containerLayout.setLayoutTransition(mTransition);
@@ -860,14 +799,8 @@ public class SortRichEditor extends ScrollView implements IEditor {
         int[] position = new int[2];
         getLocationOnScreen(position);
 
-        SortRichEditor sortRichEditor = SortRichEditor.this;
-        containerTopVal = position[1] + sortRichEditor.getPaddingTop() + SCROLL_OFFSET;
-        containerBottomVal = containerTopVal + sortRichEditor.getHeight() - sortRichEditor.getPaddingBottom() - SCROLL_OFFSET;
-    }
-
-    @Override
-    protected void onScrollChanged(int l, int t, int oldl, int oldt) {
-        super.onScrollChanged(l, t, oldl, oldt);
+        containerTopVal = position[1] + getPaddingTop() + SCROLL_OFFSET;
+        containerBottomVal = containerTopVal + getHeight() - getPaddingBottom() - SCROLL_OFFSET;
     }
 
     @Override
@@ -884,27 +817,32 @@ public class SortRichEditor extends ScrollView implements IEditor {
             case MotionEvent.ACTION_DOWN:
                 preY = ev.getY();
                 break;
+            case MotionEvent.ACTION_UP:
+                performClick();
+                break;
             case MotionEvent.ACTION_MOVE:
+                // finger moving up, trigger the keyboard
                 if (Math.abs(ev.getY() - preY) >= viewDragHelper.getTouchSlop()) {
-                    processSoftKeyBoard(false);
+                    showOrHideKeyboard(false);
                 }
                 break;
         }
         return super.onTouchEvent(ev);
     }
 
-    /**
-     * 重新排列Child的位置，更新{@link #indexArray} 中view的下标顺序
-     */
+    @Override
+    public boolean performClick() {
+        return super.performClick();
+    }
+
+    // update the indexArray according to current child position
     private void resetChildPosition() {
         indexArray.clear();
-        View child;
-        int tagID, sortIndex;
-        int childCount = containerLayout.getChildCount();
-        for (int i = 0; i < childCount; ++i) {
-            child = containerLayout.getChildAt(i);
-            tagID = Integer.parseInt(child.getTag().toString());
-            sortIndex = (preSortPositionArray.get(tagID) - DEFAULT_MARGIN) / (SIZE_REDUCE_VIEW + DEFAULT_MARGIN);
+        int num = containerLayout.getChildCount();
+        for (int i = 0; i < num; ++i) {
+            View child = containerLayout.getChildAt(i);
+            int tagID = Integer.parseInt(child.getTag().toString());
+            int sortIndex = (preSortPositionArray.get(tagID) - DEFAULT_MARGIN) / (SIZE_REDUCE_VIEW + DEFAULT_MARGIN);
             indexArray.put(i, sortIndex);
         }
     }
@@ -928,17 +866,23 @@ public class SortRichEditor extends ScrollView implements IEditor {
 
     @Override
     public void loadNote(Note note) {
-        // TODO items may be out of order
         title.setText(note.getTitle());
+        containerLayout.removeAllViews();
         List<IData> content = note.getContent();
-        for (int i = 0; i < content.size(); ++i) {
-            IData data = content.get(i);
+        for (IData data : content) {
+            int currentChild = containerLayout.getChildCount();
             if (data instanceof TextData) {
-                insertEditTextAtIndex(i, ((TextData) data).getText());
+                insertEditTextAtIndex(currentChild, ((TextData) data).getText());
             } else if (data instanceof PictureData) {
-                insertPictureAtIndex(i, ((PictureData) data).getPicturePath());
+                insertPictureAtIndex(currentChild, ((PictureData) data).getPicturePath());
             } else if (data instanceof VideoData) {
-                insertVideoAtIndex(i, ((VideoData) data).getVideoPath());
+                insertVideoAtIndex(currentChild, ((VideoData) data).getVideoPath());
+            }
+        }
+        if (containerLayout.getChildCount() != 0) {
+            View lastChild = containerLayout.getChildAt(containerLayout.getChildCount() - 1);
+            if (!(lastChild instanceof EditText)) {
+                containerLayout.addView(getFirstText());
             }
         }
     }
@@ -992,7 +936,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
         }
 
         @Override
-        public void onViewReleased(@NonNull View releasedChild, float xvel, float yvel) {
+        public void onViewReleased(@NonNull View releasedChild, float xVel, float yVel) {
             int releasedViewID = Integer.parseInt(releasedChild.getTag().toString());
             int releasedViewPos = preSortPositionArray.get(releasedViewID);
             viewDragHelper.settleCapturedViewAt(releasedChild.getLeft(), releasedViewPos);
