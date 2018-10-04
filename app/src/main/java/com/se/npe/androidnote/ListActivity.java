@@ -14,6 +14,7 @@ public class ListActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        this.setTitle(this.getResources().getString(R.string.list_title));
         setContentView(R.layout.activity_list);
     }
 }
