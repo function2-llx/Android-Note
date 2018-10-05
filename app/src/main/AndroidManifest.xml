@@ -30,11 +30,12 @@
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
-        <activity android:name=".temporary.VideoActivity">
+        <activity android:name=".SoundRecorderActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
-    </application>
 
+        <service android:name=".sound.RecordingService" />
+    </application>
 </manifest>

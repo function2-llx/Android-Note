@@ -3,7 +3,6 @@ package com.se.npe.androidnote.editor;
 import android.animation.LayoutTransition;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.PointF;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -13,6 +12,7 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -32,6 +32,7 @@ import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.interfaces.IEditor;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.PictureData;
+import com.se.npe.androidnote.models.SoundData;
 import com.se.npe.androidnote.models.TextData;
 import com.se.npe.androidnote.models.VideoData;
 
@@ -48,9 +49,6 @@ import cn.jzvd.JzvdStd;
 public class SortRichEditor extends ScrollView implements IEditor {
     private static final int TITLE_WORD_LIMIT_COUNT = 30;
 
-    // height of an image
-    private final int DEFAULT_MEDIA_HEIGHT = dip2px(170);
-
     // when sorting, the default height that text and media reduce to
     private final int SIZE_REDUCE_VIEW = dip2px(75);
 
@@ -64,7 +62,28 @@ public class SortRichEditor extends ScrollView implements IEditor {
     private final int DEFAULT_SCROLL_SPEED = dip2px(15);
 
     // the dash line marking a text out when sorting
-    private final GradientDrawable dashDrawable;
+    private final GradientDrawable dashDrawable = new GradientDrawable() {{
+        setStroke(dip2px(1), Color.parseColor("#4CA4E9"), dip2px(4), dip2px(3));
+        setColor(Color.parseColor("#ffffff"));
+    }};
+
+    private final int DEFAULT_VIDEO_HEIGHT = dip2px(160);
+
+    private final RelativeLayout.LayoutParams PICTURE_LAYOUT_PARAM
+            = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT) {{
+        bottomMargin = DEFAULT_MARGIN;
+        leftMargin = DEFAULT_MARGIN;
+        rightMargin = DEFAULT_MARGIN;
+    }};
+
+    // due to the bug? of Jzvd player, video cannot have dynamic height
+    // i.e. WRAP_CONTENT cannot be used
+    private final RelativeLayout.LayoutParams VIDEO_LAYOUT_PARAM
+            = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, DEFAULT_VIDEO_HEIGHT) {{
+        bottomMargin = DEFAULT_MARGIN;
+        leftMargin = DEFAULT_MARGIN;
+        rightMargin = DEFAULT_MARGIN;
+    }};
 
     // save the background of edit text before sorting(because sorting will change it)
     private Drawable editTextBackground;
@@ -103,8 +122,6 @@ public class SortRichEditor extends ScrollView implements IEditor {
 
     // the animation when adding or deleting media
     private LayoutTransition mTransition;
-
-    private ImageLoader imageLoader;
 
     // a helper class to implement drag-and-sort
     private ViewDragHelper viewDragHelper;
@@ -151,11 +168,6 @@ public class SortRichEditor extends ScrollView implements IEditor {
         initLineView();
         initContainerLayout();
 
-        dashDrawable = new GradientDrawable();
-        dashDrawable.setStroke(dip2px(1), Color.parseColor("#4CA4E9"), dip2px(4), dip2px(3));
-        dashDrawable.setColor(Color.parseColor("#ffffff"));
-
-        imageLoader = ImageLoader.getInstance(3, ImageLoader.Type.LIFO);
         viewDragHelper = ViewDragHelper.create(containerLayout, 1.5f, new ViewDragHelperCallBack());
     }
 
@@ -355,10 +367,14 @@ public class SortRichEditor extends ScrollView implements IEditor {
     // restore the size of child view
     private ViewGroup.LayoutParams resetChildLayoutParams(View child) {
         ViewGroup.LayoutParams layoutParams = child.getLayoutParams();
-        if (child instanceof RelativeLayout) { 
-            layoutParams.height = DEFAULT_MEDIA_HEIGHT;
+        if (child instanceof RelativeLayout) {
+            if ((((RelativeLayout) child).getChildAt(0)) instanceof ImageView) {
+                layoutParams.height = LayoutParams.WRAP_CONTENT;
+            } else {
+                layoutParams.height = DEFAULT_VIDEO_HEIGHT;
+            }
         }
-        if (child instanceof EditText) { 
+        if (child instanceof EditText) {
             child.setFocusable(true);
             child.setFocusableInTouchMode(true);
             if (child == lastFocusEdit) {
@@ -527,7 +543,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
 
                     containerLayout.setLayoutTransition(null);
                     containerLayout.removeView(editTxt);
-                    containerLayout.setLayoutTransition(mTransition); 
+                    containerLayout.setLayoutTransition(mTransition);
 
                     // hack android studio's check(it gives a warning for str2 + str1)
                     preEdit.setText(str2.concat(str1));
@@ -617,7 +633,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
         return editText;
     }
 
-    private RelativeLayout createMediaLayout(View media) {
+    private RelativeLayout createMediaLayout(View media, RelativeLayout.LayoutParams params) {
         RelativeLayout.LayoutParams closeImageLp = new RelativeLayout.LayoutParams(
                 LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         closeImageLp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
@@ -637,12 +653,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
         closeImage.setTag(layout.getTag());
         closeImage.setOnClickListener(deleteListener);
 
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LayoutParams.MATCH_PARENT, DEFAULT_MEDIA_HEIGHT);
-        lp.bottomMargin = DEFAULT_MARGIN;
-        lp.leftMargin = DEFAULT_MARGIN;
-        lp.rightMargin = DEFAULT_MARGIN;
-        layout.setLayoutParams(lp);
+        layout.setLayoutParams(params);
         return layout;
     }
 
@@ -653,7 +664,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
         imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         imageView.setLayoutParams(contentImageLp);
         imageView.setImageResource(R.mipmap.icon_empty_photo);
-        return createMediaLayout(imageView);
+        return createMediaLayout(imageView, PICTURE_LAYOUT_PARAM);
     }
 
     private RelativeLayout createVideoLayout() {
@@ -661,7 +672,15 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         JzvdStd video = new JzvdStd(getContext());
         video.setLayoutParams(contentImageLp);
-        return createMediaLayout(video);
+        return createMediaLayout(video, VIDEO_LAYOUT_PARAM);
+    }
+
+    private RelativeLayout createSoundLayout() {
+        RelativeLayout.LayoutParams contentImageLp = new RelativeLayout.LayoutParams(
+                LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
+        SoundPlayer soundPlayer = new SoundPlayer(getContext());
+        soundPlayer.setLayoutParams(contentImageLp);
+        return createMediaLayout(soundPlayer, VIDEO_LAYOUT_PARAM);
     }
 
     private void setFocusOnView(View view, boolean isFocusable) {
@@ -712,14 +731,6 @@ public class SortRichEditor extends ScrollView implements IEditor {
         showOrHideKeyboard(false);
     }
 
-    private void insertPicture(final String picturePath) {
-        insertMedia((index) -> insertPictureAtIndex(index, picturePath));
-    }
-
-    private void insertVideo(final String videoPath) {
-        insertMedia((index) -> insertVideoAtIndex(index, videoPath));
-    }
-
     private void insertMediaAtIndex(int index, RelativeLayout mediaLayout) {
         if (index > 0) {
             View currChild = containerLayout.getChildAt(index);
@@ -739,10 +750,8 @@ public class SortRichEditor extends ScrollView implements IEditor {
     private void insertPictureAtIndex(int index, String picturePath) {
         final RelativeLayout pictureLayout = createPictureLayout();
         ImageView imageView = (ImageView) pictureLayout.getChildAt(0);
-        PointF pointF = new PointF(getWidth() - 2 * DEFAULT_MARGIN, DEFAULT_MEDIA_HEIGHT);
-        imageLoader.loadImage(picturePath, imageView, pointF);
         imageView.setTag(picturePath);
-
+        new PictureLoader(imageView, getWidth()).execute(picturePath);
         insertMediaAtIndex(index, pictureLayout);
     }
 
@@ -754,6 +763,14 @@ public class SortRichEditor extends ScrollView implements IEditor {
         video.setTag(videoPath);
         new ThumbnailLoader(video.thumbImageView).execute(videoPath);
         insertMediaAtIndex(index, videoLayout);
+    }
+
+    private void insertSoundAtIndex(int index, String soundPath) {
+        RelativeLayout soundLayout = createSoundLayout();
+        SoundPlayer soundPlayer = (SoundPlayer) soundLayout.getChildAt(0);
+        soundPlayer.setUp(soundPath, "", Jzvd.SCREEN_WINDOW_LIST);
+        soundPlayer.setTag(soundPath);
+        insertMediaAtIndex(index, soundLayout);
     }
 
     public void showOrHideKeyboard(boolean show) {
@@ -850,18 +867,19 @@ public class SortRichEditor extends ScrollView implements IEditor {
     @Override
     public void addPicture(String picturePath) {
         prepareAddMedia();
-        insertPicture(picturePath);
+        insertMedia((index) -> insertPictureAtIndex(index, picturePath));
     }
 
     @Override
     public void addVideo(String videoPath) {
         prepareAddMedia();
-        insertVideo(videoPath);
+        insertMedia((index) -> insertVideoAtIndex(index, videoPath));
     }
 
     @Override
     public void addSound(String soundPath) {
-        // TODO
+        prepareAddMedia();
+        insertMedia((index) -> insertSoundAtIndex(index, soundPath));
     }
 
     @Override
@@ -877,6 +895,8 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 insertPictureAtIndex(currentChild, ((PictureData) data).getPicturePath());
             } else if (data instanceof VideoData) {
                 insertVideoAtIndex(currentChild, ((VideoData) data).getVideoPath());
+            } else if (data instanceof SoundData) {
+                insertSoundAtIndex(currentChild, ((SoundData) data).getSoundPath());
             }
         }
         if (containerLayout.getChildCount() != 0) {
@@ -907,7 +927,11 @@ public class SortRichEditor extends ScrollView implements IEditor {
                     BitmapDrawable bitmapDrawable = (BitmapDrawable) item.getDrawable();
                     data = new PictureData(item.getTag().toString(), bitmapDrawable.getBitmap());
                 } else if (view instanceof JzvdStd) {
-                    data = new VideoData(view.getTag().toString());
+                    if (view instanceof SoundPlayer) {
+                        data = new SoundData(view.getTag().toString(),"");
+                    } else {
+                        data = new VideoData(view.getTag().toString());
+                    }
                 }
             }
             if (data != null) {
@@ -925,8 +949,8 @@ public class SortRichEditor extends ScrollView implements IEditor {
 
         @Override
         public int clampViewPositionHorizontal(@NonNull View child, int left, int dx) {
-            final int leftBound = getPaddingLeft() + DEFAULT_MARGIN;
-            final int rightBound = getWidth() - child.getWidth() - leftBound;
+            int leftBound = getPaddingLeft() + DEFAULT_MARGIN;
+            int rightBound = getWidth() - child.getWidth() - leftBound;
             return Math.min(Math.max(left, leftBound), rightBound);
         }
 
