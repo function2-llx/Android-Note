@@ -13,11 +13,16 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
+import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.models.Note;
+import com.se.npe.androidnote.temporary.VideoActivity;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private Note selectedNote;
@@ -62,18 +67,47 @@ public class MainActivity extends AppCompatActivity {
         if (note == selectedNote) { // the note sent by self
             return;
         }
-        if (note != null) {
-            Toast.makeText(this, "get a note from editor, title = " + note.getTitle(), Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(this, "get a null note", Toast.LENGTH_SHORT).show();
-        }
+        Toast.makeText(this, "get a note from editor, title = " + note.getTitle(), Toast.LENGTH_SHORT).show();
+        selectedNote = note;
     }
 
     private void initListener() {
-
+        findViewById(R.id.launch_list_activity).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, ListActivity.class);
+                startActivity(intent);
+            }
+        });
+        findViewById(R.id.launch_editor_activity).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                startActivity(intent);
+            }
+        });
+        findViewById(R.id.launch_editor_activity_with_old_note).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // in the real app, generateNoteForTest() will be replaced by the selected note in the list
+                selectedNote = generateNoteForTest();
+                EventBus.getDefault().postSticky(selectedNote);
+                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                startActivity(intent);
+            }
+        });
+        findViewById(R.id.launch_video_activity).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainActivity.this, VideoActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 
     private Note generateNoteForTest() {
-        return new Note("hello from MainActivity", null);
+        if (selectedNote == null)
+            return new Note("hello from MainActivity", new ArrayList<IData>());
+        return selectedNote;
     }
 }

@@ -12,4 +12,12 @@ import com.se.npe.androidnote.interfaces.IData;
 
 public class TextData implements IData{
     private String text;
+
+    public TextData(String text) {
+        this.text = text;
+    }
+
+    public String getText() {
+        return text;
+    }
 }
