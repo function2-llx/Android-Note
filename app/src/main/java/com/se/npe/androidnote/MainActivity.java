@@ -8,6 +8,9 @@ import android.text.TextUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,6 +21,7 @@ import org.greenrobot.eventbus.Subscribe;
 
 public class MainActivity extends AppCompatActivity {
     private Note selectedNote;
+    private ListView noteList;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -30,10 +34,10 @@ public class MainActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item)
     {
         switch (item.getItemId()) {
-            case R.id.newNote: {
-                Intent intent = new Intent(this, EditorActivity.class);
+            case R.id.menu_list: {
+                System.err.println("test");
+                Intent intent = new Intent(MainActivity.this, ListActivity.class);
                 startActivity(intent);
-                break;
             }
         }
         return super.onOptionsItemSelected(item);
@@ -44,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initListener();
-        EventBus.getDefault().register(this);
     }
 
     @Override
@@ -67,39 +70,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void initListener() {
-        findViewById(R.id.floatingActionButton2).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v)
-            {
-                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
-                startActivity(intent);
-            }
-        });
 
-        findViewById(R.id.launch_list_activity).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, ListActivity.class);
-                startActivity(intent);
-            }
-        });
-        findViewById(R.id.launch_editor_activity).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
-                startActivity(intent);
-            }
-        });
-        findViewById(R.id.launch_editor_activity_with_old_note).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // in the real app, generateNoteForTest() will be replaced by the selected note in the list
-                selectedNote = generateNoteForTest();
-                EventBus.getDefault().postSticky(selectedNote);
-                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 
     private Note generateNoteForTest() {

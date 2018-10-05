@@ -25,9 +25,6 @@ public class EditorActivity extends AppCompatActivity {
         EventBus.getDefault().register(this);
     }
 
-
-
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
