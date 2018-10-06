@@ -14,4 +14,5 @@
     <string name="sort_title">Sort by title</string>
     <string name="sort_remind">Sort by remind data</string>
 
+    <string name="title_capacity">%d/%d</string>
 </resources>
