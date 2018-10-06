@@ -1,15 +1,10 @@
 package com.se.npe.androidnote.sound;
 
-import android.app.Notification;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.app.Service;
-import android.content.Context;
 import android.content.Intent;
 import android.media.MediaRecorder;
 import android.os.Environment;
 import android.os.IBinder;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.se.npe.androidnote.R;
@@ -28,20 +23,25 @@ import java.util.TimerTask;
 public class RecordingService extends Service {
     public static final String OUTPUT_DIR =
             Environment.getExternalStorageDirectory().getAbsolutePath() + "/AndroidNote/";
-    //    public static final String OUTPUT_PATH = OUTPUT_DIR + "out.mp4";
-    private static int currentFile = 0;
+    public static final String START_RECORDING = "StartRecording";
+    public static final String AHEAD_TIME = "AheadTime"; // how long the user record ahead of time
+    public static final String STARTED_TIME = "StartTime"; // how long EditorActivity start the service
+    public static final String SOUND_PATH = "SoundPath";
+
+    private static int currentFile = 1;
     private static final String LOG_TAG = "RecordingService";
 
     private MediaRecorder mRecorder = null;
 
     private long mStartingTimeMillis = 0;
     private int mElapsedSeconds = 0;
-    private OnTimerChangedListener onTimerChangedListener = null;
     private static final SimpleDateFormat mTimerFormat = new SimpleDateFormat("mm:ss", Locale.getDefault());
 
-    private TimerTask mIncrementTimerTask = null;
-
     private long cropTime = 0;
+
+    // always save the recording file at 0.mp4
+    // when a request comes, crop a part of 0.mp4
+    private static String TEMP_OUTPUT_PATH = OUTPUT_DIR + 0 + ".mp4";
 
     public static String getOutputPath() {
         return OUTPUT_DIR + currentFile + ".mp4";
@@ -52,16 +52,12 @@ public class RecordingService extends Service {
         return null;
     }
 
-    public interface OnTimerChangedListener {
-        void onTimerChanged(int seconds);
-    }
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-        if (intent.hasExtra("StartRecording")) { // initial record
+        if (intent.hasExtra(START_RECORDING)) { // initial record
             startRecording();
         } else { // half way request
-            int startTime = intent.getIntExtra("StartTime", 0);
+            int startTime = intent.getIntExtra(AHEAD_TIME, 0);
             long current = System.currentTimeMillis();
             cropTime = Math.max(0, current - mStartingTimeMillis - startTime * 1000);
         }
@@ -89,18 +85,25 @@ public class RecordingService extends Service {
         super.onDestroy();
     }
 
-    private void findValidPath() {
+    private void findValid() {
         File f;
         while ((f = new File(getOutputPath())).exists())
             ++currentFile;
     }
 
+    private void removePrev() {
+        File dirs = new File(TEMP_OUTPUT_PATH);
+        if (dirs.exists()) {
+            dirs.delete();
+        }
+    }
+
     public void startRecording() {
-        findValidPath();
+        removePrev();
         mRecorder = new MediaRecorder();
         mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
         mRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        mRecorder.setOutputFile(getOutputPath());
+        mRecorder.setOutputFile(TEMP_OUTPUT_PATH);
         mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
         mRecorder.setAudioChannels(1);
         try {
@@ -113,43 +116,11 @@ public class RecordingService extends Service {
     }
 
     public void stopRecording() {
-//        mRecorder
+        // TODO don't release it
         mRecorder.stop();
+        mRecorder.pause();
         mRecorder.release();
         //remove notification
-        if (mIncrementTimerTask != null) {
-            mIncrementTimerTask.cancel();
-            mIncrementTimerTask = null;
-        }
         mRecorder = null;
-    }
-
-    private void startTimer() {
-        Timer timer = new Timer();
-        mIncrementTimerTask = new TimerTask() {
-            @Override
-            public void run() {
-                mElapsedSeconds++;
-                if (onTimerChangedListener != null)
-                    onTimerChangedListener.onTimerChanged(mElapsedSeconds);
-                NotificationManager mgr = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-                mgr.notify(1, createNotification());
-            }
-        };
-        timer.scheduleAtFixedRate(mIncrementTimerTask, 1000, 1000);
-    }
-
-    private Notification createNotification() {
-        NotificationCompat.Builder mBuilder =
-                new NotificationCompat.Builder(getApplicationContext())
-                        .setSmallIcon(R.drawable.ic_mic_white_36dp)
-                        .setContentTitle(getString(R.string.notification_recording))
-                        .setContentText(mTimerFormat.format(mElapsedSeconds * 1000))
-                        .setOngoing(true);
-
-        mBuilder.setContentIntent(PendingIntent.getActivities(getApplicationContext(), 0,
-                new Intent[]{new Intent(getApplicationContext(), SoundRecorderActivity.class)}, 0));
-
-        return mBuilder.build();
     }
 }

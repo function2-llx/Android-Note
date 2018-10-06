@@ -10,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.WindowManager;
 import android.widget.Chronometer;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.se.npe.androidnote.sound.RecordingService;
@@ -27,7 +28,7 @@ public class SoundRecorderActivity extends AppCompatActivity {
     private Chronometer mChronometer = null;
 
     Intent consumerIntent;
-    int startTime;
+    int aheadTime;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -46,11 +47,17 @@ public class SoundRecorderActivity extends AppCompatActivity {
 
         final String[] text = {"1 min ago", "30s ago", "now"};
         final int[] time = {60, 30, 0};
+        final int startedTime = consumerIntent.getIntExtra(RecordingService.STARTED_TIME, 0);
         new AlertDialog.Builder(this)
                 .setIcon(R.drawable.ic_launcher)
-                .setTitle("Start time")
+                .setTitle("Ahead time")
                 .setSingleChoiceItems(text, 2, (dialog, which) -> {
-                    startTime = time[which];
+                    if (startedTime < time[which]) {
+                        Toast.makeText(SoundRecorderActivity.this, "Haven't recorded that long",
+                                Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                    aheadTime = time[which];
                     onRecord(mStartRecording);
                     mStartRecording = !mStartRecording;
                     dialog.cancel();
@@ -83,7 +90,7 @@ public class SoundRecorderActivity extends AppCompatActivity {
             });
 
             //start RecordingService
-            intent.putExtra("StartTime", startTime);
+            intent.putExtra(RecordingService.AHEAD_TIME, aheadTime);
             startService(intent);
             //keep screen on while recording
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -102,7 +109,7 @@ public class SoundRecorderActivity extends AppCompatActivity {
             //allow the screen to turn off again once recording is finished
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-            consumerIntent.putExtra("SoundPath", RecordingService.getOutputPath());
+            consumerIntent.putExtra(RecordingService.SOUND_PATH, RecordingService.getOutputPath());
             setResult(RESULT_CODE, consumerIntent);
             finish();
         }
