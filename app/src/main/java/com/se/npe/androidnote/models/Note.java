@@ -33,12 +33,16 @@ public class Note {
     private String title;
     private List<IData> content;
 
+    static int tot;
+    final int id;
+
     public Note()
     {
-
+        this.id = tot++;
     }
 
     public Note(String title, List<IData> content) {
+        this.id = tot++;
         this.title = title;
         this.content = content;
     }
@@ -52,7 +56,7 @@ public class Note {
     }
 
     public PreviewData getPreview() {
-        return new PreviewData("this is a title", "this is a text", "");
+        return new PreviewData("title for " + this.id, "this is a text", "");
     }
 
     public void loadFromFile(String fileName) {

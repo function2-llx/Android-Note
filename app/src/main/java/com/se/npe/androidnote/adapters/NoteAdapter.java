@@ -16,12 +16,15 @@ import com.se.npe.androidnote.models.Note;
 import java.util.List;
 
 public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
-    public class ViewHolder extends UltimateRecyclerviewViewHolder {
+    public class ViewHolder extends UltimateRecyclerviewViewHolder implements View.OnClickListener{
         private TextView title, text;
+
+        int click_cnt;
 
         public ViewHolder(View itemView)
         {
             super(itemView);
+            this.click_cnt = 0;
             this.title = itemView.findViewById(R.id.text_view_title);
             this.text = itemView.findViewById(R.id.text_view_text);
         }
@@ -33,6 +36,11 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         public void setText(String text)
         {
             this.text.setText(text);
+        }
+
+        @Override
+        public void onClick(View v) {
+            this.setTitle(String.format("%d clicked!", ++this.click_cnt));
         }
     }
 
@@ -46,7 +54,9 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_list_item, parent, false);
-        return new ViewHolder(v);
+        ViewHolder holder = new ViewHolder(v);
+        v.setOnClickListener(holder);
+        return holder;
     }
 
     @Override
@@ -122,4 +132,15 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         super.clearInternal(this.noteList);
     }
 
+    @Override
+    public void onItemMove(int fromPosition, int toPosition) {
+        this.swapPositions(fromPosition, toPosition);
+        super.onItemMove(fromPosition, toPosition);
+    }
+
+    @Override
+    public void onItemDismiss(int position) {
+        this.remove(position);
+        super.onItemDismiss(position);
+    }
 }
