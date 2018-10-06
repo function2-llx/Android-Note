@@ -78,7 +78,7 @@ public class SoundRecorderActivity extends AppCompatActivity {
             //start Chronometer
             mChronometer.setBase(SystemClock.elapsedRealtime());
             mChronometer.start();
-            mChronometer.setOnChronometerTickListener((chronometer) -> {
+            mChronometer.setOnChronometerTickListener(chronometer -> {
                 if (mRecordPromptCount == 0) {
                     mRecordingPrompt.setText(getString(R.string.record_in_progress).concat("."));
                 } else if (mRecordPromptCount == 1) {

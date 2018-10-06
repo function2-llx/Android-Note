@@ -6,8 +6,8 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.se.npe.androidnote.interfaces.INoteCollection;
 
-// TODO show a list of the preview of note(data stored in noteCollection)
-// TODO show a search input text(implement it using SearchView)
+// show a list of the preview of note(data stored in noteCollection)
+// show a search input text(implement it using SearchView)
 
 public class ListActivity extends AppCompatActivity {
     private INoteCollection noteCollection;

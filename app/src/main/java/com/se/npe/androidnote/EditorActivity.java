@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import com.dmcbig.mediapicker.PickerActivity;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
+import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.se.npe.androidnote.editor.SortRichEditor;
 import com.se.npe.androidnote.models.Note;
@@ -22,10 +23,8 @@ public class EditorActivity extends AppCompatActivity {
     private static final long MAX_SIZE = 188743680L; // 180 MB
     private static final int MAX_PICK = 15;
     private static final int PICKER_SOUND = 0;
-    private static final String TAG = "Editor-MashPlant";
     private SortRichEditor editor;
     private Note oldNote;
-    private FloatingActionsMenu insertMedia;
     private long startTime;
 
     @Override
@@ -34,23 +33,23 @@ public class EditorActivity extends AppCompatActivity {
         setContentView(R.layout.activity_editor);
         EventBus.getDefault().register(this);
         editor = findViewById(R.id.rich_editor);
-        insertMedia = findViewById(R.id.insert_media);
-        findViewById(R.id.insert_picture).setOnClickListener((v) -> {
+        final FloatingActionsMenu insertMedia = findViewById(R.id.insert_media);
+        findViewById(R.id.insert_picture).setOnClickListener(v -> {
             insertMedia.collapse();
             getPictureOrVideo(PickerConfig.PICKER_IMAGE);
         });
-        findViewById(R.id.insert_video).setOnClickListener((v) -> {
+        findViewById(R.id.insert_video).setOnClickListener(v -> {
             insertMedia.collapse();
             getPictureOrVideo(PickerConfig.PICKER_VIDEO);
         });
-        findViewById(R.id.insert_sound).setOnClickListener((v) -> {
+        findViewById(R.id.insert_sound).setOnClickListener(v -> {
             insertMedia.collapse();
             startActivityForResult(
                     new Intent(this, SoundRecorderActivity.class)
                             .putExtra(RecordingService.START_TIME, startTime)
                     , PICKER_SOUND);
         });
-        findViewById(R.id.rearrange_editor).setOnClickListener((v) -> {
+        findViewById(R.id.rearrange_editor).setOnClickListener(v -> {
             insertMedia.collapse();
             editor.sort();
         });

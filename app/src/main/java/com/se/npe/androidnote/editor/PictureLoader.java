@@ -26,7 +26,8 @@ public class PictureLoader extends AsyncTask<String, Void, Bitmap> {
     protected Bitmap doInBackground(String... strings) {
         String picturePath = strings[0];
         Bitmap old = BitmapFactory.decodeFile(picturePath);
-        int width = old.getWidth(), height = old.getHeight();
+        int width = old.getWidth();
+        int height = old.getHeight();
         float scale = ((float) resultWidth) / width;
         Matrix matrix = new Matrix();
         matrix.postScale(scale, scale);

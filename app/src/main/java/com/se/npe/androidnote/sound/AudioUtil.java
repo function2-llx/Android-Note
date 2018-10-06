@@ -11,24 +11,24 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class AudioUtil {
-    private static final int audioSource = MediaRecorder.AudioSource.MIC;
+    private static final int AUDIO_SOURCE = MediaRecorder.AudioSource.MIC;
     //录音的采样频率
-    private static final int audioRate = 16000;
+    private static final int AUDIO_RATE = 16000;
     //录音的声道，单声道
-    private static final int audioChannel = AudioFormat.CHANNEL_IN_MONO;
+    private static final int AUDIO_CHANNEL = AudioFormat.CHANNEL_IN_MONO;
     //量化的深度
-    private static final int audioFormat = AudioFormat.ENCODING_PCM_16BIT;
+    private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
     //缓存的大小
-    private static final int bufferSize = AudioRecord.getMinBufferSize(audioRate, audioChannel, audioFormat);
+    private static final int BUFFER_SIZE = AudioRecord.getMinBufferSize(AUDIO_RATE, AUDIO_CHANNEL, AUDIO_FORMAT);
 
-    private static final long byteRate = 16 * audioRate / 8;
+    private static final long BYTE_RATE = 16 * AUDIO_RATE / 8;
 
     public static class AudioRecordThread extends Thread {
         private AudioRecord recorder;
         private String pcmPath;
 
         public AudioRecordThread(String pcmPath) {
-            this.recorder = new AudioRecord(audioSource, audioRate, audioChannel, audioFormat, bufferSize);
+            this.recorder = new AudioRecord(AUDIO_SOURCE, AUDIO_RATE, AUDIO_CHANNEL, AUDIO_FORMAT, BUFFER_SIZE);
             this.pcmPath = pcmPath;
             recorder.startRecording();
         }
@@ -39,10 +39,10 @@ public class AudioUtil {
 
         @Override
         public void run() {
-            byte[] noteArray = new byte[bufferSize];
+            byte[] noteArray = new byte[BUFFER_SIZE];
             try (OutputStream os = new BufferedOutputStream(new FileOutputStream(pcmPath))) {
                 while (true) {
-                    int recordSize = recorder.read(noteArray, 0, bufferSize);
+                    int recordSize = recorder.read(noteArray, 0, BUFFER_SIZE);
                     if (recordSize > 0) {
                         os.write(noteArray);
                         os.flush();
@@ -61,21 +61,27 @@ public class AudioUtil {
         try (FileInputStream in = new FileInputStream(pcmPath);
              FileOutputStream out = new FileOutputStream(wavPath)) {
             long totalAudioLen = in.getChannel().size();
-            long startByte = (startMillis * byteRate) / 1000;
-            long endByte = Math.min(totalAudioLen, (endMillis * byteRate) / 1000);
+            long startByte = (startMillis * BYTE_RATE) / 1000;
+            long endByte = Math.min(totalAudioLen, (endMillis * BYTE_RATE) / 1000);
             long wantAudioLen = endByte - startByte;
             byte[] data = new byte[(int) wantAudioLen];
-            in.skip(startByte);
-            in.read(data);
-            pcmToFile(out, data, audioRate, 1, 16);
+            long tmp = in.skip(startByte);
+            if (tmp != startByte) {
+                throw new RuntimeException("skip error, expected " + startByte + " actual " + tmp);
+            }
+            tmp = in.read(data);
+            if (tmp != wantAudioLen) {
+                throw new RuntimeException("read error, expected " + wantAudioLen + " actual " + tmp);
+            }
+            pcmToFile(out, data, AUDIO_RATE, 1, 16);
         }
     }
 
     private static void pcmToFile(OutputStream os, byte[] data, int srate, int channel, int format) throws IOException {
         byte[] header = new byte[44];
 
-        long totalDataLen = data.length + 36;
-        long bitrate = srate * channel * format;
+        long totalDataLen = data.length + 36L;
+        long bitrate = (long) srate * channel * format;
 
         header[0] = 'R';
         header[1] = 'I';

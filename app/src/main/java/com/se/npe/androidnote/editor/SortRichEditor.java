@@ -50,26 +50,26 @@ public class SortRichEditor extends ScrollView implements IEditor {
     private static final int TITLE_WORD_LIMIT_COUNT = 30;
 
     // when sorting, the default height that text and media reduce to
-    private final int SIZE_REDUCE_VIEW = dip2px(75);
+    private static final int SIZE_REDUCE_VIEW = dip2px(75);
 
     // the offset between top and bottom
-    private final int SCROLL_OFFSET = (int) (SIZE_REDUCE_VIEW * 0.3);
+    private static final int SCROLL_OFFSET = (int) (SIZE_REDUCE_VIEW * 0.3);
 
     // margin of all items in the scroll view
-    private final int DEFAULT_MARGIN = dip2px(15);
+    private static final int DEFAULT_MARGIN = dip2px(15);
 
     // when sorting and reached the edge of ScrollView, the default scroll speed
-    private final int DEFAULT_SCROLL_SPEED = dip2px(15);
+    private static final int DEFAULT_SCROLL_SPEED = dip2px(15);
 
     // the dash line marking a text out when sorting
-    private final GradientDrawable dashDrawable = new GradientDrawable() {{
+    private static final GradientDrawable dashDrawable = new GradientDrawable() {{
         setStroke(dip2px(1), Color.parseColor("#4CA4E9"), dip2px(4), dip2px(3));
         setColor(Color.parseColor("#ffffff"));
     }};
 
-    private final int DEFAULT_VIDEO_HEIGHT = dip2px(160);
+    private static final int DEFAULT_VIDEO_HEIGHT = dip2px(160);
 
-    private final RelativeLayout.LayoutParams PICTURE_LAYOUT_PARAM
+    private static final RelativeLayout.LayoutParams PICTURE_LAYOUT_PARAM
             = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT) {{
         bottomMargin = DEFAULT_MARGIN;
         leftMargin = DEFAULT_MARGIN;
@@ -78,7 +78,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
 
     // due to the bug? of Jzvd player, video cannot have dynamic height
     // i.e. WRAP_CONTENT cannot be used
-    private final RelativeLayout.LayoutParams VIDEO_LAYOUT_PARAM
+    private static final RelativeLayout.LayoutParams VIDEO_LAYOUT_PARAM
             = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, DEFAULT_VIDEO_HEIGHT) {{
         bottomMargin = DEFAULT_MARGIN;
         leftMargin = DEFAULT_MARGIN;
@@ -108,7 +108,9 @@ public class SortRichEditor extends ScrollView implements IEditor {
     //          }
     //      }
     // }
-    private LinearLayout parentLayout, containerLayout;
+    private LinearLayout parentLayout;
+
+    private LinearLayout containerLayout;
 
     private OnKeyListener editTextKeyListener;
 
@@ -139,7 +141,9 @@ public class SortRichEditor extends ScrollView implements IEditor {
 
     // the top and bottom of containerLayout in the screen
     // it is intended to judge whether the scroll view needs to scroll when sorting
-    private int containerTopVal, containerBottomVal;
+    private int containerTopVal;
+
+    private int containerBottomVal;
 
     // use thread to implement auto scroll
     private ScheduledExecutorService scheduledExecutorService;
@@ -217,6 +221,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
         title.addTextChangedListener(new TextWatcher() {
             @Override
             public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // empty, nothing to do
             }
 
             @Override
@@ -264,7 +269,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
         };
 
         // delete a media
-        deleteListener = (v) -> {
+        deleteListener = v -> {
             RelativeLayout parentView = (RelativeLayout) v.getParent();
             onMediaDeleteClick(parentView);
         };
@@ -272,10 +277,8 @@ public class SortRichEditor extends ScrollView implements IEditor {
         focusListener = (v, hasFocus) -> {
             if (v instanceof RelativeLayout) { // media
                 showOrHideKeyboard(false);
-            } else if (v instanceof EditText) {
-                if (hasFocus) {
-                    lastFocusEdit = (EditText) v;
-                }
+            } else if (v instanceof EditText && hasFocus) {
+                lastFocusEdit = (EditText) v;
             }
         };
     }
@@ -346,6 +349,8 @@ public class SortRichEditor extends ScrollView implements IEditor {
                         break;
                     case MotionEvent.ACTION_UP:
                         stopOverEdgeAutoScroll();
+                        break;
+                    default:
                         break;
                 }
                 // if is sorting, dispatchTouchEvent directly return true
@@ -423,7 +428,8 @@ public class SortRichEditor extends ScrollView implements IEditor {
 
         List<View> removeChildList = new ArrayList<>();
         View child;
-        int pos, preIndex = 0;
+        int pos;
+        int preIndex = 0;
         for (int i = 0; i < childCount; ++i) {
             child = containerLayout.getChildAt(i);
             if (child instanceof ImageView) {
@@ -592,7 +598,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
         placeholder.setImageResource(R.mipmap.icon_add_text);
         placeholder.setScaleType(ImageView.ScaleType.FIT_START);
         placeholder.setClickable(true);
-        placeholder.setOnClickListener((v) -> {
+        placeholder.setOnClickListener(v -> {
             int index = containerLayout.indexOfChild(placeholder);
             containerLayout.removeView(placeholder);
             EditText editText = insertEditTextAtIndex(index, "");
@@ -805,8 +811,11 @@ public class SortRichEditor extends ScrollView implements IEditor {
         mTransition.setDuration(300);
     }
 
-    private int dip2px(float dipValue) {
-        float m = getContext().getResources().getDisplayMetrics().density;
+    // hard code the density to make more field static
+    // may be changed back at any time
+    private static int dip2px(float dipValue) {
+//        float m = getContext().getResources().getDisplayMetrics().density;
+        final float m = 3.0f;
         return (int) (dipValue * m + 0.5f);
     }
 
@@ -867,19 +876,19 @@ public class SortRichEditor extends ScrollView implements IEditor {
     @Override
     public void addPicture(String picturePath) {
         prepareAddMedia();
-        insertMedia((index) -> insertPictureAtIndex(index, picturePath));
+        insertMedia(index -> insertPictureAtIndex(index, picturePath));
     }
 
     @Override
     public void addVideo(String videoPath) {
         prepareAddMedia();
-        insertMedia((index) -> insertVideoAtIndex(index, videoPath));
+        insertMedia(index -> insertVideoAtIndex(index, videoPath));
     }
 
     @Override
     public void addSound(String soundPath) {
         prepareAddMedia();
-        insertMedia((index) -> insertSoundAtIndex(index, soundPath));
+        insertMedia(index -> insertSoundAtIndex(index, soundPath));
     }
 
     @Override
@@ -928,7 +937,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
                     data = new PictureData(item.getTag().toString(), bitmapDrawable.getBitmap());
                 } else if (view instanceof JzvdStd) {
                     if (view instanceof SoundPlayer) {
-                        data = new SoundData(view.getTag().toString(),"");
+                        data = new SoundData(view.getTag().toString(), "");
                     } else {
                         data = new VideoData(view.getTag().toString());
                     }
@@ -971,7 +980,10 @@ public class SortRichEditor extends ScrollView implements IEditor {
         public void onViewPositionChanged(@NonNull View changedView, int left, int top, int dx, int dy) {
             int reduceChildCount = containerLayout.getChildCount();
             View sortChild;
-            int changeViewTagID, sortViewTagID, changeViewPosition, sortViewPosition;
+            int changeViewTagID;
+            int sortViewTagID;
+            int changeViewPosition;
+            int sortViewPosition;
             for (int i = 0; i < reduceChildCount; ++i) {
                 sortChild = containerLayout.getChildAt(i);
                 if (sortChild != changedView) {
