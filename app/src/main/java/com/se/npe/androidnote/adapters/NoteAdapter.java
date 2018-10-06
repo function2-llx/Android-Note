@@ -11,25 +11,36 @@ import android.widget.TextView;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.marshalchen.ultimaterecyclerview.UltimateViewAdapter;
 import com.se.npe.androidnote.R;
+import com.se.npe.androidnote.models.Note;
 
 import java.util.List;
 
 public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
     public class ViewHolder extends UltimateRecyclerviewViewHolder {
-        TextView textView1, textView2;
+        private TextView title, text;
+
         public ViewHolder(View itemView)
         {
             super(itemView);
-            this.textView1 = itemView.findViewById(R.id.text_view_1);
-            this.textView2 = itemView.findViewById(R.id.text_view_2);
+            this.title = itemView.findViewById(R.id.text_view_title);
+            this.text = itemView.findViewById(R.id.text_view_text);
+        }
+
+        public void setTitle(String title) {
+            this.title.setText(title);
+        }
+
+        public void setText(String text)
+        {
+            this.text.setText(text);
         }
     }
 
-    private List<String> stringList;
+    private List<Note> noteList;
 
-    public NoteAdapter(List<String> stringList)
+    public NoteAdapter(List<Note> noteList)
     {
-        this.stringList = stringList;
+        this.noteList = noteList;
     }
 
     @Override
@@ -40,21 +51,23 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.textView1.setText(this.stringList.get(position));
-        holder.textView2.setText(this.stringList.get(position) + "233");
+        Note.PreviewData data = getItem(position).getPreview();
+        holder.setTitle(data.title);
+        holder.setText(data.text);
     }
 
     @Override
     public int getAdapterItemCount() {
-        return this.stringList.size();
+        return this.noteList.size();
     }
 
     @Override
     public long generateHeaderId(int position) {
-        String string = this.getItem(position);
-        if (string.length() > 0)
-            return string.charAt(0);
-        return -1;
+        Note note = getItem(position);
+        if (note == null)
+            return -1;
+
+        return note.getPreview().title.charAt(0);
     }
 
     @Override
@@ -65,7 +78,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
     @Override
     public void onBindHeaderViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         TextView textView = (TextView) viewHolder.itemView.findViewById(R.id.stick_text);
-        textView.setText(String.valueOf(getItem(position).charAt(0)));
+        textView.setText(String.valueOf(getItem(position).getPreview().title.charAt(0)));
 //        viewHolder.itemView.setBackgroundColor(Color.parseColor("#AA70DB93"));
     }
 
@@ -80,16 +93,33 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         return new ViewHolder(view);
     }
 
-    String getItem(int position)
+    Note getItem(int position)
     {
-        if (this.customHeaderView != null) position--;
-        if (position < this.stringList.size())
-            return stringList.get(position);
-        return "";
+        if (this.customHeaderView != null)
+            position--;
+        if (position < this.noteList.size())
+            return this.noteList.get(position);
+        return null;
     }
 
-    public void insert(String string, int position)
+    public void insert(Note note, int position)
     {
-        this.insertInternal(this.stringList, string, position);
+        super.insertInternal(this.noteList, note, position);
     }
+
+    public void remove(int position)
+    {
+        super.removeInternal(this.noteList, position);
+    }
+
+    public void swapPositions(int from, int to)
+    {
+        super.swapPositions(this.noteList, from, to);
+    }
+
+    public void clear()
+    {
+        super.clearInternal(this.noteList);
+    }
+
 }

@@ -15,6 +15,7 @@ import java.util.List;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.se.npe.androidnote.adapters.NoteAdapter;
 import com.se.npe.androidnote.interfaces.INoteCollection;
+import com.se.npe.androidnote.models.Note;
 
 import java.util.ArrayList;
 
@@ -51,11 +52,52 @@ public class ListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
         this.setTitle(this.getResources().getString(R.string.list_title));
-        int size = 100;
 
-        List<String> test = new ArrayList<>();
-        for (int i = 0; i < size; i++) test.add(String.valueOf(i));
-        this.noteAdapter = new NoteAdapter(test);
+        this.noteCollection = new INoteCollection() {
+            @Override
+            public List<Note> getAllNotes() {
+                int size = 100;
+                List<Note> ret = new ArrayList<>();
+                for (int i = 0; i < size; i++) ret.add(new Note());
+                return ret;
+            }
+
+            @Override
+            public List<Note> getSearchResult(String parameter) {
+                return null;
+            }
+
+            @Override
+            public void addNote(Note note) {
+
+            }
+
+            @Override
+            public Note getNoteAt(int index) {
+                return null;
+            }
+
+            @Override
+            public void setNoteAt(int index, Note Note) {
+
+            }
+
+            @Override
+            public void removeNoteAt(int index) {
+
+            }
+
+            @Override
+            public void loadFromFile(String fileName) {
+
+            }
+
+            @Override
+            public void saveToFile(String fileName) {
+
+            }
+        };
+        this.noteAdapter = new NoteAdapter(this.noteCollection.getAllNotes());
         this.layoutManager = new LinearLayoutManager(this);
         this.ultimateRecyclerView = this.findViewById(R.id.ultimate_recycler_view);
         this.ultimateRecyclerView.setLayoutManager(layoutManager);
@@ -67,7 +109,7 @@ public class ListActivity extends AppCompatActivity {
                     @Override
                     public void run() {
 //                        simpleRecyclerViewAdapter.insert("Refresh things", 0);
-                        ListActivity.this.noteAdapter.insert("refresh things", 0);
+                        ListActivity.this.noteAdapter.insert(new Note(), 0);
                         ListActivity.this.ultimateRecyclerView.setRefreshing(false);
                         //   ultimateRecyclerView.scrollBy(0, -50);
                         layoutManager.scrollToPosition(0);
