@@ -2,20 +2,11 @@ package com.se.npe.androidnote.sound;
 
 import android.app.Service;
 import android.content.Intent;
-import android.media.MediaRecorder;
 import android.os.Environment;
 import android.os.IBinder;
-import android.util.Log;
-
-import com.se.npe.androidnote.R;
-import com.se.npe.androidnote.SoundRecorderActivity;
 
 import java.io.File;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
-import java.util.Locale;
-import java.util.Timer;
-import java.util.TimerTask;
 
 /**
  * Created by Daniel on 12/28/2014.
@@ -24,27 +15,40 @@ public class RecordingService extends Service {
     public static final String OUTPUT_DIR =
             Environment.getExternalStorageDirectory().getAbsolutePath() + "/AndroidNote/";
     public static final String START_RECORDING = "StartRecording";
-    public static final String AHEAD_TIME = "AheadTime"; // how long the user record ahead of time
-    public static final String STARTED_TIME = "StartTime"; // how long EditorActivity start the service
+    // when the client want the sound to start(considering ahead time)
+    public static final String REQUEST_START_TIME = "RequestStartTime";
+    public static final String START_TIME = "StartTime"; // when EditorActivity start the service
     public static final String SOUND_PATH = "SoundPath";
+    // always save the recording file at 0.pcm
+    // when a request comes, crop a part of 0.pcm to generate a x.wav
+    private static String TEMP_OUTPUT_PATH = OUTPUT_DIR + 0 + ".pcm";
 
+    // everything is static for convenience
+    // in this way there is no need to store/load the state
     private static int currentFile = 1;
-    private static final String LOG_TAG = "RecordingService";
 
-    private MediaRecorder mRecorder = null;
+    private static AudioUtil.AudioRecordThread recorder;
+//    private static MediaRecorder mRecorder;
 
-    private long mStartingTimeMillis = 0;
-    private int mElapsedSeconds = 0;
-    private static final SimpleDateFormat mTimerFormat = new SimpleDateFormat("mm:ss", Locale.getDefault());
+    private static long mStartingTimeMillis;
 
-    private long cropTime = 0;
+    private static long requestStartTime;
 
-    // always save the recording file at 0.mp4
-    // when a request comes, crop a part of 0.mp4
-    private static String TEMP_OUTPUT_PATH = OUTPUT_DIR + 0 + ".mp4";
+    // it shouldn't be public according to my design
+    // but if the client simply call stopService(intent), the path won't be updated in time
+    // so the client must call findValidPath() himself
+    public static void findValidPath() {
+        while (new File(getOutputPath()).exists())
+            ++currentFile;
+    }
 
     public static String getOutputPath() {
-        return OUTPUT_DIR + currentFile + ".mp4";
+        return OUTPUT_DIR + currentFile + ".wav";
+    }
+
+    public static void stopRecording() {
+        recorder.stopRecording();
+        recorder = null;
     }
 
     @Override
@@ -56,71 +60,47 @@ public class RecordingService extends Service {
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent.hasExtra(START_RECORDING)) { // initial record
             startRecording();
-        } else { // half way request
-            int startTime = intent.getIntExtra(AHEAD_TIME, 0);
-            long current = System.currentTimeMillis();
-            cropTime = Math.max(0, current - mStartingTimeMillis - startTime * 1000);
+        } else { // half way request begin, remember the request start time
+            long startTime = intent.getLongExtra(REQUEST_START_TIME, -1);
+            if (startTime < mStartingTimeMillis) {
+                throw new IllegalArgumentException("REQUEST_START_TIME not found or invalid");
+            }
+            requestStartTime = startTime;
         }
-
         return START_STICKY;
     }
 
     @Override
-    public void onCreate() {
-        super.onCreate();
-        File f = new File(OUTPUT_DIR);
-        if (!f.exists()) {
-            if (!f.mkdir()) {
-                Log.e(LOG_TAG, "mkdir failed");
+    public void onDestroy() {
+        super.onDestroy();
+        long start = requestStartTime - mStartingTimeMillis;
+        long end = System.currentTimeMillis() - mStartingTimeMillis;
+        // findValidPath() called in client(horrible hack)
+        try {
+            AudioUtil.pcmToWav(TEMP_OUTPUT_PATH, getOutputPath(), start, end);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void startRecording() {
+        File dir = new File(OUTPUT_DIR);
+        if (!dir.exists()) {
+            if (!dir.mkdir()) {
+                throw new RuntimeException("mkdir failed");
             }
         }
-
-    }
-
-    @Override
-    public void onDestroy() {
-        if (mRecorder != null) {
-            stopRecording();
+        File f = new File(TEMP_OUTPUT_PATH);
+        if (f.exists()) {
+            f.delete();
         }
-        super.onDestroy();
-    }
-
-    private void findValid() {
-        File f;
-        while ((f = new File(getOutputPath())).exists())
-            ++currentFile;
-    }
-
-    private void removePrev() {
-        File dirs = new File(TEMP_OUTPUT_PATH);
-        if (dirs.exists()) {
-            dirs.delete();
-        }
-    }
-
-    public void startRecording() {
-        removePrev();
-        mRecorder = new MediaRecorder();
-        mRecorder.setAudioSource(MediaRecorder.AudioSource.MIC);
-        mRecorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4);
-        mRecorder.setOutputFile(TEMP_OUTPUT_PATH);
-        mRecorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC);
-        mRecorder.setAudioChannels(1);
         try {
-            mRecorder.prepare();
-            mRecorder.start();
-            mStartingTimeMillis = System.currentTimeMillis();
+            f.createNewFile();
         } catch (IOException e) {
-            Log.e(LOG_TAG, "prepare() failed");
+            e.printStackTrace();
         }
-    }
-
-    public void stopRecording() {
-        // TODO don't release it
-        mRecorder.stop();
-        mRecorder.pause();
-        mRecorder.release();
-        //remove notification
-        mRecorder = null;
+        recorder = new AudioUtil.AudioRecordThread(TEMP_OUTPUT_PATH);
+        recorder.start();
+        mStartingTimeMillis = System.currentTimeMillis();
     }
 }

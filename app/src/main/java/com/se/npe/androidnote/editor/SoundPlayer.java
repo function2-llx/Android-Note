@@ -24,7 +24,7 @@ public class SoundPlayer extends JzvdStd {
             SoundPlayer instance = soundPlayer.get();
             int width = instance.getWidth(), height = instance.getHeight();
             Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            bitmap.eraseColor(Color.parseColor("#FFFFFF"));
+            bitmap.eraseColor(Color.parseColor("#000000"));
             instance.thumbImageView.setImageBitmap(bitmap);
         }
     }

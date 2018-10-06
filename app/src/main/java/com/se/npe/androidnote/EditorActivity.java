@@ -47,7 +47,7 @@ public class EditorActivity extends AppCompatActivity {
             insertMedia.collapse();
             startActivityForResult(
                     new Intent(this, SoundRecorderActivity.class)
-                            .putExtra(RecordingService.STARTED_TIME, System.currentTimeMillis() - startTime)
+                            .putExtra(RecordingService.START_TIME, startTime)
                     , PICKER_SOUND);
         });
         findViewById(R.id.rearrange_editor).setOnClickListener((v) -> {
@@ -93,7 +93,8 @@ public class EditorActivity extends AppCompatActivity {
                     break;
             }
         } else if (resultCode == SoundRecorderActivity.RESULT_CODE && requestCode == PICKER_SOUND) {
-            editor.addSound(data.getStringExtra(RecordingService.SOUND_PATH));
+            String path = data.getStringExtra(RecordingService.SOUND_PATH);
+            editor.addSound(path);
         }
     }
 
@@ -103,6 +104,7 @@ public class EditorActivity extends AppCompatActivity {
         EventBus.getDefault().post(editor.buildNote());
         EventBus.getDefault().removeAllStickyEvents();
         EventBus.getDefault().unregister(this);
+        RecordingService.stopRecording();
     }
 
     @Subscribe(sticky = true)
