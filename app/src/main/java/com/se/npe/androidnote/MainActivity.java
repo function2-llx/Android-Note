@@ -40,9 +40,14 @@ public class MainActivity extends AppCompatActivity {
     {
         switch (item.getItemId()) {
             case R.id.menu_list: {
-                System.err.println("test");
                 Intent intent = new Intent(MainActivity.this, ListActivity.class);
                 startActivity(intent);
+                break;
+            }
+            case R.id.menu_new_note: {
+                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                startActivity(intent);
+                break;
             }
         }
         return super.onOptionsItemSelected(item);

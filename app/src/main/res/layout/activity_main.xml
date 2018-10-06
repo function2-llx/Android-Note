@@ -56,8 +56,10 @@
         android:id="@+id/launch_video_activity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="114dp"
+        android:layout_marginBottom="34dp"
         android:text="Launch Video Activity"
-        tools:layout_editor_absoluteX="114dp"
-        tools:layout_editor_absoluteY="429dp" />
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </android.support.constraint.ConstraintLayout>

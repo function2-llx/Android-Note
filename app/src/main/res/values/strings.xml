@@ -8,6 +8,7 @@
     <string name="menu_sort">Sort</string>
     <string name="menu_list">List of all notes</string>
     <string name="menu_settings">Settings</string>
+    <string name="menu_new_note">New note</string>
 
     <string name="sort_created_time">Sort by created time</string>
     <string name="sort_modified_time">Sort by modified time</string>

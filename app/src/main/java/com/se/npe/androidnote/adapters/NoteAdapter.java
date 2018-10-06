@@ -14,19 +14,20 @@ import com.se.npe.androidnote.R;
 
 import java.util.List;
 
-public class Adapter extends UltimateViewAdapter<Adapter.ViewHolder> {
+public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
     public class ViewHolder extends UltimateRecyclerviewViewHolder {
-        TextView textView;
+        TextView textView1, textView2;
         public ViewHolder(View itemView)
         {
             super(itemView);
-            this.textView = itemView.findViewById(R.id.text_view);
+            this.textView1 = itemView.findViewById(R.id.text_view_1);
+            this.textView2 = itemView.findViewById(R.id.text_view_2);
         }
     }
 
     private List<String> stringList;
 
-    public Adapter(List<String> stringList)
+    public NoteAdapter(List<String> stringList)
     {
         this.stringList = stringList;
     }
@@ -39,7 +40,8 @@ public class Adapter extends UltimateViewAdapter<Adapter.ViewHolder> {
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        holder.textView.setText(this.stringList.get(position));
+        holder.textView1.setText(this.stringList.get(position));
+        holder.textView2.setText(this.stringList.get(position) + "233");
     }
 
     @Override
@@ -84,5 +86,10 @@ public class Adapter extends UltimateViewAdapter<Adapter.ViewHolder> {
         if (position < this.stringList.size())
             return stringList.get(position);
         return "";
+    }
+
+    public void insert(String string, int position)
+    {
+        this.insertInternal(this.stringList, string, position);
     }
 }

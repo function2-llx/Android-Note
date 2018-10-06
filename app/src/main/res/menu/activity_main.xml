@@ -8,6 +8,10 @@
         android:id="@+id/menu_list"/>
 
     <item
+        android:title="@string/menu_new_note"
+        android:id="@+id/menu_new_note"/>
+
+    <item
         android:id="@+id/action_settings"
         android:title="@string/menu_settings"/>
 </menu>
