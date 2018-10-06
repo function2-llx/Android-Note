@@ -8,6 +8,7 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.ActionMode;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -16,7 +17,11 @@ import java.util.List;
 
 import com.marshalchen.ultimaterecyclerview.DragDropTouchListener;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
+import com.marshalchen.ultimaterecyclerview.UltimateViewAdapter;
+import com.marshalchen.ultimaterecyclerview.itemTouchHelper.SimpleItemTouchHelperCallback;
+import com.marshalchen.ultimaterecyclerview.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 import com.se.npe.androidnote.adapters.NoteAdapter;
+import com.se.npe.androidnote.editor.ImageLoader;
 import com.se.npe.androidnote.interfaces.INoteCollection;
 import com.se.npe.androidnote.models.Note;
 
@@ -30,6 +35,7 @@ public class ListActivity extends AppCompatActivity {
     private  LinearLayoutManager layoutManager;
     private NoteAdapter noteAdapter;
     private UltimateRecyclerView ultimateRecyclerView;
+    private DragDropTouchListener dragDropTouchListener;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
@@ -51,7 +57,6 @@ public class ListActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    DragDropTouchListener dragDropTouchListener;
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
@@ -106,6 +111,8 @@ public class ListActivity extends AppCompatActivity {
         this.ultimateRecyclerView = this.findViewById(R.id.ultimate_recycler_view);
         this.ultimateRecyclerView.setLayoutManager(layoutManager);
         this.ultimateRecyclerView.setAdapter(noteAdapter);
+        
+
         this.ultimateRecyclerView.setDefaultOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -121,6 +128,18 @@ public class ListActivity extends AppCompatActivity {
                 }, 1000);
             }
         });
+
+        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(noteAdapter);
+        itemTouchHelper = new ItemTouchHelper(callback);
+        itemTouchHelper.attachToRecyclerView(ultimateRecyclerView.mRecyclerView);
+        noteAdapter.setOnDragStartListener(new NoteAdapter.OnStartDragListener() {
+            @Override
+            public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
+                itemTouchHelper.startDrag(viewHolder);
+            }
+        });
+
     }
+    private  ItemTouchHelper itemTouchHelper;
 
 }

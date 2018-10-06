@@ -16,10 +16,17 @@ import com.se.npe.androidnote.models.Note;
 import java.util.List;
 
 public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
-    public class ViewHolder extends UltimateRecyclerviewViewHolder implements View.OnClickListener{
+    public class ViewHolder extends UltimateRecyclerviewViewHolder implements View.OnClickListener {
         private TextView title, text;
 
-        int click_cnt;
+        private int click_cnt;
+
+        private void inc()
+        {
+            System.err.println("inc: " + this.click_cnt);
+            this.click_cnt++;
+        }
+
 
         public ViewHolder(View itemView)
         {
@@ -39,8 +46,16 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         }
 
         @Override
-        public void onClick(View v) {
-            this.setTitle(String.format("%d clicked!", ++this.click_cnt));
+        public void onClick(@NonNull View v) {
+            System.err.println("id: " + v.getTransitionName() + " on click: " + this.click_cnt);
+            this.inc();
+            this.setTitle(String.format("%d clicked!", this.click_cnt));
+
+        }
+
+        public final int getClick_cnt()
+        {
+            return this.click_cnt;
         }
     }
 
@@ -49,6 +64,11 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
     public NoteAdapter(List<Note> noteList)
     {
         this.noteList = noteList;
+    }
+
+    public void setOnDragStartListener(OnStartDragListener onStartDragListener)
+    {
+        super.mDragStartListener = onStartDragListener;
     }
 
     @Override
