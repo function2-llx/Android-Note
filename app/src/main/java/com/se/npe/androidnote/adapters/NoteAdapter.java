@@ -136,8 +136,6 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
     {
         int size = noteList.size();
         super.insertInternal(this.noteList, note, position);
-        assert size == noteList.size() - 1;
-        System.err.println(noteList.size());
     }
 
     public void remove(int position)

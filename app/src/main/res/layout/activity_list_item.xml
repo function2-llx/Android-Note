@@ -3,8 +3,13 @@
     android:layout_width="match_parent"
     android:layout_height="100dp"
     android:orientation="vertical"
-    android:gravity="center">
-    
+    android:gravity="center"
+    android:divider="@drawable/list_divider"
+    android:showDividers="beginning"
+    >
+
+
+
     <TextView
         android:id="@+id/text_view_title"
         android:layout_width="wrap_content"
@@ -14,10 +19,7 @@
         android:id="@+id/text_view_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
-    
-    <ImageView
-        android:id="@+id/picture"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+
 
 </LinearLayout>
+
