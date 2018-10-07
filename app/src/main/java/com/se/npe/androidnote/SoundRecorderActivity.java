@@ -37,7 +37,7 @@ public class SoundRecorderActivity extends AppCompatActivity {
         mRecordingPrompt = findViewById(R.id.recording_status_text);
 
         mRecordButton = findViewById(R.id.btnRecord);
-        mRecordButton.setOnClickListener((v) -> {
+        mRecordButton.setOnClickListener(v -> {
             onRecord(mStartRecording);
             mStartRecording = !mStartRecording;
         });

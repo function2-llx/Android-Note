@@ -8,7 +8,6 @@ import android.support.v7.app.AppCompatActivity;
 import com.dmcbig.mediapicker.PickerActivity;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
-import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.se.npe.androidnote.editor.SortRichEditor;
 import com.se.npe.androidnote.models.Note;

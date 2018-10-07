@@ -23,6 +23,10 @@ public class AudioUtil {
 
     private static final long BYTE_RATE = 16 * AUDIO_RATE / 8;
 
+    // no constructor
+    private AudioUtil() {
+    }
+
     public static class AudioRecordThread extends Thread {
         private AudioRecord recorder;
         private String pcmPath;
@@ -67,11 +71,11 @@ public class AudioUtil {
             byte[] data = new byte[(int) wantAudioLen];
             long tmp = in.skip(startByte);
             if (tmp != startByte) {
-                throw new RuntimeException("skip error, expected " + startByte + " actual " + tmp);
+                throw new IOException("skip error, expected " + startByte + " actual " + tmp);
             }
             tmp = in.read(data);
             if (tmp != wantAudioLen) {
-                throw new RuntimeException("read error, expected " + wantAudioLen + " actual " + tmp);
+                throw new IOException("read error, expected " + wantAudioLen + " actual " + tmp);
             }
             pcmToFile(out, data, AUDIO_RATE, 1, 16);
         }

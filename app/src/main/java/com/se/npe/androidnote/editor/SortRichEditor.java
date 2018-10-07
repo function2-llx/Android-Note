@@ -12,7 +12,6 @@ import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -36,6 +35,7 @@ import com.se.npe.androidnote.models.SoundData;
 import com.se.npe.androidnote.models.TextData;
 import com.se.npe.androidnote.models.VideoData;
 
+import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Executors;
@@ -62,28 +62,31 @@ public class SortRichEditor extends ScrollView implements IEditor {
     private static final int DEFAULT_SCROLL_SPEED = dip2px(15);
 
     // the dash line marking a text out when sorting
-    private static final GradientDrawable dashDrawable = new GradientDrawable() {{
-        setStroke(dip2px(1), Color.parseColor("#4CA4E9"), dip2px(4), dip2px(3));
-        setColor(Color.parseColor("#ffffff"));
-    }};
+    private static final GradientDrawable DASH_DRAWABLE = new GradientDrawable();
 
     private static final int DEFAULT_VIDEO_HEIGHT = dip2px(160);
 
     private static final RelativeLayout.LayoutParams PICTURE_LAYOUT_PARAM
-            = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT) {{
-        bottomMargin = DEFAULT_MARGIN;
-        leftMargin = DEFAULT_MARGIN;
-        rightMargin = DEFAULT_MARGIN;
-    }};
+            = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
 
     // due to the bug? of Jzvd player, video cannot have dynamic height
     // i.e. WRAP_CONTENT cannot be used
     private static final RelativeLayout.LayoutParams VIDEO_LAYOUT_PARAM
-            = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, DEFAULT_VIDEO_HEIGHT) {{
-        bottomMargin = DEFAULT_MARGIN;
-        leftMargin = DEFAULT_MARGIN;
-        rightMargin = DEFAULT_MARGIN;
-    }};
+            = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, DEFAULT_VIDEO_HEIGHT);
+
+    // well, sonar cube doesn't like double-brace-init and thinks it may cause memory leak
+    // but it actually won't because they are static
+    // now I place the init here to eliminate sonar cube's complaint
+    static {
+        DASH_DRAWABLE.setStroke(dip2px(1), Color.parseColor("#4CA4E9"), dip2px(4), dip2px(3));
+        DASH_DRAWABLE.setColor(Color.parseColor("#ffffff"));
+        PICTURE_LAYOUT_PARAM.bottomMargin = DEFAULT_MARGIN;
+        PICTURE_LAYOUT_PARAM.leftMargin = DEFAULT_MARGIN;
+        PICTURE_LAYOUT_PARAM.rightMargin = DEFAULT_MARGIN;
+        VIDEO_LAYOUT_PARAM.bottomMargin = DEFAULT_MARGIN;
+        VIDEO_LAYOUT_PARAM.leftMargin = DEFAULT_MARGIN;
+        VIDEO_LAYOUT_PARAM.rightMargin = DEFAULT_MARGIN;
+    }
 
     // save the background of edit text before sorting(because sorting will change it)
     private Drawable editTextBackground;
@@ -93,21 +96,17 @@ public class SortRichEditor extends ScrollView implements IEditor {
     private int viewTagID = 1;
 
     // The layout structure is like:
-    // ScrollView {
-    //      parentLayout {
-    //          titleLayout {
-    //              EditText,
+    // ScrollView
+    //      parentLayout
+    //          titleLayout
+    //              EditText
     //              TextView
-    //          },
-    //          LineView,
-    //          containerLayout{
-    //              child1,
-    //              child2,
-    //              child3,
+    //          LineView
+    //          containerLayout
+    //              child1
+    //              child2
+    //              child3
     //              ...
-    //          }
-    //      }
-    // }
     private LinearLayout parentLayout;
 
     private LinearLayout containerLayout;
@@ -446,7 +445,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 EditText editText = ((EditText) child);
                 editTextHeightArray.put(tagID, layoutParams.height);
                 editText.setFocusable(false);
-                editText.setBackground(dashDrawable);
+                editText.setBackground(DASH_DRAWABLE);
             }
             layoutParams.height = SIZE_REDUCE_VIEW;
             child.setLayoutParams(layoutParams);
@@ -814,7 +813,6 @@ public class SortRichEditor extends ScrollView implements IEditor {
     // hard code the density to make more field static
     // may be changed back at any time
     private static int dip2px(float dipValue) {
-//        float m = getContext().getResources().getDisplayMetrics().density;
         final float m = 3.0f;
         return (int) (dipValue * m + 0.5f);
     }
@@ -891,29 +889,45 @@ public class SortRichEditor extends ScrollView implements IEditor {
         insertMedia(index -> insertSoundAtIndex(index, soundPath));
     }
 
+    static class NoteLoader implements Runnable {
+        WeakReference<SortRichEditor> target;
+        private Note note;
+
+        public NoteLoader(SortRichEditor target, Note note) {
+            this.target = new WeakReference<>(target);
+            this.note = note;
+        }
+
+        @Override
+        public void run() {
+            SortRichEditor ref = target.get();
+            ref.title.setText(note.getTitle());
+            ref.containerLayout.removeAllViews();
+            List<IData> content = note.getContent();
+            for (IData data : content) {
+                int currentChild = ref.containerLayout.getChildCount();
+                if (data instanceof TextData) {
+                    ref.insertEditTextAtIndex(currentChild, ((TextData) data).getText());
+                } else if (data instanceof PictureData) {
+                    ref.insertPictureAtIndex(currentChild, ((PictureData) data).getPicturePath());
+                } else if (data instanceof VideoData) {
+                    ref.insertVideoAtIndex(currentChild, ((VideoData) data).getVideoPath());
+                } else if (data instanceof SoundData) {
+                    ref.insertSoundAtIndex(currentChild, ((SoundData) data).getSoundPath());
+                }
+            }
+            if (ref.containerLayout.getChildCount() != 0) {
+                View lastChild = ref.containerLayout.getChildAt(ref.containerLayout.getChildCount() - 1);
+                if (!(lastChild instanceof EditText)) {
+                    ref.containerLayout.addView(ref.getFirstText());
+                }
+            }
+        }
+    }
+
     @Override
     public void loadNote(Note note) {
-        title.setText(note.getTitle());
-        containerLayout.removeAllViews();
-        List<IData> content = note.getContent();
-        for (IData data : content) {
-            int currentChild = containerLayout.getChildCount();
-            if (data instanceof TextData) {
-                insertEditTextAtIndex(currentChild, ((TextData) data).getText());
-            } else if (data instanceof PictureData) {
-                insertPictureAtIndex(currentChild, ((PictureData) data).getPicturePath());
-            } else if (data instanceof VideoData) {
-                insertVideoAtIndex(currentChild, ((VideoData) data).getVideoPath());
-            } else if (data instanceof SoundData) {
-                insertSoundAtIndex(currentChild, ((SoundData) data).getSoundPath());
-            }
-        }
-        if (containerLayout.getChildCount() != 0) {
-            View lastChild = containerLayout.getChildAt(containerLayout.getChildCount() - 1);
-            if (!(lastChild instanceof EditText)) {
-                containerLayout.addView(getFirstText());
-            }
-        }
+        postDelayed(new NoteLoader(this, note), 50);
     }
 
     @Override

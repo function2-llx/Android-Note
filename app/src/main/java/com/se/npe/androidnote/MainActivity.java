@@ -74,13 +74,6 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        findViewById(R.id.launch_sound_record_activity).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, SoundRecorderActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 
     private Note generateNoteForTest() {

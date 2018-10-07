@@ -7,6 +7,9 @@ import android.os.IBinder;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * Created by Daniel on 12/28/2014.
@@ -21,7 +24,7 @@ public class RecordingService extends Service {
     public static final String SOUND_PATH = "SoundPath";
     // always save the recording file at 0.pcm
     // when a request comes, crop a part of 0.pcm to generate a x.wav
-    private static String TEMP_OUTPUT_PATH = OUTPUT_DIR + 0 + ".pcm";
+    private static final String TEMP_OUTPUT_PATH = OUTPUT_DIR + 0 + ".pcm";
 
     // everything is static for convenience
     // in this way there is no need to store/load the state
@@ -59,7 +62,11 @@ public class RecordingService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         if (intent.hasExtra(START_RECORDING)) { // initial record
-            startRecording();
+            try {
+                startRecording();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         } else { // half way request begin, remember the request start time
             long startTime = intent.getLongExtra(REQUEST_START_TIME, -1);
             if (startTime < mStartingTimeMillis) {
@@ -83,21 +90,19 @@ public class RecordingService extends Service {
         }
     }
 
-    private void startRecording() {
+    private static void startRecording() throws IOException {
         File dir = new File(OUTPUT_DIR);
-        if (!dir.exists()) {
-            if (!dir.mkdir()) {
-                throw new RuntimeException("mkdir failed");
-            }
+        if (!dir.exists() && !dir.mkdir()) {
+            throw new IOException("mkdir failed");
         }
         File f = new File(TEMP_OUTPUT_PATH);
         if (f.exists()) {
-            f.delete();
+            if (!f.delete()) {
+                throw new IOException("delete file failed " + TEMP_OUTPUT_PATH);
+            }
         }
-        try {
-            f.createNewFile();
-        } catch (IOException e) {
-            e.printStackTrace();
+        if (!f.createNewFile()) {
+            throw new IOException("create file failed " + TEMP_OUTPUT_PATH);
         }
         recorder = new AudioUtil.AudioRecordThread(TEMP_OUTPUT_PATH);
         recorder.start();
