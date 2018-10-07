@@ -106,12 +106,25 @@ public class ListActivity extends AppCompatActivity {
 
             }
         };
-        this.noteAdapter = new NoteAdapter(this.noteCollection.getAllNotes());
+        List<Note> noteList = this.noteCollection.getAllNotes();
+        this.noteAdapter = new NoteAdapter(noteList);
         this.layoutManager = new LinearLayoutManager(this);
         this.ultimateRecyclerView = this.findViewById(R.id.ultimate_recycler_view);
         this.ultimateRecyclerView.setLayoutManager(layoutManager);
         this.ultimateRecyclerView.setAdapter(noteAdapter);
-        
+        this.ultimateRecyclerView.reenableLoadmore();
+        ultimateRecyclerView.setOnLoadMoreListener(new UltimateRecyclerView.OnLoadMoreListener() {
+            @Override
+            public void loadMore(int itemsCount, final int maxLastVisiblePosition) {
+                Handler handler = new Handler();
+                handler.postDelayed(new Runnable() {
+                    public void run() {
+                        noteList.add(new Note());
+                        noteAdapter.notifyDataSetChanged();
+                    }
+                }, 1000);
+            }
+        });
 
         this.ultimateRecyclerView.setDefaultOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
