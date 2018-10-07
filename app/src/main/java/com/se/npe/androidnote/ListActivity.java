@@ -10,9 +10,12 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.ActionMode;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import com.marshalchen.ultimaterecyclerview.DragDropTouchListener;
@@ -53,19 +56,31 @@ public class ListActivity extends AppCompatActivity {
                 this.startActivity(intent);
                 break;
             }
+            case R.id.sort_title: {
+                Collections.sort(this.noteList, new Comparator<Note>() {
+                    @Override
+                    public int compare(Note o1, Note o2) {
+                        return o1.getTitle().compareTo(o2.getTitle());
+                    }
+                });
+                this.noteAdapter.notifyDataSetChanged();
+                break;
+            }
         }
         return super.onOptionsItemSelected(item);
     }
+    private List<Note> noteList;
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
         this.setTitle(this.getResources().getString(R.string.list_title));
 
+
         this.noteCollection = new INoteCollection() {
             @Override
             public List<Note> getAllNotes() {
-                int size = 100;
+                int size = 10;
                 List<Note> ret = new ArrayList<>();
                 for (int i = 0; i < size; i++) ret.add(new Note());
                 return ret;
@@ -106,42 +121,39 @@ public class ListActivity extends AppCompatActivity {
 
             }
         };
-        List<Note> noteList = this.noteCollection.getAllNotes();
+        this.noteList = this.noteCollection.getAllNotes();
         this.noteAdapter = new NoteAdapter(noteList);
         this.layoutManager = new LinearLayoutManager(this);
         this.ultimateRecyclerView = this.findViewById(R.id.ultimate_recycler_view);
         this.ultimateRecyclerView.setLayoutManager(layoutManager);
         this.ultimateRecyclerView.setAdapter(noteAdapter);
-        this.ultimateRecyclerView.reenableLoadmore();
-        ultimateRecyclerView.setOnLoadMoreListener(new UltimateRecyclerView.OnLoadMoreListener() {
-            @Override
-            public void loadMore(int itemsCount, final int maxLastVisiblePosition) {
-                Handler handler = new Handler();
-                handler.postDelayed(new Runnable() {
-                    public void run() {
-                        noteList.add(new Note());
-                        noteAdapter.notifyDataSetChanged();
-                    }
-                }, 1000);
-            }
-        });
+//        this.ultimateRecyclerView.reenableLoadmore();
+//        this.noteAdapter.setCustomLoadMoreView(LayoutInflater.from(this).inflate(R.layout.custom_bottom_progressbar, null));
+//        ultimateRecyclerView.setOnLoadMoreListener((itemsCount, maxLastVisiblePosition) -> {
+//            Handler handler = new Handler();
+//            handler.postDelayed(() -> {
+//                noteList.add(new Note());
+//                noteAdapter.notifyDataSetChanged();
+//            }, 1000);
+//        });
 
-        this.ultimateRecyclerView.setDefaultOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
+        this.enableDrag();
+        this.enableRefresh();
+    }
+
+    private void enableRefresh()
+    {
+        this.ultimateRecyclerView.setDefaultOnRefreshListener(() -> new Handler().postDelayed(() -> {
 //                        simpleRecyclerViewAdapter.insert("Refresh things", 0);
-                        ListActivity.this.noteAdapter.insert(new Note(), 0);
-                        ListActivity.this.ultimateRecyclerView.setRefreshing(false);
-                        //   ultimateRecyclerView.scrollBy(0, -50);
-                        layoutManager.scrollToPosition(0);
-                    }
-                }, 1000);
-            }
-        });
+            ListActivity.this.noteAdapter.insert(new Note(), 0);
+            ListActivity.this.ultimateRecyclerView.setRefreshing(false);
+            //   ultimateRecyclerView.scrollBy(0, -50);
+            layoutManager.scrollToPosition(0);
+        }, 1000));
+    }
 
+    private void enableDrag()
+    {
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(noteAdapter);
         itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(ultimateRecyclerView.mRecyclerView);
@@ -151,8 +163,8 @@ public class ListActivity extends AppCompatActivity {
                 itemTouchHelper.startDrag(viewHolder);
             }
         });
-
     }
+
     private  ItemTouchHelper itemTouchHelper;
 
 }

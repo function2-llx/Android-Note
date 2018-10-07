@@ -39,6 +39,7 @@ public class Note {
     public Note()
     {
         this.id = tot++;
+        this.title = "this is tile for " + id;
     }
 
     public Note(String title, List<IData> content) {
@@ -56,7 +57,7 @@ public class Note {
     }
 
     public PreviewData getPreview() {
-        return new PreviewData("title for " + this.id, "this is a text", "");
+        return new PreviewData(this.title, "this is a text", "");
     }
 
     public void loadFromFile(String fileName) {

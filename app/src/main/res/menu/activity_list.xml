@@ -24,6 +24,9 @@
             <item
                 android:id="@+id/sort_modified_time"
                 android:title="@string/sort_modified_time"/>
+            <item
+                android:id="@+id/sort_title"
+                android:title="@string/sort_title"/>
         </menu>
     </item>
 
