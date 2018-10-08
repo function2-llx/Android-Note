@@ -21,29 +21,28 @@
             android:id="@+id/insert_sound"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@android:drawable/ic_btn_speak_now"
+            app:fab_icon="@android:drawable/ic_btn_speak_now"
             app:fab_title="insert sound" />
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/insert_picture"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@android:drawable/ic_menu_camera"
+            app:fab_icon="@android:drawable/ic_menu_camera"
             app:fab_title="insert picture" />
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/insert_video"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@android:drawable/ic_media_play"
+            app:fab_icon="@android:drawable/ic_media_play"
             app:fab_title="insert video" />
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/rearrange_editor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@android:drawable/ic_menu_rotate"
+            app:fab_icon="@android:drawable/ic_menu_sort_by_size"
             app:fab_title="insert video" />
-
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
 </android.support.design.widget.CoordinatorLayout>

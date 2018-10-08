@@ -1,8 +1,11 @@
 package com.se.npe.androidnote;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.Menu;
@@ -13,11 +16,8 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.widget.VideoView;
 
-import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.models.Note;
-import com.se.npe.androidnote.temporary.VideoActivity;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -58,6 +58,12 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         initListener();
+        EventBus.getDefault().register(this);
+        while (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO},
+                    10);
+        }
     }
 
     @Override
@@ -101,18 +107,11 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
-        findViewById(R.id.launch_video_activity).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, VideoActivity.class);
-                startActivity(intent);
-            }
-        });
     }
 
     private Note generateNoteForTest() {
         if (selectedNote == null)
-            return new Note("hello from MainActivity", new ArrayList<IData>());
+            return new Note("hello from MainActivity", new ArrayList<>());
         return selectedNote;
     }
 }

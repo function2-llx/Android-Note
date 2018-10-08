@@ -27,6 +27,9 @@ repositories {
 }
 
 dependencies {
+    configurations {
+        all*.exclude group: 'com.android.support', module: 'support-v13'
+    }
     implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.3'
@@ -43,4 +46,5 @@ dependencies {
     implementation 'com.getbase:floatingactionbutton:1.10.1'
     implementation 'com.dmcBig:mediapicker:+'
     implementation 'cn.jzvd:jiaozivideoplayer:6.3.1'
+    implementation 'com.googlecode.mp4parser:isoparser:1.1.21'
 }

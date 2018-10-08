@@ -4,38 +4,29 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.v4.view.MenuCompat;
-import android.support.v4.view.MenuItemCompat;
-import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.view.ActionMode;
-import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-
 import com.marshalchen.ultimaterecyclerview.DragDropTouchListener;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
-import com.marshalchen.ultimaterecyclerview.UltimateViewAdapter;
 import com.marshalchen.ultimaterecyclerview.itemTouchHelper.SimpleItemTouchHelperCallback;
-import com.marshalchen.ultimaterecyclerview.stickyheadersrecyclerview.StickyRecyclerHeadersDecoration;
 import com.se.npe.androidnote.adapters.NoteAdapter;
-import com.se.npe.androidnote.editor.ImageLoader;
 import com.se.npe.androidnote.interfaces.INoteCollection;
 import com.se.npe.androidnote.models.Note;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
-// TODO show a list of the preview of note(data stored in noteCollection)
-// TODO show a search input text(implement it using SearchView)
+// show a list of the preview of note(data stored in noteCollection)
+// show a search input text(implement it using SearchView)
 
 public class ListActivity extends AppCompatActivity {
     private  LinearLayoutManager layoutManager;

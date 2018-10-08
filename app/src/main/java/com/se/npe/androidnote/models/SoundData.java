@@ -11,7 +11,19 @@ import com.se.npe.androidnote.interfaces.IData;
  * */
 
 public class SoundData implements IData {
-    private String uri;
+    private String soundPath;
     private String text;
 
+    public SoundData(String soundPath, String text) {
+        this.soundPath = soundPath;
+        this.text = text;
+    }
+
+    public String getSoundPath() {
+        return soundPath;
+    }
+
+    public String getText() {
+        return text;
+    }
 }

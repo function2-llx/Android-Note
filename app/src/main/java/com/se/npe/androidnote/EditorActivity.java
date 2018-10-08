@@ -16,6 +16,7 @@ import com.dmcbig.mediapicker.entity.Media;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.se.npe.androidnote.editor.SortRichEditor;
 import com.se.npe.androidnote.models.Note;
+import com.se.npe.androidnote.sound.RecordingService;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -25,11 +26,10 @@ import java.util.ArrayList;
 public class EditorActivity extends AppCompatActivity {
     private static final long MAX_SIZE = 188743680L; // 180 MB
     private static final int MAX_PICK = 15;
-    private static final String TAG = "Editor-MashPlant";
-    SortRichEditor editor;
-    ArrayList<Media> select = new ArrayList<>();
-    Note oldNote;
-    FloatingActionsMenu insertMedia;
+    private static final int PICKER_SOUND = 0;
+    private SortRichEditor editor;
+    private Note oldNote;
+    private long startTime;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -38,34 +38,36 @@ public class EditorActivity extends AppCompatActivity {
         this.setTitle(this.getResources().getString(R.string.editor_title));
         EventBus.getDefault().register(this);
         editor = findViewById(R.id.rich_editor);
-        insertMedia = findViewById(R.id.insert_media);
-        findViewById(R.id.insert_picture).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                insertMedia.collapse();
-                getPictureOrVideo(PickerConfig.PICKER_IMAGE);
-            }
+        final FloatingActionsMenu insertMedia = findViewById(R.id.insert_media);
+        findViewById(R.id.insert_picture).setOnClickListener(v -> {
+            insertMedia.collapse();
+            getPictureOrVideo(PickerConfig.PICKER_IMAGE);
         });
-        findViewById(R.id.insert_video).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                insertMedia.collapse();
-                getPictureOrVideo(PickerConfig.PICKER_VIDEO);
-            }
+        findViewById(R.id.insert_video).setOnClickListener(v -> {
+            insertMedia.collapse();
+            getPictureOrVideo(PickerConfig.PICKER_VIDEO);
         });
-        findViewById(R.id.rearrange_editor).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                insertMedia.collapse();
-                editor.sort();
-            }
+        findViewById(R.id.insert_sound).setOnClickListener(v -> {
+            insertMedia.collapse();
+            startActivityForResult(
+                    new Intent(this, SoundRecorderActivity.class)
+                            .putExtra(RecordingService.START_TIME, startTime)
+                    , PICKER_SOUND);
+        });
+        findViewById(R.id.rearrange_editor).setOnClickListener(v -> {
+            insertMedia.collapse();
+            editor.sort();
         });
         // deferred built, or we will get NPE
         if (oldNote != null) {
             editor.loadNote(oldNote);
         }
-    }
 
+        // start recording right now
+        startService(new Intent(this, RecordingService.class)
+                .putExtra(RecordingService.START_RECORDING, true));
+        startTime = System.currentTimeMillis();
+    }
 
     private void getPictureOrVideo(int code) {
         Intent intent = new Intent(this, PickerActivity.class);
@@ -79,9 +81,7 @@ public class EditorActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == PickerConfig.RESULT_CODE) {
-            Log.d("my", "before, size = " + select.size());
-            select = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
-            Log.d("my", "after, size = " + select.size());
+            ArrayList<Media> select = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
             switch (requestCode) {
                 case PickerConfig.PICKER_IMAGE:
                     for (Media media : select) {
@@ -96,20 +96,19 @@ public class EditorActivity extends AppCompatActivity {
                 default:
                     break;
             }
+        } else if (resultCode == SoundRecorderActivity.RESULT_CODE && requestCode == PICKER_SOUND) {
+            String path = data.getStringExtra(RecordingService.SOUND_PATH);
+            editor.addSound(path);
         }
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        EventBus.getDefault().post(editor.buildNote());
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        EventBus.getDefault().post(editor.buildNote());
         EventBus.getDefault().removeAllStickyEvents();
         EventBus.getDefault().unregister(this);
+        RecordingService.stopRecording();
     }
 
     @Subscribe(sticky = true)
