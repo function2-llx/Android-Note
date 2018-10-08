@@ -51,4 +51,15 @@
         app:layout_constraintTop_toBottomOf="@+id/launch_editor_activity"
         app:layout_constraintVertical_bias="0.136"
         tools:textAllCaps="false" />
+
+    <Button
+        android:id="@+id/launch_video_activity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="114dp"
+        android:layout_marginBottom="34dp"
+        android:text="Launch Video Activity"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
 </android.support.constraint.ConstraintLayout>
