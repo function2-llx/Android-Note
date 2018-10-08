@@ -26,4 +26,8 @@ public class SoundData implements IData {
     public String getText() {
         return text;
     }
+
+    public String toString(){
+        return "Sound "+soundPath + " " + text;
+    }
 }

@@ -20,4 +20,8 @@ public class VideoData implements IData {
     public String getVideoPath() {
         return videoPath;
     }
+
+    public String toString(){
+        return "Video "+ videoPath;
+    }
 }
