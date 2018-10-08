@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.database.Cursor;
 
 import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.interfaces.INoteCollection;
@@ -59,11 +60,25 @@ public class TableOperate implements INoteCollection{
     }
 
     public List<Note> getAllNotes() {
-        return null;
+        ArrayList<Note> Notelist = new ArrayList<Note>();
+        Cursor c = db.rawQuery("select * from "+TableConfig.TABLE_NAME, null);
+        while (c.moveToNext()) {
+            Note temp = new Note(c.getString(1),decodeNote(c.getString(2)));
+            Notelist.add(temp);
+        }
+        c.close();
+        return Notelist;
     }
 
     public List<Note> getSearchResult(String parameter){
-        return null;
+        ArrayList<Note> Notelist = new ArrayList<Note>();
+        Cursor c = db.rawQuery("select * from "+TableConfig.TABLE_NAME+" where "+TableConfig.Note.NOTE_TITLE+"= ?", new String[] { parameter });
+        while (c.moveToNext()) {
+            Note temp = new Note(c.getString(1),decodeNote(c.getString(2)));
+            Notelist.add(temp);
+        }
+        c.close();
+        return Notelist;
     }
 
     public void addNote(Note note){
@@ -71,15 +86,23 @@ public class TableOperate implements INoteCollection{
     }
 
     public Note getNoteAt(int index){
-        return null;
+        ArrayList<Note> Notelist = new ArrayList<Note>();
+        Cursor c = db.rawQuery("select * from "+TableConfig.TABLE_NAME+" where "+TableConfig.Note.NOTE_ID+"= ?", new String[] { Integer.toString(index) });
+        while (c.moveToNext()) {
+            Note temp = new Note(c.getString(1),decodeNote(c.getString(2)));
+            Notelist.add(temp);
+        }
+        c.close();
+        return Notelist.get(0);
     }
 
     public void setNoteAt(int index, Note note){
-        return ;
+        db.execSQL("update "+TableConfig.TABLE_NAME+" set "+TableConfig.Note.NOTE_TITLE+"=?,"+TableConfig.Note.NOTE_CONTENT+"=? where "+TableConfig.Note.NOTE_ID+"=?",
+                new Object[] { note.getTitle(), encodeNote(note.getContent()),Integer.toString(index) });
     }
 
     public void removeNoteAt(int index){
-
+        db.execSQL("delete from "+TableConfig.TABLE_NAME+" where "+TableConfig.Note.NOTE_ID+"=?", new String[] { Integer.toString(index) });
     }
 
     public void loadFromFile(String fileName){
