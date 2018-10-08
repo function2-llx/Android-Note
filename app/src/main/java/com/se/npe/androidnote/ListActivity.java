@@ -122,7 +122,7 @@ public class ListActivity extends AppCompatActivity {
             }
         };
         this.noteList = this.noteCollection.getAllNotes();
-        this.noteAdapter = new NoteAdapter(noteList);
+        this.noteAdapter = new NoteAdapter(noteList, this);
         this.layoutManager = new LinearLayoutManager(this);
         this.ultimateRecyclerView = this.findViewById(R.id.ultimate_recycler_view);
         this.ultimateRecyclerView.setLayoutManager(layoutManager);

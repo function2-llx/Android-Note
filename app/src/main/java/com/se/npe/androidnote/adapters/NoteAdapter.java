@@ -1,32 +1,31 @@
 package com.se.npe.androidnote.adapters;
 
 import android.support.annotation.NonNull;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.PopupMenu;
 import android.widget.TextView;
 
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.marshalchen.ultimaterecyclerview.UltimateViewAdapter;
+import com.se.npe.androidnote.ListActivity;
 import com.se.npe.androidnote.R;
 import com.se.npe.androidnote.models.Note;
 
 import java.util.List;
 
 public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
+    private AppCompatActivity activity;
     public class ViewHolder extends UltimateRecyclerviewViewHolder implements View.OnClickListener {
         private TextView title, text;
 
         private int click_cnt;
-
-        private void inc()
-        {
-            System.err.println("inc: " + this.click_cnt);
-            this.click_cnt++;
-        }
-
 
         public ViewHolder(View itemView)
         {
@@ -48,7 +47,6 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         @Override
         public void onClick(@NonNull View v) {
             System.err.println("id: " + v.getTransitionName() + " on click: " + this.click_cnt);
-            this.inc();
             this.setTitle(String.format("%d clicked!", this.click_cnt));
 
         }
@@ -61,9 +59,10 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 
     private List<Note> noteList;
 
-    public NoteAdapter(List<Note> noteList)
+    public NoteAdapter(List<Note> noteList, AppCompatActivity activity)
     {
         this.noteList = noteList;
+        this.activity = activity;
     }
 
     public void setOnDragStartListener(OnStartDragListener onStartDragListener)
@@ -76,6 +75,32 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_list_item, parent, false);
         ViewHolder holder = new ViewHolder(v);
         v.setOnClickListener(holder);
+        Button btn = v.findViewById(R.id.list_item_button);
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PopupMenu popupMenu = new PopupMenu(activity, v);
+                popupMenu.getMenuInflater().inflate(R.menu.list_item_options, popupMenu.getMenu());
+                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                    @Override
+                    public boolean onMenuItemClick(MenuItem item) {
+                        switch (item.getItemId())
+                        {
+                            case R.id.preview: {
+                                break;
+                            }
+                            case R.id.delete: {
+                                System.err.println(holder.getAdapterPosition());
+                                NoteAdapter.this.remove(holder.getAdapterPosition());
+                                break;
+                            }
+                        }
+                        return true;
+                    }
+                });
+                popupMenu.show();
+            }
+        });
         return holder;
     }
 
