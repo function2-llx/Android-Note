@@ -25,24 +25,29 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-// show a list of the preview of note(data stored in noteCollection)
-// show a search input text(implement it using SearchView)
-
+/**
+ * show a list of the preview of note(data stored in noteCollection)
+ * show a search input text(implement it using SearchView)
+ *
+ * @author llx
+ */
 public class ListActivity extends AppCompatActivity {
-    private  LinearLayoutManager layoutManager;
+    private LinearLayoutManager layoutManager;
     private NoteAdapter noteAdapter, searchAdapter;
     private UltimateRecyclerView ultimateRecyclerView;
     private DragDropTouchListener dragDropTouchListener;
     private SearchView searchView;
 
+    /* Options menu */
+
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         this.getMenuInflater().inflate(R.menu.activity_list, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
 
-        this.searchView = (SearchView)searchItem.getActionView();
-        searchView.setQueryHint("search by title...");
+        /* Search */
+        this.searchView = (SearchView) searchItem.getActionView();
+        this.searchView.setQueryHint("search by title...");
         this.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
@@ -59,7 +64,7 @@ public class ListActivity extends AppCompatActivity {
             }
         });
 
-        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+        this.searchView.setOnCloseListener(new SearchView.OnCloseListener() {
             @Override
             public boolean onClose() {
                 ultimateRecyclerView.setAdapter(noteAdapter);
@@ -71,8 +76,7 @@ public class ListActivity extends AppCompatActivity {
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId())
-        {
+        switch (item.getItemId()) {
             case R.id.menu_new_note: {
                 Intent intent = new Intent(ListActivity.this, EditorActivity.class);
                 this.startActivity(intent);
@@ -92,6 +96,7 @@ public class ListActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
     private List<Note> noteList;
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -108,33 +113,31 @@ public class ListActivity extends AppCompatActivity {
         this.ultimateRecyclerView.setLayoutManager(layoutManager);
         this.ultimateRecyclerView.setAdapter(noteAdapter);
         noteAdapter.notifyDataSetChanged();
-//        this.ultimateRecyclerView.reenableLoadmore();
-//        this.noteAdapter.setCustomLoadMoreView(LayoutInflater.from(this).inflate(R.layout.custom_bottom_progressbar, null));
-//        ultimateRecyclerView.setOnLoadMoreListener((itemsCount, maxLastVisiblePosition) -> {
-//            Handler handler = new Handler();
-//            handler.postDelayed(() -> {
-//                noteList.add(new Note());
-//                noteAdapter.notifyDataSetChanged();
-//            }, 1000);
-//        });
+        // this.ultimateRecyclerView.reenableLoadmore();
+        // this.noteAdapter.setCustomLoadMoreView(LayoutInflater.from(this).inflate(R.layout.custom_bottom_progressbar, null));
+        //        ultimateRecyclerView.setOnLoadMoreListener((itemsCount, maxLastVisiblePosition) -> {
+        //            Handler handler = new Handler();
+        //            handler.postDelayed(() -> {
+        //                noteList.add(new Note());
+        //                noteAdapter.notifyDataSetChanged();
+        //            }, 1000);
+        //        });
 
         this.enableDrag();
         this.enableRefresh();
     }
 
-    private void enableRefresh()
-    {
+    private void enableRefresh() {
         this.ultimateRecyclerView.setDefaultOnRefreshListener(() -> new Handler().postDelayed(() -> {
-//                        simpleRecyclerViewAdapter.insert("Refresh things", 0);
+            // simpleRecyclerViewAdapter.insert("Refresh things", 0);
             ListActivity.this.noteAdapter.insert(new Note(), 0);
             ListActivity.this.ultimateRecyclerView.setRefreshing(false);
-            //   ultimateRecyclerView.scrollBy(0, -50);
+            // ultimateRecyclerView.scrollBy(0, -50);
             layoutManager.scrollToPosition(0);
         }, 1000));
     }
 
-    private void enableDrag()
-    {
+    private void enableDrag() {
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(noteAdapter);
         itemTouchHelper = new ItemTouchHelper(callback);
         itemTouchHelper.attachToRecyclerView(ultimateRecyclerView.mRecyclerView);
@@ -146,6 +149,6 @@ public class ListActivity extends AppCompatActivity {
         });
     }
 
-    private  ItemTouchHelper itemTouchHelper;
+    private ItemTouchHelper itemTouchHelper;
 
 }
