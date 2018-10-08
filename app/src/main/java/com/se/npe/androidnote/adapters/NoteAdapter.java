@@ -16,12 +16,73 @@ import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.marshalchen.ultimaterecyclerview.UltimateViewAdapter;
 import com.se.npe.androidnote.ListActivity;
 import com.se.npe.androidnote.R;
+import com.se.npe.androidnote.interfaces.INoteCollection;
 import com.se.npe.androidnote.models.Note;
 
+import java.util.ArrayList;
 import java.util.List;
 
-public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
+public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> implements INoteCollection {
     private AppCompatActivity activity;
+
+    @Override
+    public List<Note> getAllNotes() {
+        return this.noteList;
+    }
+
+    @Override
+    public List<Note> getSearchResult(String parameter) {
+        List<Note> ret = new ArrayList<>();
+        for (Note note: this.noteList) {
+            if (note.getTitle().contains(parameter))
+                ret.add(note);
+        }
+        return ret;
+    }
+
+    public void updateList(List<Note> list)
+    {
+        if (list.isEmpty())
+            this.clear();
+        else {
+            this.noteList.clear();
+            for (Note note: list) {
+                noteList.add(note);
+            }
+            this.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void addNote(Note note) {
+        this.insert(note, 0);
+    }
+
+    @Override
+    public Note getNoteAt(int index) {
+        return this.getItem(index);
+    }
+
+    @Override
+    public void setNoteAt(int index, Note Note) {
+
+    }
+
+    @Override
+    public void removeNoteAt(int index) {
+
+    }
+
+    @Override
+    public void loadFromFile(String fileName) {
+
+    }
+
+    @Override
+    public void saveToFile(String fileName) {
+
+    }
+
     public class ViewHolder extends UltimateRecyclerviewViewHolder implements View.OnClickListener {
         private TextView title, text;
 
@@ -46,7 +107,6 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 
         @Override
         public void onClick(@NonNull View v) {
-            System.err.println("id: " + v.getTransitionName() + " on click: " + this.click_cnt);
             this.setTitle(String.format("%d clicked!", this.click_cnt));
 
         }
@@ -159,7 +219,6 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 
     public void insert(Note note, int position)
     {
-        int size = noteList.size();
         super.insertInternal(this.noteList, note, position);
     }
 
