@@ -62,6 +62,8 @@ public class ListActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                searchAdapter = new NoteAdapter(noteAdapter.getSearchResult(newText), ListActivity.this);
+                ultimateRecyclerView.setAdapter(searchAdapter);
                 return true;
             }
         });
