@@ -59,7 +59,23 @@ public class Note {
     }
 
     public PreviewData getPreview() {
-        return null;
+        String text = null;
+        String picpath = null;
+        List<IData> templist = getContent();
+        for (int i = 0; i < templist.size(); i++) {
+            if(picpath == null&&templist.get(i).toString().charAt(0) == 'P')
+            {
+                picpath = templist.get(i).toString().split(" ")[1];
+            }
+            else if(text == null&&templist.get(i).toString().charAt(0) == 'T')
+            {
+                text = templist.get(i).toString().split(" ")[1];
+            }
+        }
+        if(text == null)text = "无预览文字";
+        if(picpath == null)picpath = "NoPic";
+        Note.PreviewData previewData = new Note.PreviewData(title,text,picpath);
+        return previewData;
     }
 
     public void loadFromFile(String fileName) {
