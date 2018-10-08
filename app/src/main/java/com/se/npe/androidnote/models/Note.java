@@ -51,6 +51,7 @@ public class Note {
     {
         this.id = tot++;
         this.title = "this is tile for " + id;
+        this.content = new ArrayList<IData>();
     }
 
     public Note(String title, List<IData> content) {
@@ -82,7 +83,7 @@ public class Note {
             }
         }
         if(text == null)text = "无预览文字";
-        if(picpath == null)picpath = "NoPic";
+        if(picpath == null)picpath = "";
         Note.PreviewData previewData = new Note.PreviewData(title,text,picpath);
         return previewData;
     }
