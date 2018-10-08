@@ -25,8 +25,7 @@ import java.io.OutputStream;
  * */
 
 public class Note {
-
-    static class PreviewData {
+    public static class PreviewData {
         // using public field just for convenience
         public @NonNull
         String title;
@@ -45,7 +44,17 @@ public class Note {
     private String title;
     private List<IData> content;
 
+    static int tot;
+    final int id;
+
+    public Note()
+    {
+        this.id = tot++;
+        this.title = "this is tile for " + id;
+    }
+
     public Note(String title, List<IData> content) {
+        this.id = tot++;
         this.title = title;
         this.content = content;
     }

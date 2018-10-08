@@ -7,7 +7,14 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.se.npe.androidnote.models.Note;
@@ -19,6 +26,32 @@ import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity {
     private Note selectedNote;
+    private ListView noteList;
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu)
+    {
+        this.getMenuInflater().inflate(R.menu.activity_main, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item)
+    {
+        switch (item.getItemId()) {
+            case R.id.menu_list: {
+                Intent intent = new Intent(MainActivity.this, ListActivity.class);
+                startActivity(intent);
+                break;
+            }
+            case R.id.menu_new_note: {
+                Intent intent = new Intent(MainActivity.this, EditorActivity.class);
+                startActivity(intent);
+                break;
+            }
+        }
+        return super.onOptionsItemSelected(item);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
