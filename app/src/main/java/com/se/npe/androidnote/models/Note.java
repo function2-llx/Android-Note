@@ -87,22 +87,22 @@ public class Note {
         content = new ArrayList<IData>();
 
         for (int i = 1; i < StrArray.length; i++) {
-            if(StrArray[i][0] == 'S') {
+            if(StrArray[i].charAt(0) == 'S') {
                 String[] tempArray = StrArray[i].split(" ");
                 SoundData tempSoundData = new SoundData(tempArray[1],tempArray[2]);
                 content.add(tempSoundData);
             }
-            else if(StrArray[i][0] == 'T') {
+            else if(StrArray[i].charAt(0) == 'T') {
                 String[] tempArray = StrArray[i].split(" ");
                 TextData tempTextData = new TextData(tempArray[1]);
                 content.add(tempTextData);
             }
-            else if(StrArray[i][0] == 'V') {
+            else if(StrArray[i].charAt(0) == 'V') {
                 String[] tempArray = StrArray[i].split(" ");
                 VideoData tempVideoData = new VideoData(tempArray[1]);
                 content.add(tempVideoData);
             }
-            else if(StrArray[i][0] == 'P'){
+            else if(StrArray[i].charAt(0) == 'P'){
                 String[] tempArray = StrArray[i].split(" ");
                 Bitmap mBitmap = BitmapFactory.decodeFile(StrArray[1]);
                 PictureData tempPictureData = new PictureData(tempArray[1],mBitmap);
