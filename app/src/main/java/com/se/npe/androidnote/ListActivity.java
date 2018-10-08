@@ -7,9 +7,11 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.SearchView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.marshalchen.ultimaterecyclerview.DragDropTouchListener;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
@@ -27,16 +29,43 @@ import java.util.List;
 // show a search input text(implement it using SearchView)
 
 public class ListActivity extends AppCompatActivity {
-    private INoteCollection noteCollection;
     private  LinearLayoutManager layoutManager;
-    private NoteAdapter noteAdapter;
+    private NoteAdapter noteAdapter, searchAdapter;
     private UltimateRecyclerView ultimateRecyclerView;
     private DragDropTouchListener dragDropTouchListener;
+    private SearchView searchView;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu)
     {
         this.getMenuInflater().inflate(R.menu.activity_list, menu);
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+
+        this.searchView = (SearchView)searchItem.getActionView();
+        searchView.setQueryHint("search by title...");
+        this.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchAdapter = new NoteAdapter(noteAdapter.getSearchResult(query), ListActivity.this);
+                ultimateRecyclerView.setAdapter(searchAdapter);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                searchAdapter = new NoteAdapter(noteAdapter.getSearchResult(newText), ListActivity.this);
+                ultimateRecyclerView.setAdapter(searchAdapter);
+                return true;
+            }
+        });
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                ultimateRecyclerView.setAdapter(noteAdapter);
+                return false;
+            }
+        });
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -49,6 +78,12 @@ public class ListActivity extends AppCompatActivity {
                 this.startActivity(intent);
                 break;
             }
+
+            case R.id.clear: {
+                noteAdapter.clear();
+                break;
+            }
+
             case R.id.sort_title: {
                 Collections.sort(this.noteList, Comparator.comparing(Note::getTitle));
                 this.noteAdapter.notifyDataSetChanged();
@@ -63,58 +98,16 @@ public class ListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
         this.setTitle(this.getResources().getString(R.string.list_title));
-
-
-        this.noteCollection = new INoteCollection() {
-            @Override
-            public List<Note> getAllNotes() {
-                int size = 10;
-                List<Note> ret = new ArrayList<>();
-                for (int i = 0; i < size; i++) ret.add(new Note());
-                return ret;
-            }
-
-            @Override
-            public List<Note> getSearchResult(String parameter) {
-                return null;
-            }
-
-            @Override
-            public void addNote(Note note) {
-
-            }
-
-            @Override
-            public Note getNoteAt(int index) {
-                return null;
-            }
-
-            @Override
-            public void setNoteAt(int index, Note Note) {
-
-            }
-
-            @Override
-            public void removeNoteAt(int index) {
-
-            }
-
-            @Override
-            public void loadFromFile(String fileName) {
-
-            }
-
-            @Override
-            public void saveToFile(String fileName) {
-
-            }
-        };
-        this.noteList = this.noteCollection.getAllNotes();
+        this.noteList = new ArrayList<>();
+        final int size = 20;
+        for (int i = 0; i < size; i++)
+            noteList.add(new Note());
         this.noteAdapter = new NoteAdapter(noteList, this);
         this.layoutManager = new LinearLayoutManager(this);
         this.ultimateRecyclerView = this.findViewById(R.id.ultimate_recycler_view);
         this.ultimateRecyclerView.setLayoutManager(layoutManager);
         this.ultimateRecyclerView.setAdapter(noteAdapter);
+        noteAdapter.notifyDataSetChanged();
 //        this.ultimateRecyclerView.reenableLoadmore();
 //        this.noteAdapter.setCustomLoadMoreView(LayoutInflater.from(this).inflate(R.layout.custom_bottom_progressbar, null));
 //        ultimateRecyclerView.setOnLoadMoreListener((itemsCount, maxLastVisiblePosition) -> {
