@@ -74,8 +74,8 @@ public class MainActivity extends AppCompatActivity {
         List<Note> allnotes = newtable.getAllNotes();
 
         Log.d("debug0001","All Notes in DB "+Integer.toString(allnotes.size()));
-
         */
+
         //Log.d("debug0001",newtable.getNoteAt(5).toString());
 
         //newtable.removeNoteAt(5);

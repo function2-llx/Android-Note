@@ -44,6 +44,8 @@ public class Note {
     private String title;
     private List<IData> content;
 
+    private int DBindex = -1;
+
     static int tot;
     final int id;
 
@@ -60,9 +62,20 @@ public class Note {
         this.content = content;
     }
 
+    public Note(String title, List<IData> content,int index) {
+        this.id = tot++;
+        this.DBindex = index;
+        this.title = title;
+        this.content = content;
+    }
+
     public String getTitle() {
         return title;
     }
+
+    public void setindex(int index){DBindex = index;}
+
+    public int getIndex(){return DBindex;}
 
     public List<IData> getContent() {
         return content;
