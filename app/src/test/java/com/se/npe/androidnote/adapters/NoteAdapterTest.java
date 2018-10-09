@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.robolectric.RobolectricTestRunner;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -23,7 +23,7 @@ import java.util.List;
 
 import static org.junit.Assert.*;
 
-@RunWith(MockitoJUnitRunner.class)
+@RunWith(RobolectricTestRunner.class)
 public class NoteAdapterTest {
     @Mock
     NoteAdapter mockNoteAdapter;
@@ -53,7 +53,8 @@ public class NoteAdapterTest {
 
     @Test
     public void getAllNotes() {
-        assertEquals(this.noteList, mockNoteAdapter.getAllNotes());
+        // Same are noteList and mockNoteAdapter.getAllNotes()
+        assertSame(this.noteList, mockNoteAdapter.getAllNotes());
     }
 
     @Test
@@ -61,6 +62,7 @@ public class NoteAdapterTest {
         // Depends on example note
         // Whole note list
         assertEquals(this.noteList, mockNoteAdapter.getSearchResult("title"));
+        assertNotSame(this.noteList, mockNoteAdapter.getSearchResult("title"));
         // Empty note list
         assertEquals(new ArrayList<Note>(), mockNoteAdapter.getSearchResult("wtf???"));
 
@@ -84,23 +86,17 @@ public class NoteAdapterTest {
         // Add 5 notes
         final int NOTE_LIST_SIZE_ADD = 5;
         for (int i = 0; i < NOTE_LIST_SIZE_ADD; ++i) {
-            Note note = getExampleNote(NOTE_LIST_SIZE + i);
-            mockNoteAdapter.addNote(note);
-            noteList.add(note);
+            mockNoteAdapter.addNote(getExampleNote(NOTE_LIST_SIZE + i));
+            assertSame(noteList, mockNoteAdapter.getAllNotes());
+            assertEquals(NOTE_LIST_SIZE + i + 1, mockNoteAdapter.getAllNotes().size());
         }
-        assertEquals(noteList, mockNoteAdapter.getAllNotes());
-        // Add a different note
-        // Not equals
-        mockNoteAdapter.addNote(getExampleNote(NOTE_LIST_SIZE + NOTE_LIST_SIZE_ADD));
-        noteList.add(getExampleNote(NOTE_LIST_SIZE + NOTE_LIST_SIZE_ADD + 1));
-        assertNotEquals(noteList, mockNoteAdapter.getAllNotes());
     }
 
     @Test
     public void getNoteAt() {
-        // All corresponding notes are equal
+        // All corresponding notes are same
         for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
-            assertEquals(noteList.get(i), mockNoteAdapter.getNoteAt(i));
+            assertSame(noteList.get(i), mockNoteAdapter.getNoteAt(i));
         }
         // Not corresponding notes are not equal
         assertNotEquals(noteList.get(0), mockNoteAdapter.getNoteAt(1));
@@ -182,9 +178,8 @@ public class NoteAdapterTest {
     public void getItem() {
         // Get all items
         for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
-            assertEquals(noteList.get(i), mockNoteAdapter.getItem(i));
+            assertSame(noteList.get(i), mockNoteAdapter.getItem(i));
         }
-
     }
 
     @Test
@@ -209,16 +204,14 @@ public class NoteAdapterTest {
         for (int i = 0; i < NOTE_LIST_SIZE_ADD; ++i) {
             Note note = getExampleNote(NOTE_LIST_SIZE + i);
             mockNoteAdapter.insert(note, i * NOTE_LIST_SIZE / NOTE_LIST_SIZE_ADD);
-            noteList.add(note);
-            assertEquals(noteList, mockNoteAdapter.getAllNotes());
+            assertSame(noteList, mockNoteAdapter.getAllNotes());
+            assertEquals(NOTE_LIST_SIZE + i + 1, mockNoteAdapter.getAllNotes().size());
         }
         // Insert at end
         Note note = getExampleNote(NOTE_LIST_SIZE + NOTE_LIST_SIZE_ADD);
         mockNoteAdapter.insert(note, NOTE_LIST_SIZE + NOTE_LIST_SIZE_ADD);
-        noteList.add(note);
-        assertEquals(noteList, mockNoteAdapter.getAllNotes());
-        // Insert after end
-        // Insert before start
+        assertSame(noteList, mockNoteAdapter.getAllNotes());
+        assertEquals(NOTE_LIST_SIZE + NOTE_LIST_SIZE_ADD + 1, mockNoteAdapter.getAllNotes().size());
     }
 
     @Test
@@ -241,9 +234,13 @@ public class NoteAdapterTest {
         final int NOTE_LIST_SIZE_SUBTRACT = 5;
         for (int i = 0; i < NOTE_LIST_SIZE_SUBTRACT; ++i) {
             mockNoteAdapter.remove(i);
-            noteList.remove(i);
-            assertEquals(noteList, mockNoteAdapter.getAllNotes());
+            assertSame(noteList, mockNoteAdapter.getAllNotes());
+            assertEquals(NOTE_LIST_SIZE - i - 1, mockNoteAdapter.getAllNotes().size());
         }
+        // Remove at end
+        mockNoteAdapter.remove(mockNoteAdapter.getAllNotes().size() - 1);
+        assertSame(noteList, mockNoteAdapter.getAllNotes());
+        assertEquals(NOTE_LIST_SIZE - NOTE_LIST_SIZE_SUBTRACT - 1, mockNoteAdapter.getAllNotes().size());
     }
 
     @Test
@@ -265,31 +262,25 @@ public class NoteAdapterTest {
         // Swap position from/to start
         for (int i = 1; i < NOTE_LIST_SIZE; ++i) {
             mockNoteAdapter.swapPositions(0, i);
-            Collections.swap(noteList, 0, i);
             assertEquals(noteList, mockNoteAdapter.getAllNotes());
             mockNoteAdapter.swapPositions(i, 0);
-            Collections.swap(noteList, i, 0);
             assertEquals(noteList, mockNoteAdapter.getAllNotes());
         }
         // Swap position from/to end
         for (int i = 1; i < NOTE_LIST_SIZE; ++i) {
             mockNoteAdapter.swapPositions(NOTE_LIST_SIZE - 1, i);
-            Collections.swap(noteList, NOTE_LIST_SIZE - 1, i);
             assertEquals(noteList, mockNoteAdapter.getAllNotes());
             mockNoteAdapter.swapPositions(i, NOTE_LIST_SIZE - 1);
-            Collections.swap(noteList, i, NOTE_LIST_SIZE - 1);
             assertEquals(noteList, mockNoteAdapter.getAllNotes());
         }
         // Swap position in the middle
         for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
             mockNoteAdapter.swapPositions(i, NOTE_LIST_SIZE - i - 1);
-            Collections.swap(noteList, i, NOTE_LIST_SIZE - i - 1);
             assertEquals(noteList, mockNoteAdapter.getAllNotes());
         }
         // Swap same position
         for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
             mockNoteAdapter.swapPositions(i, i);
-            Collections.swap(noteList, i, i);
             assertEquals(noteList, mockNoteAdapter.getAllNotes());
         }
     }
