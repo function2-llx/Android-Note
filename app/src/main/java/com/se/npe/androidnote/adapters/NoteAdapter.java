@@ -79,17 +79,17 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> imp
 
     }
 
-    public void updateList(List<Note> list) {
-        if (list.isEmpty())
-            this.clear();
-        else {
-            this.noteList.clear();
-            for (Note note : list) {
-                noteList.add(note);
-            }
-            this.notifyDataSetChanged();
-        }
-    }
+    // public void updateList(List<Note> list) {
+    //     if (list.isEmpty())
+    //         this.clear();
+    //     else {
+    //         this.noteList.clear();
+    //         for (Note note : list) {
+    //             noteList.add(note);
+    //         }
+    //         this.notifyDataSetChanged();
+    //     }
+    // }
 
     /**
      * Adapt Note to item-like View
@@ -221,12 +221,13 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> imp
         return new ViewHolder(view);
     }
 
-    Note getItem(int position) {
-        if (this.customHeaderView != null)
+    Note getItem(int position) throws IndexOutOfBoundsException {
+        // Subtract the first one used by header
+        if (this.hasHeaderView())
             position--;
-        if (position < this.noteList.size())
-            return this.noteList.get(position);
-        return null;
+        // if (position < this.noteList.size() && position >= 0)
+        return this.noteList.get(position);
+        // throw new IndexOutOfBoundsException("Note list out of range.");
     }
 
     /* Actions of Note in NoteCollection */

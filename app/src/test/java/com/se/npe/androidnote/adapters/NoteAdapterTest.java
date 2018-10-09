@@ -10,12 +10,15 @@ import com.se.npe.androidnote.models.TextData;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
@@ -30,6 +33,9 @@ public class NoteAdapterTest {
 
     @Mock
     AppCompatActivity mockActivity;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void setUp() {
@@ -107,6 +113,20 @@ public class NoteAdapterTest {
     }
 
     @Test
+    public void getNoteAtBeforeStart() {
+        // Expect exception thrown
+        expectedException.expect(IndexOutOfBoundsException.class);
+        mockNoteAdapter.getNoteAt(-1);
+    }
+
+    @Test
+    public void getNoteAtAfterEnd() {
+        // Expect exception thrown
+        expectedException.expect(IndexOutOfBoundsException.class);
+        mockNoteAdapter.getNoteAt(NOTE_LIST_SIZE);
+    }
+
+    @Test
     public void setNoteAt() {
     }
 
@@ -120,10 +140,6 @@ public class NoteAdapterTest {
 
     @Test
     public void saveToFile() {
-    }
-
-    @Test
-    public void updateList() {
     }
 
     @Test
@@ -164,22 +180,152 @@ public class NoteAdapterTest {
 
     @Test
     public void getItem() {
+        // Get all items
+        for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
+            assertEquals(noteList.get(i), mockNoteAdapter.getItem(i));
+        }
+
     }
 
     @Test
+    public void getItemBeforeStart() {
+        // Expect exception thrown
+        expectedException.expect(IndexOutOfBoundsException.class);
+        mockNoteAdapter.getItem(-1);
+    }
+
+    @Test
+    public void getItemAfterEnd() {
+        // Expect exception thrown
+        expectedException.expect(IndexOutOfBoundsException.class);
+        mockNoteAdapter.getItem(NOTE_LIST_SIZE);
+    }
+
+
+    @Test
     public void insert() {
+        // Insert at start, middle
+        final int NOTE_LIST_SIZE_ADD = 5;
+        for (int i = 0; i < NOTE_LIST_SIZE_ADD; ++i) {
+            Note note = getExampleNote(NOTE_LIST_SIZE + i);
+            mockNoteAdapter.insert(note, i * NOTE_LIST_SIZE / NOTE_LIST_SIZE_ADD);
+            noteList.add(note);
+            assertEquals(noteList, mockNoteAdapter.getAllNotes());
+        }
+        // Insert at end
+        Note note = getExampleNote(NOTE_LIST_SIZE + NOTE_LIST_SIZE_ADD);
+        mockNoteAdapter.insert(note, NOTE_LIST_SIZE + NOTE_LIST_SIZE_ADD);
+        noteList.add(note);
+        assertEquals(noteList, mockNoteAdapter.getAllNotes());
+        // Insert after end
+        // Insert before start
+    }
+
+    @Test
+    public void insertBeforeStart() {
+        // Expect exception thrown
+        expectedException.expect(IndexOutOfBoundsException.class);
+        mockNoteAdapter.insert(getExampleNote(-1), -1);
+    }
+
+    @Test
+    public void insertAfterEnd() {
+        // Expect exception thrown
+        expectedException.expect(IndexOutOfBoundsException.class);
+        mockNoteAdapter.insert(getExampleNote(NOTE_LIST_SIZE + 1), NOTE_LIST_SIZE + 1);
     }
 
     @Test
     public void remove() {
+        // Remove at start, middle
+        final int NOTE_LIST_SIZE_SUBTRACT = 5;
+        for (int i = 0; i < NOTE_LIST_SIZE_SUBTRACT; ++i) {
+            mockNoteAdapter.remove(i);
+            noteList.remove(i);
+            assertEquals(noteList, mockNoteAdapter.getAllNotes());
+        }
+    }
+
+    @Test
+    public void removeBeforeStart() {
+        // Expect exception thrown
+        expectedException.expect(IndexOutOfBoundsException.class);
+        mockNoteAdapter.remove(-1);
+    }
+
+    @Test
+    public void removeAfterEnd() {
+        // Expect exception thrown
+        expectedException.expect(IndexOutOfBoundsException.class);
+        mockNoteAdapter.remove(NOTE_LIST_SIZE);
     }
 
     @Test
     public void swapPositions() {
+        // Swap position from/to start
+        for (int i = 1; i < NOTE_LIST_SIZE; ++i) {
+            mockNoteAdapter.swapPositions(0, i);
+            Collections.swap(noteList, 0, i);
+            assertEquals(noteList, mockNoteAdapter.getAllNotes());
+            mockNoteAdapter.swapPositions(i, 0);
+            Collections.swap(noteList, i, 0);
+            assertEquals(noteList, mockNoteAdapter.getAllNotes());
+        }
+        // Swap position from/to end
+        for (int i = 1; i < NOTE_LIST_SIZE; ++i) {
+            mockNoteAdapter.swapPositions(NOTE_LIST_SIZE - 1, i);
+            Collections.swap(noteList, NOTE_LIST_SIZE - 1, i);
+            assertEquals(noteList, mockNoteAdapter.getAllNotes());
+            mockNoteAdapter.swapPositions(i, NOTE_LIST_SIZE - 1);
+            Collections.swap(noteList, i, NOTE_LIST_SIZE - 1);
+            assertEquals(noteList, mockNoteAdapter.getAllNotes());
+        }
+        // Swap position in the middle
+        for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
+            mockNoteAdapter.swapPositions(i, NOTE_LIST_SIZE - i - 1);
+            Collections.swap(noteList, i, NOTE_LIST_SIZE - i - 1);
+            assertEquals(noteList, mockNoteAdapter.getAllNotes());
+        }
+        // Swap same position
+        for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
+            mockNoteAdapter.swapPositions(i, i);
+            Collections.swap(noteList, i, i);
+            assertEquals(noteList, mockNoteAdapter.getAllNotes());
+        }
+    }
+
+    @Test
+    public void swapPositionsFromBeforeStart() {
+        // Expect exception thrown
+        expectedException.expect(IndexOutOfBoundsException.class);
+        mockNoteAdapter.swapPositions(-1, 0);
+    }
+
+    @Test
+    public void swapPositionsToBeforeStart() {
+        // Expect exception thrown
+        expectedException.expect(IndexOutOfBoundsException.class);
+        mockNoteAdapter.swapPositions(0, -1);
+    }
+
+    @Test
+    public void swapPositionsFromAfterEnd() {
+        // Expect exception thrown
+        expectedException.expect(IndexOutOfBoundsException.class);
+        mockNoteAdapter.swapPositions(NOTE_LIST_SIZE, NOTE_LIST_SIZE - 1);
+    }
+
+    @Test
+    public void swapPositionsToAfterEnd() {
+        // Expect exception thrown
+        expectedException.expect(IndexOutOfBoundsException.class);
+        mockNoteAdapter.swapPositions(NOTE_LIST_SIZE - 1, NOTE_LIST_SIZE);
     }
 
     @Test
     public void clear() {
+        mockNoteAdapter.clear();
+        assertEquals(new ArrayList<Note>(), mockNoteAdapter.getAllNotes());
     }
 
     @Test
