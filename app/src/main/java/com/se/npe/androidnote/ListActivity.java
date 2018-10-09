@@ -12,13 +12,11 @@ import android.support.v7.widget.SearchView;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
 import com.marshalchen.ultimaterecyclerview.DragDropTouchListener;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.marshalchen.ultimaterecyclerview.itemTouchHelper.SimpleItemTouchHelperCallback;
 import com.se.npe.androidnote.adapters.NoteAdapter;
-import com.se.npe.androidnote.interfaces.INoteCollection;
 import com.se.npe.androidnote.models.Note;
 
 import java.util.ArrayList;

@@ -18,7 +18,6 @@ import org.mockito.Mock;
 import org.robolectric.RobolectricTestRunner;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.*;
