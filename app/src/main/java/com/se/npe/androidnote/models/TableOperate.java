@@ -26,33 +26,35 @@ public class TableOperate implements INoteCollection{
     public String encodeNote(List<IData> src) {
         String string = "";
         for (int i = 0; i < src.size(); i++) {
-            string = string + src.get(i).toString() + "^";
+            string = string + src.get(i).toString() + "qwert";
         }
         Log.d("debug0001",string);
         return string;
     }
 
     public List<IData> decodeNote(String src){
+        Log.d("debug0001","decode:"+src);
         List<IData> content = new ArrayList<IData>();
-        String[] StrArray = src.split("^");
+        String[] StrArray = src.split("qwert");
         for (int i = 1; i < StrArray.length; i++) {
+            Log.d("debug0001",StrArray[i]);
             if(StrArray[i].charAt(0) == 'S') {
-                String[] tempArray = StrArray[i].split(" ");
+                String[] tempArray = StrArray[i].split("asdfg");
                 SoundData tempSoundData = new SoundData(tempArray[1],tempArray[2]);
                 content.add(tempSoundData);
             }
             else if(StrArray[i].charAt(0) == 'T') {
-                String[] tempArray = StrArray[i].split(" ");
+                String[] tempArray = StrArray[i].split("asdfg");
                 TextData tempTextData = new TextData(tempArray[1]);
                 content.add(tempTextData);
             }
             else if(StrArray[i].charAt(0) == 'V') {
-                String[] tempArray = StrArray[i].split(" ");
+                String[] tempArray = StrArray[i].split("asdfg");
                 VideoData tempVideoData = new VideoData(tempArray[1]);
                 content.add(tempVideoData);
             }
             else if(StrArray[i].charAt(0) == 'P'){
-                String[] tempArray = StrArray[i].split(" ");
+                String[] tempArray = StrArray[i].split("asdfg");
                 Bitmap mBitmap = BitmapFactory.decodeFile(StrArray[1]);
                 PictureData tempPictureData = new PictureData(tempArray[1],mBitmap);
                 content.add(tempPictureData);
@@ -65,6 +67,7 @@ public class TableOperate implements INoteCollection{
         ArrayList<Note> Notelist = new ArrayList<Note>();
         Cursor c = db.rawQuery("select * from "+TableConfig.TABLE_NAME, null);
         while (c.moveToNext()) {
+            Log.d("debug0001",c.getString(0)+" "+c.getString(1)+" "+c.getString(2));
             Note temp = new Note(c.getString(1),decodeNote(c.getString(2)));
             Notelist.add(temp);
         }
@@ -85,12 +88,6 @@ public class TableOperate implements INoteCollection{
 
     public void addNote(Note note){
         Log.d("debug0001","insert into "+TableConfig.TABLE_NAME+" values("+note.getTitle()+","+encodeNote(note.getContent())+")");
-        if(db == null)Log.d("debug00001","shit");
-        Cursor c = db.rawQuery("select * from "+TableConfig.TABLE_NAME, null);
-        Log.d("debug0001","OK");
-        while (c.moveToNext()) {
-            Log.d("debug0001",c.getString(0)+c.getString(1)+c.getString(2));
-        }
         ContentValues cValue = new ContentValues();
         cValue.put(TableConfig.Note.NOTE_TITLE,note.getTitle());
         cValue.put(TableConfig.Note.NOTE_CONTENT,encodeNote(note.getContent()));

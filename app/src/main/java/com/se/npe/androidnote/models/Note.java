@@ -75,11 +75,11 @@ public class Note {
         for (int i = 0; i < templist.size(); i++) {
             if(picpath == null&&templist.get(i).toString().charAt(0) == 'P')
             {
-                picpath = templist.get(i).toString().split(" ")[1];
+                picpath = templist.get(i).toString().split("asdfg")[1];
             }
             else if(text == null&&templist.get(i).toString().charAt(0) == 'T')
             {
-                text = templist.get(i).toString().split(" ")[1];
+                text = templist.get(i).toString().split("asdfg")[1];
             }
         }
         if(text == null)text = "无预览文字";
@@ -106,7 +106,7 @@ public class Note {
         }
 
         String tempcontent = new String(b);
-        String[] StrArray = tempcontent.split("\n");
+        String[] StrArray = tempcontent.split("qwert");
 
         title = StrArray[0];
 
@@ -114,22 +114,22 @@ public class Note {
 
         for (int i = 1; i < StrArray.length; i++) {
             if(StrArray[i].charAt(0) == 'S') {
-                String[] tempArray = StrArray[i].split(" ");
+                String[] tempArray = StrArray[i].split("asdfg");
                 SoundData tempSoundData = new SoundData(tempArray[1],tempArray[2]);
                 content.add(tempSoundData);
             }
             else if(StrArray[i].charAt(0) == 'T') {
-                String[] tempArray = StrArray[i].split(" ");
+                String[] tempArray = StrArray[i].split("asdfg");
                 TextData tempTextData = new TextData(tempArray[1]);
                 content.add(tempTextData);
             }
             else if(StrArray[i].charAt(0) == 'V') {
-                String[] tempArray = StrArray[i].split(" ");
+                String[] tempArray = StrArray[i].split("asdfg");
                 VideoData tempVideoData = new VideoData(tempArray[1]);
                 content.add(tempVideoData);
             }
             else if(StrArray[i].charAt(0) == 'P'){
-                String[] tempArray = StrArray[i].split(" ");
+                String[] tempArray = StrArray[i].split("asdfg");
                 Bitmap mBitmap = BitmapFactory.decodeFile(StrArray[1]);
                 PictureData tempPictureData = new PictureData(tempArray[1],mBitmap);
                 content.add(tempPictureData);
@@ -158,11 +158,11 @@ public class Note {
         } catch (FileNotFoundException e) {
             e.printStackTrace();
         }
-        String string = getTitle() + "\n";
+        String string = getTitle() + "qwert";
         List<IData> templist = getContent();
 
         for (int i = 0; i < templist.size(); i++) {
-            string = string + templist.get(i).toString() + "\n";
+            string = string + templist.get(i).toString() + "qwert";
         }
 
         byte[] bs = string.getBytes();
@@ -177,5 +177,16 @@ public class Note {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public String toString() {
+        String string = getTitle();
+        List<IData> templist = getContent();
+        for(int i = 0;i < templist.size();i ++)
+        {
+            string = string + " " + templist.get(i).toString();
+        }
+        return string;
     }
 }

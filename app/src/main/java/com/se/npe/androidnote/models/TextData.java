@@ -22,6 +22,6 @@ public class TextData implements IData{
     }
 
     public String toString(){
-        return "Text "+text;
+        return "Text"+"asdfg"+text;
     }
 }

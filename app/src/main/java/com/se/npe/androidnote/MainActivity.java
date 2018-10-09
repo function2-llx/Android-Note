@@ -27,6 +27,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
     private Note selectedNote;
@@ -61,17 +62,29 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        /*
         TableOperate newtable = new TableOperate(getApplicationContext());
         Log.d("debug0001","OK_setup");
         ArrayList<IData> templist = new ArrayList<IData>();
-        TextData data1 = new TextData("haha");
+        TextData data1 = new TextData("test data");
         templist.add(data1);
         newtable.addNote(new Note("data1",templist));
         Log.d("debug0001","OK_insert");
-        if(newtable.getAllNotes() != null) {
-            Log.d("debug0001","OK");
-        }
-        else Log.d("debug0001","Fail");
+
+        List<Note> allnotes = newtable.getAllNotes();
+
+        Log.d("debug0001","All Notes in DB "+Integer.toString(allnotes.size()));
+
+        */
+        //Log.d("debug0001",newtable.getNoteAt(5).toString());
+
+        //newtable.removeNoteAt(5);
+
+        //newtable.setNoteAt(17,new Note("data2",templist));
+
+        //List<Note> anslist = newtable.getSearchResult("data");
+
+        //Log.d("debug0001",Integer.toString(anslist.size()));
 
         setContentView(R.layout.activity_main);
         initListener();

@@ -28,6 +28,6 @@ public class SoundData implements IData {
     }
 
     public String toString(){
-        return "Sound "+soundPath + " " + text;
+        return "Sound"+"asdfg"+soundPath + "asdfg" + text;
     }
 }
