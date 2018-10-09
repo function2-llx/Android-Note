@@ -59,12 +59,9 @@ public class ListActivity extends AppCompatActivity {
             }
         });
 
-        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
-            @Override
-            public boolean onClose() {
-                ultimateRecyclerView.setAdapter(noteAdapter);
-                return false;
-            }
+        searchView.setOnCloseListener(() -> {
+            ultimateRecyclerView.setAdapter(noteAdapter);
+            return false;
         });
         return super.onCreateOptionsMenu(menu);
     }
