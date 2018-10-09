@@ -3,6 +3,7 @@ package com.se.npe.androidnote;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -36,7 +37,6 @@ public class ListActivity extends AppCompatActivity {
     private NoteAdapter noteAdapter, searchAdapter;
     private UltimateRecyclerView ultimateRecyclerView;
     private DragDropTouchListener dragDropTouchListener;
-    private SearchView searchView;
 
     /* Options menu */
 
@@ -44,33 +44,9 @@ public class ListActivity extends AppCompatActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         this.getMenuInflater().inflate(R.menu.activity_list, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
-
-        /* Search */
-        this.searchView = (SearchView) searchItem.getActionView();
-        this.searchView.setQueryHint("search by title...");
-        this.searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                searchAdapter = new NoteAdapter(noteAdapter.getSearchResult(query), ListActivity.this);
-                ultimateRecyclerView.setAdapter(searchAdapter);
-                return true;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                searchAdapter = new NoteAdapter(noteAdapter.getSearchResult(newText), ListActivity.this);
-                ultimateRecyclerView.setAdapter(searchAdapter);
-                return true;
-            }
-        });
-
-        this.searchView.setOnCloseListener(new SearchView.OnCloseListener() {
-            @Override
-            public boolean onClose() {
-                ultimateRecyclerView.setAdapter(noteAdapter);
-                return false;
-            }
-        });
+        SearchView searchView = (SearchView) searchItem.getActionView();
+        this.configureSearchView(searchView);
+        
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -125,6 +101,36 @@ public class ListActivity extends AppCompatActivity {
 
         this.enableDrag();
         this.enableRefresh();
+    }
+
+    /**
+     * Configure search view to set hint & listener
+     */
+    private void configureSearchView(@NonNull SearchView searchView) {
+        searchView.setQueryHint("search by title...");
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                searchAdapter = new NoteAdapter(noteAdapter.getSearchResult(query), ListActivity.this);
+                ultimateRecyclerView.setAdapter(searchAdapter);
+                return true;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                searchAdapter = new NoteAdapter(noteAdapter.getSearchResult(newText), ListActivity.this);
+                ultimateRecyclerView.setAdapter(searchAdapter);
+                return true;
+            }
+        });
+
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+            @Override
+            public boolean onClose() {
+                ultimateRecyclerView.setAdapter(noteAdapter);
+                return false;
+            }
+        });
     }
 
     private void enableRefresh() {
