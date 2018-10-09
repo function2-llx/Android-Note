@@ -26,4 +26,7 @@ public class PictureData implements IData {
     public Bitmap getPicture() {
         return picture;
     }
+    public String toString(){
+        return "Picture"+"asdfg"+picturePath;
+    }
 }
