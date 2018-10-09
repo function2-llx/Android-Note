@@ -20,4 +20,8 @@ public class TextData implements IData{
     public String getText() {
         return text;
     }
+
+    public String toString(){
+        return "Text"+"asdfg"+text;
+    }
 }

@@ -19,6 +19,7 @@ import com.marshalchen.ultimaterecyclerview.itemTouchHelper.SimpleItemTouchHelpe
 import com.se.npe.androidnote.adapters.NoteAdapter;
 import com.se.npe.androidnote.interfaces.INoteCollection;
 import com.se.npe.androidnote.models.Note;
+import com.se.npe.androidnote.models.TableOperate;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -95,16 +96,22 @@ public class ListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
         this.setTitle(this.getResources().getString(R.string.list_title));
-        this.noteList = new ArrayList<>();
-        final int size = 20;
-        for (int i = 0; i < size; i++)
-            noteList.add(new Note());
-        this.noteAdapter = new NoteAdapter(noteList, this);
+        TableOperate tableOperate = new TableOperate(this.getApplicationContext());
         this.layoutManager = new LinearLayoutManager(this);
         this.ultimateRecyclerView = this.findViewById(R.id.ultimate_recycler_view);
         this.ultimateRecyclerView.setLayoutManager(layoutManager);
+
+        //magic do not touch
+        this.noteList = new ArrayList<>();
+        this.noteList.add(new Note());
+        this.noteAdapter = new NoteAdapter(noteList, this);
         this.ultimateRecyclerView.setAdapter(noteAdapter);
-        noteAdapter.notifyDataSetChanged();
+        this.noteAdapter.notifyDataSetChanged();
+        this.noteAdapter.clear();
+
+        this.noteList = tableOperate.getAllNotes();
+        this.noteAdapter.updateList(noteList);
+
 //        this.ultimateRecyclerView.reenableLoadmore();
 //        this.noteAdapter.setCustomLoadMoreView(LayoutInflater.from(this).inflate(R.layout.custom_bottom_progressbar, null));
 //        ultimateRecyclerView.setOnLoadMoreListener((itemsCount, maxLastVisiblePosition) -> {

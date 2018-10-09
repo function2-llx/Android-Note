@@ -50,6 +50,7 @@ public class RecordingService extends Service {
     }
 
     public static void stopRecording() {
+        if(recorder == null)return ;
         recorder.stopRecording();
         recorder = null;
     }
