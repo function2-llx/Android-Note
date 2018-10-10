@@ -25,6 +25,8 @@ import com.se.npe.androidnote.models.Note;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -52,6 +54,25 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> imp
                 ret.add(note);
         }
         return ret;
+    }
+
+    public void sortByTitle()
+    {
+        Collections.sort(this.noteList, Comparator.comparing(Note::getTitle));
+        this.notifyDataSetChanged();
+    }
+
+    public void updateList(List<Note> list)
+    {
+        if (list.isEmpty())
+            this.clear();
+        else {
+            this.noteList.clear();
+            for (Note note: list) {
+                noteList.add(note);
+            }
+            this.notifyDataSetChanged();
+        }
     }
 
     @Override
