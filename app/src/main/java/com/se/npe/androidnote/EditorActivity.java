@@ -1,15 +1,9 @@
 package com.se.npe.androidnote;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Trace;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
-import android.widget.Toast;
-import android.util.Log;
-import android.view.View;
 
 import com.dmcbig.mediapicker.PickerActivity;
 import com.dmcbig.mediapicker.PickerConfig;
@@ -103,11 +97,7 @@ public class EditorActivity extends AppCompatActivity {
             String path = data.getStringExtra(RecordingService.SOUND_PATH);
             editor.addSound(path);
             ISoundToText tmp = new IflySoundToText();
-            try {
-                tmp.toText(path);
-            } catch (InterruptedException e) {
-
-            }
+            String resultText = tmp.toText(this, path);
         }
     }
 
