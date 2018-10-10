@@ -20,6 +20,12 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
         sourceCompatibility JavaVersion.VERSION_1_8
     }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ["libs"]
+        }
+    }
 }
 
 repositories {
@@ -48,6 +54,6 @@ dependencies {
     implementation 'cn.jzvd:jiaozivideoplayer:6.3.1'
     implementation 'com.googlecode.mp4parser:isoparser:1.1.21'
     implementation files('libs/Msc.jar')
-    implementation files('libs/Msc.jar')
-    implementation files('libs/Sunflower.jar')
+    implementation files('libs/json-jena-1.0.jar')
 }
+

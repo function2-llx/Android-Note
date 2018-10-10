@@ -1,5 +1,6 @@
 package com.se.npe.androidnote;
 
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Trace;
@@ -15,7 +16,9 @@ import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.se.npe.androidnote.editor.SortRichEditor;
+import com.se.npe.androidnote.interfaces.ISoundToText;
 import com.se.npe.androidnote.models.Note;
+import com.se.npe.androidnote.sound.IflySoundToText;
 import com.se.npe.androidnote.sound.RecordingService;
 
 import org.greenrobot.eventbus.EventBus;
@@ -99,6 +102,12 @@ public class EditorActivity extends AppCompatActivity {
         } else if (resultCode == SoundRecorderActivity.RESULT_CODE && requestCode == PICKER_SOUND) {
             String path = data.getStringExtra(RecordingService.SOUND_PATH);
             editor.addSound(path);
+            ISoundToText tmp = new IflySoundToText();
+            try {
+                tmp.toText(path);
+            } catch (InterruptedException e) {
+
+            }
         }
     }
 
