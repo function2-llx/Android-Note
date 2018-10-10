@@ -108,11 +108,13 @@ public class Note {
             inputStream = new FileInputStream(file);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            return ;
         }
 
         byte b[] = new byte[(int)file.length()];
         try{
-            inputStream.read(b);
+            int len = inputStream.read(b);
+            if(len == -1)return ;
         }
         catch(Exception e){
             System.out.println("Wrong!");
@@ -170,6 +172,7 @@ public class Note {
             outputStream = new FileOutputStream(file);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            return ;
         }
         String string = getTitle() + "qwert";
         List<IData> templist = getContent();
