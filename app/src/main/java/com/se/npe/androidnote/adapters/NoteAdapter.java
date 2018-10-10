@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.marshalchen.ultimaterecyclerview.UltimateViewAdapter;
-import com.se.npe.androidnote.ListActivity;
 import com.se.npe.androidnote.R;
 import com.se.npe.androidnote.interfaces.INoteCollection;
 import com.se.npe.androidnote.models.Note;
@@ -22,8 +21,17 @@ import com.se.npe.androidnote.models.Note;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Adapt NoteCollection to list-like View
+ *
+ * @author llx
+ */
 public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> implements INoteCollection {
     private AppCompatActivity activity;
+
+    /**
+     * Implement INoteCollection
+     */
 
     @Override
     public List<Note> getAllNotes() {
@@ -33,24 +41,11 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> imp
     @Override
     public List<Note> getSearchResult(String parameter) {
         List<Note> ret = new ArrayList<>();
-        for (Note note: this.noteList) {
+        for (Note note : this.noteList) {
             if (note.getTitle().contains(parameter))
                 ret.add(note);
         }
         return ret;
-    }
-
-    public void updateList(List<Note> list)
-    {
-        if (list.isEmpty())
-            this.clear();
-        else {
-            this.noteList.clear();
-            for (Note note: list) {
-                noteList.add(note);
-            }
-            this.notifyDataSetChanged();
-        }
     }
 
     @Override
@@ -83,13 +78,29 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> imp
 
     }
 
+    // public void updateList(List<Note> list) {
+    //     if (list.isEmpty())
+    //         this.clear();
+    //     else {
+    //         this.noteList.clear();
+    //         for (Note note : list) {
+    //             noteList.add(note);
+    //         }
+    //         this.notifyDataSetChanged();
+    //     }
+    // }
+
+    /**
+     * Adapt Note to item-like View
+     *
+     * @author llx
+     */
     public class ViewHolder extends UltimateRecyclerviewViewHolder implements View.OnClickListener {
         private TextView title, text;
 
         private int click_cnt;
 
-        public ViewHolder(View itemView)
-        {
+        public ViewHolder(View itemView) {
             super(itemView);
             this.click_cnt = 0;
             this.title = itemView.findViewById(R.id.text_view_title);
@@ -100,35 +111,32 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> imp
             this.title.setText(title);
         }
 
-        public void setText(String text)
-        {
+        public void setText(String text) {
             this.text.setText(text);
         }
 
         @Override
         public void onClick(@NonNull View v) {
             this.setTitle(String.format("%d clicked!", this.click_cnt));
-
         }
 
-        public final int getClick_cnt()
-        {
+        public final int getClick_cnt() {
             return this.click_cnt;
         }
     }
 
     private List<Note> noteList;
 
-    public NoteAdapter(List<Note> noteList, AppCompatActivity activity)
-    {
+    public NoteAdapter(List<Note> noteList, AppCompatActivity activity) {
         this.noteList = noteList;
         this.activity = activity;
     }
 
-    public void setOnDragStartListener(OnStartDragListener onStartDragListener)
-    {
+    public void setOnDragStartListener(OnStartDragListener onStartDragListener) {
         super.mDragStartListener = onStartDragListener;
     }
+
+    /* ViewHolder */
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
@@ -144,8 +152,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> imp
                 popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
                     @Override
                     public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId())
-                        {
+                        switch (item.getItemId()) {
                             case R.id.preview: {
                                 break;
                             }
@@ -176,6 +183,8 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> imp
         return this.noteList.size();
     }
 
+    /* header */
+
     @Override
     public long generateHeaderId(int position) {
         Note note = getItem(position);
@@ -191,51 +200,54 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> imp
     }
 
     @Override
-    public void onBindHeaderViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
-        TextView textView = (TextView) viewHolder.itemView.findViewById(R.id.stick_text);
-        textView.setText(String.valueOf(getItem(position).getPreview().title.charAt(0)));
-//        viewHolder.itemView.setBackgroundColor(Color.parseColor("#AA70DB93"));
+    public RecyclerView.ViewHolder onCreateHeaderViewHolder(ViewGroup parent) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.stick_header_item, parent, false);
+        return new RecyclerView.ViewHolder(v) {
+        };
     }
 
     @Override
-    public RecyclerView.ViewHolder onCreateHeaderViewHolder(ViewGroup parent) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.stick_header_item, parent, false);
-        return new RecyclerView.ViewHolder(v) {};
+    public void onBindHeaderViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
+        TextView textView = (TextView) viewHolder.itemView.findViewById(R.id.stick_text);
+        textView.setText(String.valueOf(getItem(position).getPreview().title.charAt(0)));
+        // viewHolder.itemView.setBackgroundColor(Color.parseColor("#AA70DB93"));
     }
+
+    /* footer */
 
     @Override
     public ViewHolder newFooterHolder(View view) {
         return new ViewHolder(view);
     }
 
-    Note getItem(int position)
-    {
-        if (this.customHeaderView != null)
+    Note getItem(int position) throws IndexOutOfBoundsException {
+        // Subtract the first one used by header
+        if (this.hasHeaderView())
             position--;
-        if (position < this.noteList.size())
-            return this.noteList.get(position);
-        return null;
+        // if (position < this.noteList.size() && position >= 0)
+        return this.noteList.get(position);
+        // throw new IndexOutOfBoundsException("Note list out of range.");
     }
 
-    public void insert(Note note, int position)
-    {
+    /* Actions of Note in NoteCollection */
+
+    public void insert(Note note, int position) {
         super.insertInternal(this.noteList, note, position);
     }
 
-    public void remove(int position)
-    {
+    public void remove(int position) {
         super.removeInternal(this.noteList, position);
     }
 
-    public void swapPositions(int from, int to)
-    {
+    public void swapPositions(int from, int to) {
         super.swapPositions(this.noteList, from, to);
     }
 
-    public void clear()
-    {
+    public void clear() {
         super.clearInternal(this.noteList);
     }
+
+    /* Animation */
 
     @Override
     public void onItemMove(int fromPosition, int toPosition) {
