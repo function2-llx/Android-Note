@@ -33,7 +33,6 @@ public class ListActivity extends AppCompatActivity {
     private  LinearLayoutManager layoutManager;
     private NoteAdapter noteAdapter, searchAdapter;
     private UltimateRecyclerView ultimateRecyclerView;
-    private DragDropTouchListener dragDropTouchListener;
     private SearchView searchView;
 
     @Override
@@ -83,14 +82,12 @@ public class ListActivity extends AppCompatActivity {
             }
 
             case R.id.sort_title: {
-                Collections.sort(this.noteList, Comparator.comparing(Note::getTitle));
-                this.noteAdapter.notifyDataSetChanged();
+                this.noteAdapter.sortByTitle();
                 break;
             }
         }
         return super.onOptionsItemSelected(item);
     }
-    private List<Note> noteList;
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,15 +99,14 @@ public class ListActivity extends AppCompatActivity {
         this.ultimateRecyclerView.setLayoutManager(layoutManager);
 
         //magic do not touch
-        this.noteList = new ArrayList<>();
-        this.noteList.add(new Note());
-        this.noteAdapter = new NoteAdapter(noteList, this);
+        List<Note> testNoteList = new ArrayList<>();
+        testNoteList.add(new Note());
+        this.noteAdapter = new NoteAdapter(testNoteList, this);
         this.ultimateRecyclerView.setAdapter(noteAdapter);
         this.noteAdapter.notifyDataSetChanged();
         this.noteAdapter.clear();
 
-        this.noteList = tableOperate.getAllNotes();
-        this.noteAdapter.updateList(noteList);
+        this.noteAdapter.updateList(tableOperate.getAllNotes());
 
 //        this.ultimateRecyclerView.reenableLoadmore();
 //        this.noteAdapter.setCustomLoadMoreView(LayoutInflater.from(this).inflate(R.layout.custom_bottom_progressbar, null));
