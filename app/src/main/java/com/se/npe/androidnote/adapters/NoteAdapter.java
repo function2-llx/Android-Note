@@ -1,5 +1,6 @@
 package com.se.npe.androidnote.adapters;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
@@ -12,11 +13,21 @@ import android.widget.Button;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import com.*;
+
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.marshalchen.ultimaterecyclerview.UltimateViewAdapter;
+<<<<<<< app/src/main/java/com/se/npe/androidnote/adapters/NoteAdapter.java
+=======
+import com.se.npe.androidnote.EditorActivity;
+import com.se.npe.androidnote.ListActivity;
+import com.se.npe.androidnote.MainActivity;
+>>>>>>> app/src/main/java/com/se/npe/androidnote/adapters/NoteAdapter.java
 import com.se.npe.androidnote.R;
 import com.se.npe.androidnote.interfaces.INoteCollection;
 import com.se.npe.androidnote.models.Note;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -98,11 +109,15 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> imp
     public class ViewHolder extends UltimateRecyclerviewViewHolder implements View.OnClickListener {
         private TextView title, text;
 
+<<<<<<< app/src/main/java/com/se/npe/androidnote/adapters/NoteAdapter.java
         private int click_cnt;
 
         public ViewHolder(View itemView) {
+=======
+        public ViewHolder(View itemView)
+        {
+>>>>>>> app/src/main/java/com/se/npe/androidnote/adapters/NoteAdapter.java
             super(itemView);
-            this.click_cnt = 0;
             this.title = itemView.findViewById(R.id.text_view_title);
             this.text = itemView.findViewById(R.id.text_view_text);
         }
@@ -117,12 +132,21 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> imp
 
         @Override
         public void onClick(@NonNull View v) {
+<<<<<<< app/src/main/java/com/se/npe/androidnote/adapters/NoteAdapter.java
             this.setTitle(String.format("%d clicked!", this.click_cnt));
         }
 
         public final int getClick_cnt() {
             return this.click_cnt;
         }
+=======
+            Note selectedNote = getItem(getAdapterPosition());
+            EventBus.getDefault().postSticky(selectedNote);
+            Intent intent = new Intent(activity, EditorActivity.class);
+            activity.startActivity(intent);
+        }
+
+>>>>>>> app/src/main/java/com/se/npe/androidnote/adapters/NoteAdapter.java
     }
 
     private List<Note> noteList;
