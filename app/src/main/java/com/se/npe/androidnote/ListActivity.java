@@ -64,15 +64,12 @@ public class ListActivity extends AppCompatActivity {
             }
 
             case R.id.sort_title: {
-                Collections.sort(this.noteList, Comparator.comparing(Note::getTitle));
-                this.noteAdapter.notifyDataSetChanged();
+                this.noteAdapter.sortByTitle();
                 break;
             }
         }
         return super.onOptionsItemSelected(item);
     }
-
-    private List<Note> noteList;
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -84,20 +81,24 @@ public class ListActivity extends AppCompatActivity {
         this.ultimateRecyclerView.setLayoutManager(layoutManager);
 
         //magic do not touch
-        this.noteList = new ArrayList<>();
-        this.noteList.add(new Note());
-        this.noteAdapter = new NoteAdapter(noteList, this);
+        List<Note> testNoteList = new ArrayList<>();
+        testNoteList.add(new Note());
+        this.noteAdapter = new NoteAdapter(testNoteList, this);
         this.ultimateRecyclerView.setAdapter(noteAdapter);
-        noteAdapter.notifyDataSetChanged();
-        // this.ultimateRecyclerView.reenableLoadmore();
-        // this.noteAdapter.setCustomLoadMoreView(LayoutInflater.from(this).inflate(R.layout.custom_bottom_progressbar, null));
-        //        ultimateRecyclerView.setOnLoadMoreListener((itemsCount, maxLastVisiblePosition) -> {
-        //            Handler handler = new Handler();
-        //            handler.postDelayed(() -> {
-        //                noteList.add(new Note());
-        //                noteAdapter.notifyDataSetChanged();
-        //            }, 1000);
-        //        });
+        this.noteAdapter.notifyDataSetChanged();
+        this.noteAdapter.clear();
+
+        this.noteAdapter.updateList(tableOperate.getAllNotes());
+
+//        this.ultimateRecyclerView.reenableLoadmore();
+//        this.noteAdapter.setCustomLoadMoreView(LayoutInflater.from(this).inflate(R.layout.custom_bottom_progressbar, null));
+//        ultimateRecyclerView.setOnLoadMoreListener((itemsCount, maxLastVisiblePosition) -> {
+//            Handler handler = new Handler();
+//            handler.postDelayed(() -> {
+//                noteList.add(new Note());
+//                noteAdapter.notifyDataSetChanged();
+//            }, 1000);
+//        });
 
         this.enableDrag();
         this.enableRefresh();
