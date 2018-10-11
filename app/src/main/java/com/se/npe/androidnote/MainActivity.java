@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
+        new TableOperate(this.getApplicationContext());
         /*
         TableOperate newtable = new TableOperate(getApplicationContext());
         Log.d("debug0001","OK_setup");

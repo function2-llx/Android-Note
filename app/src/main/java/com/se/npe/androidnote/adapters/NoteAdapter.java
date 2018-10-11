@@ -17,10 +17,13 @@ import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.marshalchen.ultimaterecyclerview.UltimateViewAdapter;
 import com.se.npe.androidnote.EditorActivity;
 import com.se.npe.androidnote.R;
-import com.se.npe.androidnote.interfaces.INoteCollection;
+import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
+import com.se.npe.androidnote.models.TableOperate;
+import com.se.npe.androidnote.events.DatabaseModifyEvent;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +37,8 @@ import java.util.List;
  */
 public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
     private AppCompatActivity activity;
+
+
 
     /**
      * Implement INoteCollection
@@ -104,7 +109,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
         @Override
         public void onClick(@NonNull View v) {
             Note selectedNote = getItem(getAdapterPosition());
-            EventBus.getDefault().postSticky(selectedNote);
+            EventBus.getDefault().postSticky(new NoteSelectEvent(selectedNote));
             Intent intent = new Intent(activity, EditorActivity.class);
             activity.startActivity(intent);
         }
@@ -244,5 +249,17 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
     public void onItemDismiss(int position) {
         this.remove(position);
         super.onItemDismiss(position);
+    }
+
+    private void reloadNoteList()
+    {
+        TableOperate tableOperate = new TableOperate(activity.getApplicationContext());
+        this.updateList(tableOperate.getAllNotes());
+    }
+
+    @Subscribe(sticky = true)
+    void onReceiveNoteChangeSignal(DatabaseModifyEvent signal)
+    {
+        this.reloadNoteList();
     }
 }

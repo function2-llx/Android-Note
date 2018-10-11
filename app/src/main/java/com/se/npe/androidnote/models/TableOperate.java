@@ -8,8 +8,15 @@ import android.database.Cursor;
 import android.content.ContentValues;
 import android.util.Log;
 
+import com.se.npe.androidnote.events.NoteEvent;
+import com.se.npe.androidnote.events.NoteModifyEvent;
+import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.interfaces.INoteCollection;
+import com.se.npe.androidnote.events.DatabaseModifyEvent;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +28,7 @@ public class TableOperate implements INoteCollection{
     public TableOperate(Context context) {
         manager = DBManager.newInstances(context);
         db = manager.getDataBase();
+        EventBus.getDefault().register(this);
     }
 
     public String encodeNote(List<IData> src) {
@@ -116,10 +124,14 @@ public class TableOperate implements INoteCollection{
         db.execSQL("update "+TableConfig.TABLE_NAME+" set "+TableConfig.Note.NOTE_TITLE+"=?,"+TableConfig.Note.NOTE_CONTENT+"=? where "+TableConfig.Note.NOTE_ID+"=?",
                 new Object[] { note.getTitle(), encodeNote(note.getContent()),Integer.toString(index) });
         note.setindex(index);
+
+        EventBus.getDefault().post(new DatabaseModifyEvent("modify note"));
     }
 
     public void removeNoteAt(int index){
         db.execSQL("delete from "+TableConfig.TABLE_NAME+" where "+TableConfig.Note.NOTE_ID+"=?", new String[] { Integer.toString(index) });
+
+        EventBus.getDefault().post(new DatabaseModifyEvent("delete note"));
     }
 
     public void loadFromFile(String fileName){
@@ -130,4 +142,18 @@ public class TableOperate implements INoteCollection{
 
     }
 
+    @Override
+    protected void finalize() throws Throwable {
+        EventBus.getDefault().unregister(this);
+        super.finalize();
+    }
+
+    @Subscribe (sticky = true)
+    void onReceiveNote(NoteModifyEvent event)
+    {
+        Note note = event.getNote();
+        if (note.getIndex() == -1)
+            addNote(note);
+        else setNoteAt(note.getIndex(), note);
+    }
 }
