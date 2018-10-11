@@ -63,12 +63,14 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         new TableOperate(getApplicationContext());
-        /*
+
         TableOperate newtable = new TableOperate(getApplicationContext());
         Log.d("debug0001","OK_setup");
         ArrayList<IData> templist = new ArrayList<IData>();
         TextData data1 = new TextData("test data");
         templist.add(data1);
+        newtable.decodeNote(newtable.encodeNote(templist));
+        /*
         newtable.addNote(new Note("data1",templist));
         Log.d("debug0001","OK_insert");
 
