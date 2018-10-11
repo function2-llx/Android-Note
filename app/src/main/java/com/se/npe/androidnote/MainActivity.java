@@ -68,6 +68,8 @@ public class MainActivity extends AppCompatActivity {
         ArrayList<IData> templist = new ArrayList<IData>();
         TextData data1 = new TextData("test data");
         templist.add(data1);
+        newtable.decodeNote(newtable.encodeNote(templist));
+        /*
         newtable.addNote(new Note("data1",templist));
         Log.d("debug0001","OK_insert");
 

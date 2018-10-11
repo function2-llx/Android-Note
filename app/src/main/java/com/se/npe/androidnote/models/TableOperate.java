@@ -34,9 +34,10 @@ public class TableOperate implements INoteCollection{
     public String encodeNote(List<IData> src) {
         String string = "";
         for (int i = 0; i < src.size(); i++) {
-            string = string + src.get(i).toString() + "qwert";
+            if(i == src.size()-1)string = string + src.get(i).toString();
+            else string = string + src.get(i).toString() + "qwert";
         }
-        Log.d("debug0001",string);
+        //Log.d("debug0001",string);
         return string;
     }
 
@@ -44,8 +45,8 @@ public class TableOperate implements INoteCollection{
         Log.d("debug0001","decode:"+src);
         List<IData> content = new ArrayList<IData>();
         String[] StrArray = src.split("qwert");
-        for (int i = 1; i < StrArray.length; i++) {
-            Log.d("debug0001",StrArray[i]);
+        for (int i = 0; i < StrArray.length; i++) {
+            Log.d("debug0001","str:"+StrArray[i]);
             if(StrArray[i].charAt(0) == 'S') {
                 String[] tempArray = StrArray[i].split("asdfg");
                 SoundData tempSoundData = new SoundData(tempArray[1],tempArray[2]);
@@ -68,6 +69,7 @@ public class TableOperate implements INoteCollection{
                 content.add(tempPictureData);
             }
         }
+        Log.d("debug0001","test:"+encodeNote(content));
         return content;
     }
 
