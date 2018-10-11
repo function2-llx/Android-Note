@@ -6,10 +6,19 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.database.Cursor;
 import android.content.ContentValues;
+import android.support.design.widget.TabLayout;
 import android.util.Log;
 
+import com.se.npe.androidnote.events.NoteDeleteEvent;
+import com.se.npe.androidnote.events.NoteEvent;
+import com.se.npe.androidnote.events.NoteModifyEvent;
+import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.interfaces.INoteCollection;
+import com.se.npe.androidnote.events.DatabaseModifyEvent;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -17,18 +26,36 @@ import java.util.List;
 public class TableOperate implements INoteCollection{
     private DBManager manager;
     private SQLiteDatabase db;
+    private static TableOperate tableOperate;
 
-    public TableOperate(Context context) {
+    public static void init(Context context)
+    {
+        tableOperate = new TableOperate(context);
+    }
+
+    public static TableOperate getInstance()
+    {
+        return tableOperate;
+    }
+
+    private TableOperate(Context context) {
         manager = DBManager.newInstances(context);
         db = manager.getDataBase();
+        EventBus.getDefault().register(this);
+    }
+
+    public void clearTable()
+    {
+        db.delete(TableConfig.TABLE_NAME,null,null);
     }
 
     public String encodeNote(List<IData> src) {
         String string = "";
         for (int i = 0; i < src.size(); i++) {
-            string = string + src.get(i).toString() + "qwert";
+            if(i == src.size()-1)string = string + src.get(i).toString();
+            else string = string + src.get(i).toString() + "qwert";
         }
-        Log.d("debug0001",string);
+        //Log.d("debug0001",string);
         return string;
     }
 
@@ -37,7 +64,8 @@ public class TableOperate implements INoteCollection{
         List<IData> content = new ArrayList<IData>();
         String[] StrArray = src.split("qwert");
         for (int i = 0; i < StrArray.length; i++) {
-            Log.d("debug0001",StrArray[i]);
+            Log.d("debug0001","str:"+StrArray[i]);
+            if(StrArray[0].length() == 0) continue;
             if(StrArray[i].charAt(0) == 'S') {
                 String[] tempArray = StrArray[i].split("asdfg");
                 SoundData tempSoundData = new SoundData(tempArray[1],tempArray[2]);
@@ -60,6 +88,7 @@ public class TableOperate implements INoteCollection{
                 content.add(tempPictureData);
             }
         }
+        Log.d("debug0001","test:"+encodeNote(content));
         return content;
     }
 
@@ -99,6 +128,8 @@ public class TableOperate implements INoteCollection{
         cursor.close();
         Log.d("debug0001",Integer.toString(count));
         note.setindex(count);
+
+        EventBus.getDefault().post(new DatabaseModifyEvent("new note"));
     }
 
     public Note getNoteAt(int index){
@@ -116,10 +147,14 @@ public class TableOperate implements INoteCollection{
         db.execSQL("update "+TableConfig.TABLE_NAME+" set "+TableConfig.Note.NOTE_TITLE+"=?,"+TableConfig.Note.NOTE_CONTENT+"=? where "+TableConfig.Note.NOTE_ID+"=?",
                 new Object[] { note.getTitle(), encodeNote(note.getContent()),Integer.toString(index) });
         note.setindex(index);
+
+        EventBus.getDefault().post(new DatabaseModifyEvent("modify note"));
     }
 
     public void removeNoteAt(int index){
         db.execSQL("delete from "+TableConfig.TABLE_NAME+" where "+TableConfig.Note.NOTE_ID+"=?", new String[] { Integer.toString(index) });
+
+        EventBus.getDefault().post(new DatabaseModifyEvent("delete note"));
     }
 
     public void loadFromFile(String fileName){
@@ -130,4 +165,26 @@ public class TableOperate implements INoteCollection{
 
     }
 
+    @Override
+    protected void finalize() throws Throwable {
+        EventBus.getDefault().unregister(this);
+        super.finalize();
+    }
+
+    @Subscribe (sticky = true)
+    void onReceiveNote(NoteModifyEvent event)
+    {
+        Note note = event.getNote();
+        if (note.getIndex() == -1)
+            addNote(note);
+        else
+            setNoteAt(note.getIndex(), note);
+        System.err.print(note.getTitle());
+    }
+
+    @Subscribe (sticky = true)
+    void onDeleteNote(NoteDeleteEvent event)
+    {
+        this.removeNoteAt(event.getNote().getIndex());
+    }
 }

@@ -2,20 +2,21 @@ package com.se.npe.androidnote;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Trace;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.view.Menu;
+import android.widget.EditText;
 import android.widget.Toast;
-import android.util.Log;
-import android.view.View;
 
 import com.dmcbig.mediapicker.PickerActivity;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.se.npe.androidnote.editor.SortRichEditor;
+import com.se.npe.androidnote.interfaces.ISoundToText;
+import com.se.npe.androidnote.events.NoteModifyEvent;
+import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
+import com.se.npe.androidnote.sound.IflySoundToText;
 import com.se.npe.androidnote.sound.RecordingService;
 
 import org.greenrobot.eventbus.EventBus;
@@ -99,13 +100,29 @@ public class EditorActivity extends AppCompatActivity {
         } else if (resultCode == SoundRecorderActivity.RESULT_CODE && requestCode == PICKER_SOUND) {
             String path = data.getStringExtra(RecordingService.SOUND_PATH);
             editor.addSound(path);
+            new IflySoundToText().acceptTask(this, path, new IflySoundToText.OnTextReadyListener() {
+                @Override
+                public void onTextReady(String text) {
+                    Toast.makeText(EditorActivity.this, text, Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onTextFinished(String all) {
+                    Toast.makeText(EditorActivity.this, "all: " + all, Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        EventBus.getDefault().post(editor.buildNote());
+        Note note = editor.buildNote();
+        if (oldNote != null) {
+            note.setindex(oldNote.getIndex());
+        }
+        EventBus.getDefault().post(new NoteModifyEvent(note));
+
         EventBus.getDefault().removeAllStickyEvents();
         EventBus.getDefault().unregister(this);
         RecordingService.stopRecording();
@@ -114,5 +131,11 @@ public class EditorActivity extends AppCompatActivity {
     @Subscribe(sticky = true)
     public void getNoteFromOld(Note note) {
         oldNote = note;
+    }
+
+    @Subscribe(sticky = true)
+    public void getNoteFromSelect(NoteSelectEvent event)
+    {
+        this.oldNote = event.getNote();
     }
 }

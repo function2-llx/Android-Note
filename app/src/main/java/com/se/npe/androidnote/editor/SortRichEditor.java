@@ -904,22 +904,26 @@ public class SortRichEditor extends ScrollView implements IEditor {
             ref.title.setText(note.getTitle());
             ref.containerLayout.removeAllViews();
             List<IData> content = note.getContent();
-            for (IData data : content) {
-                int currentChild = ref.containerLayout.getChildCount();
-                if (data instanceof TextData) {
-                    ref.insertEditTextAtIndex(currentChild, ((TextData) data).getText());
-                } else if (data instanceof PictureData) {
-                    ref.insertPictureAtIndex(currentChild, ((PictureData) data).getPicturePath());
-                } else if (data instanceof VideoData) {
-                    ref.insertVideoAtIndex(currentChild, ((VideoData) data).getVideoPath());
-                } else if (data instanceof SoundData) {
-                    ref.insertSoundAtIndex(currentChild, ((SoundData) data).getSoundPath());
+            if (content.isEmpty()) {
+                ref.insertEditTextAtIndex(ref.containerLayout.getChildCount(), "");
+            } else {
+                for (IData data : content) {
+                    int currentChild = ref.containerLayout.getChildCount();
+                    if (data instanceof TextData) {
+                        ref.insertEditTextAtIndex(currentChild, ((TextData) data).getText());
+                    } else if (data instanceof PictureData) {
+                        ref.insertPictureAtIndex(currentChild, ((PictureData) data).getPicturePath());
+                    } else if (data instanceof VideoData) {
+                        ref.insertVideoAtIndex(currentChild, ((VideoData) data).getVideoPath());
+                    } else if (data instanceof SoundData) {
+                        ref.insertSoundAtIndex(currentChild, ((SoundData) data).getSoundPath());
+                    }
                 }
-            }
-            if (ref.containerLayout.getChildCount() != 0) {
-                View lastChild = ref.containerLayout.getChildAt(ref.containerLayout.getChildCount() - 1);
-                if (!(lastChild instanceof EditText)) {
-                    ref.containerLayout.addView(ref.getFirstText());
+                if (ref.containerLayout.getChildCount() != 0) {
+                    View lastChild = ref.containerLayout.getChildAt(ref.containerLayout.getChildCount() - 1);
+                    if (!(lastChild instanceof EditText)) {
+                        ref.containerLayout.addView(ref.getFirstText());
+                    }
                 }
             }
         }

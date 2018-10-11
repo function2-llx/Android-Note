@@ -12,13 +12,12 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.se.npe.androidnote.interfaces.IData;
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechUtility;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.TableOperate;
 import com.se.npe.androidnote.models.TextData;
@@ -34,15 +33,13 @@ public class MainActivity extends AppCompatActivity {
     private ListView noteList;
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         this.getMenuInflater().inflate(R.menu.activity_main, menu);
         return super.onCreateOptionsMenu(menu);
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item)
-    {
+    public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_list: {
                 Intent intent = new Intent(MainActivity.this, ListActivity.class);
@@ -60,14 +57,26 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        new Thread(() -> SpeechUtility.createUtility(this, SpeechConstant.APPID + "=5bbc8c0f")).start();
         super.onCreate(savedInstanceState);
+        TableOperate.init(this.getApplicationContext());
+        /*
+        TableOperate newtable = new TableOperate(getApplicationContext());
+        newtable.decodeNote("");
 
         /*
         TableOperate newtable = new TableOperate(getApplicationContext());
         Log.d("debug0001","OK_setup");
+        newtable.removeNoteAt(1);
+        newtable.removeNoteAt(1);
+        Log.d("debug0001","OK_delete");
+        */
+        /*
         ArrayList<IData> templist = new ArrayList<IData>();
         TextData data1 = new TextData("test data");
         templist.add(data1);
+        newtable.decodeNote(newtable.encodeNote(templist));*/
+        /*
         newtable.addNote(new Note("data1",templist));
         Log.d("debug0001","OK_insert");
 

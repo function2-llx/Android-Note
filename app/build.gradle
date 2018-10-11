@@ -20,9 +20,16 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
         sourceCompatibility JavaVersion.VERSION_1_8
     }
+
     testOptions {
         unitTests {
-        includeAndroidResources = true
+            includeAndroidResources = true
+        }
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ["libs"]
         }
     }
 }
@@ -71,4 +78,8 @@ dependencies {
     implementation 'com.dmcBig:mediapicker:+'
     implementation 'cn.jzvd:jiaozivideoplayer:6.3.1'
     implementation 'com.googlecode.mp4parser:isoparser:1.1.21'
+    implementation files('libs/Msc.jar')
+    //implementation files('libs/json-jena-1.0.jar')
+    implementation files('libs/Sunflower.jar')
 }
+
