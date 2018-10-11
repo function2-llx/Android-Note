@@ -9,8 +9,16 @@ import android.content.ContentValues;
 import android.support.design.widget.TabLayout;
 import android.util.Log;
 
+import com.se.npe.androidnote.events.NoteDeleteEvent;
+import com.se.npe.androidnote.events.NoteEvent;
+import com.se.npe.androidnote.events.NoteModifyEvent;
+import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.interfaces.INoteCollection;
+import com.se.npe.androidnote.events.DatabaseModifyEvent;
+
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,10 +26,22 @@ import java.util.List;
 public class TableOperate implements INoteCollection{
     private DBManager manager;
     private SQLiteDatabase db;
+    private static TableOperate tableOperate;
 
-    public TableOperate(Context context) {
+    public static void init(Context context)
+    {
+        tableOperate = new TableOperate(context);
+    }
+
+    public static TableOperate getInstance()
+    {
+        return tableOperate;
+    }
+
+    private TableOperate(Context context) {
         manager = DBManager.newInstances(context);
         db = manager.getDataBase();
+        EventBus.getDefault().register(this);
     }
 
     public void clearTable()
@@ -109,6 +129,8 @@ public class TableOperate implements INoteCollection{
         cursor.close();
         Log.d("debug0001",Integer.toString(count));
         note.setindex(count);
+
+        EventBus.getDefault().post(new DatabaseModifyEvent("new note"));
     }
 
     public Note getNoteAt(int index){
@@ -126,10 +148,14 @@ public class TableOperate implements INoteCollection{
         db.execSQL("update "+TableConfig.TABLE_NAME+" set "+TableConfig.Note.NOTE_TITLE+"=?,"+TableConfig.Note.NOTE_CONTENT+"=? where "+TableConfig.Note.NOTE_ID+"=?",
                 new Object[] { note.getTitle(), encodeNote(note.getContent()),Integer.toString(index) });
         note.setindex(index);
+
+        EventBus.getDefault().post(new DatabaseModifyEvent("modify note"));
     }
 
     public void removeNoteAt(int index){
         db.execSQL("delete from "+TableConfig.TABLE_NAME+" where "+TableConfig.Note.NOTE_ID+"=?", new String[] { Integer.toString(index) });
+
+        EventBus.getDefault().post(new DatabaseModifyEvent("delete note"));
     }
 
     public void loadFromFile(String fileName){
@@ -140,4 +166,26 @@ public class TableOperate implements INoteCollection{
 
     }
 
+    @Override
+    protected void finalize() throws Throwable {
+        EventBus.getDefault().unregister(this);
+        super.finalize();
+    }
+
+    @Subscribe (sticky = true)
+    void onReceiveNote(NoteModifyEvent event)
+    {
+        Note note = event.getNote();
+        if (note.getIndex() == -1)
+            addNote(note);
+        else
+            setNoteAt(note.getIndex(), note);
+        System.err.print(note.getTitle());
+    }
+
+    @Subscribe (sticky = true)
+    void onDeleteNote(NoteDeleteEvent event)
+    {
+        this.removeNoteAt(event.getNote().getIndex());
+    }
 }

@@ -15,6 +15,8 @@ import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.se.npe.androidnote.editor.SortRichEditor;
+import com.se.npe.androidnote.events.NoteModifyEvent;
+import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.sound.RecordingService;
 
@@ -105,7 +107,12 @@ public class EditorActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        EventBus.getDefault().post(editor.buildNote());
+        Note note = editor.buildNote();
+        if (oldNote != null) {
+            note.setindex(oldNote.getIndex());
+        }
+        EventBus.getDefault().post(new NoteModifyEvent(note));
+
         EventBus.getDefault().removeAllStickyEvents();
         EventBus.getDefault().unregister(this);
         RecordingService.stopRecording();
@@ -114,5 +121,11 @@ public class EditorActivity extends AppCompatActivity {
     @Subscribe(sticky = true)
     public void getNoteFromOld(Note note) {
         oldNote = note;
+    }
+
+    @Subscribe(sticky = true)
+    public void getNoteFromSelect(NoteSelectEvent event)
+    {
+        this.oldNote = event.getNote();
     }
 }
