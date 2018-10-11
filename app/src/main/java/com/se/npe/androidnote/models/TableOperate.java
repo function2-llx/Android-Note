@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.database.Cursor;
 import android.content.ContentValues;
+import android.support.design.widget.TabLayout;
 import android.util.Log;
 
 import com.se.npe.androidnote.interfaces.IData;
@@ -23,6 +24,11 @@ public class TableOperate implements INoteCollection{
         db = manager.getDataBase();
     }
 
+    public void clearTable()
+    {
+        db.delete(TableConfig.TABLE_NAME,null,null);
+    }
+
     public String encodeNote(List<IData> src) {
         String string = "";
         for (int i = 0; i < src.size(); i++) {
@@ -37,8 +43,10 @@ public class TableOperate implements INoteCollection{
         Log.d("debug0001","decode:"+src);
         List<IData> content = new ArrayList<IData>();
         String[] StrArray = src.split("qwert");
+        //Log.d("debug0001","shit");
         for (int i = 0; i < StrArray.length; i++) {
             Log.d("debug0001","str:"+StrArray[i]);
+            if(StrArray[0].length() == 0)continue;
             if(StrArray[i].charAt(0) == 'S') {
                 String[] tempArray = StrArray[i].split("asdfg");
                 SoundData tempSoundData = new SoundData(tempArray[1],tempArray[2]);
