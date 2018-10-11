@@ -35,6 +35,9 @@ public class TableOperate implements INoteCollection{
 
     public static TableOperate getInstance()
     {
+        if (tableOperate == null) {
+            throw new NullPointerException("Table Operate needs to be initialized using TableOperate.init().");
+        }
         return tableOperate;
     }
 
@@ -63,10 +66,9 @@ public class TableOperate implements INoteCollection{
         Log.d("debug0001","decode:"+src);
         List<IData> content = new ArrayList<IData>();
         String[] StrArray = src.split("qwert");
-        //Log.d("debug0001","shit");
         for (int i = 0; i < StrArray.length; i++) {
             Log.d("debug0001","str:"+StrArray[i]);
-            if(StrArray[0].length() == 0)continue;
+            if(StrArray[0].length() == 0) continue;
             if(StrArray[i].charAt(0) == 'S') {
                 String[] tempArray = StrArray[i].split("asdfg");
                 SoundData tempSoundData = new SoundData(tempArray[1],tempArray[2]);
@@ -173,7 +175,7 @@ public class TableOperate implements INoteCollection{
     }
 
     @Subscribe (sticky = true)
-    void onReceiveNote(NoteModifyEvent event)
+    public void onReceiveNote(NoteModifyEvent event)
     {
         Note note = event.getNote();
         if (note.getIndex() == -1)
@@ -184,7 +186,7 @@ public class TableOperate implements INoteCollection{
     }
 
     @Subscribe (sticky = true)
-    void onDeleteNote(NoteDeleteEvent event)
+    public void onDeleteNote(NoteDeleteEvent event)
     {
         this.removeNoteAt(event.getNote().getIndex());
     }
