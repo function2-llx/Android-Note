@@ -37,7 +37,6 @@ public class ListActivity extends AppCompatActivity {
     private LinearLayoutManager layoutManager;
     private NoteAdapter noteAdapter, searchAdapter;
     private UltimateRecyclerView ultimateRecyclerView;
-    private TableOperate tableOperate;
 
     /* Options menu */
 
@@ -78,7 +77,6 @@ public class ListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_list);
         this.setTitle(this.getResources().getString(R.string.list_title));
 
-        this.tableOperate = new TableOperate(this.getApplicationContext());
         this.layoutManager = new LinearLayoutManager(this);
         this.ultimateRecyclerView = this.findViewById(R.id.ultimate_recycler_view);
         this.ultimateRecyclerView.setLayoutManager(layoutManager);
@@ -92,7 +90,7 @@ public class ListActivity extends AppCompatActivity {
         this.noteAdapter.notifyDataSetChanged();
         this.noteAdapter.clear();
 
-        this.noteAdapter.updateList(tableOperate.getAllNotes());
+        this.noteAdapter.updateList(TableOperate.getInstance().getAllNotes());
 
 //        this.ultimateRecyclerView.reenableLoadmore();
 //        this.noteAdapter.setCustomLoadMoreView(LayoutInflater.from(this).inflate(R.layout.custom_bottom_progressbar, null));
@@ -142,7 +140,7 @@ public class ListActivity extends AppCompatActivity {
         this.ultimateRecyclerView.setDefaultOnRefreshListener(() -> new Handler().postDelayed(() -> {
             // simpleRecyclerViewAdapter.insert("Refresh things", 0);
 //            ListActivity.this.noteAdapter.insert(new Note(), 0);
-            noteAdapter.updateList(tableOperate.getAllNotes());
+            noteAdapter.updateList(TableOperate.getInstance().getAllNotes());
             ListActivity.this.ultimateRecyclerView.setRefreshing(false);
             // ultimateRecyclerView.scrollBy(0, -50);
             layoutManager.scrollToPosition(0);

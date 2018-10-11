@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.content.ContentValues;
 import android.util.Log;
 
+import com.se.npe.androidnote.events.NoteDeleteEvent;
 import com.se.npe.androidnote.events.NoteEvent;
 import com.se.npe.androidnote.events.NoteModifyEvent;
 import com.se.npe.androidnote.events.NoteSelectEvent;
@@ -24,8 +25,19 @@ import java.util.List;
 public class TableOperate implements INoteCollection{
     private DBManager manager;
     private SQLiteDatabase db;
+    private static TableOperate tableOperate;
 
-    public TableOperate(Context context) {
+    public static void init(Context context)
+    {
+        tableOperate = new TableOperate(context);
+    }
+
+    public static TableOperate getInstance()
+    {
+        return tableOperate;
+    }
+
+    private TableOperate(Context context) {
         manager = DBManager.newInstances(context);
         db = manager.getDataBase();
         EventBus.getDefault().register(this);
@@ -157,5 +169,12 @@ public class TableOperate implements INoteCollection{
         if (note.getIndex() == -1)
             addNote(note);
         else setNoteAt(note.getIndex(), note);
+        System.err.print(note.getTitle());
+    }
+
+    @Subscribe (sticky = true)
+    void onDeleteNote(NoteDeleteEvent event)
+    {
+        this.removeNoteAt(event.getNote().getIndex());
     }
 }
