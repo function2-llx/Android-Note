@@ -192,8 +192,8 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
 
     @Override
     public RecyclerView.ViewHolder onCreateHeaderViewHolder(ViewGroup parent) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.stick_header_item, parent, false);
-        return new RecyclerView.ViewHolder(v) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.stick_header_item, parent, false);
+            return new RecyclerView.ViewHolder(v) {
         };
     }
 

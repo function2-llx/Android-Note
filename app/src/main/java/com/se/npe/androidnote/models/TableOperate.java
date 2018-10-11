@@ -129,6 +129,8 @@ public class TableOperate implements INoteCollection{
         cursor.close();
         Log.d("debug0001",Integer.toString(count));
         note.setindex(count);
+
+        EventBus.getDefault().post(new DatabaseModifyEvent("new note"));
     }
 
     public Note getNoteAt(int index){
@@ -176,7 +178,8 @@ public class TableOperate implements INoteCollection{
         Note note = event.getNote();
         if (note.getIndex() == -1)
             addNote(note);
-        else setNoteAt(note.getIndex(), note);
+        else
+            setNoteAt(note.getIndex(), note);
         System.err.print(note.getTitle());
     }
 

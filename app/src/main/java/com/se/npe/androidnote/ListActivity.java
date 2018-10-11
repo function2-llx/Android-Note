@@ -60,7 +60,10 @@ public class ListActivity extends AppCompatActivity {
             }
 
             case R.id.clear: {
-                noteAdapter.clear();
+                int size = noteAdapter.getAdapterItemCount();
+                for (int i = 0; i < size; i++) {
+                    noteAdapter.remove(0);
+                }
                 break;
             }
 
