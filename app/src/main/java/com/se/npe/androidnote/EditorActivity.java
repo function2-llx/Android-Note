@@ -4,6 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.dmcbig.mediapicker.PickerActivity;
 import com.dmcbig.mediapicker.PickerConfig;
@@ -96,8 +98,17 @@ public class EditorActivity extends AppCompatActivity {
         } else if (resultCode == SoundRecorderActivity.RESULT_CODE && requestCode == PICKER_SOUND) {
             String path = data.getStringExtra(RecordingService.SOUND_PATH);
             editor.addSound(path);
-            ISoundToText tmp = new IflySoundToText();
-            String resultText = tmp.toText(this, path);
+            new IflySoundToText().acceptTask(this, path, new IflySoundToText.OnTextReadyListener() {
+                @Override
+                public void onTextReady(String text) {
+                    Toast.makeText(EditorActivity.this, text, Toast.LENGTH_SHORT).show();
+                }
+
+                @Override
+                public void onTextFinished(String all) {
+                    Toast.makeText(EditorActivity.this, "all: " + all, Toast.LENGTH_SHORT).show();
+                }
+            });
         }
     }
 

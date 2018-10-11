@@ -18,7 +18,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 
 // Reference : https://blog.csdn.net/changerzhuo_319/article/details/54092206
-public class IflySoundToText implements ISoundToText {
+public class IflySoundToText {
+    public interface OnTextReadyListener {
+        void onTextReady(String text);
+
+        void onTextFinished(String all);
+    }
+
     //private static final String APPID = "5bbcc9e0";
     //private static final String APPID = "=5bbc8c0f";
     private StringBuffer mResult = new StringBuffer();
@@ -30,24 +36,15 @@ public class IflySoundToText implements ISoundToText {
     private String fileName = "";
     private SpeechRecognizer mIat = null;
 
-    @Override
-    public String toText(Context context, String soundPath) {
-        //Log.e("Enter Async :", "createUtility");
+    public void acceptTask(Context context, String soundPath, OnTextReadyListener listener) {
         fileName = soundPath;
         if (mIat == null)
             mIat = SpeechRecognizer.createRecognizer(context, null);
-        return RecognizeWavFileByte();
-    }
-
-    /* 模拟音速防止音频队列堵塞 */
-    private String RecognizeWavFileByte() {
-        new FileByteLoader().execute();
-        Log.e("mResult:", mResult.toString());
-        return mResult.toString();
+        new FileByteLoader(listener).execute();
     }
 
     private ArrayList<byte[]> splitBuffer(byte[] buffer, int length, int spsize) {
-        ArrayList<byte[]> array = new ArrayList<byte[]>();
+        ArrayList<byte[]> array = new ArrayList<>();
         if (spsize <= 0 || length <= 0 || buffer == null
                 || buffer.length < length)
             return array;
@@ -69,11 +66,15 @@ public class IflySoundToText implements ISoundToText {
         return array;
     }
 
-    private RecognizerListener recListener = new RecognizerListener() {
+    private class MyRecognizerListener implements RecognizerListener {
+        OnTextReadyListener listener;
+
+        public MyRecognizerListener(OnTextReadyListener listener) {
+            this.listener = listener;
+        }
 
         @Override
         public void onVolumeChanged(int i, byte[] bytes) {
-
         }
 
         @Override
@@ -84,12 +85,19 @@ public class IflySoundToText implements ISoundToText {
         @Override
         public void onEndOfSpeech() {
             Log.e("audioEnd:", "end");
+//            if (listener != null) {
+//                listener.onTextFinished(mResult.toString());
+//            }
         }
 
         @Override
         public void onResult(RecognizerResult result, boolean b1) {
             Log.e("addResult:", result.getResultString());
-            mResult.append(result.getResultString());
+            String text = result.getResultString();
+            mResult.append(text);
+            if (listener != null) {
+                listener.onTextReady(text);
+            }
         }
 
         @Override
@@ -101,11 +109,50 @@ public class IflySoundToText implements ISoundToText {
         public void onEvent(int i, int i1, int i2, Bundle bundle) {
 
         }
-    };
+    }
+
+//    private RecognizerListener recListener = new RecognizerListener() {
+//
+//        @Override
+//        public void onVolumeChanged(int i, byte[] bytes) {
+//
+//        }
+//
+//        @Override
+//        public void onBeginOfSpeech() {
+//            Log.e("audioBegin:", "begin");
+//        }
+//
+//        @Override
+//        public void onEndOfSpeech() {
+//            Log.e("audioEnd:", "end");
+//        }
+//
+//        @Override
+//        public void onResult(RecognizerResult result, boolean b1) {
+//            Log.e("addResult:", result.getResultString());
+//            mResult.append(result.getResultString());
+//        }
+//
+//        @Override
+//        public void onError(SpeechError error) {
+//
+//        }
+//
+//        @Override
+//        public void onEvent(int i, int i1, int i2, Bundle bundle) {
+//
+//        }
+//    };
 
     class FileByteLoader extends AsyncTask<Void, Void, Void> {
         private FileInputStream fis = null;
         private byte[] voiceBuffer = null;
+        private OnTextReadyListener listener;
+
+        public FileByteLoader(OnTextReadyListener listener) {
+            this.listener = listener;
+        }
 
         @Override
         protected Void doInBackground(Void... voids) {
@@ -141,17 +188,19 @@ public class IflySoundToText implements ISoundToText {
                 ArrayList<byte[]> buffers = splitBuffer(voiceBuffer,
                         voiceBuffer.length, 4800);
 
-                mIat.startListening(recListener);
+                mIat.startListening(new MyRecognizerListener(listener));
+//                mIat.writeAudio(voiceBuffer, 0, voiceBuffer.length);
                 for (int i = 0; i < buffers.size(); i++) {
-                    // 4.8K 150ms
+                    // 4.8K 10ms
                     mIat.writeAudio(buffers.get(i), 0, buffers.get(i).length);
                     try {
-                        Thread.sleep(150);
+                        Thread.sleep(10);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
                 mIat.stopListening();
+//                Log.e("my", mIat.isListening() + " ");
                 while (mIat.isListening()) {
                     if (maxWaitTime < 0) {
                         mResult.setLength(0);
@@ -167,6 +216,11 @@ public class IflySoundToText implements ISoundToText {
                 }
             }
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            listener.onTextFinished(mResult.toString());
         }
     }
 }
