@@ -34,7 +34,8 @@ public class TableOperateTest {
     @Before
     public void setUp() throws Exception {
         AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
-        tableOperate = new TableOperate(activity.getApplicationContext());
+        TableOperate.init(activity.getApplicationContext());
+        tableOperate = TableOperate.getInstance();
     }
 
     @After

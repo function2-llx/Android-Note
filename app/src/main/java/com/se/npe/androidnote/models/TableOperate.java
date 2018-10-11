@@ -35,6 +35,9 @@ public class TableOperate implements INoteCollection{
 
     public static TableOperate getInstance()
     {
+        if (tableOperate == null) {
+            throw new NullPointerException("Table Operate needs to be initialized using TableOperate.init().");
+        }
         return tableOperate;
     }
 
@@ -172,7 +175,7 @@ public class TableOperate implements INoteCollection{
     }
 
     @Subscribe (sticky = true)
-    void onReceiveNote(NoteModifyEvent event)
+    public void onReceiveNote(NoteModifyEvent event)
     {
         Note note = event.getNote();
         if (note.getIndex() == -1)
@@ -183,7 +186,7 @@ public class TableOperate implements INoteCollection{
     }
 
     @Subscribe (sticky = true)
-    void onDeleteNote(NoteDeleteEvent event)
+    public void onDeleteNote(NoteDeleteEvent event)
     {
         this.removeNoteAt(event.getNote().getIndex());
     }
