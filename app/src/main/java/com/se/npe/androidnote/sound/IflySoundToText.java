@@ -25,13 +25,10 @@ public class IflySoundToText {
         void onTextFinished(String all);
     }
 
-    //private static final String APPID = "5bbcc9e0";
-    //private static final String APPID = "=5bbc8c0f";
     private StringBuffer mResult = new StringBuffer();
 
     /* ms */
-    private int maxWaitTime = 500;
-    private int perWaitTime = 100;
+    private static final int WAIT_STEP = 100;
     /* error appear times */
     private String fileName = "";
     private SpeechRecognizer mIat = null;
@@ -178,7 +175,6 @@ public class IflySoundToText {
             } else {
                 Log.e("enterAsync :", "beginSpeech");
                 mResult.setLength(0);
-                SpeechRecognizer recognizer = SpeechRecognizer.getRecognizer();
                 mIat.setParameter(SpeechConstant.DOMAIN, "iat");
                 mIat.setParameter(SpeechConstant.LANGUAGE, "zh_cn");
                 mIat.setParameter(SpeechConstant.ACCENT, "mandarin");
@@ -189,7 +185,6 @@ public class IflySoundToText {
                         voiceBuffer.length, 4800);
 
                 mIat.startListening(new MyRecognizerListener(listener));
-//                mIat.writeAudio(voiceBuffer, 0, voiceBuffer.length);
                 for (int i = 0; i < buffers.size(); i++) {
                     // 4.8K 10ms
                     mIat.writeAudio(buffers.get(i), 0, buffers.get(i).length);
@@ -200,20 +195,27 @@ public class IflySoundToText {
                     }
                 }
                 mIat.stopListening();
-//                Log.e("my", mIat.isListening() + " ");
                 while (mIat.isListening()) {
-                    if (maxWaitTime < 0) {
-                        mResult.setLength(0);
-                        mResult.append("解析超时！");
-                        break;
-                    }
                     try {
-                        Thread.sleep(perWaitTime);
-                        maxWaitTime -= perWaitTime;
+                        Thread.sleep(WAIT_STEP);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
                 }
+//                Log.e("my", mIat.isListening() + " ");
+//                while (mIat.isListening()) {
+//                    if (maxWaitTime < 0) {
+//                        mResult.setLength(0);
+//                        mResult.append("解析超时！");
+//                        break;
+//                    }
+//                    try {
+//                        Thread.sleep(WAIT_STEP);
+//                        maxWaitTime -= WAIT_STEP;
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                }
             }
             return null;
         }
