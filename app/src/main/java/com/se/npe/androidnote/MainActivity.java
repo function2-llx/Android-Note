@@ -59,13 +59,24 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         new Thread(() -> SpeechUtility.createUtility(this, SpeechConstant.APPID + "=5bbc8c0f")).start();
         super.onCreate(savedInstanceState);
+        TableOperate.init(this.getApplicationContext());
+        /*
+        TableOperate newtable = new TableOperate(getApplicationContext());
+        newtable.decodeNote("");
 
         /*
         TableOperate newtable = new TableOperate(getApplicationContext());
         Log.d("debug0001","OK_setup");
+        newtable.removeNoteAt(1);
+        newtable.removeNoteAt(1);
+        Log.d("debug0001","OK_delete");
+        */
+        /*
         ArrayList<IData> templist = new ArrayList<IData>();
         TextData data1 = new TextData("test data");
         templist.add(data1);
+        newtable.decodeNote(newtable.encodeNote(templist));*/
+        /*
         newtable.addNote(new Note("data1",templist));
         Log.d("debug0001","OK_insert");
 

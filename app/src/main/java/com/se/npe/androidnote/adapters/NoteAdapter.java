@@ -17,10 +17,14 @@ import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.marshalchen.ultimaterecyclerview.UltimateViewAdapter;
 import com.se.npe.androidnote.EditorActivity;
 import com.se.npe.androidnote.R;
-import com.se.npe.androidnote.interfaces.INoteCollection;
+import com.se.npe.androidnote.events.NoteDeleteEvent;
+import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
+import com.se.npe.androidnote.models.TableOperate;
+import com.se.npe.androidnote.events.DatabaseModifyEvent;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -34,6 +38,8 @@ import java.util.List;
  */
 public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
     private AppCompatActivity activity;
+
+
 
     /**
      * Implement INoteCollection
@@ -104,7 +110,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
         @Override
         public void onClick(@NonNull View v) {
             Note selectedNote = getItem(getAdapterPosition());
-            EventBus.getDefault().postSticky(selectedNote);
+            EventBus.getDefault().postSticky(new NoteSelectEvent(selectedNote));
             Intent intent = new Intent(activity, EditorActivity.class);
             activity.startActivity(intent);
         }
@@ -186,8 +192,8 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
 
     @Override
     public RecyclerView.ViewHolder onCreateHeaderViewHolder(ViewGroup parent) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.stick_header_item, parent, false);
-        return new RecyclerView.ViewHolder(v) {
+            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.stick_header_item, parent, false);
+            return new RecyclerView.ViewHolder(v) {
         };
     }
 
@@ -221,7 +227,9 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
     }
 
     public void remove(int position) {
+        Note note = getItem(position);
         super.removeInternal(this.noteList, position);
+        EventBus.getDefault().post(new NoteDeleteEvent(note));
     }
 
     public void swapPositions(int from, int to) {
@@ -240,9 +248,14 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
         super.onItemMove(fromPosition, toPosition);
     }
 
-    @Override
-    public void onItemDismiss(int position) {
-        this.remove(position);
-        super.onItemDismiss(position);
+    private void reloadNoteList()
+    {
+        this.updateList(TableOperate.getInstance().getAllNotes());
+    }
+
+    @Subscribe(sticky = true)
+    void onReceiveNoteChangeSignal(DatabaseModifyEvent signal)
+    {
+        this.reloadNoteList();
     }
 }

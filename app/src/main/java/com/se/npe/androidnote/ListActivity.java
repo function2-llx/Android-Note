@@ -20,6 +20,8 @@ import com.se.npe.androidnote.adapters.NoteAdapter;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.TableOperate;
 
+import org.greenrobot.eventbus.EventBus;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -35,7 +37,6 @@ public class ListActivity extends AppCompatActivity {
     private LinearLayoutManager layoutManager;
     private NoteAdapter noteAdapter, searchAdapter;
     private UltimateRecyclerView ultimateRecyclerView;
-    private DragDropTouchListener dragDropTouchListener;
 
     /* Options menu */
 
@@ -59,7 +60,10 @@ public class ListActivity extends AppCompatActivity {
             }
 
             case R.id.clear: {
-                noteAdapter.clear();
+                int size = noteAdapter.getAdapterItemCount();
+                for (int i = 0; i < size; i++) {
+                    noteAdapter.remove(0);
+                }
                 break;
             }
 
@@ -75,7 +79,7 @@ public class ListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_list);
         this.setTitle(this.getResources().getString(R.string.list_title));
-        TableOperate tableOperate = new TableOperate(this.getApplicationContext());
+
         this.layoutManager = new LinearLayoutManager(this);
         this.ultimateRecyclerView = this.findViewById(R.id.ultimate_recycler_view);
         this.ultimateRecyclerView.setLayoutManager(layoutManager);
@@ -84,11 +88,12 @@ public class ListActivity extends AppCompatActivity {
         List<Note> testNoteList = new ArrayList<>();
         testNoteList.add(new Note());
         this.noteAdapter = new NoteAdapter(testNoteList, this);
+        EventBus.getDefault().register(noteAdapter);
         this.ultimateRecyclerView.setAdapter(noteAdapter);
         this.noteAdapter.notifyDataSetChanged();
         this.noteAdapter.clear();
 
-        this.noteAdapter.updateList(tableOperate.getAllNotes());
+        this.noteAdapter.updateList(TableOperate.getInstance().getAllNotes());
 
 //        this.ultimateRecyclerView.reenableLoadmore();
 //        this.noteAdapter.setCustomLoadMoreView(LayoutInflater.from(this).inflate(R.layout.custom_bottom_progressbar, null));
@@ -137,7 +142,8 @@ public class ListActivity extends AppCompatActivity {
     private void enableRefresh() {
         this.ultimateRecyclerView.setDefaultOnRefreshListener(() -> new Handler().postDelayed(() -> {
             // simpleRecyclerViewAdapter.insert("Refresh things", 0);
-            ListActivity.this.noteAdapter.insert(new Note(), 0);
+//            ListActivity.this.noteAdapter.insert(new Note(), 0);
+            noteAdapter.updateList(TableOperate.getInstance().getAllNotes());
             ListActivity.this.ultimateRecyclerView.setRefreshing(false);
             // ultimateRecyclerView.scrollBy(0, -50);
             layoutManager.scrollToPosition(0);
@@ -154,6 +160,17 @@ public class ListActivity extends AppCompatActivity {
                 itemTouchHelper.startDrag(viewHolder);
             }
         });
+    }
+
+    @Override
+    protected void onDestroy() {
+        EventBus.getDefault().unregister(noteAdapter);
+        super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
     }
 
     private ItemTouchHelper itemTouchHelper;

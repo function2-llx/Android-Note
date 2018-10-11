@@ -108,11 +108,13 @@ public class Note {
             inputStream = new FileInputStream(file);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            return ;
         }
 
         byte b[] = new byte[(int)file.length()];
         try{
-            inputStream.read(b);
+            int len = inputStream.read(b);
+            if(len == -1)return ;
         }
         catch(Exception e){
             System.out.println("Wrong!");
@@ -170,6 +172,7 @@ public class Note {
             outputStream = new FileOutputStream(file);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
+            return ;
         }
         String string = getTitle() + "qwert";
         List<IData> templist = getContent();
@@ -194,11 +197,11 @@ public class Note {
 
     @Override
     public String toString() {
-        String string = getTitle();
+        String string = "Title:"+getTitle()+"\nContents:";
         List<IData> templist = getContent();
         for(int i = 0;i < templist.size();i ++)
         {
-            string = string + " " + templist.get(i).toString();
+            string = string + "\n" + templist.get(i).toString();
         }
         return string;
     }
