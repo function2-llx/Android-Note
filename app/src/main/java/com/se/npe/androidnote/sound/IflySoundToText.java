@@ -32,7 +32,7 @@ public class IflySoundToText implements ISoundToText {
 
     @Override
     public String toText(Context context, String soundPath) {
-        Log.e("Enter Async :", "createUtility");
+        //Log.e("Enter Async :", "createUtility");
         fileName = soundPath;
         if (mIat == null)
             mIat = SpeechRecognizer.createRecognizer(context, null);
@@ -42,6 +42,7 @@ public class IflySoundToText implements ISoundToText {
     /* 模拟音速防止音频队列堵塞 */
     private String RecognizeWavFileByte() {
         new FileByteLoader().execute();
+        Log.e("mResult:", mResult.toString());
         return mResult.toString();
     }
 
@@ -87,7 +88,7 @@ public class IflySoundToText implements ISoundToText {
 
         @Override
         public void onResult(RecognizerResult result, boolean b1) {
-            Log.e("audioResult:", result.getResultString());
+            Log.e("addResult:", result.getResultString());
             mResult.append(result.getResultString());
         }
 
@@ -108,13 +109,12 @@ public class IflySoundToText implements ISoundToText {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            Log.e("Enter Async :", "Enter Async");
+            Log.e("enterAsync:", "Enter Async");
             try {
                 fis = new FileInputStream(new File(fileName));
                 voiceBuffer = new byte[fis.available()];
                 fis.read(voiceBuffer);
             } catch (Exception e) {
-                Log.e("Enter Async :", "Enter first catch");
                 e.printStackTrace();
             } finally {
                 try {
@@ -127,10 +127,9 @@ public class IflySoundToText implements ISoundToText {
             }
 
             if (0 == voiceBuffer.length) {
-                Log.e("Enter Async :", "Enter 1");
                 mResult.append("no audio available!");
             } else {
-                Log.e("Enter Async :", "Enter 2");
+                Log.e("enterAsync :", "beginSpeech");
                 mResult.setLength(0);
                 SpeechRecognizer recognizer = SpeechRecognizer.getRecognizer();
                 mIat.setParameter(SpeechConstant.DOMAIN, "iat");
@@ -145,7 +144,6 @@ public class IflySoundToText implements ISoundToText {
                 mIat.startListening(recListener);
                 for (int i = 0; i < buffers.size(); i++) {
                     // 4.8K 150ms
-                    Log.e("Enter Async :", "Enter write" + buffers.get(i));
                     mIat.writeAudio(buffers.get(i), 0, buffers.get(i).length);
                     try {
                         Thread.sleep(150);
@@ -154,7 +152,6 @@ public class IflySoundToText implements ISoundToText {
                     }
                 }
                 mIat.stopListening();
-                Log.e("Enter Async :", "result " + mResult.toString());
                 while (mIat.isListening()) {
                     if (maxWaitTime < 0) {
                         mResult.setLength(0);
@@ -169,7 +166,6 @@ public class IflySoundToText implements ISoundToText {
                     }
                 }
             }
-            Log.e("Enter Async :", "result " + mResult.toString());
             return null;
         }
     }
