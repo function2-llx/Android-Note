@@ -26,7 +26,17 @@ public class PictureData implements IData {
     public Bitmap getPicture() {
         return picture;
     }
-    public String toString(){
-        return "Picture"+"asdfg"+picturePath;
+
+    @Override
+    public boolean equals(Object another) {
+        // TODO: remove field picture?
+        // Only check whether picturePath are equal
+        return another.getClass() == this.getClass()
+                && this.picturePath.equals(((PictureData) another).picturePath);
+    }
+
+    @Override
+    public String toString() {
+        return "Picture" + "asdfg" + picturePath;
     }
 }

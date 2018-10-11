@@ -21,8 +21,9 @@ import java.io.OutputStream;
  * Note entity
  * I've thought about making it an interface, such as INote
  * But I now think this may not bring much convenience and make Note an concrete class
+ *
  * @author MashPlant
- * */
+ */
 
 public class Note {
     public static class PreviewData {
@@ -46,24 +47,17 @@ public class Note {
 
     private int DBindex = -1;
 
-    static int tot;
-    final int id;
-
-    public Note()
-    {
-        this.id = tot++;
-        this.title = "this is tile for " + id;
+    public Note() {
+        this.title = "this is tile for " + DBindex;
         this.content = new ArrayList<IData>();
     }
 
     public Note(String title, List<IData> content) {
-        this.id = tot++;
         this.title = title;
         this.content = content;
     }
 
-    public Note(String title, List<IData> content,int index) {
-        this.id = tot++;
+    public Note(String title, List<IData> content, int index) {
         this.DBindex = index;
         this.title = title;
         this.content = content;
@@ -73,9 +67,13 @@ public class Note {
         return title;
     }
 
-    public void setindex(int index){DBindex = index;}
+    public void setindex(int index) {
+        DBindex = index;
+    }
 
-    public int getIndex(){return DBindex;}
+    public int getIndex() {
+        return DBindex;
+    }
 
     public List<IData> getContent() {
         return content;
@@ -86,18 +84,15 @@ public class Note {
         String picpath = null;
         List<IData> templist = getContent();
         for (int i = 0; i < templist.size(); i++) {
-            if(picpath == null&&templist.get(i).toString().charAt(0) == 'P')
-            {
+            if (picpath == null && templist.get(i).toString().charAt(0) == 'P') {
                 picpath = templist.get(i).toString().split("asdfg")[1];
-            }
-            else if(text == null&&templist.get(i).toString().charAt(0) == 'T')
-            {
+            } else if (text == null && templist.get(i).toString().charAt(0) == 'T') {
                 text = templist.get(i).toString().split("asdfg")[1];
             }
         }
-        if(text == null)text = "无预览文字";
-        if(picpath == null)picpath = "";
-        Note.PreviewData previewData = new Note.PreviewData(title,text,picpath);
+        if (text == null) text = "无预览文字";
+        if (picpath == null) picpath = "";
+        Note.PreviewData previewData = new Note.PreviewData(title, text, picpath);
         return previewData;
     }
 
@@ -110,11 +105,10 @@ public class Note {
             e.printStackTrace();
         }
 
-        byte b[] = new byte[(int)file.length()];
-        try{
+        byte b[] = new byte[(int) file.length()];
+        try {
             inputStream.read(b);
-        }
-        catch(Exception e){
+        } catch (Exception e) {
             System.out.println("Wrong!");
         }
 
@@ -126,25 +120,22 @@ public class Note {
         content = new ArrayList<IData>();
 
         for (int i = 1; i < StrArray.length; i++) {
-            if(StrArray[i].charAt(0) == 'S') {
+            if (StrArray[i].charAt(0) == 'S') {
                 String[] tempArray = StrArray[i].split("asdfg");
-                SoundData tempSoundData = new SoundData(tempArray[1],tempArray[2]);
+                SoundData tempSoundData = new SoundData(tempArray[1], tempArray[2]);
                 content.add(tempSoundData);
-            }
-            else if(StrArray[i].charAt(0) == 'T') {
+            } else if (StrArray[i].charAt(0) == 'T') {
                 String[] tempArray = StrArray[i].split("asdfg");
                 TextData tempTextData = new TextData(tempArray[1]);
                 content.add(tempTextData);
-            }
-            else if(StrArray[i].charAt(0) == 'V') {
+            } else if (StrArray[i].charAt(0) == 'V') {
                 String[] tempArray = StrArray[i].split("asdfg");
                 VideoData tempVideoData = new VideoData(tempArray[1]);
                 content.add(tempVideoData);
-            }
-            else if(StrArray[i].charAt(0) == 'P'){
+            } else if (StrArray[i].charAt(0) == 'P') {
                 String[] tempArray = StrArray[i].split("asdfg");
                 Bitmap mBitmap = BitmapFactory.decodeFile(StrArray[1]);
-                PictureData tempPictureData = new PictureData(tempArray[1],mBitmap);
+                PictureData tempPictureData = new PictureData(tempArray[1], mBitmap);
                 content.add(tempPictureData);
             }
         }
@@ -193,11 +184,16 @@ public class Note {
     }
 
     @Override
+    public boolean equals(Object another) {
+        // Identify note by its DBindex
+        return this.DBindex == ((Note) another).DBindex;
+    }
+
+    @Override
     public String toString() {
         String string = getTitle();
         List<IData> templist = getContent();
-        for(int i = 0;i < templist.size();i ++)
-        {
+        for (int i = 0; i < templist.size(); i++) {
             string = string + " " + templist.get(i).toString();
         }
         return string;

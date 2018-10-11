@@ -36,7 +36,7 @@ public class TableOperate implements INoteCollection{
         Log.d("debug0001","decode:"+src);
         List<IData> content = new ArrayList<IData>();
         String[] StrArray = src.split("qwert");
-        for (int i = 1; i < StrArray.length; i++) {
+        for (int i = 0; i < StrArray.length; i++) {
             Log.d("debug0001",StrArray[i]);
             if(StrArray[i].charAt(0) == 'S') {
                 String[] tempArray = StrArray[i].split("asdfg");
