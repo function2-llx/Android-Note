@@ -8,7 +8,9 @@ import com.se.npe.androidnote.interfaces.IData;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
@@ -25,6 +27,9 @@ public class TableOperateTest {
     private TableOperate tableOperate;
     private List<Note> noteList;
     private final int NOTE_LIST_SIZE = 20;
+
+    @Rule
+    public ExpectedException expectedException = ExpectedException.none();
 
     @Before
     public void setUp() throws Exception {
@@ -59,8 +64,22 @@ public class TableOperateTest {
         // Add note & Get note at each index
         addNote();
         for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
-            assertEquals(noteList.get(i), tableOperate.getNoteAt(noteList.get(i).getIndex()));
+            assertEquals(noteList.get(i), tableOperate.getNoteAt(noteList.get(i).getIndex())); // noteList.get(i).getIndex() == i + 1
         }
+    }
+
+    @Test
+    public void getNoteAtBeforeStart() {
+        addNote();
+        expectedException.expect(IndexOutOfBoundsException.class);
+        tableOperate.getNoteAt(noteList.get(0).getIndex() - 1); // noteList.get(0).getIndex() == 1
+    }
+
+    @Test
+    public void getNoteAtAfterEnd() {
+        addNote();
+        expectedException.expect(IndexOutOfBoundsException.class);
+        tableOperate.getNoteAt(noteList.get(NOTE_LIST_SIZE - 1).getIndex() + 1); // noteList.get(NOTE_LIST_SIZE - 1).getIndex() == NOTE_LIST_SIZE
     }
 
     @Test
@@ -70,6 +89,8 @@ public class TableOperateTest {
             Note note = getExampleNote(i);
             noteList.add(note);
             tableOperate.addNote(note);
+            // SQL index starts at 1
+            assertEquals(noteList.get(i).getIndex(), i + 1);
         }
     }
 
@@ -110,6 +131,20 @@ public class TableOperateTest {
         noteList.clear();
         assertEquals(noteList, tableOperate.getAllNotes());
     }
+
+    // @Test
+    // public void removeNoteAtBeforeStart() {
+    //     addNote();
+    //     expectedException.expect(IndexOutOfBoundsException.class);
+    //     tableOperate.removeNoteAt(noteList.get(0).getIndex() - 1); // noteList.get(0).getIndex() == 1
+    // }
+
+    // @Test
+    // public void removeNoteAtAfterEnd() {
+    //     addNote();
+    //     expectedException.expect(IndexOutOfBoundsException.class);
+    //     tableOperate.removeNoteAt(noteList.get(NOTE_LIST_SIZE - 1).getIndex() + 1); // noteList.get(NOTE_LIST_SIZE - 1).getIndex() == NOTE_LIST_SIZE
+    // }
 
     @Test
     public void loadFromFile() {
