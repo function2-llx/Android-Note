@@ -197,11 +197,11 @@ public class Note {
 
     @Override
     public String toString() {
-        String string = getTitle();
+        String string = "Title:"+getTitle()+"\nContents:";
         List<IData> templist = getContent();
         for(int i = 0;i < templist.size();i ++)
         {
-            string = string + " " + templist.get(i).toString();
+            string = string + "\n" + templist.get(i).toString();
         }
         return string;
     }
