@@ -13,8 +13,6 @@ import android.widget.Button;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
-import com.*;
-
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.marshalchen.ultimaterecyclerview.UltimateViewAdapter;
 import com.se.npe.androidnote.EditorActivity;
@@ -34,19 +32,13 @@ import java.util.List;
  *
  * @author llx
  */
-public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> implements INoteCollection {
+public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
     private AppCompatActivity activity;
 
     /**
      * Implement INoteCollection
      */
 
-    @Override
-    public List<Note> getAllNotes() {
-        return this.noteList;
-    }
-
-    @Override
     public List<Note> getSearchResult(String parameter) {
         List<Note> ret = new ArrayList<>();
         for (Note note : this.noteList) {
@@ -73,36 +65,6 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> imp
             }
             this.notifyDataSetChanged();
         }
-    }
-
-    @Override
-    public void addNote(Note note) {
-        this.insert(note, 0);
-    }
-
-    @Override
-    public Note getNoteAt(int index) {
-        return this.getItem(index);
-    }
-
-    @Override
-    public void setNoteAt(int index, Note Note) {
-
-    }
-
-    @Override
-    public void removeNoteAt(int index) {
-
-    }
-
-    @Override
-    public void loadFromFile(String fileName) {
-
-    }
-
-    @Override
-    public void saveToFile(String fileName) {
-
     }
 
     // public void updateList(List<Note> list) {
