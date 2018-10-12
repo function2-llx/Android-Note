@@ -53,7 +53,7 @@ build:
 unit-tests:
   stage: test
   script:
-    - ./gradlew test > android-sdk-linux/log/unitTest.log
+    - ./gradlew test
     - ./gradlew jacocoTestReport > android-sdk-linux/log/jacocoTest.log
   after_script:
     - SUFFIX=$RANDOM
@@ -63,7 +63,7 @@ unit-tests:
   artifacts:
     paths:
     - app/build/reports/tests/
-    - app/build/test-results/ 
+    - app/build/test-results/
     - android-sdk-linux/log/
 
 # disabled because nested virtualization is not supported by host
