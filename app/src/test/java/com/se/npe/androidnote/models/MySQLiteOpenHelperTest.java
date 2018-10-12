@@ -12,7 +12,6 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
 import java.lang.reflect.Constructor;
-import java.lang.reflect.Field;
 
 import static org.junit.Assert.*;
 
@@ -25,12 +24,11 @@ public class MySQLiteOpenHelperTest {
     public void setUp() throws Exception {
         AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
         context = activity.getApplicationContext();
-        // "helper" is the static variable name which holds the singleton MySQLiteOpenHelper instance
-        resetSingleton(MySQLiteOpenHelper.class, "helper");
     }
 
     @After
     public void tearDown() throws Exception {
+        resetSingleton();
     }
 
     @Test
@@ -74,20 +72,8 @@ public class MySQLiteOpenHelperTest {
         assertEquals(mySQLiteOpenHelperUpgraded.getWritableDatabase().getVersion(), DATABASE_UPGRADED_VERSION);
     }
 
-    /**
-     * reset Singleton instance of class
-     *
-     * @param clazz     the name of class
-     * @param fieldName the field name of Singleton instance
-     */
-    private void resetSingleton(Class clazz, String fieldName) {
-        Field instance;
-        try {
-            instance = clazz.getDeclaredField(fieldName);
-            instance.setAccessible(true);
-            instance.set(null, null);
-        } catch (Exception e) {
-            throw new RuntimeException();
-        }
+    static void resetSingleton() {
+        // "helper" is the static variable name which holds the singleton MySQLiteOpenHelper instance
+        SingletonResetter.resetSingleton(MySQLiteOpenHelper.class, "helper");
     }
 }

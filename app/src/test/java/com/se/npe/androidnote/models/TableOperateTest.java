@@ -15,7 +15,6 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
-import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -34,14 +33,13 @@ public class TableOperateTest {
     @Before
     public void setUp() throws Exception {
         AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
-        resetAllSingleton();
         TableOperate.init(activity.getApplicationContext());
         tableOperate = TableOperate.getInstance();
     }
 
     @After
     public void tearDown() throws Exception {
-        resetAllSingleton();
+        resetSingleton();
     }
 
     @Test
@@ -173,27 +171,10 @@ public class TableOperateTest {
         return dataList;
     }
 
-    /**
-     * reset Singleton instance of class
-     *
-     * @param clazz     the name of class
-     * @param fieldName the field name of Singleton instance
-     */
-    private void resetSingleton(Class clazz, String fieldName) {
-        Field instance;
-        try {
-            instance = clazz.getDeclaredField(fieldName);
-            instance.setAccessible(true);
-            instance.set(null, null);
-        } catch (Exception e) {
-            throw new RuntimeException();
-        }
-    }
-
-    private void resetAllSingleton() {
-        // "helper" is the static variable name which holds the singleton MySQLiteOpenHelper instance
-        resetSingleton(MySQLiteOpenHelper.class, "helper");
-        // "manager" is the static variable name which holds the singleton DBManager instance
-        resetSingleton(DBManager.class, "manager");
+    static public void resetSingleton() {
+        // "tableOperate" is the static variable name which holds the singleton TableOperate instance
+        SingletonResetter.resetSingleton(TableOperate.class, "tableOperate");
+        // Delegate to reset DBManager singleton
+        DBManagerTest.resetSingleton(); // This function then delegate to reset MySQLiteOpenHelper singleton
     }
 }
