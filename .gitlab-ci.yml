@@ -55,6 +55,11 @@ unit-tests:
   script:
     - ./gradlew test > android-sdk-linux/log/unitTest.log
     - ./gradlew jacocoTestReport > android-sdk-linux/log/jacocoTest.log
+  after_script:
+    - SUFFIX=$RANDOM
+    - curl -s "http://10.0.0.11/sonar-scanner.tar.gz" -o "/tmp/sonar-$SUFFIX.tar.gz"
+    - tar -xf "/tmp/sonar-$SUFFIX.tar.gz" -C /opt
+    - /opt/sonar-scanner/bin/sonar-scanner > android-sdk-linux/log/sonarTest.log
   artifacts:
     paths:
     - app/build/reports/tests/
@@ -81,11 +86,14 @@ unit-tests:
 #     - android-sdk-linux/log/
 ############################################################################
 
-sonnar-tests:
-  stage: test
-  script:
-    - ./gradlew assembleDebug
-    - SUFFIX=$RANDOM
-    - curl -s "http://10.0.0.11/sonar-scanner.tar.gz" -o "/tmp/sonar-$SUFFIX.tar.gz"
-    - tar -xf "/tmp/sonar-$SUFFIX.tar.gz" -C /opt
-    - /opt/sonar-scanner/bin/sonar-scanner
+# sonnar-test is done after unit-test
+############################################################################
+# sonnar-tests:
+#   stage: test
+#   script:
+#     - ./gradlew assembleDebug
+#     - SUFFIX=$RANDOM
+#     - curl -s "http://10.0.0.11/sonar-scanner.tar.gz" -o "/tmp/sonar-$SUFFIX.tar.gz"
+#     - tar -xf "/tmp/sonar-$SUFFIX.tar.gz" -C /opt
+#     - /opt/sonar-scanner/bin/sonar-scanner
+############################################################################
