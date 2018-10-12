@@ -32,14 +32,30 @@ public class TableOperateTest {
 
     @Before
     public void setUp() throws Exception {
-        AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
-        TableOperate.init(activity.getApplicationContext());
-        tableOperate = TableOperate.getInstance();
+        init();
+        addNote();
     }
 
     @After
     public void tearDown() throws Exception {
         resetSingleton();
+    }
+
+    @Test
+    public void init() {
+        AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
+        TableOperate.init(activity.getApplicationContext());
+        tableOperate = TableOperate.getInstance();
+        assertNotNull(tableOperate);
+    }
+
+    @Test
+    public void getInstance() {
+        // Check TableOperate is properly set up
+        TableOperate tableOperate2 = TableOperate.getInstance();
+        assertNotNull(tableOperate2);
+        // Check singleton pattern is used
+        assertSame(tableOperate, tableOperate2);
     }
 
     @Test
@@ -51,15 +67,12 @@ public class TableOperateTest {
 
     @Test
     public void getAllNotes() {
-        // Add note & Get all notes
-        addNote();
         assertEquals(noteList, tableOperate.getAllNotes());
     }
 
     @Test
     public void getNoteAt() {
-        // Add note & Get note at each index
-        addNote();
+        // Get note at each index
         for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
             assertEquals(noteList.get(i), tableOperate.getNoteAt(noteList.get(i).getIndex())); // noteList.get(i).getIndex() == i + 1
         }
@@ -67,14 +80,12 @@ public class TableOperateTest {
 
     @Test
     public void getNoteAtBeforeStart() {
-        addNote();
         expectedException.expect(IndexOutOfBoundsException.class);
         tableOperate.getNoteAt(noteList.get(0).getIndex() - 1); // noteList.get(0).getIndex() == 1
     }
 
     @Test
     public void getNoteAtAfterEnd() {
-        addNote();
         expectedException.expect(IndexOutOfBoundsException.class);
         tableOperate.getNoteAt(noteList.get(NOTE_LIST_SIZE - 1).getIndex() + 1); // noteList.get(NOTE_LIST_SIZE - 1).getIndex() == NOTE_LIST_SIZE
     }
@@ -87,14 +98,14 @@ public class TableOperateTest {
             noteList.add(note);
             tableOperate.addNote(note);
             // SQL index starts at 1
-            assertEquals(noteList.get(i).getIndex(), i + 1);
+            // noteList.get(i).getIndex() == i + 1
+            // if addNote() is invoked the first time
         }
     }
 
     @Test
     public void setNoteAt() {
-        // Add note & Set note at some index & Get notes
-        addNote();
+        // Set note at some index & Get notes
         for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
             Note note = getExampleNote(i + NOTE_LIST_SIZE);
             // Old note get index -> New note set
@@ -107,8 +118,7 @@ public class TableOperateTest {
 
     @Test
     public void removeNoteAt() {
-        // Add note & Remove note at some index & Get notes
-        addNote();
+        // Remove note at some index & Get notes
         final int NOTE_LIST_SIZE_REMOVE = 4;
         // Remove note at start, middle
         for (int i = 0; i < NOTE_LIST_SIZE_REMOVE; ++i) {
@@ -121,7 +131,7 @@ public class TableOperateTest {
         tableOperate.removeNoteAt(noteList.get(noteList.size() - 1).getIndex());
         noteList.remove(noteList.size() - 1);
         assertEquals(noteList, tableOperate.getAllNotes());
-        // Remove all notes
+        // Remove all notes one by one
         for (int i = 0; i < noteList.size(); ++i) {
             tableOperate.removeNoteAt(noteList.get(i).getIndex());
         }
@@ -142,6 +152,20 @@ public class TableOperateTest {
     //     expectedException.expect(IndexOutOfBoundsException.class);
     //     tableOperate.removeNoteAt(noteList.get(NOTE_LIST_SIZE - 1).getIndex() + 1); // noteList.get(NOTE_LIST_SIZE - 1).getIndex() == NOTE_LIST_SIZE
     // }
+
+    @Test
+    public void removeAllNotes() {
+        tableOperate.removeAllNotes();
+        noteList.clear();
+        assertEquals(noteList, tableOperate.getAllNotes());
+    }
+
+    @Test
+    public void removeAllNotes_addNote() {
+        // Remove all notes & Add note
+        removeAllNotes();
+        addNote();
+    }
 
     @Test
     public void loadFromFile() {
