@@ -12,7 +12,7 @@ variables:
 
 before_script:
   - apt-get --quiet update --yes
-  - apt-get --quiet install --yes wget tar unzip lib32stdc++6 lib32z1
+  - apt-get --quiet install --yes apt-utils wget tar unzip lib32stdc++6 lib32z1
   
   # install Android sdk
   - mkdir -p android-sdk-linux
@@ -44,19 +44,22 @@ stages:
 build:
   stage: build
   script:
-    - ./gradlew assembleDebug
+    - ./gradlew assembleDebug > android-sdk-linux/log/buildDebug.log
   artifacts:
     paths:
     - app/build/outputs/
+    - android-sdk-linux/log/
 
 unit-tests:
   stage: test
   script:
-    - ./gradlew test
+    - ./gradlew test > android-sdk-linux/log/unitTest.log
+    - ./gradlew jacocoTestReport > android-sdk-linux/log/jacocoTest.log
   artifacts:
     paths:
     - app/build/reports/tests/
     - app/build/test-results/ 
+    - android-sdk-linux/log/
 
 # disabled because nested virtualization is not supported by host
 ############################################################################
@@ -70,11 +73,12 @@ unit-tests:
 #     - android-sdk-linux/emulator/emulator -avd test -no-window -no-audio -no-snapshot-load &
 #     - ./android-wait-for-emulator
 #     - /android-sdk-linux/platform-tools/adb shell input keyevent 82
-#     - ./gradlew connectedAndroidtest
+#     - ./gradlew connectedAndroidtest > android-sdk-linux/log/connectedAndroidTest.log
 #   artifacts:
 #     paths:
 #     - app/build/reports/androidTests/connected
 #     - app/build/outputs/androidTest-results/connected
+#     - android-sdk-linux/log/
 ############################################################################
 
 sonnar-tests:
