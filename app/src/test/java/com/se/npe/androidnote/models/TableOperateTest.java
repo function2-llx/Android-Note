@@ -34,16 +34,14 @@ public class TableOperateTest {
     @Before
     public void setUp() throws Exception {
         AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
+        resetAllSingleton();
         TableOperate.init(activity.getApplicationContext());
         tableOperate = TableOperate.getInstance();
     }
 
     @After
     public void tearDown() throws Exception {
-        // "helper" is the static variable name which holds the singleton MySQLiteOpenHelper instance
-        resetSingleton(MySQLiteOpenHelper.class, "helper");
-        // "manager" is the static variable name which holds the singleton DBManager instance
-        resetSingleton(DBManager.class, "manager");
+        resetAllSingleton();
     }
 
     @Test
@@ -83,7 +81,7 @@ public class TableOperateTest {
         tableOperate.getNoteAt(noteList.get(NOTE_LIST_SIZE - 1).getIndex() + 1); // noteList.get(NOTE_LIST_SIZE - 1).getIndex() == NOTE_LIST_SIZE
     }
 
-    // @Test
+    @Test
     public void addNote() {
         noteList = new ArrayList<Note>();
         for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
@@ -91,7 +89,7 @@ public class TableOperateTest {
             noteList.add(note);
             tableOperate.addNote(note);
             // SQL index starts at 1
-            // assertEquals(noteList.get(i).getIndex(), i + 1);
+            assertEquals(noteList.get(i).getIndex(), i + 1);
         }
     }
 
@@ -190,5 +188,12 @@ public class TableOperateTest {
         } catch (Exception e) {
             throw new RuntimeException();
         }
+    }
+
+    private void resetAllSingleton() {
+        // "helper" is the static variable name which holds the singleton MySQLiteOpenHelper instance
+        resetSingleton(MySQLiteOpenHelper.class, "helper");
+        // "manager" is the static variable name which holds the singleton DBManager instance
+        resetSingleton(DBManager.class, "manager");
     }
 }
