@@ -9,6 +9,7 @@ import android.content.ContentValues;
 import android.support.design.widget.TabLayout;
 import android.util.Log;
 
+import com.se.npe.androidnote.events.ClearEvent;
 import com.se.npe.androidnote.events.NoteDeleteEvent;
 import com.se.npe.androidnote.events.NoteEvent;
 import com.se.npe.androidnote.events.NoteModifyEvent;
@@ -96,6 +97,7 @@ public class TableOperate implements INoteCollection{
     }
 
     public List<Note> getAllNotes() {
+
         ArrayList<Note> Notelist = new ArrayList<Note>();
         Cursor c = db.rawQuery("select * from "+TableConfig.TABLE_NAME, null);
         while (c.moveToNext()) {
@@ -189,5 +191,14 @@ public class TableOperate implements INoteCollection{
     public void onDeleteNote(NoteDeleteEvent event)
     {
         this.removeNoteAt(event.getNote().getIndex());
+    }
+
+    @Subscribe (sticky = true)
+    public void receiveClearEvent(ClearEvent event)
+    {
+        int size = getAllNotes().size();
+        for (int i = 0; i < size; i++) {
+            removeNoteAt(0);
+        }
     }
 }

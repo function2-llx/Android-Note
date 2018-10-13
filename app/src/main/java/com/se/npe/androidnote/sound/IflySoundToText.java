@@ -169,9 +169,10 @@ public class IflySoundToText {
                     e.printStackTrace();
                 }
             }
-
+            Log.e("enterAsync :", "beforeSpeech");
             if (0 == voiceBuffer.length) {
                 mResult.append("no audio available!");
+                Log.e("enterAsync :", "length=0");
             } else {
                 Log.e("enterAsync :", "beginSpeech");
                 mResult.setLength(0);

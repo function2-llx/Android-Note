@@ -10,13 +10,17 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.view.ContextMenu;
 import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.marshalchen.ultimaterecyclerview.DragDropTouchListener;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.marshalchen.ultimaterecyclerview.itemTouchHelper.SimpleItemTouchHelperCallback;
 import com.se.npe.androidnote.adapters.NoteAdapter;
+import com.se.npe.androidnote.events.NoteDeleteEvent;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.TableOperate;
 
@@ -41,12 +45,17 @@ public class ListActivity extends AppCompatActivity {
     /* Options menu */
 
     @Override
+    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
+        this.getMenuInflater().inflate(R.menu.activity_list_context_menu, menu);
+        super.onCreateContextMenu(menu, v, menuInfo);
+    }
+
+    @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         this.getMenuInflater().inflate(R.menu.activity_list, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
         this.configureSearchView(searchView);
-        
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -62,7 +71,9 @@ public class ListActivity extends AppCompatActivity {
             case R.id.clear: {
                 int size = noteAdapter.getAdapterItemCount();
                 for (int i = 0; i < size; i++) {
+                    Note note = noteAdapter.getItem(0);
                     noteAdapter.remove(0);
+                    EventBus.getDefault().post(new NoteDeleteEvent(note));
                 }
                 break;
             }
@@ -105,7 +116,7 @@ public class ListActivity extends AppCompatActivity {
 //            }, 1000);
 //        });
 
-        this.enableDrag();
+//        this.enableDrag();
         this.enableRefresh();
     }
 
@@ -117,32 +128,28 @@ public class ListActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                searchAdapter = new NoteAdapter(noteAdapter.getSearchResult(query), ListActivity.this);
+                searchAdapter = new NoteAdapter(TableOperate.getInstance().getSearchResult(query), ListActivity.this);
                 ultimateRecyclerView.setAdapter(searchAdapter);
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                searchAdapter = new NoteAdapter(noteAdapter.getSearchResult(newText), ListActivity.this);
+                searchAdapter = new NoteAdapter(TableOperate.getInstance().getSearchResult(newText), ListActivity.this);
                 ultimateRecyclerView.setAdapter(searchAdapter);
                 return true;
             }
         });
 
-        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
-            @Override
-            public boolean onClose() {
-                ultimateRecyclerView.setAdapter(noteAdapter);
-                return false;
-            }
+        searchView.setOnCloseListener(() -> {
+            ultimateRecyclerView.setAdapter(noteAdapter);
+            return false;
         });
     }
 
+    //refresh the list
     private void enableRefresh() {
         this.ultimateRecyclerView.setDefaultOnRefreshListener(() -> new Handler().postDelayed(() -> {
-            // simpleRecyclerViewAdapter.insert("Refresh things", 0);
-//            ListActivity.this.noteAdapter.insert(new Note(), 0);
             noteAdapter.updateList(TableOperate.getInstance().getAllNotes());
             ListActivity.this.ultimateRecyclerView.setRefreshing(false);
             // ultimateRecyclerView.scrollBy(0, -50);
@@ -150,6 +157,7 @@ public class ListActivity extends AppCompatActivity {
         }, 1000));
     }
 
+    // drag the view
     private void enableDrag() {
         ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(noteAdapter);
         itemTouchHelper = new ItemTouchHelper(callback);

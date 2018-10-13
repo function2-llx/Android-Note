@@ -38,9 +38,6 @@ import java.util.List;
  */
 public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
     private AppCompatActivity activity;
-
-
-
     /**
      * Implement INoteCollection
      */
@@ -73,24 +70,12 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
         }
     }
 
-    // public void updateList(List<Note> list) {
-    //     if (list.isEmpty())
-    //         this.clear();
-    //     else {
-    //         this.noteList.clear();
-    //         for (Note note : list) {
-    //             noteList.add(note);
-    //         }
-    //         this.notifyDataSetChanged();
-    //     }
-    // }
-
     /**
      * Adapt Note to item-like View
      *
      * @author llx
      */
-    public class ViewHolder extends UltimateRecyclerviewViewHolder implements View.OnClickListener {
+    public class ViewHolder extends UltimateRecyclerviewViewHolder implements View.OnClickListener, View.OnLongClickListener{
         private TextView title, text;
 
         public ViewHolder(View itemView) {
@@ -114,6 +99,28 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
             Intent intent = new Intent(activity, EditorActivity.class);
             activity.startActivity(intent);
         }
+
+        @Override
+        public boolean onLongClick(View v) {
+            PopupMenu menu = new PopupMenu(activity, v);
+            menu.getMenuInflater().inflate(R.menu.activity_list_context_menu, menu.getMenu());
+            menu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem item) {
+                    int position = getAdapterPosition();
+                    Note note = getItem(position);
+                    switch (item.getItemId()) {
+                        case R.id.delete: {
+                            remove(position);
+                            EventBus.getDefault().post(new NoteDeleteEvent(note));
+                        }
+                    }
+                    return true;
+                }
+            });
+            menu.show();
+            return true;
+        }
     }
 
     private List<Note> noteList;
@@ -134,31 +141,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_list_item, parent, false);
         ViewHolder holder = new ViewHolder(v);
         v.setOnClickListener(holder);
-        Button btn = v.findViewById(R.id.list_item_button);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PopupMenu popupMenu = new PopupMenu(activity, v);
-                popupMenu.getMenuInflater().inflate(R.menu.list_item_options, popupMenu.getMenu());
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.preview: {
-                                break;
-                            }
-                            case R.id.delete: {
-                                System.err.println(holder.getAdapterPosition());
-                                NoteAdapter.this.remove(holder.getAdapterPosition());
-                                break;
-                            }
-                        }
-                        return true;
-                    }
-                });
-                popupMenu.show();
-            }
-        });
+        v.setOnLongClickListener(holder);
         return holder;
     }
 
@@ -211,7 +194,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
         return new ViewHolder(view);
     }
 
-    Note getItem(int position) throws IndexOutOfBoundsException {
+    public Note getItem(int position) throws IndexOutOfBoundsException {
         // Subtract the first one used by header
         if (this.hasHeaderView())
             position--;
@@ -227,9 +210,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
     }
 
     public void remove(int position) {
-        Note note = getItem(position);
         super.removeInternal(this.noteList, position);
-        EventBus.getDefault().post(new NoteDeleteEvent(note));
     }
 
     public void swapPositions(int from, int to) {
