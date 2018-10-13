@@ -97,6 +97,7 @@ task jacocoTestReport(type: JacocoReport) {
                       '**/*$ViewBinder*.*',
                       '**/*$MembersInjector*.*',
                       '**/Manifest*.*',
+                      '**/*Test*.*',
                       'android/**/*.*']
     def debugTree = fileTree(dir: "${buildDir}/intermediates/javac/debug", excludes: fileFilter)
     def debugUnitTestTree = fileTree(dir: "${buildDir}/intermediates/javac/debugUnitTest", excludes: fileFilter)

@@ -34,3 +34,8 @@ unitTests:
     - curl -s "http://10.0.0.11/sonar-scanner.tar.gz" -o "/tmp/sonar-$SUFFIX.tar.gz"
     - tar -xf "/tmp/sonar-$SUFFIX.tar.gz" -C /opt
     - /opt/sonar-scanner/bin/sonar-scanner
+  artifacts:
+      paths:
+      - app/build/reports/tests/
+      - app/build/test-results/
+      - app/build/jacoco
