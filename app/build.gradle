@@ -111,5 +111,5 @@ task jacocoTestReport(type: JacocoReport) {
 
     sourceDirectories = files([mainSrc])
     classDirectories = files([debugTree])
-    executionData = files("${project.buildDir}/outputs/jacoco/testDebugUnitTest.exec")
+    executionData = files("${project.buildDir}/jacoco/testDebugUnitTest.exec")
 }
