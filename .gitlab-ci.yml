@@ -37,6 +37,5 @@ unitTests:
   artifacts:
       paths:
       - app/build/outputs/
-      - app/build/reports/tests/
+      - app/build/reports/
       - app/build/test-results/
-      - app/build/reports/jacoco/

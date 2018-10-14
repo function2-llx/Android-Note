@@ -12,6 +12,9 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -90,6 +93,7 @@ dependencies {
 
 task jacocoTestReport(type: JacocoReport) {
     // " dependsOn: 'testDebugUnitTest' " property is ignored because test has been performed
+    group = "Reporting"
 
     reports {
         xml.enabled = true
