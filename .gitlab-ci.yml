@@ -36,7 +36,7 @@ unitTests:
     - /opt/sonar-scanner/bin/sonar-scanner
   artifacts:
       paths:
+      - app/build/outputs/
       - app/build/reports/tests/
       - app/build/test-results/
-      - app/build/reports/jacoco
-      - app/build/jacoco
+      - app/build/reports/jacoco/
