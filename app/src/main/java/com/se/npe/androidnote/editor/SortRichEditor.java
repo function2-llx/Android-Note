@@ -492,7 +492,8 @@ public class SortRichEditor extends ScrollView implements IEditor {
             for (int i = 1; i < num; ++i) {
                 View child = childArray[i];
                 if (preChild instanceof RelativeLayout && child instanceof RelativeLayout) {
-                    ImageView placeholder = createPlaceholder(); // not null here
+                    // because we are editing now, placeholder cannot be null here
+                    ImageView placeholder = createPlaceholder();
                     sortViewList.add(placeholder);
                 }
                 sortViewList.add(child);
@@ -596,9 +597,6 @@ public class SortRichEditor extends ScrollView implements IEditor {
     // the placeholder between two media, for future text insert
     // return null if isViewOnly is on
     private ImageView createPlaceholder() {
-        if (isViewOnly) {
-            return null;
-        }
         final ImageView placeholder = new ImageView(getContext());
         placeholder.setTag(viewTagID++);
         placeholder.setImageResource(R.mipmap.icon_add_text);
@@ -759,7 +757,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
             }
             int lastIndex = index - 1;
             View child = containerLayout.getChildAt(lastIndex);
-            if (child instanceof RelativeLayout) {
+            if (child instanceof RelativeLayout && !isViewOnly) {
                 insertPlaceholder(index++);
             }
         }
@@ -804,10 +802,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
     }
 
     private void insertPlaceholder(int index) {
-        ImageView placeholder = createPlaceholder();
-        if (placeholder != null) {
-            containerLayout.addView(placeholder, index);
-        }
+        containerLayout.addView(createPlaceholder(), index);
     }
 
     private EditText insertEditTextAtIndex(final int index, String editStr) {

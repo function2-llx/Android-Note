@@ -4,6 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.SearchView;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 
 import com.dmcbig.mediapicker.PickerActivity;
@@ -29,6 +32,12 @@ public class EditorActivity extends AppCompatActivity {
     private Note oldNote;
     private long startTime;
     public static final String VIEW_ONLY = "VIEW_ONLY";
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        this.getMenuInflater().inflate(R.menu.activiry_editor, menu);
+        return super.onCreateOptionsMenu(menu);
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
