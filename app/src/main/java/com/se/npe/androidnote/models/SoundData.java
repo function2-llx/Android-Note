@@ -4,6 +4,8 @@ import android.view.View;
 
 import com.se.npe.androidnote.interfaces.IData;
 
+import java.util.Objects;
+
 /**
  * Sound data <-> a piece of sound and text in the editor
  * maybe it will be shown as a MediaPlayer or just a ImageView of a start button
@@ -29,10 +31,17 @@ public class SoundData implements IData {
     }
 
     @Override
-    public boolean equals(Object another) {
-        return another.getClass() == this.getClass()
-                && this.soundPath.equals(((SoundData) another).soundPath)
-                && this.text.equals(((SoundData) another).text);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SoundData soundData = (SoundData) o;
+        return Objects.equals(soundPath, soundData.soundPath) &&
+                Objects.equals(text, soundData.text);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(soundPath, text);
     }
 
     @Override

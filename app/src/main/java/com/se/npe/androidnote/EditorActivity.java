@@ -119,7 +119,7 @@ public class EditorActivity extends AppCompatActivity {
         super.onDestroy();
         Note note = editor.buildNote();
         if (oldNote != null) {
-            note.setindex(oldNote.getIndex());
+            note.setIndex(oldNote.getIndex());
         }
         EventBus.getDefault().post(new NoteModifyEvent(note));
 

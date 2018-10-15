@@ -114,7 +114,7 @@ public class TableOperate implements INoteCollection {
         int count = cursor.getInt(0);
         cursor.close();
         Log.d("debug0001", Integer.toString(count));
-        note.setindex(count);
+        note.setIndex(count);
 
         EventBus.getDefault().post(new DatabaseModifyEvent("new note"));
     }
@@ -133,7 +133,7 @@ public class TableOperate implements INoteCollection {
     public void setNoteAt(int index, Note note) {
         db.execSQL("update " + TableConfig.TABLE_NAME + " set " + TableConfig.Note.NOTE_TITLE + "=?," + TableConfig.Note.NOTE_CONTENT + "=? where " + TableConfig.Note.NOTE_ID + "=?",
                 new Object[]{note.getTitle(), encodeNote(note.getContent()), Integer.toString(index)});
-        note.setindex(index);
+        note.setIndex(index);
 
         EventBus.getDefault().post(new DatabaseModifyEvent("modify note"));
     }
