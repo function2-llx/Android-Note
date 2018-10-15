@@ -100,17 +100,17 @@ public class EditorActivity extends AppCompatActivity {
         } else if (resultCode == SoundRecorderActivity.RESULT_CODE && requestCode == PICKER_SOUND) {
             String path = data.getStringExtra(RecordingService.SOUND_PATH);
             editor.addSound(path);
-            new IflySoundToText().acceptTask(this, path, new IflySoundToText.OnTextReadyListener() {
-                @Override
-                public void onTextReady(String text) {
-                    Toast.makeText(EditorActivity.this, text, Toast.LENGTH_SHORT).show();
-                }
-
-                @Override
-                public void onTextFinished(String all) {
-                    Toast.makeText(EditorActivity.this, "all: " + all, Toast.LENGTH_SHORT).show();
-                }
-            });
+//            new IflySoundToText().acceptTask(this, path, new IflySoundToText.OnTextReadyListener() {
+//                @Override
+//                public void onTextReady(String text) {
+//                    Toast.makeText(EditorActivity.this, text, Toast.LENGTH_SHORT).show();
+//                }
+//
+//                @Override
+//                public void onTextFinished(String all) {
+//                    Toast.makeText(EditorActivity.this, "all: " + all, Toast.LENGTH_SHORT).show();
+//                }
+//            });
         }
     }
 
