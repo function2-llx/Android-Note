@@ -36,9 +36,8 @@ import java.util.List;
  *
  * @author llx
  */
-public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
+public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
     private AppCompatActivity activity;
-
 
 
     /**
@@ -54,21 +53,17 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
         return ret;
     }
 
-    public void sortByTitle()
-    {
+    public void sortByTitle() {
         Collections.sort(this.noteList, Comparator.comparing(Note::getTitle));
         this.notifyDataSetChanged();
     }
 
-    public void updateList(List<Note> list)
-    {
+    public void updateList(List<Note> list) {
         if (list.isEmpty())
             this.clear();
         else {
-            this.noteList.clear();
-            for (Note note: list) {
-                noteList.add(note);
-            }
+            noteList.clear();
+            noteList.addAll(list);
             this.notifyDataSetChanged();
         }
     }
@@ -132,7 +127,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_list_item, parent, false);
-        ViewHolder holder = new ViewHolder(v);
+        final ViewHolder holder = new ViewHolder(v);
         v.setOnClickListener(holder);
         Button btn = v.findViewById(R.id.list_item_button);
         btn.setOnClickListener(new View.OnClickListener() {
@@ -145,6 +140,11 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
                     public boolean onMenuItemClick(MenuItem item) {
                         switch (item.getItemId()) {
                             case R.id.preview: {
+                                Note selectedNote = getItem(holder.getAdapterPosition());
+                                EventBus.getDefault().postSticky(new NoteSelectEvent(selectedNote));
+                                Intent intent = new Intent(activity, EditorActivity.class)
+                                        .putExtra(EditorActivity.VIEW_ONLY, true);
+                                activity.startActivity(intent);
                                 break;
                             }
                             case R.id.delete: {
@@ -192,8 +192,8 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
 
     @Override
     public RecyclerView.ViewHolder onCreateHeaderViewHolder(ViewGroup parent) {
-            View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.stick_header_item, parent, false);
-            return new RecyclerView.ViewHolder(v) {
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.stick_header_item, parent, false);
+        return new RecyclerView.ViewHolder(v) {
         };
     }
 
@@ -248,14 +248,12 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
         super.onItemMove(fromPosition, toPosition);
     }
 
-    private void reloadNoteList()
-    {
+    private void reloadNoteList() {
         this.updateList(TableOperate.getInstance().getAllNotes());
     }
 
     @Subscribe(sticky = true)
-    void onReceiveNoteChangeSignal(DatabaseModifyEvent signal)
-    {
+    void onReceiveNoteChangeSignal(DatabaseModifyEvent signal) {
         this.reloadNoteList();
     }
 }
