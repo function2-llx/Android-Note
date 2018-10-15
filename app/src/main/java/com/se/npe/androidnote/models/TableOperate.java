@@ -118,6 +118,20 @@ public class TableOperate implements INoteCollection{
         return Notelist;
     }
 
+    public List<Note> getSearchResultFuzzy(String parameter)
+    {
+        ArrayList<Note> Notelist = new ArrayList<Note>();
+        String sql2 = "select * from " + TableConfig.TABLE_NAME
+                + " where " + TableConfig.Note.NOTE_TITLE + " like '%"+parameter+"%'";
+        Cursor c = db.rawQuery(sql2,null);
+        while (c.moveToNext()) {
+            Note temp = new Note(c.getString(1),decodeNote(c.getString(2)),c.getInt(0));
+            Notelist.add(temp);
+        }
+        c.close();
+        return Notelist;
+    }
+
     public void addNote(Note note){
         Log.d("debug0001","insert into "+TableConfig.TABLE_NAME+" values("+note.getTitle()+","+encodeNote(note.getContent())+")");
         ContentValues cValue = new ContentValues();
