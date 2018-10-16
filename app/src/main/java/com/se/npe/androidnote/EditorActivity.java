@@ -121,7 +121,7 @@ public class EditorActivity extends AppCompatActivity {
     private RecognizerListener recognizerListener = new RecognizerListener() {
         @Override
         public void onVolumeChanged(int i, byte[] bytes) {
-            
+
         }
 
         @Override
