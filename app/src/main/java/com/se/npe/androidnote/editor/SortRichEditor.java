@@ -155,6 +155,9 @@ public class SortRichEditor extends ScrollView implements IEditor {
     // record the y of last touch event
     private float preY;
 
+    // when set to true, the note cannot be modified
+    private boolean isViewOnly = false;
+
     public SortRichEditor(Context context) {
         this(context, null);
     }
@@ -283,7 +286,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
     }
 
     private EditText getFirstText() {
-        EditText firstEdit = createEditText("Please Input");
+        EditText firstEdit = createEditText("");
         editTextHeightArray.put(Integer.parseInt(firstEdit.getTag().toString()), ViewGroup.LayoutParams.WRAP_CONTENT);
         editTextBackground = firstEdit.getBackground();
         lastFocusEdit = firstEdit;
@@ -489,6 +492,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
             for (int i = 1; i < num; ++i) {
                 View child = childArray[i];
                 if (preChild instanceof RelativeLayout && child instanceof RelativeLayout) {
+                    // because we are editing now, placeholder cannot be null here
                     ImageView placeholder = createPlaceholder();
                     sortViewList.add(placeholder);
                 }
@@ -591,6 +595,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
     }
 
     // the placeholder between two media, for future text insert
+    // return null if isViewOnly is on
     private ImageView createPlaceholder() {
         final ImageView placeholder = new ImageView(getContext());
         placeholder.setTag(viewTagID++);
@@ -638,6 +643,9 @@ public class SortRichEditor extends ScrollView implements IEditor {
         return editText;
     }
 
+    // called by createPictureLayout & createVideoLayout & createSoundLayout
+    // provide a common structure for medias
+    // and the specific media do their work themselves
     private RelativeLayout createMediaLayout(View media, RelativeLayout.LayoutParams params) {
         RelativeLayout.LayoutParams closeImageLp = new RelativeLayout.LayoutParams(
                 LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
@@ -651,7 +659,11 @@ public class SortRichEditor extends ScrollView implements IEditor {
 
         RelativeLayout layout = new RelativeLayout(getContext());
         layout.addView(media);
-        layout.addView(closeImage);
+        // maybe we don't need to create one, but now I just don't add it to the layout
+        // this is the easiest implementation
+        if (!isViewOnly) {
+            layout.addView(closeImage);
+        }
         layout.setTag(viewTagID++);
         setFocusOnView(layout, true);
 
@@ -745,7 +757,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
             }
             int lastIndex = index - 1;
             View child = containerLayout.getChildAt(lastIndex);
-            if (child instanceof RelativeLayout) {
+            if (child instanceof RelativeLayout && !isViewOnly) {
                 insertPlaceholder(index++);
             }
         }
@@ -790,14 +802,15 @@ public class SortRichEditor extends ScrollView implements IEditor {
     }
 
     private void insertPlaceholder(int index) {
-        ImageView placeholder = createPlaceholder();
-        containerLayout.addView(placeholder, index);
+        containerLayout.addView(createPlaceholder(), index);
     }
 
     private EditText insertEditTextAtIndex(final int index, String editStr) {
         EditText editText = createEditText("");
         editText.setText(editStr);
-
+        if (isViewOnly) {
+            editText.setFocusable(false);
+        }
         containerLayout.setLayoutTransition(null);
         containerLayout.addView(editText, index);
         containerLayout.setLayoutTransition(mTransition);
@@ -966,6 +979,11 @@ public class SortRichEditor extends ScrollView implements IEditor {
             }
         }
         return new Note(title.getText().toString().trim(), contentList);
+    }
+
+    public void setViewOnly() {
+        isViewOnly = true;
+        title.setFocusable(false);
     }
 
     private class ViewDragHelperCallBack extends ViewDragHelper.Callback {
