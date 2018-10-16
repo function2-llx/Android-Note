@@ -7,18 +7,22 @@ import android.widget.TextView;
 import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.RecognizerListener;
 import com.iflytek.cloud.RecognizerResult;
-import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechRecognizer;
 
 public class IflySoundToTextActivity extends AppCompatActivity {
+    // show result
     private TextView textView;
     private SpeechRecognizer speechRecognizer;
+    private String mEngineType = null;
     private int result = 0;
 
     @Override
-    protected void onCreat(Bundle savedInstanceState) {
-
+    protected void onCreat(@nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_recognition);
+        initView();
+        initDate();
     }
 
     private void initDate() {
