@@ -6,16 +6,16 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.SearchView;
+import android.util.Log;
 import android.view.Menu;
-import android.view.MenuItem;
 import android.view.View;
-import android.widget.TextView;
 
 import com.dmcbig.mediapicker.PickerActivity;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.iflytek.cloud.ErrorCode;
+import com.iflytek.cloud.InitListener;
 import com.iflytek.cloud.RecognizerListener;
 import com.iflytek.cloud.RecognizerResult;
 import com.iflytek.cloud.SpeechConstant;
@@ -26,6 +26,7 @@ import com.se.npe.androidnote.events.NoteModifyEvent;
 import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.sound.RecordingService;
+import com.se.npe.androidnote.sound.ResultPool;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -46,6 +47,7 @@ public class EditorActivity extends AppCompatActivity {
     private String mEngineType = null;
     private SharedPreferences sharedPreferences;
     private int ret = 0;
+    private ResultPool resultPool;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -107,16 +109,25 @@ public class EditorActivity extends AppCompatActivity {
 
         // set parameter
         speechRecognizer.setParameter(SpeechConstant.PARAMS, null);
+        speechRecognizer.setParameter(SpeechConstant.DOMAIN, "iat");
         speechRecognizer.setParameter(SpeechConstant.ENGINE_TYPE, mEngineType);
-        speechRecognizer.setParameter(SpeechConstant.RESULT_TYPE, "json");
+        speechRecognizer.setParameter(SpeechConstant.RESULT_TYPE, "plain");
         speechRecognizer.setParameter(SpeechConstant.LANGUAGE, "zh_cn");
         speechRecognizer.setParameter(SpeechConstant.ACCENT, "mandarin");
-        speechRecognizer.setParameter(SpeechConstant.ASR_PTT, sharedPreferences.getString("iat_punc_preference", "1"));
         speechRecognizer.setParameter(SpeechConstant.AUDIO_FORMAT, "pcm");
         speechRecognizer.setParameter(SpeechConstant.ASR_AUDIO_PATH, RecordingService.OUTPUT_DIR + "tmp.pcm");
 
         ret = speechRecognizer.startListening(recognizerListener);
     }
+
+    private InitListener initListener = new InitListener() {
+        @Override
+        public void onInit(int i) {
+            if (i != ErrorCode.SUCCESS) {
+                Log.e("errorTag", "error" + i);
+            }
+        }
+    };
 
     private RecognizerListener recognizerListener = new RecognizerListener() {
         @Override
@@ -126,28 +137,36 @@ public class EditorActivity extends AppCompatActivity {
 
         @Override
         public void onBeginOfSpeech() {
-
+            Log.e("beginTag", "begin to speech");
         }
 
         @Override
         public void onEndOfSpeech() {
-
+            Log.e("endTag", "end to speech");
         }
 
         @Override
         public void onResult(RecognizerResult recognizerResult, boolean b) {
-
+            if (recognizerResult != null) {
+                Log.e("recognizerResultTag", recognizerResult.getResultString());
+                printResult(recognizerResult);
+            }
         }
 
         @Override
         public void onError(SpeechError speechError) {
-
+            Log.e("errorTag", "error info : " + speechError.getPlainDescription(true));
         }
 
         @Override
         public void onEvent(int i, int i1, int i2, Bundle bundle) {
 
         }
+    };
+
+    private void printResult(RecognizerResult results) {
+        String text = results.getResultString();
+        resultPool.putResult(System.currentTimeMillis(), text);
     }
 
     private void getPictureOrVideo(int code) {

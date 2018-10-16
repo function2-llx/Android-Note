@@ -2,7 +2,6 @@ package com.se.npe.androidnote.sound;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.TreeMap;
 
 /**
  * Store the result of asr, sorted by time.
@@ -15,7 +14,7 @@ public class ResultPool {
     private ArrayList<Long> times = new ArrayList<>();
     private ArrayList<String> results = new ArrayList<>();
 
-    void putResult(long time, String result) {
+    public void putResult(long time, String result) {
         times.add(time);
         results.add(result);
     }
