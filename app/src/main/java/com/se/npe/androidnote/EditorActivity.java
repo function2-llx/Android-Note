@@ -1,6 +1,8 @@
 package com.se.npe.androidnote;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -8,11 +10,17 @@ import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.TextView;
 
 import com.dmcbig.mediapicker.PickerActivity;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.iflytek.cloud.RecognizerListener;
+import com.iflytek.cloud.RecognizerResult;
+import com.iflytek.cloud.SpeechConstant;
+import com.iflytek.cloud.SpeechError;
+import com.iflytek.cloud.SpeechRecognizer;
 import com.se.npe.androidnote.editor.SortRichEditor;
 import com.se.npe.androidnote.events.NoteModifyEvent;
 import com.se.npe.androidnote.events.NoteSelectEvent;
@@ -32,6 +40,12 @@ public class EditorActivity extends AppCompatActivity {
     private Note oldNote;
     private long startTime;
     public static final String VIEW_ONLY = "VIEW_ONLY";
+
+    // iFly
+    private SpeechRecognizer speechRecognizer;
+    private String mEngineType = null;
+    private SharedPreferences sharedPreferences;
+    private int ret = 0;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -82,6 +96,58 @@ public class EditorActivity extends AppCompatActivity {
         startService(new Intent(this, RecordingService.class)
                 .putExtra(RecordingService.START_RECORDING, true));
         startTime = System.currentTimeMillis();
+
+        iFlyOnCreate();
+    }
+
+    private void iFlyOnCreate() {
+        speechRecognizer = SpeechRecognizer.createRecognizer(this, initListener);
+        sharedPreferences = getSharedPreferences(this.getPackageName(), Context.MODE_PRIVATE);
+        mEngineType = SpeechConstant.TYPE_CLOUD;
+
+        // set parameter
+        speechRecognizer.setParameter(SpeechConstant.PARAMS, null);
+        speechRecognizer.setParameter(SpeechConstant.ENGINE_TYPE, mEngineType);
+        speechRecognizer.setParameter(SpeechConstant.RESULT_TYPE, "json");
+        speechRecognizer.setParameter(SpeechConstant.LANGUAGE, "zh_cn");
+        speechRecognizer.setParameter(SpeechConstant.ACCENT, "mandarin");
+        speechRecognizer.setParameter(SpeechConstant.ASR_PTT, sharedPreferences.getString("iat_punc_preference", "1"));
+        speechRecognizer.setParameter(SpeechConstant.AUDIO_FORMAT, "pcm");
+        speechRecognizer.setParameter(SpeechConstant.ASR_AUDIO_PATH, RecordingService.OUTPUT_DIR + "tmp.pcm");
+
+        ret = speechRecognizer.startListening(recognizerListener);
+    }
+
+    private RecognizerListener recognizerListener = new RecognizerListener() {
+        @Override
+        public void onVolumeChanged(int i, byte[] bytes) {
+            
+        }
+
+        @Override
+        public void onBeginOfSpeech() {
+
+        }
+
+        @Override
+        public void onEndOfSpeech() {
+
+        }
+
+        @Override
+        public void onResult(RecognizerResult recognizerResult, boolean b) {
+
+        }
+
+        @Override
+        public void onError(SpeechError speechError) {
+
+        }
+
+        @Override
+        public void onEvent(int i, int i1, int i2, Bundle bundle) {
+
+        }
     }
 
     private void getPictureOrVideo(int code) {
