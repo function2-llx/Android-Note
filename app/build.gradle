@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'jacoco'
 
 android {
     compileSdkVersion 27
@@ -11,6 +12,9 @@ android {
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {
+        debug {
+            testCoverageEnabled true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -20,13 +24,17 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
         sourceCompatibility JavaVersion.VERSION_1_8
     }
-
     testOptions {
+        // Enable the coverage report for unit test
+        unitTests.all {
+            jacoco {
+                includeNoLocationClasses = true
+            }
+        }
         unitTests {
             includeAndroidResources = true
         }
     }
-
     sourceSets {
         main {
             jniLibs.srcDirs = ["libs"]
@@ -83,3 +91,25 @@ dependencies {
     implementation files('libs/Sunflower.jar')
 }
 
+task jacocoTestReport(type: JacocoReport) {
+    // " dependsOn: 'testDebugUnitTest' " property is ignored because test has been performed
+    group = "Reporting"
+
+    reports {
+        xml.enabled = true
+        html.enabled = false
+    }
+
+    def fileFilter = ['**/R.class',
+                      '**/R$*.class',
+                      '**/BuildConfig.*',
+                      '**/Manifest*.*',
+                      '**/*Test*.*',
+                      'android/**/*.*']
+    def debugTree = fileTree(dir: "${project.buildDir}/intermediates/javac/debug", excludes: fileFilter)
+    def mainSrc = "${project.projectDir}/src/main/java"
+
+    sourceDirectories = files([mainSrc])
+    classDirectories = files([debugTree])
+    executionData = files("${project.buildDir}/jacoco/testDebugUnitTest.exec")
+}
