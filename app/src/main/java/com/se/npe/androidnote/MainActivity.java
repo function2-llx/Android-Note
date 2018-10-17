@@ -1,6 +1,7 @@
 package com.se.npe.androidnote;
 
 import android.Manifest;
+import android.arch.core.executor.DefaultTaskExecutor;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -15,10 +16,13 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.se.npe.androidnote.events.NoteEvent;
 import com.se.npe.androidnote.interfaces.IData;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 import com.se.npe.androidnote.models.Note;
+import com.se.npe.androidnote.models.SoundData;
+import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
 import com.se.npe.androidnote.models.TextData;
 
@@ -27,6 +31,7 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     private Note selectedNote;
@@ -60,40 +65,28 @@ public class MainActivity extends AppCompatActivity {
         new Thread(() -> SpeechUtility.createUtility(this, SpeechConstant.APPID + "=5bbc8c0f")).start();
         super.onCreate(savedInstanceState);
         TableOperate.init(this.getApplicationContext());
-        /*
-        TableOperate newtable = new TableOperate(getApplicationContext());
-        newtable.decodeNote("");
 
         /*
-        TableOperate newtable = new TableOperate(getApplicationContext());
-        Log.d("debug0001","OK_setup");
-        newtable.removeNoteAt(1);
-        newtable.removeNoteAt(1);
-        Log.d("debug0001","OK_delete");
+        TableOperate newtable = TableOperate.getInstance();
+        newtable.clearTable();
+        Note tempnote = new Note("titlex",new ArrayList<>());
+        tempnote.setStarttime(new Date(0));
+        tempnote.setModifytime(new Date());
+        Log.d("debug0001",tempnote.getModifytime().toString());
+        newtable.addNote(tempnote);
+        Log.d("debug0001",Integer.toString(newtable.getSearchResultFuzzy("title").size()));
+        Log.d("debug0001",newtable.getSearchResult("titlex").get(0).getModifytime().toString());
+        Log.d("debug0001",new Date().toString());
         */
         /*
-        ArrayList<IData> templist = new ArrayList<IData>();
-        TextData data1 = new TextData("test data");
-        templist.add(data1);
-        newtable.decodeNote(newtable.encodeNote(templist));*/
-        /*
-        newtable.addNote(new Note("data1",templist));
-        Log.d("debug0001","OK_insert");
-
-        List<Note> allnotes = newtable.getAllNotes();
-
-        Log.d("debug0001","All Notes in DB "+Integer.toString(allnotes.size()));
+        Note tempnote = new Note();
+        Log.d("debug0001",tempnote.getStarttime().toString());
+        Log.d("debug0001",tempnote.getModifytime().toString());
+        tempnote.setStarttime(new Date());
+        tempnote.setModifytime(new Date(1));
+        Log.d("debug0001",tempnote.getStarttime().toString());
+        Log.d("debug0001",tempnote.getModifytime().toString());
         */
-
-        //Log.d("debug0001",newtable.getNoteAt(5).toString());
-
-        //newtable.removeNoteAt(5);
-
-        //newtable.setNoteAt(17,new Note("data2",templist));
-
-        //List<Note> anslist = newtable.getSearchResult("data");
-
-        //Log.d("debug0001",Integer.toString(anslist.size()));
 
         setContentView(R.layout.activity_main);
         initListener();

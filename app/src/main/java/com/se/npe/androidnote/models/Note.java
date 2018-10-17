@@ -8,6 +8,7 @@ import com.se.npe.androidnote.interfaces.IData;
 
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Date;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -45,8 +46,25 @@ public class Note {
 
     private String title;
     private List<IData> content;
-
+    private Date Starttime = new Date(0);
+    private Date Modifytime = new Date(0);
     private int DBindex = -1;
+
+    public Date getStarttime() {
+        return Starttime;
+    }
+
+    public Date getModifytime() {
+        return Modifytime;
+    }
+
+    public void setStarttime(Date time) {
+        Starttime = time;
+    }
+
+    public void setModifytime(Date time) {
+        Modifytime  = time;
+    }
 
     public Note() {
         this.title = "this is tile for " + DBindex;
@@ -58,10 +76,12 @@ public class Note {
         this.content = content;
     }
 
-    public Note(String title, List<IData> content, int index) {
+    public Note(String title, List<IData> content, int index, String timestart,String timemodify) {
         this.DBindex = index;
         this.title = title;
         this.content = content;
+        this.Starttime.setTime(Long.parseLong(timestart));
+        this.Modifytime.setTime(Long.parseLong(timemodify));
     }
 
     public String getTitle() {
