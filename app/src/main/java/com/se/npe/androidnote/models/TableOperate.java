@@ -84,7 +84,7 @@ public class TableOperate implements INoteCollection {
         while (c.moveToNext()) {
             Log.d("debug0001", c.getString(0) + " " + c.getString(1) + " " + c.getString(2));
             Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4));
-            Notelist.add(temp);
+            noteList.add(temp);
         }
         c.close();
         return noteList;
@@ -95,21 +95,20 @@ public class TableOperate implements INoteCollection {
         Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME + " where " + TableConfig.Note.NOTE_TITLE + "= ?", new String[]{parameter});
         while (c.moveToNext()) {
             Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4));
-            Notelist.add(temp);
+            noteList.add(temp);
         }
         c.close();
-        return Notelist;
+        return noteList;
     }
 
-    public List<Note> getSearchResultFuzzy(String parameter)
-    {
-        ArrayList<Note> Notelist = new ArrayList<Note>();
+    public List<Note> getSearchResultFuzzy(String parameter) {
+        ArrayList<Note> noteList = new ArrayList<Note>();
         String sql2 = "select * from " + TableConfig.TABLE_NAME
                 + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%'";
-        Cursor c = db.rawQuery(sql2,null);
+        Cursor c = db.rawQuery(sql2, null);
         while (c.moveToNext()) {
             Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4));
-            Notelist.add(temp);
+            noteList.add(temp);
         }
         c.close();
         return noteList;
@@ -139,16 +138,16 @@ public class TableOperate implements INoteCollection {
         Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME + " where " + TableConfig.Note.NOTE_ID + "= ?", new String[]{Integer.toString(index)});
         while (c.moveToNext()) {
             Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4));
-            Notelist.add(temp);
+            noteList.add(temp);
         }
         c.close();
         return noteList.get(0);
     }
 
-    public void setNoteAt(int index, Note note){
+    public void setNoteAt(int index, Note note) {
         db.execSQL("update " + TableConfig.TABLE_NAME + " set " + TableConfig.Note.NOTE_TITLE + "=?," + TableConfig.Note.NOTE_STARTTIME + "=?," + TableConfig.Note.NOTE_MODIFYTIME + "=?," + TableConfig.Note.NOTE_CONTENT + "=? where " + TableConfig.Note.NOTE_ID + "=?",
-                new Object[] { note.getTitle(),Long.toString(note.getStarttime().getTime()),Long.toString(note.getModifytime().getTime()), encodeNote(note.getContent()),Integer.toString(index) });
-        note.setindex(index);
+                new Object[]{note.getTitle(), Long.toString(note.getStarttime().getTime()), Long.toString(note.getModifytime().getTime()), encodeNote(note.getContent()), Integer.toString(index)});
+        note.setIndex(index);
 
         EventBus.getDefault().post(new DatabaseModifyEvent("modify note"));
     }
