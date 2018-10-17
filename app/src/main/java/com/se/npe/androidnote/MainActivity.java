@@ -66,6 +66,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         TableOperate.init(this.getApplicationContext());
 
+
         /*
         TableOperate newtable = TableOperate.getInstance();
         newtable.clearTable();

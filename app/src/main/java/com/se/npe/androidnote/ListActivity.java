@@ -82,6 +82,16 @@ public class ListActivity extends AppCompatActivity {
                 this.noteAdapter.sortByTitle();
                 break;
             }
+
+            case R.id.sort_created_time: {
+                this.noteAdapter.sortByCreateTime();
+                break;
+            }
+
+            case R.id.sort_modified_time: {
+                this.noteAdapter.sortByModifyTime();
+                break;
+            }
         }
         return super.onOptionsItemSelected(item);
     }

@@ -23,6 +23,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 public class EditorActivity extends AppCompatActivity {
     private static final long MAX_SIZE = 188743680L; // 180 MB
@@ -31,6 +32,7 @@ public class EditorActivity extends AppCompatActivity {
     private SortRichEditor editor;
     private Note oldNote;
     private long startTime;
+    private Date createTime;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -62,7 +64,9 @@ public class EditorActivity extends AppCompatActivity {
         // deferred built, or we will get NPE
         if (oldNote != null) {
             editor.loadNote(oldNote);
-        }
+            this.createTime = oldNote.getStarttime();
+        } else
+            this.createTime = new Date();
 
         // start recording right now
         startService(new Intent(this, RecordingService.class)
@@ -121,6 +125,8 @@ public class EditorActivity extends AppCompatActivity {
         if (oldNote != null) {
             note.setindex(oldNote.getIndex());
         }
+        note.setStarttime(this.createTime);
+        note.setModifytime(new Date());
         EventBus.getDefault().post(new NoteModifyEvent(note));
 
         EventBus.getDefault().removeAllStickyEvents();

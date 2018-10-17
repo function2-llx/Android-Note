@@ -25,10 +25,12 @@ import com.se.npe.androidnote.events.DatabaseModifyEvent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -57,6 +59,18 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
         this.notifyDataSetChanged();
     }
 
+    public void sortByCreateTime()
+    {
+        Collections.sort(this.noteList, Comparator.comparing(Note::getStarttime));
+        this.notifyDataSetChanged();
+    }
+
+    public void sortByModifyTime()
+    {
+        Collections.sort(this.noteList, Comparator.comparing(Note::getModifytime));
+        this.notifyDataSetChanged();
+    }
+
     public void updateList(List<Note> list)
     {
         if (list.isEmpty())
@@ -77,11 +91,14 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
      */
     public class ViewHolder extends UltimateRecyclerviewViewHolder implements View.OnClickListener, View.OnLongClickListener{
         private TextView title, text;
+        private TextView createTimeDisplayer, modifyTimeDisplayer;
 
         public ViewHolder(View itemView) {
             super(itemView);
             this.title = itemView.findViewById(R.id.text_view_title);
             this.text = itemView.findViewById(R.id.text_view_text);
+            this.createTimeDisplayer = itemView.findViewById(R.id.text_view_create_time);
+            this.modifyTimeDisplayer = itemView.findViewById(R.id.text_view_modify_time);
         }
 
         public void setTitle(String title) {
@@ -91,6 +108,17 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
         public void setText(String text) {
             this.text.setText(text);
         }
+
+        public void setCreateDate(Date date)
+        {
+            this.createTimeDisplayer.setText("create: " + date.toString());
+        }
+
+        public void setModifyDate(Date date)
+        {
+            this.modifyTimeDisplayer.setText("modify: " + date.toString());
+        }
+
 
         @Override
         public void onClick(@NonNull View v) {
@@ -147,9 +175,12 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Note.PreviewData data = getItem(position).getPreview();
+        Note note = getItem(position);
+        Note.PreviewData data = note.getPreview();
         holder.setTitle(data.title);
         holder.setText(data.text);
+        holder.setCreateDate(note.getStarttime());
+        holder.setModifyDate(note.getModifytime());
     }
 
     @Override
