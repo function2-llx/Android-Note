@@ -18,7 +18,7 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
 
     public static  synchronized  MySQLiteOpenHelper getInstance(Context context) {
         if(helper==null){
-            helper = new MySQLiteOpenHelper(context, "Notes");
+            helper = new MySQLiteOpenHelper(context, TableConfig.TABLE_NAME);
         }
         return  helper;
     }
@@ -28,7 +28,9 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
         sqLiteDatabase.execSQL("create table if not exists "+TableConfig.TABLE_NAME+"("
                 +TableConfig.Note.NOTE_ID+" integer not null primary key autoincrement,"
                 +TableConfig.Note.NOTE_TITLE+ " verchar(50),"
-                +TableConfig.Note.NOTE_CONTENT+ " TEXT)");
+                +TableConfig.Note.NOTE_CONTENT+ " TEXT,"
+                +TableConfig.Note.NOTE_STARTTIME+ " TEXT,"
+                +TableConfig.Note.NOTE_MODIFYTIME+ " TEXT)");
     }
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int i, int i1) {

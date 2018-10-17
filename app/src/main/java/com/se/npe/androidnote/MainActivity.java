@@ -1,6 +1,7 @@
 package com.se.npe.androidnote;
 
 import android.Manifest;
+import android.arch.core.executor.DefaultTaskExecutor;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -15,11 +16,13 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.se.npe.androidnote.events.NoteEvent;
 import com.se.npe.androidnote.interfaces.IData;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.SoundData;
+import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
 import com.se.npe.androidnote.models.TextData;
 
@@ -64,6 +67,18 @@ public class MainActivity extends AppCompatActivity {
         TableOperate.init(this.getApplicationContext());
 
         /*
+        TableOperate newtable = TableOperate.getInstance();
+        newtable.clearTable();
+        Note tempnote = new Note("titlex",new ArrayList<>());
+        tempnote.setStarttime(new Date(0));
+        tempnote.setModifytime(new Date());
+        Log.d("debug0001",tempnote.getModifytime().toString());
+        newtable.addNote(tempnote);
+        Log.d("debug0001",Integer.toString(newtable.getSearchResultFuzzy("title").size()));
+        Log.d("debug0001",newtable.getSearchResult("titlex").get(0).getModifytime().toString());
+        Log.d("debug0001",new Date().toString());
+        */
+        /*
         Note tempnote = new Note();
         Log.d("debug0001",tempnote.getStarttime().toString());
         Log.d("debug0001",tempnote.getModifytime().toString());
@@ -72,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("debug0001",tempnote.getStarttime().toString());
         Log.d("debug0001",tempnote.getModifytime().toString());
         */
-        
+
         setContentView(R.layout.activity_main);
         initListener();
         EventBus.getDefault().register(this);

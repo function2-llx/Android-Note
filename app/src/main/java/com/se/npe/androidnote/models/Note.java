@@ -75,10 +75,12 @@ public class Note {
         this.content = content;
     }
 
-    public Note(String title, List<IData> content, int index) {
+    public Note(String title, List<IData> content, int index, String timestart,String timemodify) {
         this.DBindex = index;
         this.title = title;
         this.content = content;
+        this.Starttime.setTime(Long.parseLong(timestart));
+        this.Modifytime.setTime(Long.parseLong(timemodify));
     }
 
     public String getTitle() {
