@@ -28,6 +28,7 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     private Note selectedNote;
@@ -63,14 +64,15 @@ public class MainActivity extends AppCompatActivity {
         TableOperate.init(this.getApplicationContext());
 
         /*
-        TableOperate newtable = TableOperate.getInstance();
-        List<Note> templist;
-        Log.d("debug0001","FuzzySearch:shit");
-        newtable.addNote(new Note("shit",new ArrayList<IData>()));
-        templist = newtable.getSearchResultFuzzy("data");
-        Log.d("debug0001","FuzzySearch:"+Integer.toString(templist.size()));
+        Note tempnote = new Note();
+        Log.d("debug0001",tempnote.getStarttime().toString());
+        Log.d("debug0001",tempnote.getModifytime().toString());
+        tempnote.setStarttime(new Date());
+        tempnote.setModifytime(new Date(1));
+        Log.d("debug0001",tempnote.getStarttime().toString());
+        Log.d("debug0001",tempnote.getModifytime().toString());
         */
-
+        
         setContentView(R.layout.activity_main);
         initListener();
         EventBus.getDefault().register(this);
