@@ -16,6 +16,11 @@ public class PictureData implements IData {
     private String picturePath;
     private Bitmap picture;
 
+    public PictureData(String picturePath)
+    {
+        this.picturePath = picturePath;
+    }
+
     public PictureData(String picturePath, Bitmap picture) {
         this.picturePath = picturePath;
         this.picture = picture;

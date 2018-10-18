@@ -10,4 +10,10 @@ public class TableConfig {
         public static final String NOTE_STARTTIME="note_starttime";
         public static final String NOTE_MODIFYTIME="note_modifytime";
     }
+
+    public static class Filesave
+    {
+        public static final String LIST_SEPERATOR="qwert";
+        public static final String LINE_SEPERATOR="asdfg";
+    }
 }
