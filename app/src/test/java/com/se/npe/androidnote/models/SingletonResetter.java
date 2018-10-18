@@ -19,7 +19,7 @@ public class SingletonResetter {
             instance.setAccessible(true);
             instance.set(null, null);
         } catch (Exception e) {
-            Logger.log("Singleton reset failed in test.", e);
+            org.robolectric.util.Logger.error("Singleton reset failed in SingletonResetter.resetSingleton().", e);
         }
     }
 

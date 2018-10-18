@@ -12,21 +12,21 @@ import static org.junit.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 public class VideoDataTest {
 
-    private static final String exampleMixIn = "test";
+    private static final String EXAMPLE_MIX_IN = "test";
     private VideoData videoData;
     private VideoData videoDataEquals;
     private VideoData videoDataNotEquals;
 
     @Before
     public void setUp() {
-        videoData = getExampleVideoData(exampleMixIn);
-        videoDataEquals = getExampleVideoData(exampleMixIn);
-        videoDataNotEquals = getExampleVideoData(exampleMixIn + exampleMixIn);
+        videoData = getExampleVideoData(EXAMPLE_MIX_IN);
+        videoDataEquals = getExampleVideoData(EXAMPLE_MIX_IN);
+        videoDataNotEquals = getExampleVideoData(EXAMPLE_MIX_IN + EXAMPLE_MIX_IN);
     }
 
     @Test
     public void getVideoPath() {
-        assertEquals(getExampleVideoPath(exampleMixIn), videoData.getVideoPath());
+        assertEquals(getExampleVideoPath(EXAMPLE_MIX_IN), videoData.getVideoPath());
     }
 
     @Test

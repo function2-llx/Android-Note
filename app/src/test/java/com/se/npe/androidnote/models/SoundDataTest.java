@@ -12,26 +12,26 @@ import static org.junit.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 public class SoundDataTest {
 
-    private final static String exampleMixIn = "test";
+    private final static String EXAMPLE_MIX_IN = "test";
     private SoundData soundData;
     private SoundData soundDataEquals;
     private SoundData soundDataNotEquals;
 
     @Before
     public void setUp() {
-        soundData = getExampleSoundData(exampleMixIn);
-        soundDataEquals = getExampleSoundData(exampleMixIn);
-        soundDataNotEquals = getExampleSoundData(exampleMixIn + exampleMixIn);
+        soundData = getExampleSoundData(EXAMPLE_MIX_IN);
+        soundDataEquals = getExampleSoundData(EXAMPLE_MIX_IN);
+        soundDataNotEquals = getExampleSoundData(EXAMPLE_MIX_IN + EXAMPLE_MIX_IN);
     }
 
     @Test
     public void getSoundPath() {
-        assertEquals(getExampleSoundPath(exampleMixIn), soundData.getSoundPath());
+        assertEquals(getExampleSoundPath(EXAMPLE_MIX_IN), soundData.getSoundPath());
     }
 
     @Test
     public void getText() {
-        assertEquals(getExampleSoundText(exampleMixIn), soundData.getText());
+        assertEquals(getExampleSoundText(EXAMPLE_MIX_IN), soundData.getText());
     }
 
     @Test

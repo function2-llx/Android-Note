@@ -25,7 +25,7 @@ public class TableOperateTest {
 
     private TableOperate tableOperate;
     private List<Note> noteList;
-    private final static int NOTE_LIST_SIZE = 20;
+    private static final int NOTE_LIST_SIZE = 20;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -148,7 +148,7 @@ public class TableOperateTest {
     }
 
     @Test
-    public void removeAllNotes_addNote() {
+    public void removeAllNotesAndAddNote() {
         // Remove all notes & Add note
         removeAllNotes();
         addNote();

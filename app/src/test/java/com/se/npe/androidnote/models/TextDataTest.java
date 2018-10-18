@@ -12,21 +12,21 @@ import static org.junit.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 public class TextDataTest {
 
-    private static final String exampleMixIn = "test";
+    private static final String EXAMPLE_MIX_IN = "test";
     private TextData textData;
     private TextData textDataEquals;
     private TextData textDataNotEquals;
 
     @Before
     public void setUp() {
-        textData = getExampleTextData(exampleMixIn);
-        textDataEquals = getExampleTextData(exampleMixIn);
-        textDataNotEquals = getExampleTextData(exampleMixIn + exampleMixIn);
+        textData = getExampleTextData(EXAMPLE_MIX_IN);
+        textDataEquals = getExampleTextData(EXAMPLE_MIX_IN);
+        textDataNotEquals = getExampleTextData(EXAMPLE_MIX_IN + EXAMPLE_MIX_IN);
     }
 
     @Test
     public void getText() {
-        assertEquals(getExampleText(exampleMixIn), textData.getText());
+        assertEquals(getExampleText(EXAMPLE_MIX_IN), textData.getText());
     }
 
     @Test

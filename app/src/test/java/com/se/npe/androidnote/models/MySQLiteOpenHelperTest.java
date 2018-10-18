@@ -4,6 +4,8 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 
+import com.se.npe.androidnote.util.Logger;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -12,6 +14,7 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 import static org.junit.Assert.*;
 
@@ -51,23 +54,19 @@ public class MySQLiteOpenHelperTest {
     }
 
     @Test
-    public void onUpgrade() {
+    public void onUpgrade() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         MySQLiteOpenHelper mySQLiteOpenHelper = MySQLiteOpenHelper.getInstance(context);
         assertEquals(mySQLiteOpenHelper.getWritableDatabase().getVersion(), 1);
         // Get access to private constructor of MySQLiteOpenHelper
         MySQLiteOpenHelper mySQLiteOpenHelperUpgraded;
         final int DATABASE_UPGRADED_VERSION = 2;
-        try {
-            Class mySQLiteOpenHelperClass = MySQLiteOpenHelper.class;
-            Constructor mySQLiteOpenHelperConstructor = mySQLiteOpenHelperClass.getDeclaredConstructor(Context.class, String.class, SQLiteDatabase.CursorFactory.class, int.class);
-            mySQLiteOpenHelperConstructor.setAccessible(true);
-            // Depends on the private constructor of MySQLiteOpenHelper
-            mySQLiteOpenHelperUpgraded = (MySQLiteOpenHelper) mySQLiteOpenHelperConstructor.newInstance(context, "Notes", null, DATABASE_UPGRADED_VERSION);
-        } catch (Exception e) {
-            throw new RuntimeException("Reflection on MySQLiteOpenHelper in MySQLiteOpenHelperTest failed.");
-        }
-        // Check database version is upgraded
+        Class mySQLiteOpenHelperClass = MySQLiteOpenHelper.class;
+        Constructor mySQLiteOpenHelperConstructor = mySQLiteOpenHelperClass.getDeclaredConstructor(Context.class, String.class, SQLiteDatabase.CursorFactory.class, int.class);
+        mySQLiteOpenHelperConstructor.setAccessible(true);
+        // Depends on the private constructor of MySQLiteOpenHelper
+        mySQLiteOpenHelperUpgraded = (MySQLiteOpenHelper) mySQLiteOpenHelperConstructor.newInstance(context, "Notes", null, DATABASE_UPGRADED_VERSION);
         assertNotNull(mySQLiteOpenHelperUpgraded);
+        // Check database version is upgraded
         assertEquals(mySQLiteOpenHelperUpgraded.getWritableDatabase().getVersion(), DATABASE_UPGRADED_VERSION);
         assertEquals(mySQLiteOpenHelperUpgraded.getWritableDatabase().getVersion(), DATABASE_UPGRADED_VERSION);
     }
