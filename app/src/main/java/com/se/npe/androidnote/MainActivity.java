@@ -19,6 +19,7 @@ import com.se.npe.androidnote.interfaces.IData;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 import com.se.npe.androidnote.models.Note;
+import com.se.npe.androidnote.models.SoundData;
 import com.se.npe.androidnote.models.TableOperate;
 import com.se.npe.androidnote.models.TextData;
 
@@ -60,40 +61,15 @@ public class MainActivity extends AppCompatActivity {
         new Thread(() -> SpeechUtility.createUtility(this, SpeechConstant.APPID + "=5bbc8c0f")).start();
         super.onCreate(savedInstanceState);
         TableOperate.init(this.getApplicationContext());
-        /*
-        TableOperate newtable = new TableOperate(getApplicationContext());
-        newtable.decodeNote("");
 
         /*
-        TableOperate newtable = new TableOperate(getApplicationContext());
-        Log.d("debug0001","OK_setup");
-        newtable.removeNoteAt(1);
-        newtable.removeNoteAt(1);
-        Log.d("debug0001","OK_delete");
+        TableOperate newtable = TableOperate.getInstance();
+        List<Note> templist;
+        Log.d("debug0001","FuzzySearch:shit");
+        newtable.addNote(new Note("shit",new ArrayList<IData>()));
+        templist = newtable.getSearchResultFuzzy("data");
+        Log.d("debug0001","FuzzySearch:"+Integer.toString(templist.size()));
         */
-        /*
-        ArrayList<IData> templist = new ArrayList<IData>();
-        TextData data1 = new TextData("test data");
-        templist.add(data1);
-        newtable.decodeNote(newtable.encodeNote(templist));*/
-        /*
-        newtable.addNote(new Note("data1",templist));
-        Log.d("debug0001","OK_insert");
-
-        List<Note> allnotes = newtable.getAllNotes();
-
-        Log.d("debug0001","All Notes in DB "+Integer.toString(allnotes.size()));
-        */
-
-        //Log.d("debug0001",newtable.getNoteAt(5).toString());
-
-        //newtable.removeNoteAt(5);
-
-        //newtable.setNoteAt(17,new Note("data2",templist));
-
-        //List<Note> anslist = newtable.getSearchResult("data");
-
-        //Log.d("debug0001",Integer.toString(anslist.size()));
 
         setContentView(R.layout.activity_main);
         initListener();
