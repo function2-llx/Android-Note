@@ -75,10 +75,11 @@ public class Note {
         this.content = content;
     }
 
-    public Note(String title, List<IData> content, int index, String timestart,String timemodify) {
+    public Note(String title, List<IData> content, int index, String timestart,String timemodify,List<String> tag) {
         this.indexDB = index;
         this.title = title;
         this.content = content;
+        this.tag = tag;
         this.starttime.setTime(Long.parseLong(timestart));
         this.modifytime.setTime(Long.parseLong(timemodify));
     }

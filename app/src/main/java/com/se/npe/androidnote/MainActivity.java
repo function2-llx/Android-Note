@@ -66,6 +66,8 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         TableOperate.init(this.getApplicationContext());
 
+        
+
         setContentView(R.layout.activity_main);
         initListener();
         EventBus.getDefault().register(this);
