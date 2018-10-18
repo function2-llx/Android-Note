@@ -133,14 +133,14 @@ public class ListActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                searchAdapter = new NoteAdapter(TableOperate.getInstance().getSearchResult(query), ListActivity.this);
+                searchAdapter = new NoteAdapter(TableOperate.getInstance().getSearchResultFuzzy(query), ListActivity.this);
                 ultimateRecyclerView.setAdapter(searchAdapter);
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                searchAdapter = new NoteAdapter(TableOperate.getInstance().getSearchResult(newText), ListActivity.this);
+                searchAdapter = new NoteAdapter(TableOperate.getInstance().getSearchResultFuzzy(newText), ListActivity.this);
                 ultimateRecyclerView.setAdapter(searchAdapter);
                 return true;
             }
