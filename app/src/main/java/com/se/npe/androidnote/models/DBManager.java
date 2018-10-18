@@ -2,7 +2,6 @@ package com.se.npe.androidnote.models;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.util.Log;
 
 public class DBManager {
     private static DBManager manager;

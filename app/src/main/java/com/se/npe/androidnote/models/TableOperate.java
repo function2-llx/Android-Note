@@ -43,7 +43,7 @@ public class TableOperate implements INoteCollection {
     public String encodeNote(List<IData> src) {
         String string = "";
         for (int i = 0; i < src.size(); i++) {
-            string = string + src.get(i).toString() + "qwert";
+            string = string + src.get(i).toString() + TableConfig.Filesave.LIST_SEPERATOR;
         }
         return string;
     }
@@ -51,24 +51,24 @@ public class TableOperate implements INoteCollection {
     public List<IData> decodeNote(String src) {
         Log.d("debug0001", "decode:" + src);
         List<IData> content = new ArrayList<IData>();
-        String[] StrArray = src.split("qwert");
+        String[] StrArray = src.split(TableConfig.Filesave.LIST_SEPERATOR);
         for (int i = 0; i < StrArray.length; i++) {
             Log.d("debug0001", "str:" + StrArray[i]);
             if (StrArray[0].length() == 0) continue;
             if (StrArray[i].charAt(0) == 'S') {
-                String[] tempArray = StrArray[i].split("asdfg");
+                String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPERATOR);
                 SoundData tempSoundData = new SoundData(tempArray[1], tempArray[2]);
                 content.add(tempSoundData);
             } else if (StrArray[i].charAt(0) == 'T') {
-                String[] tempArray = StrArray[i].split("asdfg");
+                String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPERATOR);
                 TextData tempTextData = new TextData(tempArray[1]);
                 content.add(tempTextData);
             } else if (StrArray[i].charAt(0) == 'V') {
-                String[] tempArray = StrArray[i].split("asdfg");
+                String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPERATOR);
                 VideoData tempVideoData = new VideoData(tempArray[1]);
                 content.add(tempVideoData);
             } else if (StrArray[i].charAt(0) == 'P') {
-                String[] tempArray = StrArray[i].split("asdfg");
+                String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPERATOR);
                 Bitmap mBitmap = BitmapFactory.decodeFile(StrArray[1]);
                 PictureData tempPictureData = new PictureData(tempArray[1], mBitmap);
                 content.add(tempPictureData);
