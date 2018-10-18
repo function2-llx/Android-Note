@@ -46,6 +46,7 @@ public class Note {
     private List<IData> content;
     private Date starttime = new Date(0);
     private Date modifytime = new Date(0);
+    private List<String> tag;
     private int indexDB = -1;
 
     public Date getStarttime() {
@@ -67,17 +68,20 @@ public class Note {
     public Note() {
         this.title = "this is tile for " + indexDB;
         this.content = new ArrayList<IData>();
+        this.tag = new ArrayList<String>();
     }
 
     public Note(String title, List<IData> content) {
         this.title = title;
         this.content = content;
+        this.tag = new ArrayList<String>();
     }
 
-    public Note(String title, List<IData> content, int index, String timestart,String timemodify) {
+    public Note(String title, List<IData> content, int index, String timestart,String timemodify,List<String> tag) {
         this.indexDB = index;
         this.title = title;
         this.content = content;
+        this.tag = tag;
         this.starttime.setTime(Long.parseLong(timestart));
         this.modifytime.setTime(Long.parseLong(timemodify));
     }
@@ -96,6 +100,11 @@ public class Note {
 
     public List<IData> getContent() {
         return content;
+    }
+
+    public List<String> getTag()
+    {
+        return tag;
     }
 
     public PreviewData getPreview() {

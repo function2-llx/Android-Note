@@ -68,26 +68,18 @@ public class MainActivity extends AppCompatActivity {
 
         /*
         TableOperate newtable = TableOperate.getInstance();
-        newtable.clearTable();
-        Note tempnote = new Note("titlex",new ArrayList<>());
-        tempnote.setStarttime(new Date(0));
-        tempnote.setModifytime(new Date());
-        Log.d("debug0001",tempnote.getModifytime().toString());
-        newtable.addNote(tempnote);
-        Log.d("debug0001",Integer.toString(newtable.getSearchResultFuzzy("title").size()));
-        Log.d("debug0001",newtable.getSearchResult("titlex").get(0).getModifytime().toString());
-        Log.d("debug0001",new Date().toString());
-        */
-        /*
-        Note tempnote = new Note();
-        Log.d("debug0001",tempnote.getStarttime().toString());
-        Log.d("debug0001",tempnote.getModifytime().toString());
-        tempnote.setStarttime(new Date());
-        tempnote.setModifytime(new Date(1));
-        Log.d("debug0001",tempnote.getStarttime().toString());
-        Log.d("debug0001",tempnote.getModifytime().toString());
-        */
+        newtable.removeAllNotes();
+        Note tempnote = new Note("data2",new ArrayList<IData>());
+        Log.d("debug0001","success1");
+        //tempnote.getTag().add("shit");
+        Log.d("debug0001","success2");
 
+        newtable.addNote(tempnote);
+        List<Note> templist = newtable.getSearchResult("data2");
+        Log.d("debug0001",Integer.toString(templist.size()));
+        Log.d("debug0001",Integer.toString(templist.get(0).getTag().size()));
+        */
+        
         setContentView(R.layout.activity_main);
         initListener();
         EventBus.getDefault().register(this);

@@ -19,6 +19,7 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Arrays;
 
 public class TableOperate implements INoteCollection {
     private DBManager manager;
@@ -78,12 +79,26 @@ public class TableOperate implements INoteCollection {
         return content;
     }
 
+    public String listStringToString(List<String> src) {
+        String string = "";
+        for (int i = 0; i < src.size() - 1; i++) {
+            string = string + src.get(i) + TableConfig.Filesave.LINE_SEPERATOR;
+        }
+        if(src.size() >= 2)string = string + TableConfig.Filesave.LINE_SEPERATOR;
+        return string;
+    }
+
+    public List<String> stringToListString(String src) {
+        if(src.length() == 0)return new ArrayList<String>();
+        String[] strings = src.split(TableConfig.Filesave.LINE_SEPERATOR);
+        return Arrays.asList(strings);
+    }
+
     public List<Note> getAllNotes() {
         ArrayList<Note> noteList = new ArrayList<Note>();
         Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME, null);
         while (c.moveToNext()) {
-            Log.d("debug0001", c.getString(0) + " " + c.getString(1) + " " + c.getString(2));
-            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4));
+            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)));
             noteList.add(temp);
         }
         c.close();
@@ -94,7 +109,7 @@ public class TableOperate implements INoteCollection {
         ArrayList<Note> noteList = new ArrayList<Note>();
         Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME + " where " + TableConfig.Note.NOTE_TITLE + "= ?", new String[]{parameter});
         while (c.moveToNext()) {
-            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4));
+            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)));
             noteList.add(temp);
         }
         c.close();
@@ -107,7 +122,7 @@ public class TableOperate implements INoteCollection {
                 + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%'";
         Cursor c = db.rawQuery(sql2, null);
         while (c.moveToNext()) {
-            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4));
+            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)));
             noteList.add(temp);
         }
         c.close();
@@ -121,6 +136,7 @@ public class TableOperate implements INoteCollection {
         cValue.put(TableConfig.Note.NOTE_CONTENT, encodeNote(note.getContent()));
         cValue.put(TableConfig.Note.NOTE_STARTTIME, Long.toString(note.getStarttime().getTime()));
         cValue.put(TableConfig.Note.NOTE_MODIFYTIME, Long.toString(note.getModifytime().getTime()));
+        cValue.put(TableConfig.Note.NOTE_TAG, listStringToString(note.getTag()));
         db.insert(TableConfig.TABLE_NAME, null, cValue);
         String sql = "select * from " + TableConfig.TABLE_NAME;
         Cursor cursor = db.rawQuery(sql, null);
@@ -137,7 +153,7 @@ public class TableOperate implements INoteCollection {
         ArrayList<Note> noteList = new ArrayList<Note>();
         Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME + " where " + TableConfig.Note.NOTE_ID + "= ?", new String[]{Integer.toString(index)});
         while (c.moveToNext()) {
-            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4));
+            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)));
             noteList.add(temp);
         }
         c.close();
@@ -145,8 +161,8 @@ public class TableOperate implements INoteCollection {
     }
 
     public void setNoteAt(int index, Note note) {
-        db.execSQL("update " + TableConfig.TABLE_NAME + " set " + TableConfig.Note.NOTE_TITLE + "=?," + TableConfig.Note.NOTE_STARTTIME + "=?," + TableConfig.Note.NOTE_MODIFYTIME + "=?," + TableConfig.Note.NOTE_CONTENT + "=? where " + TableConfig.Note.NOTE_ID + "=?",
-                new Object[]{note.getTitle(), Long.toString(note.getStarttime().getTime()), Long.toString(note.getModifytime().getTime()), encodeNote(note.getContent()), Integer.toString(index)});
+        db.execSQL("update " + TableConfig.TABLE_NAME + " set " + TableConfig.Note.NOTE_TITLE + "=?," + TableConfig.Note.NOTE_TAG + "=?," + TableConfig.Note.NOTE_STARTTIME + "=?," + TableConfig.Note.NOTE_MODIFYTIME + "=?," + TableConfig.Note.NOTE_CONTENT + "=? where " + TableConfig.Note.NOTE_ID + "=?",
+                new Object[]{note.getTitle(),listStringToString(note.getTag()), Long.toString(note.getStarttime().getTime()), Long.toString(note.getModifytime().getTime()), encodeNote(note.getContent()), Integer.toString(index)});
         note.setIndex(index);
 
         EventBus.getDefault().post(new DatabaseModifyEvent("modify note"));
