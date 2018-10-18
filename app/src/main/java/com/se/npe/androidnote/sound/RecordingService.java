@@ -31,7 +31,6 @@ public class RecordingService extends Service {
     private static int currentFile = 1;
 
     private static AudioUtil.AudioRecordThread recorder;
-//    private static MediaRecorder mRecorder;
 
     private static long mStartingTimeMillis;
 

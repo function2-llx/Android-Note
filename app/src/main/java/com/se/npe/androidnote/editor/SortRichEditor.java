@@ -785,7 +785,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
     private void insertSoundAtIndex(int index, String soundPath) {
         RelativeLayout soundLayout = createSoundLayout();
         SoundPlayer soundPlayer = (SoundPlayer) soundLayout.getChildAt(0);
-        soundPlayer.setUp(soundPath, "", Jzvd.SCREEN_WINDOW_LIST);
+//        soundPlayer.setUp(soundPath, "", Jzvd.SCREEN_WINDOW_LIST);
         soundPlayer.setTag(soundPath);
         insertMediaAtIndex(index, soundLayout);
     }
@@ -971,12 +971,10 @@ public class SortRichEditor extends ScrollView implements IEditor {
                     ImageView item = (ImageView) ((RelativeLayout) itemView).getChildAt(0);
                     BitmapDrawable bitmapDrawable = (BitmapDrawable) item.getDrawable();
                     data = new PictureData(item.getTag().toString(), bitmapDrawable.getBitmap());
+                } else if (view instanceof SoundPlayer) {
+                    data = new SoundData(view.getTag().toString(), "");
                 } else if (view instanceof JzvdStd) {
-                    if (view instanceof SoundPlayer) {
-                        data = new SoundData(view.getTag().toString(), "");
-                    } else {
-                        data = new VideoData(view.getTag().toString());
-                    }
+                    data = new VideoData(view.getTag().toString());
                 }
             }
             if (data != null) {
