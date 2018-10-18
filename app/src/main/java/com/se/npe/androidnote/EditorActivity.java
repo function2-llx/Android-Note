@@ -47,7 +47,7 @@ public class EditorActivity extends AppCompatActivity {
     private String mEngineType = null;
     private SharedPreferences sharedPreferences;
     private int ret = 0;
-    private ResultPool resultPool;
+    private ResultPool resultPool = new ResultPool();
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -103,12 +103,13 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     private void iFlyOnCreate() {
+        Log.e("iFlyTag", "iFlyOnCreate");
         speechRecognizer = SpeechRecognizer.createRecognizer(this, initListener);
         sharedPreferences = getSharedPreferences(this.getPackageName(), Context.MODE_PRIVATE);
         mEngineType = SpeechConstant.TYPE_CLOUD;
 
         // set parameter
-        speechRecognizer.setParameter(SpeechConstant.PARAMS, null);
+        //speechRecognizer.setParameter(SpeechConstant.PARAMS, null);
         speechRecognizer.setParameter(SpeechConstant.DOMAIN, "iat");
         speechRecognizer.setParameter(SpeechConstant.ENGINE_TYPE, mEngineType);
         speechRecognizer.setParameter(SpeechConstant.RESULT_TYPE, "plain");
