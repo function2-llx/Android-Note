@@ -2,6 +2,7 @@ package com.se.npe.androidnote;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
 import static org.junit.Assert.*;
@@ -10,16 +11,9 @@ import static org.junit.Assert.*;
 public class ListActivityTest {
 
     @Test
-    public void onCreateContextMenu() {
-        
-    }
-
-    @Test
-    public void onContextItemSelected() {
-    }
-
-    @Test
     public void onCreateOptionsMenu() {
+        ListActivity activity = Robolectric.setupActivity(ListActivity.class);
+
     }
 
     @Test

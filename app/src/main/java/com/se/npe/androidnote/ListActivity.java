@@ -44,11 +44,6 @@ public class ListActivity extends AppCompatActivity {
 
     /* Options menu */
 
-    @Override
-    public void onCreateContextMenu(ContextMenu menu, View v, ContextMenu.ContextMenuInfo menuInfo) {
-        this.getMenuInflater().inflate(R.menu.activity_list_context_menu, menu);
-        super.onCreateContextMenu(menu, v, menuInfo);
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

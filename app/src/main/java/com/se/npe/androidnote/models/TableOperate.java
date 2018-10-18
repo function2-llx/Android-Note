@@ -24,6 +24,8 @@ import org.greenrobot.eventbus.Subscribe;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Thread.sleep;
+
 public class TableOperate implements INoteCollection{
     private DBManager manager;
     private SQLiteDatabase db;
@@ -86,8 +88,8 @@ public class TableOperate implements INoteCollection{
             }
             else if(StrArray[i].charAt(0) == 'P'){
                 String[] tempArray = StrArray[i].split("asdfg");
-                Bitmap mBitmap = BitmapFactory.decodeFile(StrArray[1]);
-                PictureData tempPictureData = new PictureData(tempArray[1],mBitmap);
+//                Bitmap mBitmap = BitmapFactory.decodeFile(StrArray[1]);
+                PictureData tempPictureData = new PictureData(tempArray[1]);
                 content.add(tempPictureData);
             }
         }
@@ -173,7 +175,6 @@ public class TableOperate implements INoteCollection{
 
     public void removeNoteAt(int index){
         db.execSQL("delete from "+TableConfig.TABLE_NAME+" where "+TableConfig.Note.NOTE_ID+"=?", new String[] { Integer.toString(index) });
-
         EventBus.getDefault().post(new DatabaseModifyEvent("delete note"));
     }
 

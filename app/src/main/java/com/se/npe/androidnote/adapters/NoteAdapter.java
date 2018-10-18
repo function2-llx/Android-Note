@@ -10,6 +10,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
@@ -17,6 +18,7 @@ import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.marshalchen.ultimaterecyclerview.UltimateViewAdapter;
 import com.se.npe.androidnote.EditorActivity;
 import com.se.npe.androidnote.R;
+import com.se.npe.androidnote.editor.PictureLoader;
 import com.se.npe.androidnote.events.NoteDeleteEvent;
 import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
@@ -92,6 +94,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
     public class ViewHolder extends UltimateRecyclerviewViewHolder implements View.OnClickListener, View.OnLongClickListener{
         private TextView title, text;
         private TextView createTimeDisplayer, modifyTimeDisplayer;
+        private ImageView imageView;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -99,6 +102,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
             this.text = itemView.findViewById(R.id.text_view_text);
             this.createTimeDisplayer = itemView.findViewById(R.id.text_view_create_time);
             this.modifyTimeDisplayer = itemView.findViewById(R.id.text_view_modify_time);
+            this.imageView = itemView.findViewById(R.id.image_view);
         }
 
         public void setTitle(String title) {
@@ -119,6 +123,10 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
             this.modifyTimeDisplayer.setText("modify: " + date.toString());
         }
 
+        public void setIamge(String imagePath)
+        {
+            new PictureLoader(imageView, 50).execute(imagePath);
+        }
 
         @Override
         public void onClick(@NonNull View v) {
@@ -181,6 +189,8 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder>{
         holder.setText(data.text);
         holder.setCreateDate(note.getStarttime());
         holder.setModifyDate(note.getModifytime());
+        if (!data.picturePath.isEmpty())
+                holder.setIamge(data.picturePath);
     }
 
     @Override
