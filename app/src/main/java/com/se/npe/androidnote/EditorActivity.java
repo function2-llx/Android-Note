@@ -8,6 +8,7 @@ import android.support.v7.widget.SearchView;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Toast;
 
 import com.dmcbig.mediapicker.PickerActivity;
 import com.dmcbig.mediapicker.PickerConfig;
@@ -18,6 +19,7 @@ import com.se.npe.androidnote.events.NoteModifyEvent;
 import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.sound.RecordingService;
+import com.se.npe.androidnote.sound.ResultPool;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -114,17 +116,8 @@ public class EditorActivity extends AppCompatActivity {
         } else if (resultCode == SoundRecorderActivity.RESULT_CODE && requestCode == PICKER_SOUND) {
             String path = data.getStringExtra(RecordingService.SOUND_PATH);
             editor.addSound(path);
-//            new IflySoundToText().acceptTask(this, path, new IflySoundToText.OnTextReadyListener() {
-//                @Override
-//                public void onTextReady(String text) {
-//                    Toast.makeText(EditorActivity.this, text, Toast.LENGTH_SHORT).show();
-//                }
-//
-//                @Override
-//                public void onTextFinished(String all) {
-//                    Toast.makeText(EditorActivity.this, "all: " + all, Toast.LENGTH_SHORT).show();
-//                }
-//            });
+            ResultPool instance = ResultPool.getInstance();
+            Toast.makeText(this, instance.resultFrom(RecordingService.getOffset()), Toast.LENGTH_SHORT).show();
         }
     }
 

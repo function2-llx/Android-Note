@@ -12,15 +12,20 @@ import java.util.TreeMap;
  */
 
 public class ResultPool {
+    private static ResultPool instance = new ResultPool();
     private ArrayList<Long> times = new ArrayList<>();
     private ArrayList<String> results = new ArrayList<>();
 
-    void putResult(long time, String result) {
+    public static ResultPool getInstance() {
+        return instance;
+    }
+
+    public void putResult(long time, String result) {
         times.add(time);
         results.add(result);
     }
 
-    String resultFrom(long offset) {
+    public String resultFrom(long offset) {
         StringBuilder sb = new StringBuilder();
         int index = Collections.binarySearch(times, System.currentTimeMillis() - offset);
         if (index < 0) {
@@ -32,7 +37,7 @@ public class ResultPool {
         return sb.toString();
     }
 
-    String resultRange(long begin, long end) {
+    public String resultRange(long begin, long end) {
         return null;
     }
 }
