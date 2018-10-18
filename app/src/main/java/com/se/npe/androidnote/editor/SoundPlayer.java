@@ -3,22 +3,48 @@ package com.se.npe.androidnote.editor;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.media.MediaPlayer;
+import android.os.AsyncTask;
 import android.os.Handler;
 import android.os.Message;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
+import com.bumptech.glide.util.Util;
 import com.se.npe.androidnote.R;
+import com.se.npe.androidnote.util.Logger;
 
+import java.io.IOException;
 import java.lang.ref.WeakReference;
 
 import cn.jzvd.JzvdStd;
 
 public class SoundPlayer extends RelativeLayout {
+    private static class ProgressSetter extends AsyncTask<Void, Void, Void> {
+        WeakReference<SoundPlayer> ref;
+
+        ProgressSetter(SoundPlayer ref) {
+            this.ref = new WeakReference<>(ref);
+        }
+
+        @Override
+        protected Void doInBackground(Void... voids) {
+            return null;
+        }
+
+        @Override
+        protected void onProgressUpdate(Void... values) {
+            super.onProgressUpdate(values);
+        }
+    }
+
+    private MediaPlayer mediaPlayer;
+
     public SoundPlayer(Context context) {
         this(context, null);
     }
@@ -26,31 +52,19 @@ public class SoundPlayer extends RelativeLayout {
     public SoundPlayer(Context context, AttributeSet attrs) {
         super(context, attrs);
         LayoutInflater.from(context).inflate(R.layout.sound_player, this);
+        mediaPlayer = new MediaPlayer();
+        findViewById(R.id.sound_player_play).setOnClickListener(v -> {
+            mediaPlayer.start();
+        });
+        new ProgressSetter(this).execute();
     }
-//    private static class ThumbnailSetter extends Handler {
-//        WeakReference<SoundPlayer> soundPlayer;
-//
-//        public ThumbnailSetter(SoundPlayer soundPlayer) {
-//            this.soundPlayer = new WeakReference<>(soundPlayer);
-//        }
-//
-//        @Override
-//        public void handleMessage(Message msg) {
-//            super.handleMessage(msg);
-//            SoundPlayer instance = soundPlayer.get();
-//            int width = instance.getWidth();
-//            int height = instance.getHeight();
-//            Bitmap bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-//            bitmap.eraseColor(Color.parseColor("#000000"));
-//            instance.thumbImageView.setImageBitmap(bitmap);
-//        }
-//    }
-//
-//    ThumbnailSetter thumbnailSetter;
-//
-//    public SoundPlayer(Context context) {
-//        super(context);
-//        thumbnailSetter = new ThumbnailSetter(this);
-//        thumbnailSetter.sendEmptyMessageDelayed(0, 50);
-//    }
+
+    public void setSource(String source) {
+        try {
+            mediaPlayer.setDataSource(source);
+        } catch (IOException e) {
+            Logger.log("my", e);
+        }
+        mediaPlayer.prepareAsync();
+    }
 }

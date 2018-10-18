@@ -793,6 +793,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
         RelativeLayout soundLayout = createSoundLayout();
         SoundPlayer soundPlayer = (SoundPlayer) soundLayout.getChildAt(0);
         soundPlayer.setTag(soundPath);
+        soundPlayer.setSource(soundPath);
         insertMediaAtIndex(index, soundLayout);
     }
 

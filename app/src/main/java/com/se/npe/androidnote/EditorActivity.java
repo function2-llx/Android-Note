@@ -101,8 +101,8 @@ public class EditorActivity extends AppCompatActivity {
         }
 
         // start recording right now
-//        startService(new Intent(this, RecordingService.class)
-//                .putExtra(RecordingService.START_RECORDING, true));
+        startService(new Intent(this, RecordingService.class)
+                .putExtra(RecordingService.START_RECORDING, true));
         startTime = System.currentTimeMillis();
 
         iFlyOnCreate();
