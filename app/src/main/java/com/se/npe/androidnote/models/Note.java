@@ -68,11 +68,13 @@ public class Note {
     public Note() {
         this.title = "this is tile for " + indexDB;
         this.content = new ArrayList<IData>();
+        this.tag = new ArrayList<String>();
     }
 
     public Note(String title, List<IData> content) {
         this.title = title;
         this.content = content;
+        this.tag = new ArrayList<String>();
     }
 
     public Note(String title, List<IData> content, int index, String timestart,String timemodify,List<String> tag) {

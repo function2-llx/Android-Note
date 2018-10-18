@@ -66,8 +66,20 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         TableOperate.init(this.getApplicationContext());
 
-        
+        /*
+        TableOperate newtable = TableOperate.getInstance();
+        newtable.removeAllNotes();
+        Note tempnote = new Note("data2",new ArrayList<IData>());
+        Log.d("debug0001","success1");
+        //tempnote.getTag().add("shit");
+        Log.d("debug0001","success2");
 
+        newtable.addNote(tempnote);
+        List<Note> templist = newtable.getSearchResult("data2");
+        Log.d("debug0001",Integer.toString(templist.size()));
+        Log.d("debug0001",Integer.toString(templist.get(0).getTag().size()));
+        */
+        
         setContentView(R.layout.activity_main);
         initListener();
         EventBus.getDefault().register(this);

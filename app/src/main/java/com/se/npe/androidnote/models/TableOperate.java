@@ -84,11 +84,12 @@ public class TableOperate implements INoteCollection {
         for (int i = 0; i < src.size() - 1; i++) {
             string = string + src.get(i) + TableConfig.Filesave.LINE_SEPERATOR;
         }
-        string = string + src.get(src.size()-1);
+        if(src.size() >= 2)string = string + TableConfig.Filesave.LINE_SEPERATOR;
         return string;
     }
 
     public List<String> stringToListString(String src) {
+        if(src.length() == 0)return new ArrayList<String>();
         String[] strings = src.split(TableConfig.Filesave.LINE_SEPERATOR);
         return Arrays.asList(strings);
     }
