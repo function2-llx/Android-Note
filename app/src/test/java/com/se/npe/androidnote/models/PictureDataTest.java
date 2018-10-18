@@ -3,7 +3,6 @@ package com.se.npe.androidnote.models;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -14,26 +13,22 @@ import static org.junit.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 public class PictureDataTest {
 
-    private final static String exampleMixIn = "test";
-    private final static Bitmap exampleBitmap = Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888);
+    private static final String EXAMPLE_MIX_IN = "test";
+    private static final Bitmap exampleBitmap = Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888);
     private PictureData pictureData;
     private PictureData pictureDataEquals;
     private PictureData pictureDataNotEquals;
 
     @Before
-    public void setUp() throws Exception {
-        pictureData = getExamplePictureData(exampleMixIn);
-        pictureDataEquals = getExamplePictureData(exampleMixIn);
-        pictureDataNotEquals = getExamplePictureData(exampleMixIn + exampleMixIn);
-    }
-
-    @After
-    public void tearDown() throws Exception {
+    public void setUp() {
+        pictureData = getExamplePictureData(EXAMPLE_MIX_IN);
+        pictureDataEquals = getExamplePictureData(EXAMPLE_MIX_IN);
+        pictureDataNotEquals = getExamplePictureData(EXAMPLE_MIX_IN + EXAMPLE_MIX_IN);
     }
 
     @Test
     public void getPicturePath() {
-        assertEquals(getExamplePicturePath(exampleMixIn), pictureData.getPicturePath());
+        assertEquals(getExamplePicturePath(EXAMPLE_MIX_IN), pictureData.getPicturePath());
     }
 
     @Test

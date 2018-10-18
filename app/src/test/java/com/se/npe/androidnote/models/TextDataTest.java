@@ -2,7 +2,6 @@ package com.se.npe.androidnote.models;
 
 import android.support.annotation.NonNull;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,25 +12,21 @@ import static org.junit.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 public class TextDataTest {
 
-    private static final String exampleMixIn = "test";
+    private static final String EXAMPLE_MIX_IN = "test";
     private TextData textData;
     private TextData textDataEquals;
     private TextData textDataNotEquals;
 
     @Before
-    public void setUp() throws Exception {
-        textData = getExampleTextData(exampleMixIn);
-        textDataEquals = getExampleTextData(exampleMixIn);
-        textDataNotEquals = getExampleTextData(exampleMixIn + exampleMixIn);
-    }
-
-    @After
-    public void tearDown() throws Exception {
+    public void setUp() {
+        textData = getExampleTextData(EXAMPLE_MIX_IN);
+        textDataEquals = getExampleTextData(EXAMPLE_MIX_IN);
+        textDataNotEquals = getExampleTextData(EXAMPLE_MIX_IN + EXAMPLE_MIX_IN);
     }
 
     @Test
     public void getText() {
-        assertEquals(getExampleText(exampleMixIn), textData.getText());
+        assertEquals(getExampleText(EXAMPLE_MIX_IN), textData.getText());
     }
 
     @Test

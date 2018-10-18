@@ -25,20 +25,20 @@ public class TableOperateTest {
 
     private TableOperate tableOperate;
     private List<Note> noteList;
-    private final int NOTE_LIST_SIZE = 20;
+    private static final int NOTE_LIST_SIZE = 20;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         init();
         addNote();
     }
 
     @After
-    public void tearDown() throws Exception {
-        resetSingleton();
+    public void tearDown() {
+        SingletonResetter.resetTableOperateSingleton();
     }
 
     @Test
@@ -59,7 +59,7 @@ public class TableOperateTest {
     }
 
     @Test
-    public void encodeNote_decodeNote() {
+    public void encodeNoteAndDecodeNote() {
         // Encode & Decode
         List<IData> dataList = getExampleDataList("encode_decode");
         assertEquals(dataList, tableOperate.decodeNote(tableOperate.encodeNote(dataList)));
@@ -92,7 +92,7 @@ public class TableOperateTest {
 
     @Test
     public void addNote() {
-        noteList = new ArrayList<Note>();
+        noteList = new ArrayList<>();
         for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
             Note note = getExampleNote(i);
             noteList.add(note);
@@ -137,21 +137,8 @@ public class TableOperateTest {
         }
         noteList.clear();
         assertEquals(noteList, tableOperate.getAllNotes());
+        // Remove note before start/after end will not throw exception
     }
-
-    // @Test
-    // public void removeNoteAtBeforeStart() {
-    //     addNote();
-    //     expectedException.expect(IndexOutOfBoundsException.class);
-    //     tableOperate.removeNoteAt(noteList.get(0).getIndex() - 1); // noteList.get(0).getIndex() == 1
-    // }
-
-    // @Test
-    // public void removeNoteAtAfterEnd() {
-    //     addNote();
-    //     expectedException.expect(IndexOutOfBoundsException.class);
-    //     tableOperate.removeNoteAt(noteList.get(NOTE_LIST_SIZE - 1).getIndex() + 1); // noteList.get(NOTE_LIST_SIZE - 1).getIndex() == NOTE_LIST_SIZE
-    // }
 
     @Test
     public void removeAllNotes() {
@@ -161,26 +148,18 @@ public class TableOperateTest {
     }
 
     @Test
-    public void removeAllNotes_addNote() {
+    public void removeAllNotesAndAddNote() {
         // Remove all notes & Add note
         removeAllNotes();
         addNote();
     }
 
-    @Test
-    public void loadFromFile() {
-    }
-
-    @Test
-    public void saveToFile() {
-    }
-
     @NonNull
     private Note getExampleNote(int data) {
         // Create a new example note
-        String title = "This is the title for " + String.valueOf(data);
+        String title = "This is the title for " + data;
         List<IData> content = new ArrayList<>();
-        content.add(new TextData("This is the content for " + String.valueOf(data)));
+        content.add(new TextData("This is the content for " + data));
         return new Note(title, content);
     }
 
@@ -193,12 +172,5 @@ public class TableOperateTest {
         dataList.add(new SoundData("This is the SoundData sound path for " + data, "This is the SoundData text for " + data));
         dataList.add(new VideoData("This is the VideoData video path for " + data));
         return dataList;
-    }
-
-    static public void resetSingleton() {
-        // "tableOperate" is the static variable name which holds the singleton TableOperate instance
-        SingletonResetter.resetSingleton(TableOperate.class, "tableOperate");
-        // Delegate to reset DBManager singleton
-        DBManagerTest.resetSingleton(); // This function then delegate to reset MySQLiteOpenHelper singleton
     }
 }

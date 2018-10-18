@@ -2,7 +2,6 @@ package com.se.npe.androidnote.models;
 
 import android.support.annotation.NonNull;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,25 +12,21 @@ import static org.junit.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 public class VideoDataTest {
 
-    private static final String exampleMixIn = "test";
+    private static final String EXAMPLE_MIX_IN = "test";
     private VideoData videoData;
     private VideoData videoDataEquals;
     private VideoData videoDataNotEquals;
 
     @Before
-    public void setUp() throws Exception {
-        videoData = getExampleVideoData(exampleMixIn);
-        videoDataEquals = getExampleVideoData(exampleMixIn);
-        videoDataNotEquals = getExampleVideoData(exampleMixIn + exampleMixIn);
-    }
-
-    @After
-    public void tearDown() throws Exception {
+    public void setUp() {
+        videoData = getExampleVideoData(EXAMPLE_MIX_IN);
+        videoDataEquals = getExampleVideoData(EXAMPLE_MIX_IN);
+        videoDataNotEquals = getExampleVideoData(EXAMPLE_MIX_IN + EXAMPLE_MIX_IN);
     }
 
     @Test
     public void getVideoPath() {
-        assertEquals(getExampleVideoPath(exampleMixIn), videoData.getVideoPath());
+        assertEquals(getExampleVideoPath(EXAMPLE_MIX_IN), videoData.getVideoPath());
     }
 
     @Test

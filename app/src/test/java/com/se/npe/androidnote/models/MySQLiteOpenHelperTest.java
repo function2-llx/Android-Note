@@ -12,6 +12,7 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 
 import static org.junit.Assert.*;
 
@@ -21,14 +22,14 @@ public class MySQLiteOpenHelperTest {
     Context context;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
         context = activity.getApplicationContext();
     }
 
     @After
-    public void tearDown() throws Exception {
-        resetSingleton();
+    public void tearDown() {
+        SingletonResetter.resetMySQLiteOpenHelperSingleton();
     }
 
     @Test
@@ -51,29 +52,20 @@ public class MySQLiteOpenHelperTest {
     }
 
     @Test
-    public void onUpgrade() {
+    public void onUpgrade() throws NoSuchMethodException, InstantiationException, IllegalAccessException, InvocationTargetException {
         MySQLiteOpenHelper mySQLiteOpenHelper = MySQLiteOpenHelper.getInstance(context);
         assertEquals(mySQLiteOpenHelper.getWritableDatabase().getVersion(), 1);
         // Get access to private constructor of MySQLiteOpenHelper
         MySQLiteOpenHelper mySQLiteOpenHelperUpgraded;
         final int DATABASE_UPGRADED_VERSION = 2;
-        try {
-            Class mySQLiteOpenHelperClass = MySQLiteOpenHelper.class;
-            Constructor mySQLiteOpenHelperConstructor = mySQLiteOpenHelperClass.getDeclaredConstructor(Context.class, String.class, SQLiteDatabase.CursorFactory.class, int.class);
-            mySQLiteOpenHelperConstructor.setAccessible(true);
-            // Depends on the private constructor of MySQLiteOpenHelper
-            mySQLiteOpenHelperUpgraded = (MySQLiteOpenHelper) mySQLiteOpenHelperConstructor.newInstance(context, "Notes", null, DATABASE_UPGRADED_VERSION);
-        } catch (Exception e) {
-            throw new RuntimeException("Reflection on MySQLiteOpenHelper in MySQLiteOpenHelperTest failed.");
-        }
-        // Check database version is upgraded
+        Class mySQLiteOpenHelperClass = MySQLiteOpenHelper.class;
+        Constructor mySQLiteOpenHelperConstructor = mySQLiteOpenHelperClass.getDeclaredConstructor(Context.class, String.class, SQLiteDatabase.CursorFactory.class, int.class);
+        mySQLiteOpenHelperConstructor.setAccessible(true);
+        // Depends on the private constructor of MySQLiteOpenHelper
+        mySQLiteOpenHelperUpgraded = (MySQLiteOpenHelper) mySQLiteOpenHelperConstructor.newInstance(context, "Notes", null, DATABASE_UPGRADED_VERSION);
         assertNotNull(mySQLiteOpenHelperUpgraded);
+        // Check database version is upgraded
         assertEquals(mySQLiteOpenHelperUpgraded.getWritableDatabase().getVersion(), DATABASE_UPGRADED_VERSION);
         assertEquals(mySQLiteOpenHelperUpgraded.getWritableDatabase().getVersion(), DATABASE_UPGRADED_VERSION);
-    }
-
-    static void resetSingleton() {
-        // "helper" is the static variable name which holds the singleton MySQLiteOpenHelper instance
-        SingletonResetter.resetSingleton(MySQLiteOpenHelper.class, "helper");
     }
 }

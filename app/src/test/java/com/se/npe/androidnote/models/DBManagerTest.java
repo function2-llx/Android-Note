@@ -18,14 +18,14 @@ public class DBManagerTest {
     Context context;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
         context = activity.getApplicationContext();
     }
 
     @After
-    public void tearDown() throws Exception {
-        resetSingleton();
+    public void tearDown() {
+        SingletonResetter.resetDBManagerSingleton();
     }
 
     @Test
@@ -46,12 +46,5 @@ public class DBManagerTest {
         assertTrue(dbManager.getDataBase().isOpen());
         // Check database is writable
         assertFalse(dbManager.getDataBase().isReadOnly());
-    }
-
-    static void resetSingleton() {
-        // "manager" is the static variable name which holds the singleton DBManager instance
-        SingletonResetter.resetSingleton(DBManager.class, "manager");
-        // Delegate to reset MySQLiteOpenHelper singleton
-        MySQLiteOpenHelperTest.resetSingleton();
     }
 }
