@@ -2,7 +2,6 @@ package com.se.npe.androidnote.models;
 
 import android.support.annotation.NonNull;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,14 +18,10 @@ public class VideoDataTest {
     private VideoData videoDataNotEquals;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         videoData = getExampleVideoData(exampleMixIn);
         videoDataEquals = getExampleVideoData(exampleMixIn);
         videoDataNotEquals = getExampleVideoData(exampleMixIn + exampleMixIn);
-    }
-
-    @After
-    public void tearDown() throws Exception {
     }
 
     @Test

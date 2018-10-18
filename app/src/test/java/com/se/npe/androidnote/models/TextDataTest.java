@@ -2,7 +2,6 @@ package com.se.npe.androidnote.models;
 
 import android.support.annotation.NonNull;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,14 +18,10 @@ public class TextDataTest {
     private TextData textDataNotEquals;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         textData = getExampleTextData(exampleMixIn);
         textDataEquals = getExampleTextData(exampleMixIn);
         textDataNotEquals = getExampleTextData(exampleMixIn + exampleMixIn);
-    }
-
-    @After
-    public void tearDown() throws Exception {
     }
 
     @Test

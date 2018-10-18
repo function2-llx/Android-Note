@@ -21,14 +21,14 @@ public class MySQLiteOpenHelperTest {
     Context context;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
         context = activity.getApplicationContext();
     }
 
     @After
-    public void tearDown() throws Exception {
-        resetSingleton();
+    public void tearDown() {
+        SingletonResetter.resetMySQLiteOpenHelperSingleton();
     }
 
     @Test
@@ -70,10 +70,5 @@ public class MySQLiteOpenHelperTest {
         assertNotNull(mySQLiteOpenHelperUpgraded);
         assertEquals(mySQLiteOpenHelperUpgraded.getWritableDatabase().getVersion(), DATABASE_UPGRADED_VERSION);
         assertEquals(mySQLiteOpenHelperUpgraded.getWritableDatabase().getVersion(), DATABASE_UPGRADED_VERSION);
-    }
-
-    static void resetSingleton() {
-        // "helper" is the static variable name which holds the singleton MySQLiteOpenHelper instance
-        SingletonResetter.resetSingleton(MySQLiteOpenHelper.class, "helper");
     }
 }

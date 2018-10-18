@@ -2,7 +2,6 @@ package com.se.npe.androidnote.models;
 
 import android.support.annotation.NonNull;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -19,14 +18,10 @@ public class SoundDataTest {
     private SoundData soundDataNotEquals;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         soundData = getExampleSoundData(exampleMixIn);
         soundDataEquals = getExampleSoundData(exampleMixIn);
         soundDataNotEquals = getExampleSoundData(exampleMixIn + exampleMixIn);
-    }
-
-    @After
-    public void tearDown() throws Exception {
     }
 
     @Test

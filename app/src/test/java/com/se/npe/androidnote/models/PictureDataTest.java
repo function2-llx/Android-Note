@@ -3,7 +3,6 @@ package com.se.npe.androidnote.models;
 import android.graphics.Bitmap;
 import android.support.annotation.NonNull;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,14 +20,10 @@ public class PictureDataTest {
     private PictureData pictureDataNotEquals;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         pictureData = getExamplePictureData(exampleMixIn);
         pictureDataEquals = getExamplePictureData(exampleMixIn);
         pictureDataNotEquals = getExamplePictureData(exampleMixIn + exampleMixIn);
-    }
-
-    @After
-    public void tearDown() throws Exception {
     }
 
     @Test
