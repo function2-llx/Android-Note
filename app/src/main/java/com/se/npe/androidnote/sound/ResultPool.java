@@ -20,7 +20,18 @@ public class ResultPool {
         return instance;
     }
 
+    public void clearAll() {
+        times.clear();
+        results.clear();
+    }
+
     public void putResult(long time, String result) {
+        if (!times.isEmpty()) {
+            long lastTime = times.get(times.size() - 1);
+            if (lastTime > time) {
+                throw new IllegalArgumentException("time must >= lastTime");
+            }
+        }
         times.add(time);
         results.add(result);
     }

@@ -902,11 +902,16 @@ public class SortRichEditor extends ScrollView implements IEditor {
         insertMedia(index -> insertSoundAtIndex(index, soundPath));
     }
 
+    @Override
+    public void addText(String text) {
+        insertEditTextAtIndex(containerLayout.getChildCount(), text);
+    }
+
     static class NoteLoader implements Runnable {
         WeakReference<SortRichEditor> target;
         private Note note;
 
-        public NoteLoader(SortRichEditor target, Note note) {
+        NoteLoader(SortRichEditor target, Note note) {
             this.target = new WeakReference<>(target);
             this.note = note;
         }

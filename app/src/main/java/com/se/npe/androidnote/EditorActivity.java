@@ -117,7 +117,7 @@ public class EditorActivity extends AppCompatActivity {
             String path = data.getStringExtra(RecordingService.SOUND_PATH);
             editor.addSound(path);
             ResultPool instance = ResultPool.getInstance();
-            Toast.makeText(this, instance.resultFrom(RecordingService.getOffset()), Toast.LENGTH_SHORT).show();
+            String result = instance.resultFrom(RecordingService.getOffset());
         }
     }
 
