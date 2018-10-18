@@ -37,6 +37,12 @@ public class RecordingService extends Service {
 
     private static long requestStartTime;
 
+    // get the request ahead-of-time offset
+    // TODO: unify offset & absolute time, don't use them together
+    public static long getOffset() {
+        return System.currentTimeMillis() - requestStartTime;
+    }
+
     // it shouldn't be public according to my design
     // but if the client simply call stopService(intent), the path won't be updated in time
     // so the client must call findValidPath() himself
@@ -50,7 +56,7 @@ public class RecordingService extends Service {
     }
 
     public static void stopRecording() {
-        if(recorder == null)return ;
+        if (recorder == null) return;
         recorder.stopRecording();
         recorder = null;
     }

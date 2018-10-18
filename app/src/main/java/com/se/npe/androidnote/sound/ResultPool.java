@@ -13,16 +13,32 @@ import java.util.Collections;
  */
 
 public class ResultPool {
+    private static ResultPool instance = new ResultPool();
     private ArrayList<Long> times = new ArrayList<>();
     private ArrayList<String> results = new ArrayList<>();
 
+    public static ResultPool getInstance() {
+        return instance;
+    }
+
+    public void clearAll() {
+        times.clear();
+        results.clear();
+    }
+
     public void putResult(long time, String result) {
+        if (!times.isEmpty()) {
+            long lastTime = times.get(times.size() - 1);
+            if (lastTime > time) {
+                throw new IllegalArgumentException("time must >= lastTime");
+            }
+        }
         times.add(time);
         results.add(result);
         Log.e("putResultTag", "time : " + time + ", result : " + result);
     }
 
-    String resultFrom(long offset) {
+    public String resultFrom(long offset) {
         StringBuilder sb = new StringBuilder();
         int index = Collections.binarySearch(times, System.currentTimeMillis() - offset);
         if (index < 0) {
@@ -36,7 +52,7 @@ public class ResultPool {
         return sb.toString();
     }
 
-    String resultRange(long begin, long end) {
+    public String resultRange(long begin, long end) {
         return null;
     }
 }
