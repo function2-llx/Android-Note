@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -25,7 +26,7 @@ import java.lang.ref.WeakReference;
 import cn.jzvd.JzvdStd;
 
 public class SoundPlayer extends RelativeLayout {
-    private static class ProgressSetter extends AsyncTask<Void, Void, Void> {
+    private static class ProgressSetter extends AsyncTask<Void, Integer, Void> {
         WeakReference<SoundPlayer> ref;
 
         ProgressSetter(SoundPlayer ref) {
@@ -34,16 +35,35 @@ public class SoundPlayer extends RelativeLayout {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            return null;
+            int elapsed = 0;
+            long lastTime = System.currentTimeMillis();
+            while (true) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                long now = System.currentTimeMillis();
+                elapsed += (int) (now - lastTime);
+                lastTime = now;
+                int percentage = ref.get().progressBar.getMax() * elapsed / ref.get().mediaPlayer.getDuration();
+                if (percentage >= ref.get().progressBar.getMax()) {
+                    break;
+                }
+                onProgressUpdate(percentage);
+            }
         }
 
         @Override
-        protected void onProgressUpdate(Void... values) {
+        protected void onProgressUpdate(Integer... values) {
             super.onProgressUpdate(values);
+            int now = values[0];
+            ref.get().progressBar.setProgress(now);
         }
     }
 
     private MediaPlayer mediaPlayer;
+    private ProgressBar progressBar;
 
     public SoundPlayer(Context context) {
         this(context, null);
@@ -55,15 +75,16 @@ public class SoundPlayer extends RelativeLayout {
         mediaPlayer = new MediaPlayer();
         findViewById(R.id.sound_player_play).setOnClickListener(v -> {
             mediaPlayer.start();
+            new ProgressSetter(this).execute();
         });
-        new ProgressSetter(this).execute();
+        progressBar = findViewById(R.id.sound_player_progress);
     }
 
     public void setSource(String source) {
         try {
             mediaPlayer.setDataSource(source);
         } catch (IOException e) {
-            Logger.log("my", e);
+            e.printStackTrace();
         }
         mediaPlayer.prepareAsync();
     }
