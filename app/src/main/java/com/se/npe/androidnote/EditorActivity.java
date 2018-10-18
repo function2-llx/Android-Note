@@ -2,12 +2,12 @@ package com.se.npe.androidnote;
 
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
@@ -43,17 +43,22 @@ public class EditorActivity extends AppCompatActivity {
     private long startTime;
     public static final String VIEW_ONLY = "VIEW_ONLY";
 
-    // iFly
-    private SpeechRecognizer speechRecognizer;
-    private String mEngineType = null;
-    private SharedPreferences sharedPreferences;
-    private int ret = 0;
-    private ResultPool resultPool = new ResultPool();
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        this.getMenuInflater().inflate(R.menu.activiry_editor, menu);
+        getMenuInflater().inflate(R.menu.activiry_editor, menu);
         return super.onCreateOptionsMenu(menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.menu_save:
+                Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
+                break;
+            default:
+                break;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -96,8 +101,8 @@ public class EditorActivity extends AppCompatActivity {
         }
 
         // start recording right now
-        startService(new Intent(this, RecordingService.class)
-                .putExtra(RecordingService.START_RECORDING, true));
+//        startService(new Intent(this, RecordingService.class)
+//                .putExtra(RecordingService.START_RECORDING, true));
         startTime = System.currentTimeMillis();
 
         iFlyOnCreate();
@@ -105,12 +110,14 @@ public class EditorActivity extends AppCompatActivity {
 
     private void iFlyOnCreate() {
         Log.e("iFlyTag", "iFlyOnCreate");
-        speechRecognizer = SpeechRecognizer.createRecognizer(this, initListener);
-        sharedPreferences = getSharedPreferences(this.getPackageName(), Context.MODE_PRIVATE);
-        mEngineType = SpeechConstant.TYPE_CLOUD;
+        SpeechRecognizer speechRecognizer = SpeechRecognizer.createRecognizer(this, code -> {
+            if (code != ErrorCode.SUCCESS) {
+                Log.e("errorTag", "error " + code);
+            }
+        });
+        String mEngineType = SpeechConstant.TYPE_CLOUD;
 
         // set parameter
-        //speechRecognizer.setParameter(SpeechConstant.PARAMS, null);
         speechRecognizer.setParameter(SpeechConstant.DOMAIN, "iat");
         speechRecognizer.setParameter(SpeechConstant.ENGINE_TYPE, mEngineType);
         speechRecognizer.setParameter(SpeechConstant.RESULT_TYPE, "plain");
@@ -119,22 +126,13 @@ public class EditorActivity extends AppCompatActivity {
         speechRecognizer.setParameter(SpeechConstant.AUDIO_FORMAT, "pcm");
         speechRecognizer.setParameter(SpeechConstant.ASR_AUDIO_PATH, RecordingService.OUTPUT_DIR + "tmp.pcm");
 
-        ret = speechRecognizer.startListening(recognizerListener);
+        // don't start yet!
+//        speechRecognizer.startListening(recognizerListener);
     }
-
-    private InitListener initListener = new InitListener() {
-        @Override
-        public void onInit(int i) {
-            if (i != ErrorCode.SUCCESS) {
-                Log.e("errorTag", "error" + i);
-            }
-        }
-    };
 
     private RecognizerListener recognizerListener = new RecognizerListener() {
         @Override
         public void onVolumeChanged(int i, byte[] bytes) {
-
         }
 
         @Override
@@ -168,7 +166,7 @@ public class EditorActivity extends AppCompatActivity {
 
     private void printResult(RecognizerResult results) {
         String text = results.getResultString();
-        resultPool.putResult(System.currentTimeMillis(), text);
+        ResultPool.getInstance().putResult(System.currentTimeMillis(), text);
     }
 
     private void getPictureOrVideo(int code) {

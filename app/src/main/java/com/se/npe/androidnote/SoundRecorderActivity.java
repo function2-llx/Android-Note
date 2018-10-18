@@ -67,6 +67,11 @@ public class SoundRecorderActivity extends AppCompatActivity {
                 .show();
     }
 
+    @Override
+    public void onBackPressed() {
+        // do nothing, eat back press
+    }
+
     // Recording Start/Stop
     private void onRecord(boolean start) {
         Intent intent = new Intent(this, RecordingService.class);

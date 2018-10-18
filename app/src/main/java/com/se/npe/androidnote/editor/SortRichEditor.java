@@ -74,18 +74,25 @@ public class SortRichEditor extends ScrollView implements IEditor {
     private static final RelativeLayout.LayoutParams VIDEO_LAYOUT_PARAM
             = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, DEFAULT_VIDEO_HEIGHT);
 
+    private static final RelativeLayout.LayoutParams SOUND_LAYOUT_PARAM
+            = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+
     // well, sonar cube doesn't like double-brace-init and thinks it may cause memory leak
     // but it actually won't because they are static
     // now I place the init here to eliminate sonar cube's complaint
     static {
         DASH_DRAWABLE.setStroke(dip2px(1), Color.parseColor("#4CA4E9"), dip2px(4), dip2px(3));
         DASH_DRAWABLE.setColor(Color.parseColor("#ffffff"));
-        PICTURE_LAYOUT_PARAM.bottomMargin = DEFAULT_MARGIN;
-        PICTURE_LAYOUT_PARAM.leftMargin = DEFAULT_MARGIN;
-        PICTURE_LAYOUT_PARAM.rightMargin = DEFAULT_MARGIN;
-        VIDEO_LAYOUT_PARAM.bottomMargin = DEFAULT_MARGIN;
-        VIDEO_LAYOUT_PARAM.leftMargin = DEFAULT_MARGIN;
-        VIDEO_LAYOUT_PARAM.rightMargin = DEFAULT_MARGIN;
+        PICTURE_LAYOUT_PARAM.bottomMargin
+                = PICTURE_LAYOUT_PARAM.leftMargin
+                = PICTURE_LAYOUT_PARAM.rightMargin
+                = VIDEO_LAYOUT_PARAM.bottomMargin
+                = VIDEO_LAYOUT_PARAM.leftMargin
+                = VIDEO_LAYOUT_PARAM.rightMargin
+                = SOUND_LAYOUT_PARAM.bottomMargin
+                = SOUND_LAYOUT_PARAM.leftMargin
+                = SOUND_LAYOUT_PARAM.rightMargin
+                = DEFAULT_MARGIN;
     }
 
     // save the background of edit text before sorting(because sorting will change it)
@@ -697,7 +704,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         SoundPlayer soundPlayer = new SoundPlayer(getContext());
         soundPlayer.setLayoutParams(contentImageLp);
-        return createMediaLayout(soundPlayer, VIDEO_LAYOUT_PARAM);
+        return createMediaLayout(soundPlayer, SOUND_LAYOUT_PARAM);
     }
 
     private void setFocusOnView(View view, boolean isFocusable) {
@@ -785,7 +792,6 @@ public class SortRichEditor extends ScrollView implements IEditor {
     private void insertSoundAtIndex(int index, String soundPath) {
         RelativeLayout soundLayout = createSoundLayout();
         SoundPlayer soundPlayer = (SoundPlayer) soundLayout.getChildAt(0);
-//        soundPlayer.setUp(soundPath, "", Jzvd.SCREEN_WINDOW_LIST);
         soundPlayer.setTag(soundPath);
         insertMediaAtIndex(index, soundLayout);
     }
@@ -972,7 +978,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
                     BitmapDrawable bitmapDrawable = (BitmapDrawable) item.getDrawable();
                     data = new PictureData(item.getTag().toString(), bitmapDrawable.getBitmap());
                 } else if (view instanceof SoundPlayer) {
-                    data = new SoundData(view.getTag().toString(), "");
+                    data = new SoundData(view.getTag().toString(), " ");
                 } else if (view instanceof JzvdStd) {
                     data = new VideoData(view.getTag().toString());
                 }

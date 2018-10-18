@@ -1,7 +1,5 @@
 package com.se.npe.androidnote.sound;
 
-import android.util.Log;
-
 import java.util.ArrayList;
 import java.util.Collections;
 
@@ -35,7 +33,6 @@ public class ResultPool {
         }
         times.add(time);
         results.add(result);
-        Log.e("putResultTag", "time : " + time + ", result : " + result);
     }
 
     public String resultFrom(long offset) {
@@ -43,8 +40,6 @@ public class ResultPool {
         int index = Collections.binarySearch(times, System.currentTimeMillis() - offset);
         if (index < 0) {
             index = -index - 1;
-            if (index > 0)
-                index--;
         }
         for (; index < results.size(); ++index) {
             sb.append(results.get(index));
