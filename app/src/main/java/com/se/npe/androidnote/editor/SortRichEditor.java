@@ -418,6 +418,8 @@ public class SortRichEditor extends ScrollView implements IEditor {
                         if (video.isCurrentPlay()) {
                             video.onStateAutoComplete();
                         }
+                    } else if (media instanceof SoundPlayer) {
+                        ((SoundPlayer) media).destroy();
                     }
                 }
             }

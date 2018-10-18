@@ -12,6 +12,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
@@ -35,23 +36,21 @@ public class SoundPlayer extends RelativeLayout {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            int elapsed = 0;
-            long lastTime = System.currentTimeMillis();
+            MediaPlayer mediaPlayer = ref.get().mediaPlayer;
+            ProgressBar progressBar = ref.get().progressBar;
             while (true) {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                long now = System.currentTimeMillis();
-                elapsed += (int) (now - lastTime);
-                lastTime = now;
-                int percentage = ref.get().progressBar.getMax() * elapsed / ref.get().mediaPlayer.getDuration();
-                if (percentage >= ref.get().progressBar.getMax()) {
-                    break;
+                if (!mediaPlayer.isPlaying()) {
+                    continue;
                 }
-                onProgressUpdate(percentage);
+                onProgressUpdate(progressBar.getMax() * mediaPlayer.getCurrentPosition()
+                        / mediaPlayer.getDuration());
             }
+//            return null;
         }
 
         @Override
@@ -62,8 +61,10 @@ public class SoundPlayer extends RelativeLayout {
         }
     }
 
+    private ImageButton play, backward, forward;
     private MediaPlayer mediaPlayer;
     private ProgressBar progressBar;
+    private ProgressSetter progressSetter;
 
     public SoundPlayer(Context context) {
         this(context, null);
@@ -72,12 +73,29 @@ public class SoundPlayer extends RelativeLayout {
     public SoundPlayer(Context context, AttributeSet attrs) {
         super(context, attrs);
         LayoutInflater.from(context).inflate(R.layout.sound_player, this);
+        play = findViewById(R.id.sound_player_play);
+        backward = findViewById(R.id.sound_player_backward);
+        forward = findViewById(R.id.sound_player_forward);
         mediaPlayer = new MediaPlayer();
         findViewById(R.id.sound_player_play).setOnClickListener(v -> {
-            mediaPlayer.start();
-            new ProgressSetter(this).execute();
+            if (mediaPlayer.isPlaying()) {
+                mediaPlayer.pause();
+//                play.setBackgroundResource(R.drawable.ic_media_play);
+            } else {
+                mediaPlayer.start();
+//                play.setImageResource(R.drawable.ic_media_pause);
+            }
         });
         progressBar = findViewById(R.id.sound_player_progress);
+        progressSetter = new ProgressSetter(this);
+        progressSetter.execute();
+    }
+
+    public void destroy() {
+        if (mediaPlayer.isPlaying()) {
+            mediaPlayer.stop();
+        }
+        progressSetter.cancel(true);
     }
 
     public void setSource(String source) {
