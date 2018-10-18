@@ -12,7 +12,7 @@ import static org.junit.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 public class SoundDataTest {
 
-    private final static String EXAMPLE_MIX_IN = "test";
+    private static final String EXAMPLE_MIX_IN = "test";
     private SoundData soundData;
     private SoundData soundDataEquals;
     private SoundData soundDataNotEquals;

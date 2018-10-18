@@ -1,10 +1,12 @@
 package com.se.npe.androidnote.models;
 
-import com.se.npe.androidnote.util.Logger;
-
 import java.lang.reflect.Field;
 
 public class SingletonResetter {
+
+    private SingletonResetter() {
+        // private constructor to avoid construction
+    }
 
     /**
      * reset Singleton instance of class

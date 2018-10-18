@@ -4,8 +4,6 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.support.v7.app.AppCompatActivity;
 
-import com.se.npe.androidnote.util.Logger;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
