@@ -1,8 +1,6 @@
 package com.se.npe.androidnote.models;
 
 import android.support.annotation.NonNull;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import com.se.npe.androidnote.interfaces.IData;
 
@@ -46,28 +44,28 @@ public class Note {
 
     private String title;
     private List<IData> content;
-    private Date Starttime = new Date(0);
-    private Date Modifytime = new Date(0);
-    private int DBindex = -1;
+    private Date starttime = new Date(0);
+    private Date modifytime = new Date(0);
+    private int indexDB = -1;
 
     public Date getStarttime() {
-        return Starttime;
+        return starttime;
     }
 
     public Date getModifytime() {
-        return Modifytime;
+        return modifytime;
     }
 
     public void setStarttime(Date time) {
-        Starttime = time;
+        starttime = time;
     }
 
     public void setModifytime(Date time) {
-        Modifytime  = time;
+        modifytime  = time;
     }
 
     public Note() {
-        this.title = "this is tile for " + DBindex;
+        this.title = "this is tile for " + indexDB;
         this.content = new ArrayList<IData>();
     }
 
@@ -77,11 +75,11 @@ public class Note {
     }
 
     public Note(String title, List<IData> content, int index, String timestart,String timemodify) {
-        this.DBindex = index;
+        this.indexDB = index;
         this.title = title;
         this.content = content;
-        this.Starttime.setTime(Long.parseLong(timestart));
-        this.Modifytime.setTime(Long.parseLong(timemodify));
+        this.starttime.setTime(Long.parseLong(timestart));
+        this.modifytime.setTime(Long.parseLong(timemodify));
     }
 
     public String getTitle() {
@@ -89,11 +87,11 @@ public class Note {
     }
 
     public void setIndex(int index) {
-        DBindex = index;
+        indexDB = index;
     }
 
     public int getIndex() {
-        return DBindex;
+        return indexDB;
     }
 
     public List<IData> getContent() {
@@ -106,15 +104,14 @@ public class Note {
         List<IData> templist = getContent();
         for (int i = 0; i < templist.size(); i++) {
             if (picpath == null && templist.get(i).toString().charAt(0) == 'P') {
-                picpath = templist.get(i).toString().split("asdfg")[1];
+                picpath = templist.get(i).toString().split(TableConfig.Filesave.LINE_SEPERATOR)[1];
             } else if (text == null && templist.get(i).toString().charAt(0) == 'T') {
-                text = templist.get(i).toString().split("asdfg")[1];
+                text = templist.get(i).toString().split(TableConfig.Filesave.LINE_SEPERATOR)[1];
             }
         }
         if (text == null) text = "无预览文字";
         if (picpath == null) picpath = "";
-        Note.PreviewData previewData = new Note.PreviewData(title, text, picpath);
-        return previewData;
+        return new Note.PreviewData(title, text, picpath);
     }
 
     public void loadFromFile(String fileName) {
@@ -136,7 +133,7 @@ public class Note {
         }
 
         String tempcontent = new String(b);
-        String[] StrArray = tempcontent.split("qwert");
+        String[] StrArray = tempcontent.split(TableConfig.Filesave.LIST_SEPERATOR);
 
         title = StrArray[0];
 
@@ -144,21 +141,20 @@ public class Note {
 
         for (int i = 1; i < StrArray.length; i++) {
             if (StrArray[i].charAt(0) == 'S') {
-                String[] tempArray = StrArray[i].split("asdfg");
+                String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPERATOR);
                 SoundData tempSoundData = new SoundData(tempArray[1], tempArray[2]);
                 content.add(tempSoundData);
             } else if (StrArray[i].charAt(0) == 'T') {
-                String[] tempArray = StrArray[i].split("asdfg");
+                String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPERATOR);
                 TextData tempTextData = new TextData(tempArray[1]);
                 content.add(tempTextData);
             } else if (StrArray[i].charAt(0) == 'V') {
-                String[] tempArray = StrArray[i].split("asdfg");
+                String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPERATOR);
                 VideoData tempVideoData = new VideoData(tempArray[1]);
                 content.add(tempVideoData);
             } else if (StrArray[i].charAt(0) == 'P') {
-                String[] tempArray = StrArray[i].split("asdfg");
-                Bitmap mBitmap = BitmapFactory.decodeFile(StrArray[1]);
-                PictureData tempPictureData = new PictureData(tempArray[1], mBitmap);
+                String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPERATOR);
+                PictureData tempPictureData = new PictureData(tempArray[1]);
                 content.add(tempPictureData);
             }
         }
@@ -186,11 +182,11 @@ public class Note {
             e.printStackTrace();
             return;
         }
-        String string = getTitle() + "qwert";
+        String string = getTitle() + TableConfig.Filesave.LIST_SEPERATOR;
         List<IData> templist = getContent();
 
         for (int i = 0; i < templist.size(); i++) {
-            string = string + templist.get(i).toString() + "qwert";
+            string = string + templist.get(i).toString() + TableConfig.Filesave.LIST_SEPERATOR;
         }
 
         byte[] bs = string.getBytes();
@@ -213,12 +209,12 @@ public class Note {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Note note = (Note) o;
-        return DBindex == note.DBindex;
+        return indexDB == note.indexDB;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(DBindex);
+        return Objects.hash(indexDB);
     }
 
     @Override
