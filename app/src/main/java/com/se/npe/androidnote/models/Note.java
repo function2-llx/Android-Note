@@ -46,6 +46,7 @@ public class Note {
     private List<IData> content;
     private Date starttime = new Date(0);
     private Date modifytime = new Date(0);
+    private List<String> tag;
     private int indexDB = -1;
 
     public Date getStarttime() {
@@ -96,6 +97,11 @@ public class Note {
 
     public List<IData> getContent() {
         return content;
+    }
+
+    public List<String> getTag()
+    {
+        return tag;
     }
 
     public PreviewData getPreview() {

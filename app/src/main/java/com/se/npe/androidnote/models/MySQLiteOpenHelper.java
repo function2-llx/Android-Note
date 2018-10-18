@@ -37,7 +37,8 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
                 + TableConfig.Note.NOTE_TITLE + " verchar(50),"
                 + TableConfig.Note.NOTE_CONTENT + " TEXT,"
                 + TableConfig.Note.NOTE_STARTTIME + " TEXT,"
-                + TableConfig.Note.NOTE_MODIFYTIME + " TEXT)");
+                + TableConfig.Note.NOTE_MODIFYTIME + " TEXT,"
+                + TableConfig.Note.NOTE_TAG + " TEXT)");
     }
 
     /**
@@ -53,15 +54,5 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
         // Work well in early development
         sqLiteDatabase.execSQL("drop table if exists " + TableConfig.TABLE_NAME);
         onCreate(sqLiteDatabase);
-
-        // Work better in production
-        // if (oldVersion < 2) {
-        //     sqLiteDatabase.execSQL("alter table " + TableConfig.TABLE_NAME +
-        //             " add column " + "ColumnName1" + " string;");
-        // }
-        // if (oldVersion < 3) {
-        //     sqLiteDatabase.execSQL("alter table " + TableConfig.TABLE_NAME +
-        //             " add column " + "ColumnName2" + " string;");
-        // }
     }
 }
