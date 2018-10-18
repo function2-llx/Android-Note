@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 
 import com.se.npe.androidnote.interfaces.IData;
 
+import java.util.Objects;
+
 /**
  * Picture data <-> an ImageView in the editor
  *
@@ -28,11 +30,18 @@ public class PictureData implements IData {
     }
 
     @Override
-    public boolean equals(Object another) {
+    public boolean equals(Object o) {
         // TODO: remove field picture?
         // Only check whether picturePath are equal
-        return another.getClass() == this.getClass()
-                && this.picturePath.equals(((PictureData) another).picturePath);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PictureData that = (PictureData) o;
+        return Objects.equals(picturePath, that.picturePath);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(picturePath);
     }
 
     @Override

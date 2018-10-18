@@ -1,5 +1,6 @@
 package com.se.npe.androidnote.models;
 
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 
 import org.junit.After;
@@ -14,34 +15,43 @@ import static org.junit.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 public class DBManagerTest {
 
-    AppCompatActivity activity;
+    Context context;
 
     @Before
     public void setUp() throws Exception {
-        activity = Robolectric.setupActivity(AppCompatActivity.class);
+        AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
+        context = activity.getApplicationContext();
     }
 
     @After
     public void tearDown() throws Exception {
+        resetSingleton();
     }
 
     @Test
     public void newInstances() {
         // Check DBManager is properly set up
-        DBManager dbManager = DBManager.newInstances(activity.getApplicationContext());
+        DBManager dbManager = DBManager.newInstances(context);
         assertNotNull(dbManager);
         // Check singleton pattern is used
-        DBManager dbManager2 = DBManager.newInstances(activity.getApplicationContext());
+        DBManager dbManager2 = DBManager.newInstances(context);
         assertSame(dbManager, dbManager2);
     }
 
     @Test
     public void getDataBase() {
-        DBManager dbManager = DBManager.newInstances(activity.getApplicationContext());
+        DBManager dbManager = DBManager.newInstances(context);
         assertNotNull(dbManager.getDataBase());
         // Check database is open
         assertTrue(dbManager.getDataBase().isOpen());
         // Check database is writable
         assertFalse(dbManager.getDataBase().isReadOnly());
+    }
+
+    static void resetSingleton() {
+        // "manager" is the static variable name which holds the singleton DBManager instance
+        SingletonResetter.resetSingleton(DBManager.class, "manager");
+        // Delegate to reset MySQLiteOpenHelper singleton
+        MySQLiteOpenHelperTest.resetSingleton();
     }
 }

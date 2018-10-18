@@ -46,7 +46,7 @@ public class ListActivity extends AppCompatActivity {
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
         this.configureSearchView(searchView);
-        
+
         return super.onCreateOptionsMenu(menu);
     }
 

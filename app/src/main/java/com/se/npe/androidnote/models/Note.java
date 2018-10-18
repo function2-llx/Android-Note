@@ -17,6 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Objects;
 
 /**
  * Note entity
@@ -87,7 +88,7 @@ public class Note {
         return title;
     }
 
-    public void setindex(int index) {
+    public void setIndex(int index) {
         DBindex = index;
     }
 
@@ -123,15 +124,14 @@ public class Note {
             inputStream = new FileInputStream(file);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return ;
+            return;
         }
 
-        byte b[] = new byte[(int)file.length()];
-        try{
+        byte b[] = new byte[(int) file.length()];
+        try {
             int len = inputStream.read(b);
-            if(len == -1)return ;
-        }
-        catch(Exception e){
+            if (len == -1) return;
+        } catch (Exception e) {
             System.out.println("Wrong!");
         }
 
@@ -184,7 +184,7 @@ public class Note {
             outputStream = new FileOutputStream(file);
         } catch (FileNotFoundException e) {
             e.printStackTrace();
-            return ;
+            return;
         }
         String string = getTitle() + "qwert";
         List<IData> templist = getContent();
@@ -208,18 +208,25 @@ public class Note {
     }
 
     @Override
-    public boolean equals(Object another) {
+    public boolean equals(Object o) {
         // Identify note by its DBindex
-        return this.DBindex == ((Note) another).DBindex;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Note note = (Note) o;
+        return DBindex == note.DBindex;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(DBindex);
     }
 
     @Override
     public String toString() {
-        String string = "Title:"+getTitle()+"\nContents:";
-        List<IData> templist = getContent();
-        for(int i = 0;i < templist.size();i ++)
-        {
-            string = string + "\n" + templist.get(i).toString();
+        String string = "Title:" + getTitle() + "\nContents:";
+        List<IData> tempList = getContent();
+        for (int i = 0; i < tempList.size(); i++) {
+            string = string + "\n" + tempList.get(i).toString();
         }
         return string;
     }
