@@ -28,19 +28,21 @@ import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.sound.RecordingService;
 import com.se.npe.androidnote.sound.ResultPool;
+import com.se.npe.androidnote.util.Logger;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class EditorActivity extends AppCompatActivity {
+    private static final String LOG_TAG = EditorActivity.class.getSimpleName();
     private static final long MAX_SIZE = 188743680L; // 180 MB
     private static final int MAX_PICK = 15;
     private static final int PICKER_SOUND = 0;
     private SortRichEditor editor;
     private Note oldNote;
-    private long startTime;
     public static final String VIEW_ONLY = "VIEW_ONLY";
 
     @Override
@@ -79,9 +81,7 @@ public class EditorActivity extends AppCompatActivity {
         });
         findViewById(R.id.insert_sound).setOnClickListener(v -> {
             insertMedia.collapse();
-            startActivityForResult(
-                    new Intent(this, SoundRecorderActivity.class)
-                            .putExtra(RecordingService.START_TIME, startTime)
+            startActivityForResult(new Intent(this, SoundRecorderActivity.class)
                     , PICKER_SOUND);
         });
         findViewById(R.id.rearrange_editor).setOnClickListener(v -> {
@@ -101,10 +101,11 @@ public class EditorActivity extends AppCompatActivity {
         }
 
         // start recording right now
-        startService(new Intent(this, RecordingService.class)
-                .putExtra(RecordingService.START_RECORDING, true));
-        startTime = System.currentTimeMillis();
-
+        try {
+            ResultPool.getInstance().startRecording();
+        } catch (IOException e) {
+            Logger.log(LOG_TAG, e);
+        }
         iFlyOnCreate();
     }
 
@@ -197,10 +198,8 @@ public class EditorActivity extends AppCompatActivity {
                     break;
             }
         } else if (resultCode == SoundRecorderActivity.RESULT_CODE && requestCode == PICKER_SOUND) {
-            String path = data.getStringExtra(RecordingService.SOUND_PATH);
+            String path = ResultPool.getInstance().getCurrentPath();
             editor.addSound(path);
-            ResultPool instance = ResultPool.getInstance();
-            String result = instance.resultFrom(RecordingService.getOffset());
         }
     }
 
@@ -215,7 +214,7 @@ public class EditorActivity extends AppCompatActivity {
 
         EventBus.getDefault().removeAllStickyEvents();
         EventBus.getDefault().unregister(this);
-        RecordingService.stopRecording();
+        ResultPool.getInstance().stopRecording();
     }
 
     @Subscribe(sticky = true)
