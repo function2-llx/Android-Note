@@ -1,5 +1,7 @@
 package com.se.npe.androidnote.sound;
 
+import com.se.npe.androidnote.util.Logger;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
@@ -7,6 +9,7 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class ResultPoolTest {
+    private static final String LOG_TAG = ResultPoolTest.class.getSimpleName();
     private ResultPool instance;
 
     @Before
@@ -41,7 +44,7 @@ public class ResultPoolTest {
         try {
             Thread.sleep(1000);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            Logger.log(LOG_TAG, e);
         }
         instance.putResult(System.currentTimeMillis(), "2");
         assertEquals(instance.resultFrom(990), "2");

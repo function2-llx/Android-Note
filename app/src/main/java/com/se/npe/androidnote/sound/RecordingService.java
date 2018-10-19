@@ -5,6 +5,8 @@ import android.content.Intent;
 import android.os.Environment;
 import android.os.IBinder;
 
+import com.se.npe.androidnote.util.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -15,6 +17,8 @@ import java.nio.file.Paths;
  * Created by Daniel on 12/28/2014.
  */
 public class RecordingService extends Service {
+    private static final String LOG_TAG = RecordingService.class.getSimpleName();
+
     public static final String OUTPUT_DIR =
             Environment.getExternalStorageDirectory().getAbsolutePath() + "/AndroidNote/";
     public static final String START_RECORDING = "StartRecording";
@@ -71,7 +75,7 @@ public class RecordingService extends Service {
             try {
                 startRecording();
             } catch (IOException e) {
-                e.printStackTrace();
+                Logger.log(LOG_TAG, e);
             }
         } else { // half way request begin, remember the request start time
             long startTime = intent.getLongExtra(REQUEST_START_TIME, -1);
@@ -92,7 +96,7 @@ public class RecordingService extends Service {
         try {
             AudioUtil.pcmToWav(TEMP_OUTPUT_PATH, getOutputPath(), start, end);
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.log(LOG_TAG, e);
         }
     }
 

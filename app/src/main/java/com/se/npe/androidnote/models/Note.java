@@ -5,6 +5,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import com.se.npe.androidnote.interfaces.IData;
+import com.se.npe.androidnote.util.Logger;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -26,6 +27,8 @@ import java.io.OutputStream;
  */
 
 public class Note {
+    private static final String LOG_TAG = Note.class.getSimpleName();
+
     public static class PreviewData {
         // using public field just for convenience
         public @NonNull
@@ -102,17 +105,16 @@ public class Note {
         try {
             inputStream = new FileInputStream(file);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return ;
+            Logger.log(LOG_TAG, e);
+            return;
         }
 
-        byte b[] = new byte[(int)file.length()];
-        try{
+        byte b[] = new byte[(int) file.length()];
+        try {
             int len = inputStream.read(b);
-            if(len == -1)return ;
-        }
-        catch(Exception e){
-            System.out.println("Wrong!");
+            if (len == -1) return;
+        } catch (Exception e) {
+            Logger.log(LOG_TAG, e);
         }
 
         String tempcontent = new String(b);
@@ -146,7 +148,7 @@ public class Note {
         try {
             inputStream.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.log(LOG_TAG, e);
         }
     }
 
@@ -156,15 +158,15 @@ public class Note {
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                e.printStackTrace();
+                Logger.log(LOG_TAG, e);
             }
         }
         OutputStream outputStream = null;
         try {
             outputStream = new FileOutputStream(file);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return ;
+            Logger.log(LOG_TAG, e);
+            return;
         }
         String string = getTitle() + "qwert";
         List<IData> templist = getContent();
@@ -177,13 +179,13 @@ public class Note {
         try {
             outputStream.write(bs);
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.log(LOG_TAG, e);
         }
 
         try {
             outputStream.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.log(LOG_TAG, e);
         }
     }
 
@@ -195,12 +197,14 @@ public class Note {
 
     @Override
     public String toString() {
-        String string = "Title:"+getTitle()+"\nContents:";
+        String string = "Title:" + getTitle() + "\nContents:";
         List<IData> templist = getContent();
-        for(int i = 0;i < templist.size();i ++)
-        {
-            string = string + "\n" + templist.get(i).toString();
+        StringBuilder sb = new StringBuilder();
+        sb.append(string);
+        for (int i = 0; i < templist.size(); i++) {
+            sb.append('\n');
+            sb.append(templist.get(i).toString());
         }
-        return string;
+        return sb.toString();
     }
 }
