@@ -26,7 +26,6 @@ import com.se.npe.androidnote.editor.SortRichEditor;
 import com.se.npe.androidnote.events.NoteModifyEvent;
 import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
-import com.se.npe.androidnote.sound.RecordingService;
 import com.se.npe.androidnote.sound.ResultPool;
 import com.se.npe.androidnote.util.Logger;
 
@@ -125,7 +124,7 @@ public class EditorActivity extends AppCompatActivity {
         speechRecognizer.setParameter(SpeechConstant.LANGUAGE, "zh_cn");
         speechRecognizer.setParameter(SpeechConstant.ACCENT, "mandarin");
         speechRecognizer.setParameter(SpeechConstant.AUDIO_FORMAT, "pcm");
-        speechRecognizer.setParameter(SpeechConstant.ASR_AUDIO_PATH, RecordingService.OUTPUT_DIR + "tmp.pcm");
+//        speechRecognizer.setParameter(SpeechConstant.ASR_AUDIO_PATH, RecordingService.OUTPUT_DIR + "tmp.pcm");
 
         // don't start yet!
 //        speechRecognizer.startListening(recognizerListener);

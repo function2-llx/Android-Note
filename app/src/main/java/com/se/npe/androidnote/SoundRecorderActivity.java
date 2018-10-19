@@ -1,7 +1,6 @@
 package com.se.npe.androidnote;
 
 import android.app.AlertDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
@@ -12,7 +11,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.se.npe.androidnote.sound.RecordingService;
 import com.se.npe.androidnote.sound.ResultPool;
 
 public class SoundRecorderActivity extends AppCompatActivity {
