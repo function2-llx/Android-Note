@@ -6,7 +6,7 @@
     android:foreground="?android:attr/selectableItemBackground"
     android:stateListAnimator="@drawable/lift_on_touch"
     app:cardCornerRadius="4dp"
-    app:cardElevation="3dp"
+    app:cardElevation="2.5dp"
     app:cardPreventCornerOverlap="false"
     app:cardUseCompatPadding="true">
 

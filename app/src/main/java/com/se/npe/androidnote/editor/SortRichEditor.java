@@ -46,7 +46,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import cn.jzvd.Jzvd;
-import cn.jzvd.JzvdStd;
 
 public class SortRichEditor extends ScrollView implements IEditor {
     private static final int TITLE_WORD_LIMIT_COUNT = 30;
@@ -389,7 +388,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
             View media = ((RelativeLayout) child).getChildAt(0);
             if (media instanceof ImageView || media instanceof SoundPlayer) {
                 layoutParams.height = LayoutParams.WRAP_CONTENT;
-            } else if (media instanceof JzvdStd) {
+            } else if (media instanceof VideoPlayer) {
                 layoutParams.height = DEFAULT_VIDEO_HEIGHT;
             }
         } else if (child instanceof EditText) {
@@ -416,11 +415,9 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 View itemView = containerLayout.getChildAt(i);
                 if (itemView instanceof RelativeLayout) {
                     View media = ((RelativeLayout) itemView).getChildAt(0);
-                    if (media instanceof JzvdStd) {
-                        // finish the current playing video
-                        JzvdStd video = (JzvdStd) media;
-                        if (video.isCurrentPlay()) {
-                            video.onStateAutoComplete();
+                    if (media instanceof VideoPlayer) {
+                        if (((VideoPlayer) media).getJzvdStd().isCurrentPlay()) {
+                            ((VideoPlayer) media).getJzvdStd().onStateAutoComplete();
                         }
                     } else if (media instanceof SoundPlayer) {
                         ((SoundPlayer) media).destroy();
@@ -700,7 +697,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
     private RelativeLayout createVideoLayout() {
         RelativeLayout.LayoutParams contentImageLp = new RelativeLayout.LayoutParams(
                 LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        JzvdStd video = new JzvdStd(getContext());
+        VideoPlayer video = new VideoPlayer(getContext());
         video.setLayoutParams(contentImageLp);
         return createMediaLayout(video, VIDEO_LAYOUT_PARAM);
     }
@@ -788,10 +785,10 @@ public class SortRichEditor extends ScrollView implements IEditor {
 
     private void insertVideoAtIndex(int index, String videoPath) {
         RelativeLayout videoLayout = createVideoLayout();
-        JzvdStd video = (JzvdStd) videoLayout.getChildAt(0);
-        video.setUp(videoPath, "", Jzvd.SCREEN_WINDOW_LIST);
-        video.setTag(videoPath);
-        new ThumbnailLoader(video.thumbImageView).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, videoPath);
+        VideoPlayer video = (VideoPlayer) videoLayout.getChildAt(0);
+        video.getJzvdStd().setUp(videoPath, "", Jzvd.SCREEN_WINDOW_LIST);
+        video.setTag(videoPath); // tag stored in VideoPlayer itself
+        new ThumbnailLoader(video.getJzvdStd().thumbImageView).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, videoPath);
         insertMediaAtIndex(index, videoLayout);
     }
 
@@ -947,9 +944,9 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 View media = ((RelativeLayout) v).getChildAt(0);
                 if (media instanceof SoundPlayer) {
                     ((SoundPlayer) media).destroy();
-                } else if (media instanceof JzvdStd) {
-                    if (((JzvdStd) media).isCurrentPlay()) {
-                        ((JzvdStd) media).onAutoCompletion();
+                } else if (media instanceof VideoPlayer) {
+                    if (((VideoPlayer) media).getJzvdStd().isCurrentPlay()) {
+                        ((VideoPlayer) media).getJzvdStd().onAutoCompletion();
                     }
                 }
             }
@@ -1021,7 +1018,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
                     data = new PictureData(item.getTag().toString());
                 } else if (view instanceof SoundPlayer) {
                     data = new SoundData(view.getTag().toString(), " ");
-                } else if (view instanceof JzvdStd) {
+                } else if (view instanceof VideoPlayer) {
                     data = new VideoData(view.getTag().toString());
                 }
             }
