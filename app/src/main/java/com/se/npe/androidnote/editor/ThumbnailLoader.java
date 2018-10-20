@@ -6,12 +6,15 @@ import android.os.AsyncTask;
 import android.provider.MediaStore;
 import android.widget.ImageView;
 
+import com.se.npe.androidnote.util.MyAsyncTask;
+
 import java.lang.ref.WeakReference;
 
-public class ThumbnailLoader extends AsyncTask<String, Void, Bitmap> {
+public class ThumbnailLoader extends MyAsyncTask<String, Void, Bitmap> {
     private WeakReference<ImageView> target;
 
     public ThumbnailLoader(ImageView target) {
+        super();
         this.target = new WeakReference<>(target);
     }
 

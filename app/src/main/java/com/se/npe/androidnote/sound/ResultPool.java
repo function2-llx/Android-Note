@@ -11,6 +11,7 @@ import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechRecognizer;
 import com.se.npe.androidnote.util.Logger;
+import com.se.npe.androidnote.util.MyAsyncTask;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -40,7 +41,7 @@ public class ResultPool {
     private AudioUtil.AudioRecordThread recorder;
     private long startTime;
 
-    static class IFlyFeeder extends AsyncTask<Void, Void, Void> {
+    static class IFlyFeeder extends MyAsyncTask<Void, Void, Void> {
         private static final int SLEEP_MILL = 1000; // 1000ms
         private WeakReference<ResultPool> ref;
         private int currentPcmByte;
@@ -48,6 +49,7 @@ public class ResultPool {
         private SpeechRecognizer iat;
 
         IFlyFeeder(ResultPool ref) {
+            super();
             this.ref = new WeakReference<>(ref);
             try {
                 fis = new FileInputStream(new File(TEMP_OUTPUT_PATH));
@@ -74,64 +76,68 @@ public class ResultPool {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            final ResultPool target = ref.get();
-            while (true) {
-                final long now = System.currentTimeMillis();
-                byte[] voiceBuffer = null;
-                try {
-                    voiceBuffer = new byte[fis.available() - currentPcmByte];
-                    fis.skip(currentPcmByte);
-                    fis.read(voiceBuffer);
-                    currentPcmByte = fis.available();
-                } catch (IOException e) {
-                    Logger.log(LOG_TAG, e);
-                }
-                if (voiceBuffer != null && voiceBuffer.length != 0) {
-                    iat.startListening(new RecognizerListener() {
-                        @Override
-                        public void onVolumeChanged(int i, byte[] bytes) {
-                            // no-op
-                        }
-
-                        @Override
-                        public void onBeginOfSpeech() {
-                            // no-op
-                        }
-
-                        @Override
-                        public void onEndOfSpeech() {
-                            // no-op
-                        }
-
-                        @Override
-                        public void onResult(RecognizerResult recognizerResult, boolean isLast) {
-                            // skip 。
-                            if (isLast) {
-                                return;
-                            }
-                            String result = recognizerResult.getResultString();
-                            target.putResult(now, result);
-                        }
-
-                        @Override
-                        public void onError(SpeechError speechError) {
-                            // no-op
-                        }
-
-                        @Override
-                        public void onEvent(int i, int i1, int i2, Bundle bundle) {
-                            // no-op
-                        }
-                    });
-                    iat.writeAudio(voiceBuffer, 0, voiceBuffer.length);
-                    iat.stopListening();
-                }
-                try {
-                    Thread.sleep(SLEEP_MILL);
-                } catch (InterruptedException e) {
-                    Logger.log(LOG_TAG, e);
-                }
-            }
+            return null;
+//            final ResultPool target = ref.get();
+//            while (true) {
+//                if (isCancelled()) {
+//                    return null;
+//                }
+//                final long now = System.currentTimeMillis();
+//                byte[] voiceBuffer = null;
+//                try {
+//                    voiceBuffer = new byte[fis.available() - currentPcmByte];
+//                    fis.skip(currentPcmByte);
+//                    fis.read(voiceBuffer);
+//                    currentPcmByte = fis.available();
+//                } catch (IOException e) {
+//                    Logger.log(LOG_TAG, e);
+//                }
+//                if (voiceBuffer != null && voiceBuffer.length != 0) {
+//                    iat.startListening(new RecognizerListener() {
+//                        @Override
+//                        public void onVolumeChanged(int i, byte[] bytes) {
+//                            // no-op
+//                        }
+//
+//                        @Override
+//                        public void onBeginOfSpeech() {
+//                            // no-op
+//                        }
+//
+//                        @Override
+//                        public void onEndOfSpeech() {
+//                            // no-op
+//                        }
+//
+//                        @Override
+//                        public void onResult(RecognizerResult recognizerResult, boolean isLast) {
+//                            // skip 。
+//                            if (isLast) {
+//                                return;
+//                            }
+//                            String result = recognizerResult.getResultString();
+//                            target.putResult(now, result);
+//                        }
+//
+//                        @Override
+//                        public void onError(SpeechError speechError) {
+//                            // no-op
+//                        }
+//
+//                        @Override
+//                        public void onEvent(int i, int i1, int i2, Bundle bundle) {
+//                            // no-op
+//                        }
+//                    });
+//                    iat.writeAudio(voiceBuffer, 0, voiceBuffer.length);
+//                    iat.stopListening();
+//                }
+//                try {
+//                    Thread.sleep(SLEEP_MILL);
+//                } catch (InterruptedException e) {
+//                    Logger.log(LOG_TAG, e);
+//                }
+//            }
         }
     }
 

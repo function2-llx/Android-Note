@@ -70,8 +70,7 @@ public class TableOperate implements INoteCollection {
                 content.add(tempVideoData);
             } else if (StrArray[i].charAt(0) == 'P') {
                 String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPERATOR);
-                Bitmap mBitmap = BitmapFactory.decodeFile(StrArray[1]);
-                PictureData tempPictureData = new PictureData(tempArray[1], mBitmap);
+                PictureData tempPictureData = new PictureData(tempArray[1]);
                 content.add(tempPictureData);
             }
         }

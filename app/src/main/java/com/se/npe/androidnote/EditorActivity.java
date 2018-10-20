@@ -149,6 +149,7 @@ public class EditorActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         Note note = editor.buildNote();
+        editor.destroy();
         if (oldNote != null) {
             note.setIndex(oldNote.getIndex());
         }

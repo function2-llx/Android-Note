@@ -21,6 +21,7 @@ import android.widget.TextView;
 import com.bumptech.glide.util.Util;
 import com.se.npe.androidnote.R;
 import com.se.npe.androidnote.util.Logger;
+import com.se.npe.androidnote.util.MyAsyncTask;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
@@ -30,10 +31,11 @@ import cn.jzvd.JzvdStd;
 public class SoundPlayer extends RelativeLayout {
     private static final String LOG_TAG = SoundPlayer.class.getSimpleName();
 
-    private static class ProgressSetter extends AsyncTask<Void, Void, Void> {
+    private static class ProgressSetter extends MyAsyncTask<Void, Void, Void> {
         WeakReference<SoundPlayer> ref;
 
         ProgressSetter(SoundPlayer ref) {
+            super();
             this.ref = new WeakReference<>(ref);
         }
 
