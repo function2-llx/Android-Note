@@ -62,32 +62,10 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        new Thread(() -> SpeechUtility.createUtility(this, SpeechConstant.APPID + "=5bbc8c0f")).start();
         super.onCreate(savedInstanceState);
-        TableOperate.init(this.getApplicationContext());
-
-        /*
-        TableOperate newtable = TableOperate.getInstance();
-        newtable.removeAllNotes();
-        Note tempnote = new Note("data2",new ArrayList<IData>());
-        Log.d("debug0001","success1");
-        //tempnote.getTag().add("shit");
-        Log.d("debug0001","success2");
-
-        newtable.addNote(tempnote);
-        List<Note> templist = newtable.getSearchResult("data2");
-        Log.d("debug0001",Integer.toString(templist.size()));
-        Log.d("debug0001",Integer.toString(templist.get(0).getTag().size()));
-        */
-
         setContentView(R.layout.activity_main);
         initListener();
         EventBus.getDefault().register(this);
-        while (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
-                != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO},
-                    10);
-        }
     }
 
     @Override

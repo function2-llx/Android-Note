@@ -1,15 +1,19 @@
 package com.se.npe.androidnote;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -47,6 +51,10 @@ public class ListActivity extends AppCompatActivity {
         SearchView searchView = (SearchView) searchItem.getActionView();
         this.configureSearchView(searchView);
 
+        // launch from short cut
+        if (getIntent().hasExtra("SEARCH")) {
+            searchView.onActionViewExpanded();
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -95,18 +103,14 @@ public class ListActivity extends AppCompatActivity {
 
         this.noteAdapter.updateList(TableOperate.getInstance().getAllNotes());
 
-//        this.ultimateRecyclerView.reenableLoadmore();
-//        this.noteAdapter.setCustomLoadMoreView(LayoutInflater.from(this).inflate(R.layout.custom_bottom_progressbar, null));
-//        ultimateRecyclerView.setOnLoadMoreListener((itemsCount, maxLastVisiblePosition) -> {
-//            Handler handler = new Handler();
-//            handler.postDelayed(() -> {
-//                noteList.add(new Note());
-//                noteAdapter.notifyDataSetChanged();
-//            }, 1000);
-//        });
-
         this.enableDrag();
         this.enableRefresh();
+
+        while (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
+                != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO},
+                    10);
+        }
     }
 
     /**
@@ -147,7 +151,7 @@ public class ListActivity extends AppCompatActivity {
             ListActivity.this.ultimateRecyclerView.setRefreshing(false);
             // ultimateRecyclerView.scrollBy(0, -50);
             layoutManager.scrollToPosition(0);
-        }, 1000));
+        }, 500));
     }
 
     private void enableDrag() {
