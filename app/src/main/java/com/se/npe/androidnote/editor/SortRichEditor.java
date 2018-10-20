@@ -610,9 +610,9 @@ public class SortRichEditor extends ScrollView implements IEditor {
     // the placeholder between two media, for future text insert
     // return null if isViewOnly is on
     private ImageView createPlaceholder() {
-        final ImageView placeholder = new ImageView(getContext());
+        ImageView placeholder = new ImageView(getContext());
         placeholder.setTag(viewTagID++);
-        placeholder.setImageResource(R.mipmap.icon_add_text);
+        placeholder.setImageResource(R.drawable.baseline_playlist_add_black_48dp);
         placeholder.setScaleType(ImageView.ScaleType.FIT_START);
         placeholder.setClickable(true);
         placeholder.setOnClickListener(v -> {
@@ -627,8 +627,8 @@ public class SortRichEditor extends ScrollView implements IEditor {
         });
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        lp.bottomMargin = DEFAULT_MARGIN;
+                dip2px(25), dip2px(25));
+        lp.leftMargin = lp.bottomMargin = DEFAULT_MARGIN;
         placeholder.setLayoutParams(lp);
 
         return placeholder;
@@ -661,13 +661,13 @@ public class SortRichEditor extends ScrollView implements IEditor {
     // and the specific media do their work themselves
     private RelativeLayout createMediaLayout(View media, RelativeLayout.LayoutParams params) {
         RelativeLayout.LayoutParams closeImageLp = new RelativeLayout.LayoutParams(
-                LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                dip2px(25), dip2px(25));
         closeImageLp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         closeImageLp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         closeImageLp.setMargins(0, dip2px(10), dip2px(10), 0);
         ImageView closeImage = new ImageView(getContext());
         closeImage.setScaleType(ImageView.ScaleType.FIT_XY);
-        closeImage.setImageResource(R.mipmap.icon_delete);
+        closeImage.setImageResource(R.drawable.baseline_delete_outline_white_48dp);
         closeImage.setLayoutParams(closeImageLp);
 
         RelativeLayout layout = new RelativeLayout(getContext());
