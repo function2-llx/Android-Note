@@ -54,6 +54,9 @@ public class ListActivity extends AppCompatActivity {
         // launch from short cut
         if (getIntent().hasExtra("SEARCH")) {
             searchView.onActionViewExpanded();
+        } else if (getIntent().hasExtra("NEW")) {
+            Intent intent = new Intent(ListActivity.this, EditorActivity.class);
+            this.startActivity(intent);
         }
         return super.onCreateOptionsMenu(menu);
     }
