@@ -42,6 +42,11 @@ public class SoundPlayer extends RelativeLayout {
         @Override
         protected Void doInBackground(Void... voids) {
             while (true) {
+                // must check cancelled or not to terminate doInBackground()
+                // (calling cancel() from outside WON'T terminate doInBackground())
+                if (isCancelled() || !ref.get().mediaPlayer.isPlaying()) {
+                    return null;
+                }
                 try {
                     Thread.sleep(100);
                     publishProgress();
@@ -49,7 +54,6 @@ public class SoundPlayer extends RelativeLayout {
                     Logger.log(LOG_TAG, e);
                 }
             }
-//            return null;
         }
 
         @Override
@@ -61,6 +65,7 @@ public class SoundPlayer extends RelativeLayout {
             progressBar.setProgress(now);
         }
     }
+
     private MediaPlayer mediaPlayer;
     private ProgressBar progressBar;
     private ProgressSetter progressSetter;
@@ -76,15 +81,16 @@ public class SoundPlayer extends RelativeLayout {
         findViewById(R.id.sound_player_play).setOnClickListener(v -> {
             if (mediaPlayer.isPlaying()) {
                 mediaPlayer.pause();
+                progressSetter.cancel(true);
             } else {
                 mediaPlayer.start();
+                progressSetter.cancel(true);
+
+                progressSetter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
             }
         });
         progressBar = findViewById(R.id.sound_player_progress);
         progressSetter = new ProgressSetter(this);
-        // set the progressSetter work on multi thread
-        // or only one progressSetter will be working
-        progressSetter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
     }
 
     public void destroy() {

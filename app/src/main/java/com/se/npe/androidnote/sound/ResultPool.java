@@ -76,68 +76,69 @@ public class ResultPool {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            return null;
-//            final ResultPool target = ref.get();
-//            while (true) {
-//                if (isCancelled()) {
-//                    return null;
-//                }
-//                final long now = System.currentTimeMillis();
-//                byte[] voiceBuffer = null;
-//                try {
-//                    voiceBuffer = new byte[fis.available() - currentPcmByte];
-//                    fis.skip(currentPcmByte);
-//                    fis.read(voiceBuffer);
-//                    currentPcmByte = fis.available();
-//                } catch (IOException e) {
-//                    Logger.log(LOG_TAG, e);
-//                }
-//                if (voiceBuffer != null && voiceBuffer.length != 0) {
-//                    iat.startListening(new RecognizerListener() {
-//                        @Override
-//                        public void onVolumeChanged(int i, byte[] bytes) {
-//                            // no-op
-//                        }
-//
-//                        @Override
-//                        public void onBeginOfSpeech() {
-//                            // no-op
-//                        }
-//
-//                        @Override
-//                        public void onEndOfSpeech() {
-//                            // no-op
-//                        }
-//
-//                        @Override
-//                        public void onResult(RecognizerResult recognizerResult, boolean isLast) {
-//                            // skip 。
-//                            if (isLast) {
-//                                return;
-//                            }
-//                            String result = recognizerResult.getResultString();
-//                            target.putResult(now, result);
-//                        }
-//
-//                        @Override
-//                        public void onError(SpeechError speechError) {
-//                            // no-op
-//                        }
-//
-//                        @Override
-//                        public void onEvent(int i, int i1, int i2, Bundle bundle) {
-//                            // no-op
-//                        }
-//                    });
-//                    iat.writeAudio(voiceBuffer, 0, voiceBuffer.length);
-//                    iat.stopListening();
-//                }
-//                try {
-//                    Thread.sleep(SLEEP_MILL);
-//                } catch (InterruptedException e) {
-//                    Logger.log(LOG_TAG, e);
-//                }
-//            }
+            final ResultPool target = ref.get();
+            while (true) {
+                // must check cancelled or not to terminate doInBackground()
+                // (calling cancel() from outside WON'T terminate doInBackground())
+                if (isCancelled()) {
+                    return null;
+                }
+                final long now = System.currentTimeMillis();
+                byte[] voiceBuffer = null;
+                try {
+                    voiceBuffer = new byte[fis.available() - currentPcmByte];
+                    fis.skip(currentPcmByte);
+                    fis.read(voiceBuffer);
+                    currentPcmByte = fis.available();
+                } catch (IOException e) {
+                    Logger.log(LOG_TAG, e);
+                }
+                if (voiceBuffer != null && voiceBuffer.length != 0) {
+                    iat.startListening(new RecognizerListener() {
+                        @Override
+                        public void onVolumeChanged(int i, byte[] bytes) {
+                            // no-op
+                        }
+
+                        @Override
+                        public void onBeginOfSpeech() {
+                            // no-op
+                        }
+
+                        @Override
+                        public void onEndOfSpeech() {
+                            // no-op
+                        }
+
+                        @Override
+                        public void onResult(RecognizerResult recognizerResult, boolean isLast) {
+                            // skip 。
+                            if (isLast) {
+                                return;
+                            }
+                            String result = recognizerResult.getResultString();
+                            target.putResult(now, result);
+                        }
+
+                        @Override
+                        public void onError(SpeechError speechError) {
+                            // no-op
+                        }
+
+                        @Override
+                        public void onEvent(int i, int i1, int i2, Bundle bundle) {
+                            // no-op
+                        }
+                    });
+                    iat.writeAudio(voiceBuffer, 0, voiceBuffer.length);
+                    iat.stopListening();
+                }
+                try {
+                    Thread.sleep(SLEEP_MILL);
+                } catch (InterruptedException e) {
+                    Logger.log(LOG_TAG, e);
+                }
+            }
         }
     }
 
@@ -218,7 +219,7 @@ public class ResultPool {
         results.clear();
     }
 
-    public void putResult(long time, String result) {
+    private void putResult(long time, String result) {
         if (!times.isEmpty()) {
             long lastTime = times.get(times.size() - 1);
             if (lastTime > time) {
