@@ -7,11 +7,9 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.widget.ImageView;
 
-import com.se.npe.androidnote.util.MyAsyncTask;
-
 import java.lang.ref.WeakReference;
 
-public class PictureLoader extends MyAsyncTask<String, Void, Bitmap> {
+public class PictureLoader extends AsyncTask<String, Void, Bitmap> {
     private WeakReference<ImageView> target;
     private int resultWidth; // always fill the width
 

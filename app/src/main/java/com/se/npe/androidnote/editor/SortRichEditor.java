@@ -384,13 +384,13 @@ public class SortRichEditor extends ScrollView implements IEditor {
     private ViewGroup.LayoutParams resetChildLayoutParams(View child) {
         ViewGroup.LayoutParams layoutParams = child.getLayoutParams();
         if (child instanceof RelativeLayout) {
-            if ((((RelativeLayout) child).getChildAt(0)) instanceof ImageView) {
+            View media = ((RelativeLayout) child).getChildAt(0);
+            if (media instanceof ImageView || media instanceof SoundPlayer) {
                 layoutParams.height = LayoutParams.WRAP_CONTENT;
-            } else {
+            } else if (media instanceof JzvdStd) {
                 layoutParams.height = DEFAULT_VIDEO_HEIGHT;
             }
-        }
-        if (child instanceof EditText) {
+        } else if (child instanceof EditText) {
             child.setFocusable(true);
             child.setFocusableInTouchMode(true);
             if (child == lastFocusEdit) {
@@ -941,7 +941,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 View media = ((RelativeLayout) v).getChildAt(0);
                 if (media instanceof SoundPlayer) {
                     ((SoundPlayer) media).destroy();
-                } else if (media instanceof JzvdStd){
+                } else if (media instanceof JzvdStd) {
                     if (((JzvdStd) media).isCurrentPlay()) {
                         ((JzvdStd) media).onStateAutoComplete();
                     }

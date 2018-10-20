@@ -11,7 +11,6 @@ import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechRecognizer;
 import com.se.npe.androidnote.util.Logger;
-import com.se.npe.androidnote.util.MyAsyncTask;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,7 +40,7 @@ public class ResultPool {
     private AudioUtil.AudioRecordThread recorder;
     private long startTime;
 
-    static class IFlyFeeder extends MyAsyncTask<Void, Void, Void> {
+    static class IFlyFeeder extends AsyncTask<Void, Void, Void> {
         private static final int SLEEP_MILL = 1000; // 1000ms
         private WeakReference<ResultPool> ref;
         private int currentPcmByte;

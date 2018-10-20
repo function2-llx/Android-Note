@@ -1,74 +1,44 @@
 package com.se.npe.androidnote.editor;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.media.MediaPlayer;
-import android.os.AsyncTask;
 import android.os.Handler;
-import android.os.Message;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.View;
-import android.widget.Button;
-import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
-import android.widget.TextView;
 
-import com.bumptech.glide.util.Util;
 import com.se.npe.androidnote.R;
 import com.se.npe.androidnote.util.Logger;
-import com.se.npe.androidnote.util.MyAsyncTask;
 
 import java.io.IOException;
 import java.lang.ref.WeakReference;
 
-import cn.jzvd.JzvdStd;
 
 public class SoundPlayer extends RelativeLayout {
     private static final String LOG_TAG = SoundPlayer.class.getSimpleName();
 
-    private static class ProgressSetter extends MyAsyncTask<Void, Void, Void> {
+    static class ProgressSetter implements Runnable {
         WeakReference<SoundPlayer> ref;
 
         ProgressSetter(SoundPlayer ref) {
-            super();
             this.ref = new WeakReference<>(ref);
         }
 
         @Override
-        protected Void doInBackground(Void... voids) {
-            while (true) {
-                // must check cancelled or not to terminate doInBackground()
-                // (calling cancel() from outside WON'T terminate doInBackground())
-                if (isCancelled() || !ref.get().mediaPlayer.isPlaying()) {
-                    return null;
-                }
-                try {
-                    Thread.sleep(100);
-                    publishProgress();
-                } catch (InterruptedException e) {
-                    Logger.log(LOG_TAG, e);
-                }
-            }
-        }
-
-        @Override
-        protected void onProgressUpdate(Void... values) {
-            super.onProgressUpdate(values);
+        public void run() {
             MediaPlayer mediaPlayer = ref.get().mediaPlayer;
             ProgressBar progressBar = ref.get().progressBar;
             int now = progressBar.getMax() * mediaPlayer.getCurrentPosition() / mediaPlayer.getDuration();
             progressBar.setProgress(now);
+            if (mediaPlayer.isPlaying()) {
+                new Handler().postDelayed(this, 100);
+            }
         }
     }
 
     private MediaPlayer mediaPlayer;
     private ProgressBar progressBar;
-    private ProgressSetter progressSetter;
 
     public SoundPlayer(Context context) {
         this(context, null);
@@ -81,23 +51,18 @@ public class SoundPlayer extends RelativeLayout {
         findViewById(R.id.sound_player_play).setOnClickListener(v -> {
             if (mediaPlayer.isPlaying()) {
                 mediaPlayer.pause();
-                progressSetter.cancel(true);
             } else {
                 mediaPlayer.start();
-                progressSetter.cancel(true);
-
-                progressSetter.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+                new Handler().postDelayed(new ProgressSetter(this), 100);
             }
         });
         progressBar = findViewById(R.id.sound_player_progress);
-        progressSetter = new ProgressSetter(this);
     }
 
     public void destroy() {
         if (mediaPlayer.isPlaying()) {
             mediaPlayer.stop();
         }
-        progressSetter.cancel(true);
     }
 
     public void setSource(String source) {
