@@ -1,6 +1,7 @@
 package com.se.npe.androidnote;
 
 import android.Manifest;
+import android.arch.core.executor.DefaultTaskExecutor;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -15,11 +16,13 @@ import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.se.npe.androidnote.events.NoteEvent;
 import com.se.npe.androidnote.interfaces.IData;
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.SoundData;
+import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
 import com.se.npe.androidnote.models.TextData;
 
@@ -28,6 +31,7 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
     private Note selectedNote;
@@ -64,13 +68,18 @@ public class MainActivity extends AppCompatActivity {
 
         /*
         TableOperate newtable = TableOperate.getInstance();
-        List<Note> templist;
-        Log.d("debug0001","FuzzySearch:shit");
-        newtable.addNote(new Note("shit",new ArrayList<IData>()));
-        templist = newtable.getSearchResultFuzzy("data");
-        Log.d("debug0001","FuzzySearch:"+Integer.toString(templist.size()));
-        */
+        newtable.removeAllNotes();
+        Note tempnote = new Note("data2",new ArrayList<IData>());
+        Log.d("debug0001","success1");
+        //tempnote.getTag().add("shit");
+        Log.d("debug0001","success2");
 
+        newtable.addNote(tempnote);
+        List<Note> templist = newtable.getSearchResult("data2");
+        Log.d("debug0001",Integer.toString(templist.size()));
+        Log.d("debug0001",Integer.toString(templist.get(0).getTag().size()));
+        */
+        
         setContentView(R.layout.activity_main);
         initListener();
         EventBus.getDefault().register(this);

@@ -4,6 +4,8 @@ import android.view.View;
 
 import com.se.npe.androidnote.interfaces.IData;
 
+import java.util.Objects;
+
 /**
  * Sound data <-> a EditText in the editor it is a piece of continuous text in
  * the editor
@@ -23,9 +25,16 @@ public class TextData implements IData {
     }
 
     @Override
-    public boolean equals(Object another) {
-        return another.getClass() == this.getClass()
-                && this.text.equals(((TextData) another).text);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TextData textData = (TextData) o;
+        return Objects.equals(text, textData.text);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(text);
     }
 
     @Override
