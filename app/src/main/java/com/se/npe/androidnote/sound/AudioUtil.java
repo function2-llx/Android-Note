@@ -4,6 +4,8 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 
+import com.se.npe.androidnote.util.Logger;
+
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -11,6 +13,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class AudioUtil {
+    private static final String LOG_TAG = AudioUtil.class.getSimpleName();
+
     private static final int AUDIO_SOURCE = MediaRecorder.AudioSource.MIC;
     //录音的采样频率
     private static final int AUDIO_RATE = 16000;
@@ -31,7 +35,7 @@ public class AudioUtil {
         private AudioRecord recorder;
         private String pcmPath;
 
-        public AudioRecordThread(String pcmPath) {
+        AudioRecordThread(String pcmPath) {
             this.recorder = new AudioRecord(AUDIO_SOURCE, AUDIO_RATE, AUDIO_CHANNEL, AUDIO_FORMAT, BUFFER_SIZE);
             this.pcmPath = pcmPath;
             recorder.startRecording();
@@ -55,7 +59,7 @@ public class AudioUtil {
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                Logger.log(LOG_TAG, e);
             }
         }
     }

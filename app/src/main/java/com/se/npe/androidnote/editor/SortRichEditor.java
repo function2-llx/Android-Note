@@ -74,18 +74,25 @@ public class SortRichEditor extends ScrollView implements IEditor {
     private static final RelativeLayout.LayoutParams VIDEO_LAYOUT_PARAM
             = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, DEFAULT_VIDEO_HEIGHT);
 
+    private static final RelativeLayout.LayoutParams SOUND_LAYOUT_PARAM
+            = new RelativeLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+
     // well, sonar cube doesn't like double-brace-init and thinks it may cause memory leak
     // but it actually won't because they are static
     // now I place the init here to eliminate sonar cube's complaint
     static {
         DASH_DRAWABLE.setStroke(dip2px(1), Color.parseColor("#4CA4E9"), dip2px(4), dip2px(3));
         DASH_DRAWABLE.setColor(Color.parseColor("#ffffff"));
-        PICTURE_LAYOUT_PARAM.bottomMargin = DEFAULT_MARGIN;
-        PICTURE_LAYOUT_PARAM.leftMargin = DEFAULT_MARGIN;
-        PICTURE_LAYOUT_PARAM.rightMargin = DEFAULT_MARGIN;
-        VIDEO_LAYOUT_PARAM.bottomMargin = DEFAULT_MARGIN;
-        VIDEO_LAYOUT_PARAM.leftMargin = DEFAULT_MARGIN;
-        VIDEO_LAYOUT_PARAM.rightMargin = DEFAULT_MARGIN;
+        PICTURE_LAYOUT_PARAM.bottomMargin
+                = PICTURE_LAYOUT_PARAM.leftMargin
+                = PICTURE_LAYOUT_PARAM.rightMargin
+                = VIDEO_LAYOUT_PARAM.bottomMargin
+                = VIDEO_LAYOUT_PARAM.leftMargin
+                = VIDEO_LAYOUT_PARAM.rightMargin
+                = SOUND_LAYOUT_PARAM.bottomMargin
+                = SOUND_LAYOUT_PARAM.leftMargin
+                = SOUND_LAYOUT_PARAM.rightMargin
+                = DEFAULT_MARGIN;
     }
 
     // save the background of edit text before sorting(because sorting will change it)
@@ -154,6 +161,9 @@ public class SortRichEditor extends ScrollView implements IEditor {
 
     // record the y of last touch event
     private float preY;
+
+    // when set to true, the note cannot be modified
+    private boolean isViewOnly = false;
 
     public SortRichEditor(Context context) {
         this(context, null);
@@ -283,7 +293,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
     }
 
     private EditText getFirstText() {
-        EditText firstEdit = createEditText("Please Input");
+        EditText firstEdit = createEditText("");
         editTextHeightArray.put(Integer.parseInt(firstEdit.getTag().toString()), ViewGroup.LayoutParams.WRAP_CONTENT);
         editTextBackground = firstEdit.getBackground();
         lastFocusEdit = firstEdit;
@@ -408,6 +418,8 @@ public class SortRichEditor extends ScrollView implements IEditor {
                         if (video.isCurrentPlay()) {
                             video.onStateAutoComplete();
                         }
+                    } else if (media instanceof SoundPlayer) {
+                        ((SoundPlayer) media).destroy();
                     }
                 }
             }
@@ -489,6 +501,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
             for (int i = 1; i < num; ++i) {
                 View child = childArray[i];
                 if (preChild instanceof RelativeLayout && child instanceof RelativeLayout) {
+                    // because we are editing now, placeholder cannot be null here
                     ImageView placeholder = createPlaceholder();
                     sortViewList.add(placeholder);
                 }
@@ -591,6 +604,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
     }
 
     // the placeholder between two media, for future text insert
+    // return null if isViewOnly is on
     private ImageView createPlaceholder() {
         final ImageView placeholder = new ImageView(getContext());
         placeholder.setTag(viewTagID++);
@@ -638,6 +652,9 @@ public class SortRichEditor extends ScrollView implements IEditor {
         return editText;
     }
 
+    // called by createPictureLayout & createVideoLayout & createSoundLayout
+    // provide a common structure for medias
+    // and the specific media do their work themselves
     private RelativeLayout createMediaLayout(View media, RelativeLayout.LayoutParams params) {
         RelativeLayout.LayoutParams closeImageLp = new RelativeLayout.LayoutParams(
                 LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
@@ -651,7 +668,11 @@ public class SortRichEditor extends ScrollView implements IEditor {
 
         RelativeLayout layout = new RelativeLayout(getContext());
         layout.addView(media);
-        layout.addView(closeImage);
+        // maybe we don't need to create one, but now I just don't add it to the layout
+        // this is the easiest implementation
+        if (!isViewOnly) {
+            layout.addView(closeImage);
+        }
         layout.setTag(viewTagID++);
         setFocusOnView(layout, true);
 
@@ -685,7 +706,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         SoundPlayer soundPlayer = new SoundPlayer(getContext());
         soundPlayer.setLayoutParams(contentImageLp);
-        return createMediaLayout(soundPlayer, VIDEO_LAYOUT_PARAM);
+        return createMediaLayout(soundPlayer, SOUND_LAYOUT_PARAM);
     }
 
     private void setFocusOnView(View view, boolean isFocusable) {
@@ -745,7 +766,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
             }
             int lastIndex = index - 1;
             View child = containerLayout.getChildAt(lastIndex);
-            if (child instanceof RelativeLayout) {
+            if (child instanceof RelativeLayout && !isViewOnly) {
                 insertPlaceholder(index++);
             }
         }
@@ -773,8 +794,8 @@ public class SortRichEditor extends ScrollView implements IEditor {
     private void insertSoundAtIndex(int index, String soundPath) {
         RelativeLayout soundLayout = createSoundLayout();
         SoundPlayer soundPlayer = (SoundPlayer) soundLayout.getChildAt(0);
-        soundPlayer.setUp(soundPath, "", Jzvd.SCREEN_WINDOW_LIST);
         soundPlayer.setTag(soundPath);
+        soundPlayer.setSource(soundPath);
         insertMediaAtIndex(index, soundLayout);
     }
 
@@ -790,14 +811,15 @@ public class SortRichEditor extends ScrollView implements IEditor {
     }
 
     private void insertPlaceholder(int index) {
-        ImageView placeholder = createPlaceholder();
-        containerLayout.addView(placeholder, index);
+        containerLayout.addView(createPlaceholder(), index);
     }
 
     private EditText insertEditTextAtIndex(final int index, String editStr) {
         EditText editText = createEditText("");
         editText.setText(editStr);
-
+        if (isViewOnly) {
+            editText.setFocusable(false);
+        }
         containerLayout.setLayoutTransition(null);
         containerLayout.addView(editText, index);
         containerLayout.setLayoutTransition(mTransition);
@@ -889,11 +911,27 @@ public class SortRichEditor extends ScrollView implements IEditor {
         insertMedia(index -> insertSoundAtIndex(index, soundPath));
     }
 
+    @Override
+    public void addText(String text) {
+        // only when it is necessary...
+        if (containerLayout.getChildCount() == 0
+                || !(containerLayout.getChildAt(containerLayout.getChildCount() - 1) instanceof EditText))
+            insertEditTextAtIndex(containerLayout.getChildCount(), text);
+    }
+
+    public void setLastText(String text) {
+        EditText editText = (EditText) containerLayout.getChildAt(containerLayout.getChildCount() - 1);
+        editText.setText(text);
+        lastFocusEdit = editText;
+        editText.requestFocus();
+        editText.setSelection(text.length());
+    }
+
     static class NoteLoader implements Runnable {
         WeakReference<SortRichEditor> target;
         private Note note;
 
-        public NoteLoader(SortRichEditor target, Note note) {
+        NoteLoader(SortRichEditor target, Note note) {
             this.target = new WeakReference<>(target);
             this.note = note;
         }
@@ -953,12 +991,10 @@ public class SortRichEditor extends ScrollView implements IEditor {
                     ImageView item = (ImageView) ((RelativeLayout) itemView).getChildAt(0);
                     BitmapDrawable bitmapDrawable = (BitmapDrawable) item.getDrawable();
                     data = new PictureData(item.getTag().toString(), bitmapDrawable.getBitmap());
+                } else if (view instanceof SoundPlayer) {
+                    data = new SoundData(view.getTag().toString(), " ");
                 } else if (view instanceof JzvdStd) {
-                    if (view instanceof SoundPlayer) {
-                        data = new SoundData(view.getTag().toString(), "");
-                    } else {
-                        data = new VideoData(view.getTag().toString());
-                    }
+                    data = new VideoData(view.getTag().toString());
                 }
             }
             if (data != null) {
@@ -966,6 +1002,11 @@ public class SortRichEditor extends ScrollView implements IEditor {
             }
         }
         return new Note(title.getText().toString().trim(), contentList);
+    }
+
+    public void setViewOnly() {
+        isViewOnly = true;
+        title.setFocusable(false);
     }
 
     private class ViewDragHelperCallBack extends ViewDragHelper.Callback {

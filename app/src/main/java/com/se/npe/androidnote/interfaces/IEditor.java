@@ -18,6 +18,8 @@ public interface IEditor {
 
     void addSound(String soundPath);
 
+    void addText(String text);
+
     void loadNote(Note note);
 
     Note buildNote();

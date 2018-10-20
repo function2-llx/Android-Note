@@ -3,6 +3,7 @@ package com.se.npe.androidnote.models;
 import android.support.annotation.NonNull;
 
 import com.se.npe.androidnote.interfaces.IData;
+import com.se.npe.androidnote.util.Logger;
 
 import java.util.List;
 import java.util.ArrayList;
@@ -26,6 +27,8 @@ import java.util.Objects;
  */
 
 public class Note {
+    private static final String LOG_TAG = Note.class.getSimpleName();
+
     public static class PreviewData {
         // using public field just for convenience
         public @NonNull
@@ -129,7 +132,7 @@ public class Note {
         try {
             inputStream = new FileInputStream(file);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            Logger.log(LOG_TAG, e);
             return;
         }
 
@@ -138,7 +141,7 @@ public class Note {
             int len = inputStream.read(b);
             if (len == -1) return;
         } catch (Exception e) {
-            System.out.println("Wrong!");
+            Logger.log(LOG_TAG, e);
         }
 
         String tempcontent = new String(b);
@@ -171,7 +174,7 @@ public class Note {
         try {
             inputStream.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.log(LOG_TAG, e);
         }
     }
 
@@ -181,14 +184,14 @@ public class Note {
             try {
                 file.createNewFile();
             } catch (IOException e) {
-                e.printStackTrace();
+                Logger.log(LOG_TAG, e);
             }
         }
         OutputStream outputStream = null;
         try {
             outputStream = new FileOutputStream(file);
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            Logger.log(LOG_TAG, e);
             return;
         }
         String string = getTitle() + TableConfig.Filesave.LIST_SEPERATOR;
@@ -202,13 +205,13 @@ public class Note {
         try {
             outputStream.write(bs);
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.log(LOG_TAG, e);
         }
 
         try {
             outputStream.close();
         } catch (IOException e) {
-            e.printStackTrace();
+            Logger.log(LOG_TAG, e);
         }
     }
 
@@ -229,10 +232,13 @@ public class Note {
     @Override
     public String toString() {
         String string = "Title:" + getTitle() + "\nContents:";
-        List<IData> tempList = getContent();
-        for (int i = 0; i < tempList.size(); i++) {
-            string = string + "\n" + tempList.get(i).toString();
+        List<IData> templist = getContent();
+        StringBuilder sb = new StringBuilder();
+        sb.append(string);
+        for (int i = 0; i < templist.size(); i++) {
+            sb.append('\n');
+            sb.append(templist.get(i).toString());
         }
-        return string;
+        return sb.toString();
     }
 }

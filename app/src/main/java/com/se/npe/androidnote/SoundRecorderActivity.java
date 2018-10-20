@@ -12,11 +12,11 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.getbase.floatingactionbutton.FloatingActionButton;
-import com.se.npe.androidnote.sound.RecordingService;
+import com.se.npe.androidnote.sound.ResultPool;
 
 public class SoundRecorderActivity extends AppCompatActivity {
     public static final int RESULT_CODE = 0;
-
+    public static final String REQUEST_START_TIME = "REQUEST_START_TIME";
     // Recording controls
     private FloatingActionButton mRecordButton = null;
 
@@ -26,7 +26,6 @@ public class SoundRecorderActivity extends AppCompatActivity {
     private boolean mStartRecording = true;
     private Chronometer mChronometer = null;
 
-    Intent consumerIntent;
     long requestStartTime;
 
     @Override
@@ -42,12 +41,9 @@ public class SoundRecorderActivity extends AppCompatActivity {
             mStartRecording = !mStartRecording;
         });
 
-        consumerIntent = getIntent();
-
         final String[] text = {"1 min ago", "30s ago", "now"};
         final int[] time = {60, 30, 0};
-        final long startTime = consumerIntent.getLongExtra(RecordingService.START_TIME,
-                System.currentTimeMillis());
+        final long startTime = ResultPool.getInstance().getStartTime();
         new AlertDialog.Builder(this)
                 .setIcon(R.drawable.ic_launcher)
                 .setTitle("Ahead time")
@@ -67,10 +63,13 @@ public class SoundRecorderActivity extends AppCompatActivity {
                 .show();
     }
 
+    @Override
+    public void onBackPressed() {
+        // do nothing, eat back press
+    }
+
     // Recording Start/Stop
     private void onRecord(boolean start) {
-        Intent intent = new Intent(this, RecordingService.class);
-
         if (start) {
             // start recording
             mRecordButton.setIcon(R.drawable.ic_media_stop);
@@ -90,9 +89,6 @@ public class SoundRecorderActivity extends AppCompatActivity {
                 mRecordPromptCount++;
             });
 
-            //start RecordingService
-            intent.putExtra(RecordingService.REQUEST_START_TIME, requestStartTime);
-            startService(intent);
             //keep screen on while recording
             getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
@@ -106,13 +102,12 @@ public class SoundRecorderActivity extends AppCompatActivity {
             mChronometer.setBase(SystemClock.elapsedRealtime());
             mRecordingPrompt.setText(getString(R.string.record_prompt));
 
-            RecordingService.findValidPath();
-            stopService(intent);
             //allow the screen to turn off again once recording is finished
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-            consumerIntent.putExtra(RecordingService.SOUND_PATH, RecordingService.getOutputPath());
-            setResult(RESULT_CODE, consumerIntent);
+            ResultPool.getInstance().generateWav(requestStartTime);
+            getIntent().putExtra(REQUEST_START_TIME, requestStartTime);
+            setResult(RESULT_CODE, getIntent());
             finish();
         }
     }
