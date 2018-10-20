@@ -6,12 +6,14 @@ import android.graphics.Color;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
+import android.os.AsyncTask;
 import android.support.annotation.NonNull;
 import android.support.v4.widget.ViewDragHelper;
 import android.text.Editable;
 import android.text.InputFilter;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.SparseIntArray;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -164,6 +166,8 @@ public class SortRichEditor extends ScrollView implements IEditor {
 
     // when set to true, the note cannot be modified
     private boolean isViewOnly = false;
+
+    private boolean destroyed = false;
 
     public SortRichEditor(Context context) {
         this(context, null);
@@ -382,13 +386,13 @@ public class SortRichEditor extends ScrollView implements IEditor {
     private ViewGroup.LayoutParams resetChildLayoutParams(View child) {
         ViewGroup.LayoutParams layoutParams = child.getLayoutParams();
         if (child instanceof RelativeLayout) {
-            if ((((RelativeLayout) child).getChildAt(0)) instanceof ImageView) {
+            View media = ((RelativeLayout) child).getChildAt(0);
+            if (media instanceof ImageView || media instanceof SoundPlayer) {
                 layoutParams.height = LayoutParams.WRAP_CONTENT;
-            } else {
+            } else if (media instanceof JzvdStd) {
                 layoutParams.height = DEFAULT_VIDEO_HEIGHT;
             }
-        }
-        if (child instanceof EditText) {
+        } else if (child instanceof EditText) {
             child.setFocusable(true);
             child.setFocusableInTouchMode(true);
             if (child == lastFocusEdit) {
@@ -777,7 +781,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
         final RelativeLayout pictureLayout = createPictureLayout();
         ImageView imageView = (ImageView) pictureLayout.getChildAt(0);
         imageView.setTag(picturePath);
-        new PictureLoader(imageView, getWidth()).execute(picturePath);
+        new PictureLoader(imageView, getWidth()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, picturePath);
         insertMediaAtIndex(index, pictureLayout);
     }
 
@@ -787,7 +791,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
         JzvdStd video = (JzvdStd) videoLayout.getChildAt(0);
         video.setUp(videoPath, "", Jzvd.SCREEN_WINDOW_LIST);
         video.setTag(videoPath);
-        new ThumbnailLoader(video.thumbImageView).execute(videoPath);
+        new ThumbnailLoader(video.thumbImageView).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, videoPath);
         insertMediaAtIndex(index, videoLayout);
     }
 
@@ -927,6 +931,31 @@ public class SortRichEditor extends ScrollView implements IEditor {
         editText.setSelection(text.length());
     }
 
+    // well, I have to say I like C++ better for the deterministic resource freeing
+    // though in Java, memory will THEORETICALLY never leak
+    // but it actually will because of AsyncTask or so on
+    // I have to free the resource here manually
+    public void destroy() {
+        if (destroyed) {
+            return;
+        }
+        destroyed = true;
+        int count = containerLayout.getChildCount();
+        for (int i = 0; i < count; ++i) {
+            View v = containerLayout.getChildAt(i);
+            if (v instanceof RelativeLayout) {
+                View media = ((RelativeLayout) v).getChildAt(0);
+                if (media instanceof SoundPlayer) {
+                    ((SoundPlayer) media).destroy();
+                } else if (media instanceof JzvdStd) {
+                    if (((JzvdStd) media).isCurrentPlay()) {
+                        ((JzvdStd) media).onAutoCompletion();
+                    }
+                }
+            }
+        }
+    }
+
     static class NoteLoader implements Runnable {
         WeakReference<SortRichEditor> target;
         private Note note;
@@ -989,8 +1018,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 View view = ((RelativeLayout) itemView).getChildAt(0);
                 if (view instanceof ImageView) {
                     ImageView item = (ImageView) ((RelativeLayout) itemView).getChildAt(0);
-                    BitmapDrawable bitmapDrawable = (BitmapDrawable) item.getDrawable();
-                    data = new PictureData(item.getTag().toString(), bitmapDrawable.getBitmap());
+                    data = new PictureData(item.getTag().toString());
                 } else if (view instanceof SoundPlayer) {
                     data = new SoundData(view.getTag().toString(), " ");
                 } else if (view instanceof JzvdStd) {

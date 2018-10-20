@@ -48,6 +48,7 @@ public class ResultPool {
         private SpeechRecognizer iat;
 
         IFlyFeeder(ResultPool ref) {
+            super();
             this.ref = new WeakReference<>(ref);
             try {
                 fis = new FileInputStream(new File(TEMP_OUTPUT_PATH));
@@ -76,6 +77,11 @@ public class ResultPool {
         protected Void doInBackground(Void... voids) {
             final ResultPool target = ref.get();
             while (true) {
+                // must check cancelled or not to terminate doInBackground()
+                // (calling cancel() from outside WON'T terminate doInBackground())
+                if (isCancelled()) {
+                    return null;
+                }
                 final long now = System.currentTimeMillis();
                 byte[] voiceBuffer = null;
                 try {
@@ -212,7 +218,7 @@ public class ResultPool {
         results.clear();
     }
 
-    public void putResult(long time, String result) {
+    private void putResult(long time, String result) {
         if (!times.isEmpty()) {
             long lastTime = times.get(times.size() - 1);
             if (lastTime > time) {

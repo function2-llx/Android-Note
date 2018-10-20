@@ -12,6 +12,7 @@ public class ThumbnailLoader extends AsyncTask<String, Void, Bitmap> {
     private WeakReference<ImageView> target;
 
     public ThumbnailLoader(ImageView target) {
+        super();
         this.target = new WeakReference<>(target);
     }
 
