@@ -1,6 +1,7 @@
 package com.se.npe.androidnote;
 
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.annotation.Nullable;
@@ -15,7 +16,7 @@ import com.se.npe.androidnote.sound.ResultPool;
 
 public class SoundRecorderActivity extends AppCompatActivity {
     public static final int RESULT_CODE = 0;
-
+    public static final String REQUEST_START_TIME = "REQUEST_START_TIME";
     // Recording controls
     private FloatingActionButton mRecordButton = null;
 
@@ -105,6 +106,7 @@ public class SoundRecorderActivity extends AppCompatActivity {
             getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
             ResultPool.getInstance().generateWav(requestStartTime);
+            getIntent().putExtra(REQUEST_START_TIME, requestStartTime);
             setResult(RESULT_CODE, getIntent());
             finish();
         }

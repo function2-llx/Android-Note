@@ -80,7 +80,6 @@ public class ResultPool {
                 byte[] voiceBuffer = null;
                 try {
                     voiceBuffer = new byte[fis.available() - currentPcmByte];
-                    Log.e("my", "voiceBuffer.length: " + voiceBuffer.length);
                     fis.skip(currentPcmByte);
                     fis.read(voiceBuffer);
                     currentPcmByte = fis.available();
@@ -111,7 +110,6 @@ public class ResultPool {
                                 return;
                             }
                             String result = recognizerResult.getResultString();
-                            Log.e("my", now + " : " + result);
                             target.putResult(now, result);
                         }
 
@@ -225,9 +223,9 @@ public class ResultPool {
         results.add(result);
     }
 
-    public String resultFrom(long offset) {
+    public String resultFrom(long requestStart) {
         StringBuilder sb = new StringBuilder();
-        int index = Collections.binarySearch(times, System.currentTimeMillis() - offset);
+        int index = Collections.binarySearch(times, requestStart);
         if (index < 0) {
             index = -index - 1;
         }

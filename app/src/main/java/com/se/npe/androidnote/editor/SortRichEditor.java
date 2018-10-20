@@ -913,7 +913,18 @@ public class SortRichEditor extends ScrollView implements IEditor {
 
     @Override
     public void addText(String text) {
-        insertEditTextAtIndex(containerLayout.getChildCount(), text);
+        // only when it is necessary...
+        if (containerLayout.getChildCount() == 0
+                || !(containerLayout.getChildAt(containerLayout.getChildCount() - 1) instanceof EditText))
+            insertEditTextAtIndex(containerLayout.getChildCount(), text);
+    }
+
+    public void setLastText(String text) {
+        EditText editText = (EditText) containerLayout.getChildAt(containerLayout.getChildCount() - 1);
+        editText.setText(text);
+        lastFocusEdit = editText;
+        editText.requestFocus();
+        editText.setSelection(text.length());
     }
 
     static class NoteLoader implements Runnable {
