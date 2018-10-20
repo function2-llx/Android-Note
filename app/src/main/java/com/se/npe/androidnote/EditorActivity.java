@@ -105,7 +105,7 @@ public class EditorActivity extends AppCompatActivity {
         } catch (IOException e) {
             Logger.log(LOG_TAG, e);
         }
-        iFlyOnCreate();
+//        iFlyOnCreate();
     }
 
     private void iFlyOnCreate() {
