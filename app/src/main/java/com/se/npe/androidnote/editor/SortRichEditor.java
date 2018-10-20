@@ -167,6 +167,8 @@ public class SortRichEditor extends ScrollView implements IEditor {
     // when set to true, the note cannot be modified
     private boolean isViewOnly = false;
 
+    private boolean destroyed = false;
+
     public SortRichEditor(Context context) {
         this(context, null);
     }
@@ -934,6 +936,10 @@ public class SortRichEditor extends ScrollView implements IEditor {
     // but it actually will because of AsyncTask or so on
     // I have to free the resource here manually
     public void destroy() {
+        if (destroyed) {
+            return;
+        }
+        destroyed = true;
         int count = containerLayout.getChildCount();
         for (int i = 0; i < count; ++i) {
             View v = containerLayout.getChildAt(i);
@@ -943,7 +949,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
                     ((SoundPlayer) media).destroy();
                 } else if (media instanceof JzvdStd) {
                     if (((JzvdStd) media).isCurrentPlay()) {
-                        ((JzvdStd) media).onStateAutoComplete();
+                        ((JzvdStd) media).onAutoCompletion();
                     }
                 }
             }

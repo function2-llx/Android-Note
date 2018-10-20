@@ -146,6 +146,12 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        editor.destroy();
+        super.onBackPressed();
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         Note note = editor.buildNote();
