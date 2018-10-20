@@ -79,7 +79,7 @@ public class MainActivity extends AppCompatActivity {
         Log.d("debug0001",Integer.toString(templist.size()));
         Log.d("debug0001",Integer.toString(templist.get(0).getTag().size()));
         */
-        
+
         setContentView(R.layout.activity_main);
         initListener();
         EventBus.getDefault().register(this);
