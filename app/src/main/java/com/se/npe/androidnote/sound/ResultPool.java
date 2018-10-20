@@ -41,7 +41,7 @@ public class ResultPool {
     private long startTime;
 
     static class IFlyFeeder extends AsyncTask<Void, Void, Void> {
-        private static final int SLEEP_MILL = 500;
+        private static final int SLEEP_MILL = 1000; // 1000ms
         private WeakReference<ResultPool> ref;
         private int currentPcmByte;
         private FileInputStream fis;
@@ -60,13 +60,11 @@ public class ResultPool {
             iat.setParameter(SpeechConstant.ACCENT, "mandarin");
             iat.setParameter(SpeechConstant.AUDIO_SOURCE, "-1");
             iat.setParameter(SpeechConstant.RESULT_TYPE, "plain");
-            Log.e("my", "IFlyFeeder ctor");
         }
 
         @Override
         protected void onCancelled() {
             super.onCancelled();
-            Log.e("my", "onCancelled");
             try {
                 fis.close();
             } catch (IOException e) {
@@ -77,12 +75,12 @@ public class ResultPool {
         @Override
         protected Void doInBackground(Void... voids) {
             final ResultPool target = ref.get();
-            Log.e("my", "doInBackground start");
             while (true) {
                 final long now = System.currentTimeMillis();
                 byte[] voiceBuffer = null;
                 try {
                     voiceBuffer = new byte[fis.available() - currentPcmByte];
+                    Log.e("my", "voiceBuffer.length: " + voiceBuffer.length);
                     fis.skip(currentPcmByte);
                     fis.read(voiceBuffer);
                     currentPcmByte = fis.available();
@@ -90,8 +88,6 @@ public class ResultPool {
                     Logger.log(LOG_TAG, e);
                 }
                 if (voiceBuffer != null && voiceBuffer.length != 0) {
-                    iat.writeAudio(voiceBuffer, 0, voiceBuffer.length);
-                    Log.e("my", "voiceBuffer.length : " + voiceBuffer.length);
                     iat.startListening(new RecognizerListener() {
                         @Override
                         public void onVolumeChanged(int i, byte[] bytes) {
@@ -109,7 +105,11 @@ public class ResultPool {
                         }
 
                         @Override
-                        public void onResult(RecognizerResult recognizerResult, boolean b) {
+                        public void onResult(RecognizerResult recognizerResult, boolean isLast) {
+                            // skip 。
+                            if (isLast) {
+                                return;
+                            }
                             String result = recognizerResult.getResultString();
                             Log.e("my", now + " : " + result);
                             target.putResult(now, result);
@@ -125,6 +125,7 @@ public class ResultPool {
                             // no-op
                         }
                     });
+                    iat.writeAudio(voiceBuffer, 0, voiceBuffer.length);
                     iat.stopListening();
                 }
                 try {
@@ -161,7 +162,6 @@ public class ResultPool {
         recorder.start();
         iFlyFeeder = new IFlyFeeder(this);
         iFlyFeeder.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
-        Log.e("my", "start exec");
     }
 
     public long getStartTime() {
