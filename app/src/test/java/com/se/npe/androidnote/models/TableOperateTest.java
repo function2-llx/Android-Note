@@ -168,7 +168,7 @@ public class TableOperateTest {
         // Create a new example data list
         List<IData> dataList = new ArrayList<>();
         dataList.add(new TextData("This is the TextData text for " + data));
-        dataList.add(new PictureData("This is the PictureData picture path for " + data, Bitmap.createBitmap(10, 10, Bitmap.Config.ARGB_8888)));
+        dataList.add(new PictureData("This is the PictureData picture path for " + data));
         dataList.add(new SoundData("This is the SoundData sound path for " + data, "This is the SoundData text for " + data));
         dataList.add(new VideoData("This is the VideoData video path for " + data));
         return dataList;

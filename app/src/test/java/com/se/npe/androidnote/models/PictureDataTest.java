@@ -32,11 +32,6 @@ public class PictureDataTest {
     }
 
     @Test
-    public void getPicture() {
-        assertTrue(pictureData.getPicture().sameAs(getExamplePicture()));
-    }
-
-    @Test
     public void equalsTest() {
         assertTrue(pictureDataEquals.equals(pictureData));
         assertEquals(pictureData.getPicturePath(), pictureDataEquals.getPicturePath());
@@ -58,7 +53,7 @@ public class PictureDataTest {
 
     @NonNull
     private PictureData getExamplePictureData(String mixIn) {
-        return new PictureData(getExamplePicturePath(mixIn), getExamplePicture());
+        return new PictureData(getExamplePicturePath(mixIn));
     }
 
     @NonNull

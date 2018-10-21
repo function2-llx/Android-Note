@@ -46,7 +46,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import cn.jzvd.Jzvd;
-import cn.jzvd.JzvdStd;
 
 public class SortRichEditor extends ScrollView implements IEditor {
     private static final int TITLE_WORD_LIMIT_COUNT = 30;
@@ -387,9 +386,9 @@ public class SortRichEditor extends ScrollView implements IEditor {
         ViewGroup.LayoutParams layoutParams = child.getLayoutParams();
         if (child instanceof RelativeLayout) {
             View media = ((RelativeLayout) child).getChildAt(0);
-            if (media instanceof ImageView || media instanceof SoundPlayer) {
+            if (media instanceof ImagePlayer || media instanceof SoundPlayer) {
                 layoutParams.height = LayoutParams.WRAP_CONTENT;
-            } else if (media instanceof JzvdStd) {
+            } else if (media instanceof VideoPlayer) {
                 layoutParams.height = DEFAULT_VIDEO_HEIGHT;
             }
         } else if (child instanceof EditText) {
@@ -416,11 +415,9 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 View itemView = containerLayout.getChildAt(i);
                 if (itemView instanceof RelativeLayout) {
                     View media = ((RelativeLayout) itemView).getChildAt(0);
-                    if (media instanceof JzvdStd) {
-                        // finish the current playing video
-                        JzvdStd video = (JzvdStd) media;
-                        if (video.isCurrentPlay()) {
-                            video.onStateAutoComplete();
+                    if (media instanceof VideoPlayer) {
+                        if (((VideoPlayer) media).getJzvdStd().isCurrentPlay()) {
+                            ((VideoPlayer) media).getJzvdStd().onStateAutoComplete();
                         }
                     } else if (media instanceof SoundPlayer) {
                         ((SoundPlayer) media).destroy();
@@ -447,7 +444,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
         int preIndex = 0;
         for (int i = 0; i < childCount; ++i) {
             child = containerLayout.getChildAt(i);
-            if (child instanceof ImageView) {
+            if (child instanceof ImageView) { // placeholder, not real image
                 removeChildList.add(child);
                 continue;
             }
@@ -610,9 +607,9 @@ public class SortRichEditor extends ScrollView implements IEditor {
     // the placeholder between two media, for future text insert
     // return null if isViewOnly is on
     private ImageView createPlaceholder() {
-        final ImageView placeholder = new ImageView(getContext());
+        ImageView placeholder = new ImageView(getContext());
         placeholder.setTag(viewTagID++);
-        placeholder.setImageResource(R.mipmap.icon_add_text);
+        placeholder.setImageResource(R.drawable.baseline_playlist_add_black_48dp);
         placeholder.setScaleType(ImageView.ScaleType.FIT_START);
         placeholder.setClickable(true);
         placeholder.setOnClickListener(v -> {
@@ -627,8 +624,8 @@ public class SortRichEditor extends ScrollView implements IEditor {
         });
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
-        lp.bottomMargin = DEFAULT_MARGIN;
+                dip2px(25), dip2px(25));
+        lp.leftMargin = lp.bottomMargin = DEFAULT_MARGIN;
         placeholder.setLayoutParams(lp);
 
         return placeholder;
@@ -661,17 +658,18 @@ public class SortRichEditor extends ScrollView implements IEditor {
     // and the specific media do their work themselves
     private RelativeLayout createMediaLayout(View media, RelativeLayout.LayoutParams params) {
         RelativeLayout.LayoutParams closeImageLp = new RelativeLayout.LayoutParams(
-                LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
+                dip2px(25), dip2px(25));
         closeImageLp.addRule(RelativeLayout.ALIGN_PARENT_RIGHT);
         closeImageLp.addRule(RelativeLayout.ALIGN_PARENT_TOP);
         closeImageLp.setMargins(0, dip2px(10), dip2px(10), 0);
         ImageView closeImage = new ImageView(getContext());
         closeImage.setScaleType(ImageView.ScaleType.FIT_XY);
-        closeImage.setImageResource(R.mipmap.icon_delete);
+        closeImage.setImageResource(R.drawable.baseline_delete_outline_white_48dp);
         closeImage.setLayoutParams(closeImageLp);
 
         RelativeLayout layout = new RelativeLayout(getContext());
         layout.addView(media);
+
         // maybe we don't need to create one, but now I just don't add it to the layout
         // this is the easiest implementation
         if (!isViewOnly) {
@@ -688,28 +686,24 @@ public class SortRichEditor extends ScrollView implements IEditor {
     }
 
     private RelativeLayout createPictureLayout() {
-        RelativeLayout.LayoutParams contentImageLp = new RelativeLayout.LayoutParams(
-                LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        ImageView imageView = new ImageView(getContext());
-        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
-        imageView.setLayoutParams(contentImageLp);
-        imageView.setImageResource(R.mipmap.icon_empty_photo);
-        return createMediaLayout(imageView, PICTURE_LAYOUT_PARAM);
+        ImagePlayer image = new ImagePlayer(getContext());
+        image.getImageView().setScaleType(ImageView.ScaleType.CENTER_CROP);
+        image.setLayoutParams(new RelativeLayout.LayoutParams(
+                LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+        return createMediaLayout(image, PICTURE_LAYOUT_PARAM);
     }
 
     private RelativeLayout createVideoLayout() {
-        RelativeLayout.LayoutParams contentImageLp = new RelativeLayout.LayoutParams(
-                LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        JzvdStd video = new JzvdStd(getContext());
-        video.setLayoutParams(contentImageLp);
+        VideoPlayer video = new VideoPlayer(getContext());
+        video.setLayoutParams(new RelativeLayout.LayoutParams(
+                LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         return createMediaLayout(video, VIDEO_LAYOUT_PARAM);
     }
 
     private RelativeLayout createSoundLayout() {
-        RelativeLayout.LayoutParams contentImageLp = new RelativeLayout.LayoutParams(
-                LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
         SoundPlayer soundPlayer = new SoundPlayer(getContext());
-        soundPlayer.setLayoutParams(contentImageLp);
+        soundPlayer.setLayoutParams(new RelativeLayout.LayoutParams(
+                LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
         return createMediaLayout(soundPlayer, SOUND_LAYOUT_PARAM);
     }
 
@@ -778,20 +772,20 @@ public class SortRichEditor extends ScrollView implements IEditor {
     }
 
     private void insertPictureAtIndex(int index, String picturePath) {
-        final RelativeLayout pictureLayout = createPictureLayout();
-        ImageView imageView = (ImageView) pictureLayout.getChildAt(0);
-        imageView.setTag(picturePath);
-        new PictureLoader(imageView, getWidth()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, picturePath);
+        RelativeLayout pictureLayout = createPictureLayout();
+        ImagePlayer image = (ImagePlayer) pictureLayout.getChildAt(0);
+        image.setTag(picturePath);
+        new PictureLoader(image.getImageView(), getWidth()).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, picturePath);
         insertMediaAtIndex(index, pictureLayout);
     }
 
 
     private void insertVideoAtIndex(int index, String videoPath) {
         RelativeLayout videoLayout = createVideoLayout();
-        JzvdStd video = (JzvdStd) videoLayout.getChildAt(0);
-        video.setUp(videoPath, "", Jzvd.SCREEN_WINDOW_LIST);
-        video.setTag(videoPath);
-        new ThumbnailLoader(video.thumbImageView).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, videoPath);
+        VideoPlayer video = (VideoPlayer) videoLayout.getChildAt(0);
+        video.getJzvdStd().setUp(videoPath, "", Jzvd.SCREEN_WINDOW_LIST);
+        video.setTag(videoPath); // tag stored in VideoPlayer itself
+        new ThumbnailLoader(video.getJzvdStd().thumbImageView).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, videoPath);
         insertMediaAtIndex(index, videoLayout);
     }
 
@@ -947,9 +941,9 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 View media = ((RelativeLayout) v).getChildAt(0);
                 if (media instanceof SoundPlayer) {
                     ((SoundPlayer) media).destroy();
-                } else if (media instanceof JzvdStd) {
-                    if (((JzvdStd) media).isCurrentPlay()) {
-                        ((JzvdStd) media).onAutoCompletion();
+                } else if (media instanceof VideoPlayer) {
+                    if (((VideoPlayer) media).getJzvdStd().isCurrentPlay()) {
+                        ((VideoPlayer) media).getJzvdStd().onAutoCompletion();
                     }
                 }
             }
@@ -1016,12 +1010,11 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 }
             } else if (itemView instanceof RelativeLayout) {
                 View view = ((RelativeLayout) itemView).getChildAt(0);
-                if (view instanceof ImageView) {
-                    ImageView item = (ImageView) ((RelativeLayout) itemView).getChildAt(0);
-                    data = new PictureData(item.getTag().toString());
+                if (view instanceof ImagePlayer) {
+                    data = new PictureData(view.getTag().toString());
                 } else if (view instanceof SoundPlayer) {
                     data = new SoundData(view.getTag().toString(), " ");
-                } else if (view instanceof JzvdStd) {
+                } else if (view instanceof VideoPlayer) {
                     data = new VideoData(view.getTag().toString());
                 }
             }

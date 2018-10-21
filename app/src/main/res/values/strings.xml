@@ -66,4 +66,11 @@
     <string name="pref_about_desc">v%s</string>
     <string name="delete">Delete</string>
     <string name="clear">Clear</string>
+
+    <string name="shortcut_search_disable">Search Unavailable</string>
+    <string name="shortcut_search_long">Search Note</string>
+    <string name="shortcut_search_short">Search Note</string>
+    <string name="shortcut_new_disable">New Unavailable</string>
+    <string name="shortcut_new_long">New Note</string>
+    <string name="shortcut_new_short">New Note</string>
 </resources>
