@@ -1,8 +1,9 @@
 package com.se.npe.androidnote.interfaces;
 
+import android.widget.EditText;
+
 import com.se.npe.androidnote.models.Note;
 
-import java.util.List;
 
 /**
  * The Editor(not the EditorActivity) will implement this interface
@@ -16,7 +17,7 @@ public interface IEditor {
 
     void addVideo(String videoPath);
 
-    void addSound(String soundPath);
+    EditText addSound(String soundPath);
 
     void addText(String text);
 

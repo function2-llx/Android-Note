@@ -5,6 +5,7 @@ import android.media.MediaPlayer;
 import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
+import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
@@ -39,6 +40,7 @@ public class SoundPlayer extends RelativeLayout {
 
     private MediaPlayer mediaPlayer;
     private ProgressBar progressBar;
+    private EditText editText;
 
     public SoundPlayer(Context context) {
         this(context, null);
@@ -57,6 +59,7 @@ public class SoundPlayer extends RelativeLayout {
             }
         });
         progressBar = findViewById(R.id.sound_player_progress);
+        editText = findViewById(R.id.sound_player_text);
     }
 
     public void destroy() {
@@ -72,5 +75,9 @@ public class SoundPlayer extends RelativeLayout {
             Logger.log(LOG_TAG, e);
         }
         mediaPlayer.prepareAsync();
+    }
+
+    public EditText getEditText() {
+        return editText;
     }
 }

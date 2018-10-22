@@ -37,6 +37,7 @@ import com.se.npe.androidnote.models.SoundData;
 import com.se.npe.androidnote.models.TextData;
 import com.se.npe.androidnote.models.VideoData;
 
+import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
 import java.util.List;
@@ -126,6 +127,8 @@ public class SortRichEditor extends ScrollView implements IEditor {
     private OnFocusChangeListener focusListener;
 
     private EditText lastFocusEdit;
+
+    private SoundPlayer lastAddedSoundPlayer;
 
     private DeletableEditText title;
 
@@ -792,6 +795,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
     private void insertSoundAtIndex(int index, String soundPath) {
         RelativeLayout soundLayout = createSoundLayout();
         SoundPlayer soundPlayer = (SoundPlayer) soundLayout.getChildAt(0);
+        lastAddedSoundPlayer = soundPlayer;
         soundPlayer.setTag(soundPath);
         soundPlayer.setSource(soundPath);
         insertMediaAtIndex(index, soundLayout);
@@ -904,9 +908,10 @@ public class SortRichEditor extends ScrollView implements IEditor {
     }
 
     @Override
-    public void addSound(String soundPath) {
+    public EditText addSound(String soundPath) {
         prepareAddMedia();
         insertMedia(index -> insertSoundAtIndex(index, soundPath));
+        return lastAddedSoundPlayer.getEditText();
     }
 
     @Override
@@ -917,8 +922,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
             insertEditTextAtIndex(containerLayout.getChildCount(), text);
     }
 
-    public void setLastText(String text) {
-        EditText editText = (EditText) containerLayout.getChildAt(containerLayout.getChildCount() - 1);
+    public void setEditText(EditText editText, String text) {
         editText.setText(text);
         lastFocusEdit = editText;
         editText.requestFocus();
@@ -978,6 +982,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
                         ref.insertVideoAtIndex(currentChild, ((VideoData) data).getVideoPath());
                     } else if (data instanceof SoundData) {
                         ref.insertSoundAtIndex(currentChild, ((SoundData) data).getSoundPath());
+                        ref.lastAddedSoundPlayer.getEditText().setText(((SoundData) data).getText());
                     }
                 }
                 if (ref.containerLayout.getChildCount() != 0) {
@@ -1013,7 +1018,8 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 if (view instanceof ImagePlayer) {
                     data = new PictureData(view.getTag().toString());
                 } else if (view instanceof SoundPlayer) {
-                    data = new SoundData(view.getTag().toString(), " ");
+                    String text = ((SoundPlayer) view).getEditText().getText().toString();
+                    data = new SoundData(view.getTag().toString(), text.isEmpty() ? " " : text);
                 } else if (view instanceof VideoPlayer) {
                     data = new VideoData(view.getTag().toString());
                 }
