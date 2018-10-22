@@ -982,6 +982,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
                         ref.insertVideoAtIndex(currentChild, ((VideoData) data).getVideoPath());
                     } else if (data instanceof SoundData) {
                         ref.insertSoundAtIndex(currentChild, ((SoundData) data).getSoundPath());
+                        ref.lastAddedSoundPlayer.getEditText().setText(((SoundData) data).getText());
                     }
                 }
                 if (ref.containerLayout.getChildCount() != 0) {
@@ -1017,7 +1018,8 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 if (view instanceof ImagePlayer) {
                     data = new PictureData(view.getTag().toString());
                 } else if (view instanceof SoundPlayer) {
-                    data = new SoundData(view.getTag().toString(), " ");
+                    String text = ((SoundPlayer) view).getEditText().getText().toString();
+                    data = new SoundData(view.getTag().toString(), text.isEmpty() ? " " : text);
                 } else if (view instanceof VideoPlayer) {
                     data = new VideoData(view.getTag().toString());
                 }
