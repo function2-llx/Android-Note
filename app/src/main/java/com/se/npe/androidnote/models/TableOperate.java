@@ -31,7 +31,9 @@ public class TableOperate implements INoteCollection {
     }
 
     public static TableOperate getInstance() {
-        assert tableOperate != null : "Table Operate needs to be initialized using TableOperate.init().";
+        if (tableOperate == null) {
+            throw new NullPointerException("Table Operate needs to be initialized using TableOperate.init().");
+        }
         return tableOperate;
     }
 
@@ -83,12 +85,12 @@ public class TableOperate implements INoteCollection {
         for (int i = 0; i < src.size() - 1; i++) {
             string = string + src.get(i) + TableConfig.Filesave.LINE_SEPERATOR;
         }
-        if(src.size() >= 2)string = string + TableConfig.Filesave.LINE_SEPERATOR;
+        if (src.size() >= 2) string = string + TableConfig.Filesave.LINE_SEPERATOR;
         return string;
     }
 
     public List<String> stringToListString(String src) {
-        if(src.length() == 0)return new ArrayList<String>();
+        if (src.length() == 0) return new ArrayList<String>();
         String[] strings = src.split(TableConfig.Filesave.LINE_SEPERATOR);
         return Arrays.asList(strings);
     }
@@ -161,7 +163,7 @@ public class TableOperate implements INoteCollection {
 
     public void setNoteAt(int index, Note note) {
         db.execSQL("update " + TableConfig.TABLE_NAME + " set " + TableConfig.Note.NOTE_TITLE + "=?," + TableConfig.Note.NOTE_TAG + "=?," + TableConfig.Note.NOTE_STARTTIME + "=?," + TableConfig.Note.NOTE_MODIFYTIME + "=?," + TableConfig.Note.NOTE_CONTENT + "=? where " + TableConfig.Note.NOTE_ID + "=?",
-                new Object[]{note.getTitle(),listStringToString(note.getTag()), Long.toString(note.getStarttime().getTime()), Long.toString(note.getModifytime().getTime()), encodeNote(note.getContent()), Integer.toString(index)});
+                new Object[]{note.getTitle(), listStringToString(note.getTag()), Long.toString(note.getStarttime().getTime()), Long.toString(note.getModifytime().getTime()), encodeNote(note.getContent()), Integer.toString(index)});
         note.setIndex(index);
 
         EventBus.getDefault().post(new DatabaseModifyEvent("modify note"));
