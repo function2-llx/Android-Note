@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import com.dmcbig.mediapicker.PickerActivity;
@@ -137,10 +138,10 @@ public class EditorActivity extends AppCompatActivity {
             }
         } else if (resultCode == SoundRecorderActivity.RESULT_CODE && requestCode == PICKER_SOUND) {
             String path = ResultPool.getInstance().getCurrentPath();
-            editor.addSound(path);
+            final EditText editText = editor.addSound(path);
             editor.addText("");
             final long requestStartTime = data.getLongExtra(SoundRecorderActivity.REQUEST_START_TIME, -1);
-            new Handler().postDelayed(() -> editor.setLastText(ResultPool.getInstance().resultFrom(requestStartTime))
+            new Handler().postDelayed(() -> editText.setText(ResultPool.getInstance().resultFrom(requestStartTime))
                     , 1000);
         }
     }
