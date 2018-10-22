@@ -9,7 +9,7 @@
         android:shortcutShortLabel="@string/shortcut_search_short">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetClass="com.se.npe.androidnote.ListActivity"
+            android:targetClass="com.se.npe.androidnote.SplashActivity"
             android:targetPackage="com.se.npe.androidnote">
             <extra
                 android:name="SEARCH"
@@ -26,7 +26,7 @@
         android:shortcutShortLabel="@string/shortcut_new_short">
         <intent
             android:action="android.intent.action.VIEW"
-            android:targetClass="com.se.npe.androidnote.ListActivity"
+            android:targetClass="com.se.npe.androidnote.SplashActivity"
             android:targetPackage="com.se.npe.androidnote">
             <extra
                 android:name="NEW"

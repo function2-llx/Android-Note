@@ -10,9 +10,9 @@ public class AndroidNoteApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        TableOperate.init(getApplicationContext());
-        new Thread(() ->
-                SpeechUtility.createUtility(this, SpeechConstant.APPID + "=5bbc8c0f")
-        ).start();
+//        TableOperate.init(getApplicationContext());
+//        new Thread(() ->
+//                SpeechUtility.createUtility(this, SpeechConstant.APPID + "=5bbc8c0f")
+//        ).start();
     }
 }

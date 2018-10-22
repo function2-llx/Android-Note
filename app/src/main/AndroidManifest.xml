@@ -42,7 +42,7 @@
             android:name="android.test.runner"
             android:required="false" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -50,6 +50,12 @@
             <!--add static shortcut-->
             <meta-data android:name="android.app.shortcuts"
                 android:resource="@xml/static_shortcut" />
+        </activity>
+
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+            </intent-filter>
         </activity>
         <activity android:name=".EditorActivity">
             <intent-filter>
