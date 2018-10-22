@@ -1,7 +1,5 @@
 package com.se.npe.androidnote.models;
 
-import android.graphics.Bitmap;
-
 import com.se.npe.androidnote.interfaces.IData;
 
 /**
@@ -12,11 +10,10 @@ import com.se.npe.androidnote.interfaces.IData;
 
 public class PictureData implements IData {
     private String picturePath;
-    private Bitmap picture;
 
-    public PictureData(String picturePath, Bitmap picture) {
+    public PictureData(String picturePath)
+    {
         this.picturePath = picturePath;
-        this.picture = picture;
     }
 
     public PictureData(String picturePath)
@@ -28,16 +25,14 @@ public class PictureData implements IData {
         return picturePath;
     }
 
-    public Bitmap getPicture() {
-        return picture;
+    @Override
+    public boolean equals(Object o) {
+        return o instanceof PictureData && ((PictureData) o).picturePath.equals(picturePath);
     }
 
     @Override
-    public boolean equals(Object another) {
-        // TODO: remove field picture?
-        // Only check whether picturePath are equal
-        return another.getClass() == this.getClass()
-                && this.picturePath.equals(((PictureData) another).picturePath);
+    public int hashCode() {
+        return picturePath.hashCode();
     }
 
     @Override
