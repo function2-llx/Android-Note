@@ -44,14 +44,12 @@ public interface INoteFileConverter {
         String exportDirPath = getExportDirPath(context);
         File exportDir = new File(exportDirPath);
         // create dir
-        if (!exportDir.exists())
-            exportDir.mkdirs();
+        exportDir.mkdirs();
 
         String exportFilePath = getExportFilePath(context, fileName);
         File exportFile = new File(exportFilePath);
         // delete original file
-        if (exportFile.exists())
-            exportFile.delete();
+        exportFile.delete();
         // create file
         try {
             exportFile.createNewFile();
