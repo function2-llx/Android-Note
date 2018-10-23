@@ -32,12 +32,6 @@ public class SplashActivity extends Activity {
         protected Void doInBackground(Void... voids) {
             publishProgress("loading database...");
             TableOperate.init(ref.get());
-
-            TableOperate newtable = TableOperate.getInstance();
-            Log.d("debug0001",Integer.toString(newtable.getSearchConfig()));
-            newtable.setSearchConfig(1);
-            Log.d("debug0001",Integer.toString(newtable.getSearchConfig()));
-
             publishProgress("loading ifly...");
             SpeechUtility.createUtility(ref.get(), SpeechConstant.APPID + "=5bbc8c0f");
             return null;
