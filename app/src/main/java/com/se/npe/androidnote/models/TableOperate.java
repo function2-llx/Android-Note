@@ -14,17 +14,25 @@ import com.se.npe.androidnote.events.NoteModifyEvent;
 import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.interfaces.INoteCollection;
 import com.se.npe.androidnote.events.DatabaseModifyEvent;
+import com.se.npe.androidnote.util.Logger;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
 
 public class TableOperate implements INoteCollection {
+    private static final String LOG_TAG = Note.class.getSimpleName();
+
     private DBManager manager;
     private SQLiteDatabase db;
     private static File configfile;
@@ -44,7 +52,10 @@ public class TableOperate implements INoteCollection {
         }
         configfile = new File(path+"/AndroidNote/Config/searchconfig.txt");
         try {
-            configfile.createNewFile();
+            if(!configfile.exists()) {
+                configfile.createNewFile();
+                setSearchConfig(-1);
+            }
         }
         catch (IOException c)
         {
@@ -117,12 +128,43 @@ public class TableOperate implements INoteCollection {
         return Arrays.asList(strings);
     }
 
-    public int getSearchConfig() {
-        return 1;
+    public static int getSearchConfig() {
+        InputStream inputStream = null;
+        try {
+            inputStream = new FileInputStream(configfile);
+        } catch (FileNotFoundException e) {
+            Logger.log(LOG_TAG, e);
+            return -2;
+        }
+
+        byte b[] = new byte[(int) configfile.length()];
+        try {
+            int len = inputStream.read(b);
+            if (len == -1) return -2;
+        } catch (Exception e) {
+            Logger.log(LOG_TAG, e);
+        }
+        String tempcontent = new String(b);
+        return Integer.parseInt(tempcontent);
     }
 
-    public void setSearchConfig(int x) {
+    public static void setSearchConfig(int x) {
+        OutputStream outputStream = null;
+        try {
+            outputStream = new FileOutputStream(configfile);
+        } catch (FileNotFoundException e) {
+            Logger.log(LOG_TAG, e);
+            return;
+        }
 
+        String string = Integer.toString(x);
+
+        byte[] bs = string.getBytes();
+        try {
+            outputStream.write(bs);
+        } catch (IOException e) {
+            Logger.log(LOG_TAG, e);
+        }
     }
 
     public List<Note> getAllNotes() {
