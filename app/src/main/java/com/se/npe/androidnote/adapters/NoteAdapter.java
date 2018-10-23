@@ -5,11 +5,14 @@ import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 
+import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
@@ -17,6 +20,7 @@ import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.marshalchen.ultimaterecyclerview.UltimateViewAdapter;
 import com.se.npe.androidnote.EditorActivity;
 import com.se.npe.androidnote.R;
+import com.se.npe.androidnote.editor.PictureLoader;
 import com.se.npe.androidnote.events.NoteDeleteEvent;
 import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
@@ -25,10 +29,13 @@ import com.se.npe.androidnote.events.DatabaseModifyEvent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.w3c.dom.Text;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -38,8 +45,6 @@ import java.util.List;
  */
 public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
     private AppCompatActivity activity;
-
-
     /**
      * Implement INoteCollection
      */
@@ -58,6 +63,18 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         this.notifyDataSetChanged();
     }
 
+    public void sortByCreateTime()
+    {
+        Collections.sort(this.noteList, Comparator.comparing(Note::getStarttime));
+        this.notifyDataSetChanged();
+    }
+
+    public void sortByModifyTime()
+    {
+        Collections.sort(this.noteList, Comparator.comparing(Note::getModifytime));
+        this.notifyDataSetChanged();
+    }
+
     public void updateList(List<Note> list) {
         if (list.isEmpty())
             this.clear();
@@ -68,30 +85,40 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         }
     }
 
-    // public void updateList(List<Note> list) {
-    //     if (list.isEmpty())
-    //         this.clear();
-    //     else {
-    //         this.noteList.clear();
-    //         for (Note note : list) {
-    //             noteList.add(note);
-    //         }
-    //         this.notifyDataSetChanged();
-    //     }
-    // }
-
     /**
      * Adapt Note to item-like View
      *
      * @author llx
      */
-    public class ViewHolder extends UltimateRecyclerviewViewHolder implements View.OnClickListener {
+    public class ViewHolder extends UltimateRecyclerviewViewHolder implements View.OnClickListener, View.OnLongClickListener{
         private TextView title, text;
+        private TextView createTimeDisplayer, modifyTimeDisplayer;
+        private ImageView imageView;
+        int screenWidth = -1;
+
+        private int getScreenWidth()
+        {
+            if (screenWidth != -1)
+                return screenWidth;
+            DisplayMetrics outMetrics = new DisplayMetrics();
+            activity.getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
+            return screenWidth = outMetrics.widthPixels;
+        }
 
         public ViewHolder(View itemView) {
             super(itemView);
+
             this.title = itemView.findViewById(R.id.text_view_title);
             this.text = itemView.findViewById(R.id.text_view_text);
+            this.createTimeDisplayer = itemView.findViewById(R.id.text_view_create_time);
+
+            int textWidth = getScreenWidth() / 3 * 2;
+            this.createTimeDisplayer.setWidth(textWidth);
+            this.modifyTimeDisplayer = itemView.findViewById(R.id.text_view_modify_time);
+            this.modifyTimeDisplayer.setWidth(textWidth);
+
+            this.imageView = itemView.findViewById(R.id.image_view);
+            LinearLayout layout = itemView.findViewById(R.id.text_layout);
         }
 
         public void setTitle(String title) {
@@ -102,12 +129,57 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
             this.text.setText(text);
         }
 
+        private String getFormatDate(Date date) {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd  HH:mm:ss");
+            return format.format(date);
+        }
+
+        public void setCreateDate(Date date)
+        {
+            this.createTimeDisplayer.setText("create: " + getFormatDate(date));
+        }
+
+        public void setModifyDate(Date date)
+        {
+            this.modifyTimeDisplayer.setText("modify: " + getFormatDate(date));
+        }
+
+        public void setIamge(String imagePath)
+        {
+            if (imagePath.isEmpty())
+                this.imageView.setImageBitmap(null);    //clear the previous image
+            else {
+                DisplayMetrics outMetrics = new DisplayMetrics();
+                activity.getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
+                new PictureLoader(imageView, outMetrics.widthPixels / 3).execute(imagePath);
+            }
+        }
+
         @Override
         public void onClick(@NonNull View v) {
             Note selectedNote = getItem(getAdapterPosition());
             EventBus.getDefault().postSticky(new NoteSelectEvent(selectedNote));
             Intent intent = new Intent(activity, EditorActivity.class);
             activity.startActivity(intent);
+        }
+
+        @Override
+        public boolean onLongClick(View v) {
+            PopupMenu menu = new PopupMenu(activity, v);
+            menu.getMenuInflater().inflate(R.menu.activity_list_context_menu, menu.getMenu());
+            menu.setOnMenuItemClickListener(item -> {
+                int position = getAdapterPosition();
+                Note note = getItem(position);
+                switch (item.getItemId()) {
+                    case R.id.delete: {
+                        remove(position);
+                        EventBus.getDefault().post(new NoteDeleteEvent(note));
+                    }
+                }
+                return true;
+            });
+            menu.show();
+            return true;
         }
     }
 
@@ -129,44 +201,19 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_list_item, parent, false);
         final ViewHolder holder = new ViewHolder(v);
         v.setOnClickListener(holder);
-        Button btn = v.findViewById(R.id.list_item_button);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PopupMenu popupMenu = new PopupMenu(activity, v);
-                popupMenu.getMenuInflater().inflate(R.menu.list_item_options, popupMenu.getMenu());
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.preview: {
-                                Note selectedNote = getItem(holder.getAdapterPosition());
-                                EventBus.getDefault().postSticky(new NoteSelectEvent(selectedNote));
-                                Intent intent = new Intent(activity, EditorActivity.class)
-                                        .putExtra(EditorActivity.VIEW_ONLY, true);
-                                activity.startActivity(intent);
-                                break;
-                            }
-                            case R.id.delete: {
-                                System.err.println(holder.getAdapterPosition());
-                                NoteAdapter.this.remove(holder.getAdapterPosition());
-                                break;
-                            }
-                        }
-                        return true;
-                    }
-                });
-                popupMenu.show();
-            }
-        });
+        v.setOnLongClickListener(holder);
         return holder;
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        Note.PreviewData data = getItem(position).getPreview();
+        Note note = getItem(position);
+        Note.PreviewData data = note.getPreview();
         holder.setTitle(data.title);
         holder.setText(data.text);
+        holder.setCreateDate(note.getStarttime());
+        holder.setModifyDate(note.getModifytime());
+        holder.setIamge(data.picturePath);
     }
 
     @Override
@@ -211,7 +258,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         return new ViewHolder(view);
     }
 
-    Note getItem(int position) throws IndexOutOfBoundsException {
+    public Note getItem(int position) throws IndexOutOfBoundsException {
         // Subtract the first one used by header
         if (this.hasHeaderView())
             position--;
@@ -227,9 +274,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
     }
 
     public void remove(int position) {
-        Note note = getItem(position);
         super.removeInternal(this.noteList, position);
-        EventBus.getDefault().post(new NoteDeleteEvent(note));
     }
 
     public void swapPositions(int from, int to) {

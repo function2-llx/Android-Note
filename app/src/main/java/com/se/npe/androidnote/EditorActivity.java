@@ -36,6 +36,7 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 
 public class EditorActivity extends AppCompatActivity {
     private static final String LOG_TAG = EditorActivity.class.getSimpleName();
@@ -44,6 +45,8 @@ public class EditorActivity extends AppCompatActivity {
     private static final int PICKER_SOUND = 0;
     private SortRichEditor editor;
     private Note oldNote;
+    private long startTime;
+    private Date createTime;
     public static final String VIEW_ONLY = "VIEW_ONLY";
 
     @Override
@@ -99,7 +102,9 @@ public class EditorActivity extends AppCompatActivity {
         // deferred built, or we will get NPE
         if (oldNote != null) {
             editor.loadNote(oldNote);
-        }
+            this.createTime = oldNote.getStarttime();
+        } else
+            this.createTime = new Date();
 
         // start recording right now
         try {
@@ -160,6 +165,8 @@ public class EditorActivity extends AppCompatActivity {
         if (oldNote != null) {
             note.setIndex(oldNote.getIndex());
         }
+        note.setStarttime(this.createTime);
+        note.setModifytime(new Date());
         EventBus.getDefault().post(new NoteModifyEvent(note));
 
         EventBus.getDefault().removeAllStickyEvents();
