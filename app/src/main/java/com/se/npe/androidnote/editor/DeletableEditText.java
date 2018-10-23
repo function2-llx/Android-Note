@@ -7,10 +7,12 @@ import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputConnectionWrapper;
 import android.widget.EditText;
 
+import com.yydcdut.markdown.MarkdownEditText;
+
 /**
  * 处理软键盘回删按钮backSpace时回调OnKeyListener
  */
-public class DeletableEditText extends EditText {
+public class DeletableEditText extends MarkdownEditText {
 
     public DeletableEditText(Context context) {
         super(context);
