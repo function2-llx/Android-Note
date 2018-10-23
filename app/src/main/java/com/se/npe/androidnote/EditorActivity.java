@@ -62,8 +62,8 @@ public class EditorActivity extends AppCompatActivity {
     private Date createTime;
     public static final String VIEW_ONLY = "VIEW_ONLY";
 
-    public static EditorActivity context;
     private MarkdownProcessor mMarkdownProcessor;
+    public static EditorActivity context;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -78,7 +78,8 @@ public class EditorActivity extends AppCompatActivity {
                 Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
                 break;
             case R.id.menu_markdown :
-
+                editor.changeIsMarkdown();
+                break;
             default:
                 break;
         }
