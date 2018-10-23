@@ -11,23 +11,27 @@
         app:actionViewClass="android.support.v7.widget.SearchView"
         app:showAsAction="always"/>
 
+
     <item
         android:id="@+id/menu_sort"
         android:title="@string/menu_sort"
         android:icon="@mipmap/icon_sort"
         app:showAsAction="always"
-        >
+        android:checkable="true">
         <menu>
-            <item
-                android:id="@+id/sort_created_time"
-                android:title="@string/sort_created_time"/>
-
-            <item
-                android:id="@+id/sort_modified_time"
-                android:title="@string/sort_modified_time"/>
-            <item
-                android:id="@+id/sort_title"
-                android:title="@string/sort_title"/>
+            <group
+                android:id="@+id/sort_options"
+                android:checkableBehavior="single" >
+                <item
+                    android:title="@string/sort_title"
+                    android:id="@+id/sort_title" />
+                <item
+                    android:title="@string/sort_created_time"
+                    android:id="@+id/sort_created_time" />
+                <item
+                    android:title="@string/sort_modified_time"
+                    android:id="@+id/sort_modified_time" />
+            </group>
         </menu>
     </item>
 
