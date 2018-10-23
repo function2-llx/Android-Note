@@ -45,11 +45,6 @@ import java.util.List;
  */
 public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
     private AppCompatActivity activity;
-<<<<<<< HEAD
-=======
-
-
->>>>>>> 767ac50ce9af94c85628a9c3ac6d5ed2225311a0
     /**
      * Implement INoteCollection
      */
@@ -206,40 +201,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_list_item, parent, false);
         final ViewHolder holder = new ViewHolder(v);
         v.setOnClickListener(holder);
-<<<<<<< HEAD
         v.setOnLongClickListener(holder);
-=======
-        Button btn = v.findViewById(R.id.list_item_button);
-        btn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                PopupMenu popupMenu = new PopupMenu(activity, v);
-                popupMenu.getMenuInflater().inflate(R.menu.list_item_options, popupMenu.getMenu());
-                popupMenu.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
-                    @Override
-                    public boolean onMenuItemClick(MenuItem item) {
-                        switch (item.getItemId()) {
-                            case R.id.preview: {
-                                Note selectedNote = getItem(holder.getAdapterPosition());
-                                EventBus.getDefault().postSticky(new NoteSelectEvent(selectedNote));
-                                Intent intent = new Intent(activity, EditorActivity.class)
-                                        .putExtra(EditorActivity.VIEW_ONLY, true);
-                                activity.startActivity(intent);
-                                break;
-                            }
-                            case R.id.delete: {
-                                System.err.println(holder.getAdapterPosition());
-                                NoteAdapter.this.remove(holder.getAdapterPosition());
-                                break;
-                            }
-                        }
-                        return true;
-                    }
-                });
-                popupMenu.show();
-            }
-        });
->>>>>>> 767ac50ce9af94c85628a9c3ac6d5ed2225311a0
         return holder;
     }
 

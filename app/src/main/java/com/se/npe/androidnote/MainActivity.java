@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.Toast;
 
 import com.se.npe.androidnote.models.Note;
+import com.se.npe.androidnote.models.TableOperate;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;

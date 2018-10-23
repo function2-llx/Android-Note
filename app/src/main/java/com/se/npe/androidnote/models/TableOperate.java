@@ -22,13 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
 
-<<<<<<< HEAD
-import static java.lang.Thread.sleep;
-
-public class TableOperate implements INoteCollection{
-=======
 public class TableOperate implements INoteCollection {
->>>>>>> 767ac50ce9af94c85628a9c3ac6d5ed2225311a0
     private DBManager manager;
     private SQLiteDatabase db;
     private static TableOperate tableOperate;
@@ -75,15 +69,8 @@ public class TableOperate implements INoteCollection {
                 String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPERATOR);
                 VideoData tempVideoData = new VideoData(tempArray[1]);
                 content.add(tempVideoData);
-<<<<<<< HEAD
-            }
-            else if(StrArray[i].charAt(0) == 'P'){
-                String[] tempArray = StrArray[i].split("asdfg");
-//                Bitmap mBitmap = BitmapFactory.decodeFile(StrArray[1]);
-=======
             } else if (StrArray[i].charAt(0) == 'P') {
                 String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPERATOR);
->>>>>>> 767ac50ce9af94c85628a9c3ac6d5ed2225311a0
                 PictureData tempPictureData = new PictureData(tempArray[1]);
                 content.add(tempPictureData);
             }
