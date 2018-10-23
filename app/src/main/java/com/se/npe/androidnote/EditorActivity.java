@@ -2,8 +2,10 @@ package com.se.npe.androidnote;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.design.widget.FloatingActionButton;
@@ -40,7 +42,12 @@ import com.yydcdut.markdown.syntax.edit.EditFactory;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -149,6 +156,49 @@ public class EditorActivity extends AppCompatActivity {
         mMarkdownProcessor.config(markdownConfiguration);
         mMarkdownProcessor.factory(EditFactory.create());
         mMarkdownProcessor.live(mMarkdownEditText);
+    }
+
+    class PictureAsyncTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            OutputStream outputStream = null;
+            InputStream inputStream = null;
+            try {
+                File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "rxMarkdown");
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                outputStream = new FileOutputStream(dir.getAbsolutePath() + File.separator + "b.jpg");
+                AssetManager assetManager = getAssets();
+                inputStream = assetManager.open("b.jpg");
+                byte[] buffer = new byte[1024];
+                int read = 0;
+                while ((read = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, read);
+                }
+                outputStream.flush();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (outputStream != null) {
+                    try {
+                        outputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                try {
+                    if (inputStream != null) {
+                        inputStream.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
     }
 
     private void getPictureOrVideo(int code) {
