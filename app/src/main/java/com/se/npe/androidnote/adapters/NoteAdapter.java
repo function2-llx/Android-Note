@@ -61,6 +61,8 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 
     public void setComparator(Comparator<Note> comparator) {
         this.comparator = comparator;
+        Collections.sort(noteList, comparator);
+        this.notifyDataSetChanged();
     }
 
     public void updateList(List<Note> list) {

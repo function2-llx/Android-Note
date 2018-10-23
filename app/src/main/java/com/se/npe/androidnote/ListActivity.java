@@ -53,6 +53,8 @@ public class ListActivity extends AppCompatActivity {
     final static int MENU_SORT_GROUP_ID = 2333;
 
     private void setSortOption(int sortOptionId) {
+        TableOperate.setSearchConfig(sortOptionId);
+
         switch (sortOptionId) {
             case R.id.sort_title: {
                 noteAdapter.setComparator(Comparator.comparing(Note::getTitle));
@@ -87,10 +89,11 @@ public class ListActivity extends AppCompatActivity {
             this.startActivity(intent);
         }
 
-        int sortOptionId = R.id.sort_title;
-        int selectedId = -1;
+        int sortOptionId;
+        int selectedId = TableOperate.getSearchConfig();
         if (selectedId != -1)
             sortOptionId = selectedId;
+        else sortOptionId = R.id.sort_title;
 
         SubMenu sortMenu = menu.findItem(R.id.menu_sort).getSubMenu();
         for (int i = 0; i < sortMenu.size(); i++) {
@@ -136,19 +139,19 @@ public class ListActivity extends AppCompatActivity {
 
             case R.id.sort_title: {
                 item.setChecked(true);
-                noteAdapter.setComparator(Comparator.comparing(Note::getTitle));
+                setSortOption(R.id.sort_title);
                 break;
             }
 
             case R.id.sort_created_time: {
                 item.setChecked(true);
-                noteAdapter.setComparator(Comparator.comparing(Note::getStarttime));
+                setSortOption(R.id.sort_created_time);
                 break;
             }
 
             case R.id.sort_modified_time: {
                 item.setChecked(true);
-                noteAdapter.setComparator(Comparator.comparing(Note::getModifytime));
+                setSortOption(R.id.sort_modified_time);
                 break;
             }
         }
