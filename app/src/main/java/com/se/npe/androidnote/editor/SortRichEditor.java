@@ -40,6 +40,7 @@ import com.se.npe.androidnote.models.VideoData;
 import java.lang.ref.Reference;
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -1028,7 +1029,9 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 contentList.add(data);
             }
         }
-        return new Note(title.getText().toString().trim(), contentList);
+        Note note = new Note(title.getText().toString().trim(), contentList);
+
+        return note;
     }
 
     public void setViewOnly() {
