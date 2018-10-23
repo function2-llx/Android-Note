@@ -18,6 +18,8 @@ import com.se.npe.androidnote.events.DatabaseModifyEvent;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
@@ -25,10 +27,29 @@ import java.util.Arrays;
 public class TableOperate implements INoteCollection {
     private DBManager manager;
     private SQLiteDatabase db;
+    private static File configfile;
     private static TableOperate tableOperate;
 
     public static void init(Context context) {
         tableOperate = new TableOperate(context);
+        String path = context.getExternalFilesDir(null).getAbsolutePath();
+        File filepath = new File(path + "/AndroidNote");
+        if(!filepath.exists())
+        {
+            filepath.mkdir();
+        }
+        File file = new File(path+"/AndroidNote/Config");
+        if (!file.exists()) {
+            file.mkdirs();
+        }
+        configfile = new File(path+"/AndroidNote/Config/searchconfig.txt");
+        try {
+            configfile.createNewFile();
+        }
+        catch (IOException c)
+        {
+            c.printStackTrace();
+        }
     }
 
     public static TableOperate getInstance() {
@@ -94,6 +115,14 @@ public class TableOperate implements INoteCollection {
         if (src.length() == 0) return new ArrayList<String>();
         String[] strings = src.split(TableConfig.Filesave.LINE_SEPERATOR);
         return Arrays.asList(strings);
+    }
+
+    public int getSearchConfig() {
+        return 1;
+    }
+
+    public void setSearchConfig(int x) {
+
     }
 
     public List<Note> getAllNotes() {
