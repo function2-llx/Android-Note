@@ -59,7 +59,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         return ret;
     }
 
-    void setComparator(Comparator<Note> comparator) {
+    public void setComparator(Comparator<Note> comparator) {
         this.comparator = comparator;
     }
 

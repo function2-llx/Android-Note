@@ -17,9 +17,22 @@
         android:title="@string/menu_sort"
         android:icon="@mipmap/icon_sort"
         app:showAsAction="always"
-        android:checkable="true"
-        >
-        <menu />
+        android:checkable="true">
+        <menu>
+            <group
+                android:id="@+id/sort_options"
+                android:checkableBehavior="single" >
+                <item
+                    android:title="@string/sort_title"
+                    android:id="@+id/sort_title" />
+                <item
+                    android:title="@string/sort_created_time"
+                    android:id="@+id/sort_created_time" />
+                <item
+                    android:title="@string/sort_modified_time"
+                    android:id="@+id/sort_modified_time" />
+            </group>
+        </menu>
     </item>
 
     <item

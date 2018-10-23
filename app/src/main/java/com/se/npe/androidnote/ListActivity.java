@@ -52,6 +52,25 @@ public class ListActivity extends AppCompatActivity {
 
     final static int MENU_SORT_GROUP_ID = 2333;
 
+    private void setSortOption(int sortOptionId) {
+        switch (sortOptionId) {
+            case R.id.sort_title: {
+                noteAdapter.setComparator(Comparator.comparing(Note::getTitle));
+                break;
+            }
+
+            case R.id.sort_created_time: {
+                noteAdapter.setComparator(Comparator.comparing(Note::getStarttime));
+                break;
+            }
+
+            case R.id.sort_modified_time: {
+                noteAdapter.setComparator(Comparator.comparing(Note::getModifytime));
+                break;
+            }
+        }
+    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -68,16 +87,31 @@ public class ListActivity extends AppCompatActivity {
             this.startActivity(intent);
         }
 
+        int sortOptionId = R.id.sort_title;
+        int selectedId = -1;
+        if (selectedId != -1)
+            sortOptionId = selectedId;
 
-        SubMenu subMenu = menu.findItem(R.id.menu_sort).getSubMenu();
-        final String[] sortOptions = getResources().getStringArray(R.array.sort_options_human_readable);
-        for (int i = 0; i < sortOptions.length; i++) {
-            if (subMenu.findItem(i) == null) {
-                subMenu.add(MENU_SORT_GROUP_ID, i, i, sortOptions[i]);
+        SubMenu sortMenu = menu.findItem(R.id.menu_sort).getSubMenu();
+        for (int i = 0; i < sortMenu.size(); i++) {
+            MenuItem item = sortMenu.getItem(i);
+            if (item.getItemId() == sortOptionId) {
+                item.setChecked(true);
+                break;
             }
         }
 
-        subMenu.setGroupCheckable(MENU_SORT_GROUP_ID, true, true);
+        setSortOption(sortOptionId);
+
+//        SubMenu subMenu = menu.findItem(R.id.menu_sort).getSubMenu();
+//        final String[] sortOptions = getResources().getStringArray(R.array.sort_options_human_readable);
+//        for (int i = 0; i < sortOptions.length; i++) {
+//            if (subMenu.findItem(i) == null) {
+//                subMenu.add(MENU_SORT_GROUP_ID, i, i, sortOptions[i]);
+//            }
+//        }
+//
+//        subMenu.setGroupCheckable(MENU_SORT_GROUP_ID, true, true);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -100,6 +134,23 @@ public class ListActivity extends AppCompatActivity {
                 break;
             }
 
+            case R.id.sort_title: {
+                item.setChecked(true);
+                noteAdapter.setComparator(Comparator.comparing(Note::getTitle));
+                break;
+            }
+
+            case R.id.sort_created_time: {
+                item.setChecked(true);
+                noteAdapter.setComparator(Comparator.comparing(Note::getStarttime));
+                break;
+            }
+
+            case R.id.sort_modified_time: {
+                item.setChecked(true);
+                noteAdapter.setComparator(Comparator.comparing(Note::getModifytime));
+                break;
+            }
         }
         return super.onOptionsItemSelected(item);
     }
