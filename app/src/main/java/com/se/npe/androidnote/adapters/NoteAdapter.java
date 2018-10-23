@@ -45,6 +45,7 @@ import java.util.List;
  */
 public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
     private AppCompatActivity activity;
+    private Comparator<Note> comparator = Comparator.comparing(Note::getTitle);
     /**
      * Implement INoteCollection
      */
@@ -58,21 +59,8 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         return ret;
     }
 
-    public void sortByTitle() {
-        Collections.sort(this.noteList, Comparator.comparing(Note::getTitle));
-        this.notifyDataSetChanged();
-    }
-
-    public void sortByCreateTime()
-    {
-        Collections.sort(this.noteList, Comparator.comparing(Note::getStarttime));
-        this.notifyDataSetChanged();
-    }
-
-    public void sortByModifyTime()
-    {
-        Collections.sort(this.noteList, Comparator.comparing(Note::getModifytime));
-        this.notifyDataSetChanged();
+    void setComparator(Comparator<Note> comparator) {
+        this.comparator = comparator;
     }
 
     public void updateList(List<Note> list) {
@@ -81,6 +69,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         else {
             noteList.clear();
             noteList.addAll(list);
+            Collections.sort(noteList, comparator);
             this.notifyDataSetChanged();
         }
     }

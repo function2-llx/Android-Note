@@ -18,7 +18,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.SubMenu;
 import android.view.View;
+import android.widget.RadioButton;
 
 import com.marshalchen.ultimaterecyclerview.DragDropTouchListener;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
@@ -48,6 +50,8 @@ public class ListActivity extends AppCompatActivity {
 
     /* Options menu */
 
+    final static int MENU_SORT_GROUP_ID = 2333;
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -63,6 +67,17 @@ public class ListActivity extends AppCompatActivity {
             Intent intent = new Intent(ListActivity.this, EditorActivity.class);
             this.startActivity(intent);
         }
+
+
+        SubMenu subMenu = menu.findItem(R.id.menu_sort).getSubMenu();
+        final String[] sortOptions = getResources().getStringArray(R.array.sort_options_human_readable);
+        for (int i = 0; i < sortOptions.length; i++) {
+            if (subMenu.findItem(i) == null) {
+                subMenu.add(MENU_SORT_GROUP_ID, i, i, sortOptions[i]);
+            }
+        }
+
+        subMenu.setGroupCheckable(MENU_SORT_GROUP_ID, true, true);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -85,20 +100,6 @@ public class ListActivity extends AppCompatActivity {
                 break;
             }
 
-            case R.id.sort_title: {
-                this.noteAdapter.sortByTitle();
-                break;
-            }
-
-            case R.id.sort_created_time: {
-                this.noteAdapter.sortByCreateTime();
-                break;
-            }
-
-            case R.id.sort_modified_time: {
-                this.noteAdapter.sortByModifyTime();
-                break;
-            }
         }
         return super.onOptionsItemSelected(item);
     }
