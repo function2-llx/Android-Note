@@ -2,9 +2,11 @@ package com.se.npe.androidnote;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
@@ -30,6 +32,10 @@ import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.sound.ResultPool;
 import com.se.npe.androidnote.util.Logger;
+import com.yydcdut.markdown.MarkdownConfiguration;
+import com.yydcdut.markdown.MarkdownEditText;
+import com.yydcdut.markdown.MarkdownProcessor;
+import com.yydcdut.markdown.syntax.edit.EditFactory;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -49,6 +55,11 @@ public class EditorActivity extends AppCompatActivity {
     private Date createTime;
     public static final String VIEW_ONLY = "VIEW_ONLY";
 
+    private MarkdownEditText mMarkdownEditText;
+    private MarkdownProcessor mMarkdownProcessor;
+    private AsyncTask mAsyncTask;
+    private FloatingActionButton mFloatingActionButton;
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activiry_editor, menu);
@@ -61,6 +72,8 @@ public class EditorActivity extends AppCompatActivity {
             case R.id.menu_save:
                 Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
                 break;
+            case R.id.menu_markdown :
+
             default:
                 break;
         }
@@ -112,6 +125,30 @@ public class EditorActivity extends AppCompatActivity {
         } catch (IOException e) {
             Logger.log(LOG_TAG, e);
         }
+
+        //markdown();
+    }
+
+    private void markdown() {
+        MarkdownConfiguration markdownConfiguration = new MarkdownConfiguration.Builder(this)
+                .setDefaultImageSize(50, 50)
+                .setBlockQuotesLineColor(0xff33b5e5)
+                .setHeader1RelativeSize(1.6f)
+                .setHeader2RelativeSize(1.5f)
+                .setHeader3RelativeSize(1.4f)
+                .setHeader4RelativeSize(1.3f)
+                .setHeader5RelativeSize(1.2f)
+                .setHeader6RelativeSize(1.1f)
+                .setHorizontalRulesColor(0xff99cc00)
+                .setCodeBgColor(0xffff4444)
+                .setTodoColor(0xffaa66cc)
+                .setTodoDoneColor(0xffff8800)
+                .setUnOrderListColor(0xff00ddff)
+                .build();
+        mMarkdownProcessor = new MarkdownProcessor(this);
+        mMarkdownProcessor.config(markdownConfiguration);
+        mMarkdownProcessor.factory(EditFactory.create());
+        mMarkdownProcessor.live(mMarkdownEditText);
     }
 
     private void getPictureOrVideo(int code) {
