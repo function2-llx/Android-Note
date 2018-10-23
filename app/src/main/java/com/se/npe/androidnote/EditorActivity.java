@@ -62,10 +62,8 @@ public class EditorActivity extends AppCompatActivity {
     private Date createTime;
     public static final String VIEW_ONLY = "VIEW_ONLY";
 
-    private MarkdownEditText mMarkdownEditText;
+    public static EditorActivity context;
     private MarkdownProcessor mMarkdownProcessor;
-    private AsyncTask mAsyncTask;
-    private FloatingActionButton mFloatingActionButton;
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -89,6 +87,7 @@ public class EditorActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        context = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
         this.setTitle(this.getResources().getString(R.string.editor_title));
@@ -155,10 +154,7 @@ public class EditorActivity extends AppCompatActivity {
         mMarkdownProcessor = new MarkdownProcessor(this);
         mMarkdownProcessor.config(markdownConfiguration);
         mMarkdownProcessor.factory(EditFactory.create());
-        mMarkdownProcessor.live(mMarkdownEditText);
     }
-
-
 
     class PictureAsyncTask extends AsyncTask<Void, Void, Void> {
         @Override

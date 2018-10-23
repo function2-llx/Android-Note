@@ -27,13 +27,16 @@ import com.yydcdut.markdown.theme.ThemeSunburst;
 public class ShowActivity extends AppCompatActivity {
     public static final String EXTRA_CONTENT = "extra_content";
     public static void startShowActivity(Activity activity, String content, boolean isRx) {
+        /*
         Intent intent = new Intent(activity, ShowActivity.class);
         intent.putExtra(EXTRA_CONTENT, content);
         activity.startActivity(intent);
+        */
     }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
+        /*
         super.onCreate(savedInstanceState);
         MarkdownTextView markdownTextView = ;
         markdownTextView.setMovementMethod(LinkMovementMethod.getInstance());
@@ -41,6 +44,7 @@ public class ShowActivity extends AppCompatActivity {
         MDImageLoader mdImageLoader = null;
         markdownTextView.setVisibility(View.VISIBLE);
         markdown(markdownTextView, content, mdImageLoader);
+        */
     }
 
     private void markdown(final TextView textView, String content, MDImageLoader imageLoader) {
@@ -79,14 +83,5 @@ public class ShowActivity extends AppCompatActivity {
         processor.factory(TextFactory.create());
         processor.config(markdownConfiguration);
         textView.setText(processor.parse(content));
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        if (item.getItemId() == android.R.id.home) {
-            finish();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 }
