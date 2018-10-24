@@ -1,6 +1,7 @@
 package com.se.npe.androidnote.models;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.util.Logger;
@@ -8,6 +9,7 @@ import com.se.npe.androidnote.util.Logger;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,7 +18,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Objects;
+
 
 /**
  * Note entity
@@ -127,7 +129,46 @@ public class Note {
     }
 
     public void loadFromFile(String fileName) {
-        File file = new File(fileName);
+
+        //文件夹生成
+
+        File savepath = new File(TableConfig.SAVE_PATH);
+        if(!savepath.exists()) {
+            savepath.mkdir();
+        }
+        File notesave = new File(TableConfig.SAVE_PATH+"/NoteSave");
+        if (!notesave.exists()) {
+            notesave.mkdirs();
+        }
+        File tempfloder = new File(TableConfig.SAVE_PATH+"/NoteSave/TempFloder");
+        if (!tempfloder.exists()) {
+            tempfloder.mkdirs();
+        }
+
+        //文件解压缩
+
+        try {
+            FileOperate.unzip(fileName, TableConfig.SAVE_PATH + "/NoteSave/TempFloder");
+        }catch (IOException e){
+            Logger.log(LOG_TAG, e);
+        }
+
+        //文件解压测试
+
+        Log.d("debug0001","TestFileUnzip");
+        File fa[] = tempfloder.listFiles();
+        for (int i = 0; i < fa.length; i++) {
+            File fs = fa[i];
+            if (fs.isDirectory()) {
+                Log.d("debug0001",fs.getPath()+"目录");
+            } else {
+                Log.d("debug0001",fs.getPath()+"文件");
+            }
+        }
+
+        //Note标题解析
+
+        File file = new File(TableConfig.SAVE_PATH + "/NoteSave/TempFloder/data.txt");
         InputStream inputStream = null;
         try {
             inputStream = new FileInputStream(file);
@@ -149,9 +190,32 @@ public class Note {
 
         title = StrArray[0];
 
+        //Note资源文件转移
+
+        tempfloder.renameTo(new File(TableConfig.SAVE_PATH+"/NoteSave/"+title+"_unzip"));
+
+        //转移测试
+
+        Log.d("debug0001","TestFileMove");
+        File unzip = new File(TableConfig.SAVE_PATH+"/NoteSave/"+title+"_unzip");
+        File fax[] = unzip.listFiles();
+        for (int i = 0; i < fax.length; i++) {
+            File fs = fax[i];
+            if (fs.isDirectory()) {
+                Log.d("debug0001",fs.getPath()+"目录");
+            } else {
+                Log.d("debug0001",fs.getPath()+"文件");
+            }
+        }
+
+        //Note结构解析
+
+        Log.d("debug0001","TestNoteStruct");
+
         content = new ArrayList<IData>();
 
         for (int i = 1; i < StrArray.length; i++) {
+            Log.d("debug0001",StrArray[i]);
             if (StrArray[i].charAt(0) == 'S') {
                 String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPERATOR);
                 SoundData tempSoundData = new SoundData(tempArray[1], tempArray[2]);
@@ -179,7 +243,62 @@ public class Note {
     }
 
     public void saveToFile(String fileName) {
-        File file = new File(fileName);
+
+        //文件夹生成
+
+        File savepath = new File(TableConfig.SAVE_PATH);
+        if(!savepath.exists()) {
+            savepath.mkdir();
+        }
+        File notesave = new File(TableConfig.SAVE_PATH+"/NoteSave");
+        if (!notesave.exists()) {
+            notesave.mkdirs();
+        }
+        File tempfloder = new File(TableConfig.SAVE_PATH+"/NoteSave/TempFloder");
+        if (!tempfloder.exists()) {
+            tempfloder.mkdirs();
+        }
+
+        //Note资源文件拷贝
+
+        File srcFile;
+        File desFile;
+        List<IData> ContentList = getContent();
+
+        for (int i = 0; i < ContentList.size(); i++) {
+            if(ContentList.get(i).getType() == "Pic") {
+                srcFile = new File(ContentList.get(i).getPath());
+                FileOperate.getSuffix(ContentList.get(i).getPath());
+                desFile = new File(TableConfig.SAVE_PATH+"/NoteSave/TempFloder/Picdata"+Integer.toString(i)+"."+FileOperate.getSuffix(ContentList.get(i).getPath()));
+                try{
+                    FileOperate.copyFileUsingStream(srcFile,desFile);
+                }catch (IOException e){
+                    Logger.log(LOG_TAG, e);
+                }
+            }
+            else if(ContentList.get(i).getType() == "Sound"){
+                srcFile = new File(ContentList.get(i).getPath());
+                desFile = new File(TableConfig.SAVE_PATH+"/NoteSave/TempFloder/Sounddata"+Integer.toString(i)+"."+FileOperate.getSuffix(ContentList.get(i).getPath()));
+                try{
+                    FileOperate.copyFileUsingStream(srcFile,desFile);
+                }catch (IOException e){
+                    Logger.log(LOG_TAG, e);
+                }
+            }
+            else if(ContentList.get(i).getType() == "Video"){
+                srcFile = new File(ContentList.get(i).getPath());
+                desFile = new File(TableConfig.SAVE_PATH+"/NoteSave/TempFloder/Videodata"+Integer.toString(i)+"."+FileOperate.getSuffix(ContentList.get(i).getPath()));
+                try{
+                    FileOperate.copyFileUsingStream(srcFile,desFile);
+                }catch (IOException e){
+                    Logger.log(LOG_TAG, e);
+                }
+            }
+        }
+
+        //Note结构文件
+
+        File file = new File(TableConfig.SAVE_PATH+"/NoteSave/TempFloder/data.txt");
         if (!file.exists()) {
             try {
                 file.createNewFile();
@@ -195,10 +314,23 @@ public class Note {
             return;
         }
         String string = getTitle() + TableConfig.Filesave.LIST_SEPERATOR;
-        List<IData> templist = getContent();
 
-        for (int i = 0; i < templist.size(); i++) {
-            string = string + templist.get(i).toString() + TableConfig.Filesave.LIST_SEPERATOR;
+        for (int i = 0; i < ContentList.size(); i++) {
+            if(ContentList.get(i).getType() == "Pic") {
+                String newdir = TableConfig.SAVE_PATH+"/NoteSave/"+getTitle()+"_unzip/Picdata"+Integer.toString(i)+"."+FileOperate.getSuffix(ContentList.get(i).getPath());
+                string = string + "Picture" + TableConfig.Filesave.LINE_SEPERATOR + newdir;
+            }
+            else if(ContentList.get(i).getType() == "Sound"){
+                String newdir = TableConfig.SAVE_PATH+"/NoteSave/"+getTitle()+"_unzip/Sounddata"+Integer.toString(i)+"."+FileOperate.getSuffix(ContentList.get(i).getPath());
+                string = string + "Sound" + TableConfig.Filesave.LINE_SEPERATOR + newdir + TableConfig.Filesave.LINE_SEPERATOR + ContentList.get(i).getText();
+            }
+            else if(ContentList.get(i).getType() == "Video"){
+                String newdir = TableConfig.SAVE_PATH+"/NoteSave/"+getTitle()+"_unzip/Videodata"+Integer.toString(i)+"."+FileOperate.getSuffix(ContentList.get(i).getPath());
+                string = string + "Video" + TableConfig.Filesave.LINE_SEPERATOR + newdir;
+            }
+            else {
+                string = string + ContentList.get(i).toString() + TableConfig.Filesave.LIST_SEPERATOR;
+            }
         }
 
         byte[] bs = string.getBytes();
@@ -212,6 +344,31 @@ public class Note {
             outputStream.close();
         } catch (IOException e) {
             Logger.log(LOG_TAG, e);
+        }
+
+        //文件压缩
+
+        try {
+            FileOperate.zip(TableConfig.SAVE_PATH + "/NoteSave/TempFloder", TableConfig.SAVE_PATH + "/NoteSave/" + fileName + ".zip");
+        }catch (IOException e){
+            Logger.log(LOG_TAG, e);
+        }
+
+        //文件夹删除
+
+        FileOperate.delete(TableConfig.SAVE_PATH + "/NoteSave/TempFloder");
+
+        //文件存储测试
+
+        Log.d("debug0001","TestFileSave");
+        File fa[] = notesave.listFiles();
+        for (int i = 0; i < fa.length; i++) {
+            File fs = fa[i];
+            if (fs.isDirectory()) {
+                Log.d("debug0001",fs.getPath()+"目录");
+            } else {
+                Log.d("debug0001",fs.getPath()+"文件");
+            }
         }
     }
 

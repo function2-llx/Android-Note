@@ -26,6 +26,10 @@ public class SoundData implements IData {
         return soundPath;
     }
 
+    public String getType() { return "Sound"; }
+
+    public String getPath() { return getSoundPath(); }
+
     public String getText() {
         return text;
     }
@@ -46,6 +50,6 @@ public class SoundData implements IData {
 
     @Override
     public String toString() {
-        return "Sound" + "asdfg" + soundPath + "asdfg" + text;
+        return "Sound" + TableConfig.Filesave.LINE_SEPERATOR + soundPath + TableConfig.Filesave.LINE_SEPERATOR + text;
     }
 }

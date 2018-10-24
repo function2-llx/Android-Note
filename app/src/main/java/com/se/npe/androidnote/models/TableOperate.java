@@ -40,25 +40,22 @@ public class TableOperate implements INoteCollection {
 
     public static void init(Context context) {
         tableOperate = new TableOperate(context);
-        String path = context.getExternalFilesDir(null).getAbsolutePath();
-        File filepath = new File(path + "/AndroidNote");
-        if(!filepath.exists())
-        {
+        File filepath = new File(TableConfig.SAVE_PATH);
+        if(!filepath.exists()) {
             filepath.mkdir();
         }
-        File file = new File(path+"/AndroidNote/Config");
+        File file = new File(TableConfig.SAVE_PATH+"/Config");
         if (!file.exists()) {
             file.mkdirs();
         }
-        configfile = new File(path+"/AndroidNote/Config/searchconfig.txt");
+        configfile = new File(TableConfig.SAVE_PATH+"/Config/searchconfig.txt");
         try {
             if(!configfile.exists()) {
                 configfile.createNewFile();
                 setSearchConfig(-1);
             }
         }
-        catch (IOException c)
-        {
+        catch (IOException c) {
             c.printStackTrace();
         }
     }
@@ -85,7 +82,6 @@ public class TableOperate implements INoteCollection {
     }
 
     public List<IData> decodeNote(String src) {
-        Log.d("debug0001", "decode:" + src);
         List<IData> content = new ArrayList<IData>();
         String[] StrArray = src.split(TableConfig.Filesave.LIST_SEPERATOR);
         for (int i = 0; i < StrArray.length; i++) {
@@ -109,7 +105,6 @@ public class TableOperate implements INoteCollection {
                 content.add(tempPictureData);
             }
         }
-        Log.d("debug0001", "test:" + encodeNote(content));
         return content;
     }
 

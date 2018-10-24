@@ -24,6 +24,10 @@ public class TextData implements IData {
         return text;
     }
 
+    public String getPath() { return ""; }
+
+    public String getType() { return "Text"; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

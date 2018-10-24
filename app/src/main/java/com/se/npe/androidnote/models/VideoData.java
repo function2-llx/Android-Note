@@ -24,6 +24,12 @@ public class VideoData implements IData {
         return videoPath;
     }
 
+    public String getPath() { return getVideoPath(); }
+
+    public String getType() { return "Video"; }
+
+    public String getText() { return ""; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -39,6 +45,6 @@ public class VideoData implements IData {
 
     @Override
     public String toString() {
-        return "Video" + "asdfg" + videoPath;
+        return "Video" + TableConfig.Filesave.LINE_SEPERATOR + videoPath;
     }
 }
