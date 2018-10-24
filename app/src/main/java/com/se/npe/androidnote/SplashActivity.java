@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
+import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
 
 import java.lang.ref.WeakReference;
@@ -32,6 +33,7 @@ public class SplashActivity extends Activity {
         protected Void doInBackground(Void... voids) {
             publishProgress("loading database...");
             TableOperate.init(ref.get());
+            TableConfig.SAVE_PATH = ref.get().getExternalFilesDir(null).getAbsolutePath()+ "/AndroidNote";
             publishProgress("loading ifly...");
             SpeechUtility.createUtility(ref.get(), SpeechConstant.APPID + "=5bbc8c0f");
             return null;

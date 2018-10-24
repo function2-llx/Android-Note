@@ -8,6 +8,7 @@ import com.se.npe.androidnote.util.Logger;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,7 +17,7 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.Objects;
+
 
 /**
  * Note entity
@@ -179,6 +180,8 @@ public class Note {
     }
 
     public void saveToFile(String fileName) {
+
+
         File file = new File(fileName);
         if (!file.exists()) {
             try {
