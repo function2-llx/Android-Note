@@ -270,10 +270,22 @@ public class Note {
             Logger.log(LOG_TAG, e);
         }
 
+        //文件压缩
+
+        try {
+            FileOperate.zip(TableConfig.SAVE_PATH + "/NoteSave/TempFloder", TableConfig.SAVE_PATH + "/NoteSave/" + fileName + ".zip");
+        }catch (IOException e){
+            Logger.log(LOG_TAG, e);
+        }
+
+        //文件夹删除
+
+        FileOperate.delete(TableConfig.SAVE_PATH + "/NoteSave/TempFloder");
+
         //文件存储测试
 
         Log.d("debug0001","TestFileSave");
-        File fa[] = tempfloder.listFiles();
+        File fa[] = notesave.listFiles();
         for (int i = 0; i < fa.length; i++) {
             File fs = fa[i];
             if (fs.isDirectory()) {
@@ -282,7 +294,6 @@ public class Note {
                 Log.d("debug0001",fs.getPath()+"文件");
             }
         }
-
     }
 
     @Override
