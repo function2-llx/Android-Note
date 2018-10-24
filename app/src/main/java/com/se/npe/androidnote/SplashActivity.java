@@ -11,8 +11,10 @@ import android.widget.TextView;
 
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
+import com.se.npe.androidnote.models.FileOperate;
 import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
+import com.se.npe.androidnote.models.Note;
 
 import java.lang.ref.WeakReference;
 
@@ -36,6 +38,11 @@ public class SplashActivity extends Activity {
             TableOperate.init(ref.get());
 
             TableOperate.getInstance().getSearchResult("123456").get(0).saveToFile("Note");
+            Note tempnote = new Note();
+            tempnote.loadFromFile(TableConfig.SAVE_PATH+"/NoteSave/Note.zip");
+            Log.d("debug0001",Integer.toString(tempnote.getContent().size()));
+            TableOperate.getInstance().addNote(tempnote);
+            //TableOperate.getInstance().getSearchResult("data2").get(0).loadFromFile(TableConfig.SAVE_PATH+"/NoteSave/Note.zip");
 
             publishProgress("loading ifly...");
             SpeechUtility.createUtility(ref.get(), SpeechConstant.APPID + "=5bbc8c0f");

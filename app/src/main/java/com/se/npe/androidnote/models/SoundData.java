@@ -50,6 +50,6 @@ public class SoundData implements IData {
 
     @Override
     public String toString() {
-        return "Sound" + "asdfg" + soundPath + "asdfg" + text;
+        return "Sound" + TableConfig.Filesave.LINE_SEPERATOR + soundPath + TableConfig.Filesave.LINE_SEPERATOR + text;
     }
 }

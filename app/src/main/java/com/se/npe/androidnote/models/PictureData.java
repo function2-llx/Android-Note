@@ -24,6 +24,8 @@ public class PictureData implements IData {
 
     public String getPath() { return getPicturePath(); }
 
+    public String getText() { return ""; }
+
     @Override
     public boolean equals(Object o) {
         return o instanceof PictureData && ((PictureData) o).picturePath.equals(picturePath);
@@ -36,6 +38,6 @@ public class PictureData implements IData {
 
     @Override
     public String toString() {
-        return "Picture" + "asdfg" + picturePath;
+        return "Picture" + TableConfig.Filesave.LINE_SEPERATOR + picturePath;
     }
 }

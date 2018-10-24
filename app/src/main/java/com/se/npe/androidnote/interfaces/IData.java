@@ -13,4 +13,6 @@ public interface IData {
     String getType();
 
     String getPath();
+
+    String getText();
 }
