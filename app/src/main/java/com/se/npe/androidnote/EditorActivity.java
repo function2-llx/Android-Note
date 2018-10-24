@@ -1,12 +1,22 @@
 package com.se.npe.androidnote;
 
+import android.Manifest;
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -27,7 +37,10 @@ import com.se.npe.androidnote.util.Logger;
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -134,14 +147,21 @@ public class EditorActivity extends AppCompatActivity {
         }
     }
 
+    private File createTempPictureOrVideo() throws IOException {
+        // Create an image file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
+        return File.createTempFile(timeStamp, "", storageDir);
+    }
+
     private void takePictureOrVideo(int code) {
+        while (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) !=
+                PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 10);
+        }
         Intent intent = new Intent(
                 code == REQUEST_IMAGE_CAPTURE ? MediaStore.ACTION_IMAGE_CAPTURE : MediaStore.ACTION_VIDEO_CAPTURE);
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivityForResult(intent, code);
-        } else {
-            Toast.makeText(this, "fail to take picture or video", Toast.LENGTH_SHORT).show();
-        }
+        startActivityForResult(intent, code);
     }
 
     private void pickPictureOrVideo(int code) {
@@ -155,7 +175,10 @@ public class EditorActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        switch (resultCode) {
+        if (data == null) {
+            return;
+        }
+        switch (requestCode) {
             case PickerConfig.PICKER_IMAGE: {
                 ArrayList<Media> select = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
                 for (Media media : select) {
@@ -173,18 +196,27 @@ public class EditorActivity extends AppCompatActivity {
             case PICKER_SOUND: {
                 String path = ResultPool.getInstance().getCurrentPath();
                 final EditText editText = editor.addSound(path);
-                editor.addText("");
                 final long requestStartTime = data.getLongExtra(SoundRecorderActivity.REQUEST_START_TIME, -1);
                 new Handler().postDelayed(() -> editText.setText(ResultPool.getInstance().resultFrom(requestStartTime))
                         , 1000);
             }
             break;
             case REQUEST_IMAGE_CAPTURE: {
-
+                Bitmap bitmap = data.getParcelableExtra("data");
+                try {
+                    File f = createTempPictureOrVideo();
+                    FileOutputStream fos = new FileOutputStream(f);
+                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
+                    fos.flush();
+                    fos.close();
+                    editor.addPicture(f.getPath());
+                } catch (IOException e) {
+                    Logger.log(LOG_TAG, e);
+                }
             }
             break;
             case REQUEST_VIDEO_CAPTURE: {
-
+                editor.addVideo(data.getData().getPath());
             }
             break;
             default:
