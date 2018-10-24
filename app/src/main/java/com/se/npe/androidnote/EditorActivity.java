@@ -1,8 +1,10 @@
 package com.se.npe.androidnote;
 
+import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
@@ -34,6 +36,9 @@ public class EditorActivity extends AppCompatActivity {
     private static final long MAX_SIZE = 188743680L; // 180 MB
     private static final int MAX_PICK = 15;
     private static final int PICKER_SOUND = 0;
+    private static final int REQUEST_IMAGE_CAPTURE = 1;
+    private static final int REQUEST_VIDEO_CAPTURE = 2;
+
     private SortRichEditor editor;
     private Note oldNote;
     private long startTime;
@@ -68,11 +73,35 @@ public class EditorActivity extends AppCompatActivity {
         final FloatingActionsMenu insertMedia = findViewById(R.id.insert_media);
         findViewById(R.id.insert_picture).setOnClickListener(v -> {
             insertMedia.collapse();
-            getPictureOrVideo(PickerConfig.PICKER_IMAGE);
+            new AlertDialog.Builder(this)
+                    .setIcon(R.drawable.ic_launcher)
+                    .setTitle("From")
+                    .setSingleChoiceItems(new String[]{"Camera", "Gallery"}, -1, (dialog, which) -> {
+                        if (which == 0) {
+                            takePictureOrVideo(REQUEST_IMAGE_CAPTURE);
+                        } else {
+                            pickPictureOrVideo(PickerConfig.PICKER_IMAGE);
+                        }
+                        dialog.cancel();
+                    })
+                    .setCancelable(false)
+                    .show();
         });
         findViewById(R.id.insert_video).setOnClickListener(v -> {
             insertMedia.collapse();
-            getPictureOrVideo(PickerConfig.PICKER_VIDEO);
+            new AlertDialog.Builder(this)
+                    .setIcon(R.drawable.ic_launcher)
+                    .setTitle("From")
+                    .setSingleChoiceItems(new String[]{"Camera", "Gallery"}, -1, (dialog, which) -> {
+                        if (which == 0) {
+                            takePictureOrVideo(REQUEST_VIDEO_CAPTURE);
+                        } else {
+                            pickPictureOrVideo(PickerConfig.PICKER_VIDEO);
+                        }
+                        dialog.cancel();
+                    })
+                    .setCancelable(false)
+                    .show();
         });
         findViewById(R.id.insert_sound).setOnClickListener(v -> {
             insertMedia.collapse();
@@ -105,7 +134,17 @@ public class EditorActivity extends AppCompatActivity {
         }
     }
 
-    private void getPictureOrVideo(int code) {
+    private void takePictureOrVideo(int code) {
+        Intent intent = new Intent(
+                code == REQUEST_IMAGE_CAPTURE ? MediaStore.ACTION_IMAGE_CAPTURE : MediaStore.ACTION_VIDEO_CAPTURE);
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivityForResult(intent, code);
+        } else {
+            Toast.makeText(this, "fail to take picture or video", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void pickPictureOrVideo(int code) {
         Intent intent = new Intent(this, PickerActivity.class);
         intent.putExtra(PickerConfig.SELECT_MODE, code);
         intent.putExtra(PickerConfig.MAX_SELECT_SIZE, MAX_SIZE);
@@ -116,29 +155,40 @@ public class EditorActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (resultCode == PickerConfig.RESULT_CODE) {
-            ArrayList<Media> select = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
-            switch (requestCode) {
-                case PickerConfig.PICKER_IMAGE:
-                    for (Media media : select) {
-                        editor.addPicture(media.path);
-                    }
-                    break;
-                case PickerConfig.PICKER_VIDEO:
-                    for (Media media : select) {
-                        editor.addVideo(media.path);
-                    }
-                    break;
-                default:
-                    break;
+        switch (resultCode) {
+            case PickerConfig.PICKER_IMAGE: {
+                ArrayList<Media> select = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
+                for (Media media : select) {
+                    editor.addPicture(media.path);
+                }
             }
-        } else if (resultCode == SoundRecorderActivity.RESULT_CODE && requestCode == PICKER_SOUND) {
-            String path = ResultPool.getInstance().getCurrentPath();
-            final EditText editText = editor.addSound(path);
-            editor.addText("");
-            final long requestStartTime = data.getLongExtra(SoundRecorderActivity.REQUEST_START_TIME, -1);
-            new Handler().postDelayed(() -> editText.setText(ResultPool.getInstance().resultFrom(requestStartTime))
-                    , 1000);
+            break;
+            case PickerConfig.PICKER_VIDEO: {
+                ArrayList<Media> select = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
+                for (Media media : select) {
+                    editor.addVideo(media.path);
+                }
+            }
+            break;
+            case PICKER_SOUND: {
+                String path = ResultPool.getInstance().getCurrentPath();
+                final EditText editText = editor.addSound(path);
+                editor.addText("");
+                final long requestStartTime = data.getLongExtra(SoundRecorderActivity.REQUEST_START_TIME, -1);
+                new Handler().postDelayed(() -> editText.setText(ResultPool.getInstance().resultFrom(requestStartTime))
+                        , 1000);
+            }
+            break;
+            case REQUEST_IMAGE_CAPTURE: {
+
+            }
+            break;
+            case REQUEST_VIDEO_CAPTURE: {
+
+            }
+            break;
+            default:
+                break;
         }
     }
 
