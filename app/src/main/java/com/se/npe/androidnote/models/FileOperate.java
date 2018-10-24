@@ -1,5 +1,7 @@
 package com.se.npe.androidnote.models;
 
+import android.util.Log;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -10,8 +12,15 @@ import java.util.Enumeration;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
+import java.util.Arrays;
+import java.util.List;
 
 public class FileOperate {
+
+    public static String getSuffix(String path) {
+        String[] stringList = path.split("\\.");
+        return stringList[stringList.length-1];
+    }
 
     /**
      *

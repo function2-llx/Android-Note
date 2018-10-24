@@ -82,7 +82,6 @@ public class TableOperate implements INoteCollection {
     }
 
     public List<IData> decodeNote(String src) {
-        Log.d("debug0001", "decode:" + src);
         List<IData> content = new ArrayList<IData>();
         String[] StrArray = src.split(TableConfig.Filesave.LIST_SEPERATOR);
         for (int i = 0; i < StrArray.length; i++) {
@@ -106,7 +105,6 @@ public class TableOperate implements INoteCollection {
                 content.add(tempPictureData);
             }
         }
-        Log.d("debug0001", "test:" + encodeNote(content));
         return content;
     }
 

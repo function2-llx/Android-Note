@@ -181,6 +181,9 @@ public class Note {
     }
 
     public void saveToFile(String fileName) {
+
+        //文件夹生成
+
         File savepath = new File(TableConfig.SAVE_PATH);
         if(!savepath.exists()) {
             savepath.mkdir();
@@ -194,6 +197,8 @@ public class Note {
             tempfloder.mkdirs();
         }
 
+        //Note资源文件拷贝
+
         File srcFile;
         File desFile;
         List<IData> ContentList = getContent();
@@ -201,17 +206,17 @@ public class Note {
         for (int i = 0; i < ContentList.size(); i++) {
             if(ContentList.get(i).getType() == "Pic") {
                 srcFile = new File(ContentList.get(i).getPath());
-                desFile = new File(TableConfig.SAVE_PATH+"/NoteSave/TempFloder/Picdata"+Integer.toString(i));
+                FileOperate.getSuffix(ContentList.get(i).getPath());
+                desFile = new File(TableConfig.SAVE_PATH+"/NoteSave/TempFloder/Picdata"+Integer.toString(i)+"."+FileOperate.getSuffix(ContentList.get(i).getPath()));
                 try{
                     FileOperate.copyFileUsingStream(srcFile,desFile);
                 }catch (IOException e){
                     Logger.log(LOG_TAG, e);
                 }
-
             }
             else if(ContentList.get(i).getType() == "Sound"){
                 srcFile = new File(ContentList.get(i).getPath());
-                desFile = new File(TableConfig.SAVE_PATH+"/NoteSave/TempFloder/Sounddata"+Integer.toString(i));
+                desFile = new File(TableConfig.SAVE_PATH+"/NoteSave/TempFloder/Sounddata"+Integer.toString(i)+"."+FileOperate.getSuffix(ContentList.get(i).getPath()));
                 try{
                     FileOperate.copyFileUsingStream(srcFile,desFile);
                 }catch (IOException e){
@@ -220,7 +225,7 @@ public class Note {
             }
             else if(ContentList.get(i).getType() == "Video"){
                 srcFile = new File(ContentList.get(i).getPath());
-                desFile = new File(TableConfig.SAVE_PATH+"/NoteSave/TempFloder/Videodata"+Integer.toString(i));
+                desFile = new File(TableConfig.SAVE_PATH+"/NoteSave/TempFloder/Videodata"+Integer.toString(i)+"."+FileOperate.getSuffix(ContentList.get(i).getPath()));
                 try{
                     FileOperate.copyFileUsingStream(srcFile,desFile);
                 }catch (IOException e){
@@ -228,6 +233,8 @@ public class Note {
                 }
             }
         }
+
+        //Note结构文件
 
         File file = new File(TableConfig.SAVE_PATH+"/NoteSave/TempFloder/data.txt");
         if (!file.exists()) {
@@ -245,10 +252,9 @@ public class Note {
             return;
         }
         String string = getTitle() + TableConfig.Filesave.LIST_SEPERATOR;
-        List<IData> templist = getContent();
 
-        for (int i = 0; i < templist.size(); i++) {
-            string = string + templist.get(i).toString() + TableConfig.Filesave.LIST_SEPERATOR;
+        for (int i = 0; i < ContentList.size(); i++) {
+            string = string + ContentList.get(i).toString() + TableConfig.Filesave.LIST_SEPERATOR;
         }
 
         byte[] bs = string.getBytes();
@@ -264,7 +270,9 @@ public class Note {
             Logger.log(LOG_TAG, e);
         }
 
-        Log.d("debug0001","testfilesave");
+        //文件存储测试
+
+        Log.d("debug0001","TestFileSave");
         File fa[] = tempfloder.listFiles();
         for (int i = 0; i < fa.length; i++) {
             File fs = fa[i];
@@ -275,41 +283,6 @@ public class Note {
             }
         }
 
-        /*
-        File file = new File(TableConfig.SAVE_PATH+"/NoteSave/TempFloder/data.txt");
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                Logger.log(LOG_TAG, e);
-            }
-        }
-        OutputStream outputStream = null;
-        try {
-            outputStream = new FileOutputStream(file);
-        } catch (FileNotFoundException e) {
-            Logger.log(LOG_TAG, e);
-            return;
-        }
-        String string = getTitle() + TableConfig.Filesave.LIST_SEPERATOR;
-        List<IData> templist = getContent();
-
-        for (int i = 0; i < templist.size(); i++) {
-            string = string + templist.get(i).toString() + TableConfig.Filesave.LIST_SEPERATOR;
-        }
-
-        byte[] bs = string.getBytes();
-        try {
-            outputStream.write(bs);
-        } catch (IOException e) {
-            Logger.log(LOG_TAG, e);
-        }
-
-        try {
-            outputStream.close();
-        } catch (IOException e) {
-            Logger.log(LOG_TAG, e);
-        }*/
     }
 
     @Override
