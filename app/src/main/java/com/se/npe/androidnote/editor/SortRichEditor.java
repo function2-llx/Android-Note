@@ -696,8 +696,10 @@ public class SortRichEditor extends ScrollView implements IEditor {
             View child = containerLayout.getChildAt(i);
             if (child instanceof MarkdownEditText) {
                 MarkdownProcessor mMarkdownProcessor = new MarkdownProcessor(EditorActivity.context);
-                mMarkdownProcessor.config(markdownConfiguration);
                 mMarkdownProcessor.factory(TextFactory.create());
+                mMarkdownProcessor.config(markdownConfiguration);
+                //Log.e("1 text", ((MarkdownEditText) child).getText().toString());
+                //Log.e("2 text", mMarkdownProcessor.parse(((MarkdownEditText) child).getText()).toString());
                 ((MarkdownEditText) child).setText(mMarkdownProcessor.parse(((MarkdownEditText) child).getText()));
             }
         }
