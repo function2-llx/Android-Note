@@ -1,6 +1,7 @@
 package com.se.npe.androidnote.models;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.util.Logger;
@@ -180,9 +181,37 @@ public class Note {
     }
 
     public void saveToFile(String fileName) {
+        File savepath = new File(TableConfig.SAVE_PATH);
+        if(!savepath.exists()) {
+            savepath.mkdir();
+        }
+        File notesave = new File(TableConfig.SAVE_PATH+"/NoteSave");
+        if (!notesave.exists()) {
+            notesave.mkdirs();
+        }
+        File tempfloder = new File(TableConfig.SAVE_PATH+"/NoteSave/TempFloder");
+        if (!tempfloder.exists()) {
+            tempfloder.mkdirs();
+        }
 
+        List<IData> ContentList = getContent();
 
-        File file = new File(fileName);
+        for (int i = 0; i < ContentList.size(); i++) {
+            //ContentList.get(i)
+        }
+
+        File fa[] = tempfloder.listFiles();
+        for (int i = 0; i < fa.length; i++) {
+            File fs = fa[i];
+            if (fs.isDirectory()) {
+                Log.d("debug0001",fs.getPath()+"目录");
+            } else {
+                Log.d("debug0001",fs.getPath()+"文件");
+            }
+        }
+
+        /*
+        File file = new File(TableConfig.SAVE_PATH+"/NoteSave/TempFloder/data.txt");
         if (!file.exists()) {
             try {
                 file.createNewFile();
@@ -215,7 +244,7 @@ public class Note {
             outputStream.close();
         } catch (IOException e) {
             Logger.log(LOG_TAG, e);
-        }
+        }*/
     }
 
     @Override

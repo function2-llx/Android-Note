@@ -32,8 +32,11 @@ public class SplashActivity extends Activity {
         @Override
         protected Void doInBackground(Void... voids) {
             publishProgress("loading database...");
-            TableOperate.init(ref.get());
             TableConfig.SAVE_PATH = ref.get().getExternalFilesDir(null).getAbsolutePath()+ "/AndroidNote";
+            TableOperate.init(ref.get());
+
+            TableOperate.getInstance().getAllNotes().get(0).saveToFile("");
+
             publishProgress("loading ifly...");
             SpeechUtility.createUtility(ref.get(), SpeechConstant.APPID + "=5bbc8c0f");
             return null;
