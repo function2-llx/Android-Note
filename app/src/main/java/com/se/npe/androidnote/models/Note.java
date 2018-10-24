@@ -194,12 +194,77 @@ public class Note {
             tempfloder.mkdirs();
         }
 
+        File srcFile;
+        File desFile;
         List<IData> ContentList = getContent();
 
         for (int i = 0; i < ContentList.size(); i++) {
-            //ContentList.get(i)
+            if(ContentList.get(i).getType() == "Pic") {
+                srcFile = new File(ContentList.get(i).getPath());
+                desFile = new File(TableConfig.SAVE_PATH+"/NoteSave/TempFloder/Picdata"+Integer.toString(i));
+                try{
+                    FileOperate.copyFileUsingStream(srcFile,desFile);
+                }catch (IOException e){
+                    Logger.log(LOG_TAG, e);
+                }
+
+            }
+            else if(ContentList.get(i).getType() == "Sound"){
+                srcFile = new File(ContentList.get(i).getPath());
+                desFile = new File(TableConfig.SAVE_PATH+"/NoteSave/TempFloder/Sounddata"+Integer.toString(i));
+                try{
+                    FileOperate.copyFileUsingStream(srcFile,desFile);
+                }catch (IOException e){
+                    Logger.log(LOG_TAG, e);
+                }
+            }
+            else if(ContentList.get(i).getType() == "Video"){
+                srcFile = new File(ContentList.get(i).getPath());
+                desFile = new File(TableConfig.SAVE_PATH+"/NoteSave/TempFloder/Videodata"+Integer.toString(i));
+                try{
+                    FileOperate.copyFileUsingStream(srcFile,desFile);
+                }catch (IOException e){
+                    Logger.log(LOG_TAG, e);
+                }
+            }
         }
 
+        File file = new File(TableConfig.SAVE_PATH+"/NoteSave/TempFloder/data.txt");
+        if (!file.exists()) {
+            try {
+                file.createNewFile();
+            } catch (IOException e) {
+                Logger.log(LOG_TAG, e);
+            }
+        }
+        OutputStream outputStream = null;
+        try {
+            outputStream = new FileOutputStream(file);
+        } catch (FileNotFoundException e) {
+            Logger.log(LOG_TAG, e);
+            return;
+        }
+        String string = getTitle() + TableConfig.Filesave.LIST_SEPERATOR;
+        List<IData> templist = getContent();
+
+        for (int i = 0; i < templist.size(); i++) {
+            string = string + templist.get(i).toString() + TableConfig.Filesave.LIST_SEPERATOR;
+        }
+
+        byte[] bs = string.getBytes();
+        try {
+            outputStream.write(bs);
+        } catch (IOException e) {
+            Logger.log(LOG_TAG, e);
+        }
+
+        try {
+            outputStream.close();
+        } catch (IOException e) {
+            Logger.log(LOG_TAG, e);
+        }
+
+        Log.d("debug0001","testfilesave");
         File fa[] = tempfloder.listFiles();
         for (int i = 0; i < fa.length; i++) {
             File fs = fa[i];

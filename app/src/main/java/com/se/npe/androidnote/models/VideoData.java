@@ -24,6 +24,10 @@ public class VideoData implements IData {
         return videoPath;
     }
 
+    public String getPath() { return getVideoPath(); }
+
+    public String getType() { return "Video"; }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;

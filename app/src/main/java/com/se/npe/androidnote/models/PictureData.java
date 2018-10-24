@@ -20,6 +20,10 @@ public class PictureData implements IData {
         return picturePath;
     }
 
+    public String getType() { return "Pic"; }
+
+    public String getPath() { return getPicturePath(); }
+
     @Override
     public boolean equals(Object o) {
         return o instanceof PictureData && ((PictureData) o).picturePath.equals(picturePath);

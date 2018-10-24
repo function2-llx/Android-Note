@@ -9,4 +9,8 @@ package com.se.npe.androidnote.interfaces;
  */
 
 public interface IData {
+
+    String getType();
+
+    String getPath();
 }

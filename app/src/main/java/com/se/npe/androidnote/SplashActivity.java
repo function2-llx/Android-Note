@@ -35,7 +35,7 @@ public class SplashActivity extends Activity {
             TableConfig.SAVE_PATH = ref.get().getExternalFilesDir(null).getAbsolutePath()+ "/AndroidNote";
             TableOperate.init(ref.get());
 
-            TableOperate.getInstance().getAllNotes().get(0).saveToFile("");
+            TableOperate.getInstance().getSearchResult("123456").get(0).saveToFile("");
 
             publishProgress("loading ifly...");
             SpeechUtility.createUtility(ref.get(), SpeechConstant.APPID + "=5bbc8c0f");
