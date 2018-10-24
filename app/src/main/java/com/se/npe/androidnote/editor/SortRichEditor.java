@@ -181,22 +181,6 @@ public class SortRichEditor extends ScrollView implements IEditor {
 
     private boolean isMarkdown = false;
 
-    MarkdownConfiguration markdownConfiguration = new MarkdownConfiguration.Builder(EditorActivity.context)
-            .setDefaultImageSize(50, 50)
-            .setBlockQuotesLineColor(0xff33b5e5)
-            .setHeader1RelativeSize(1.6f)
-            .setHeader2RelativeSize(1.5f)
-            .setHeader3RelativeSize(1.4f)
-            .setHeader4RelativeSize(1.3f)
-            .setHeader5RelativeSize(1.2f)
-            .setHeader6RelativeSize(1.1f)
-            .setHorizontalRulesColor(0xff99cc00)
-            .setCodeBgColor(0xffff4444)
-            .setTodoColor(0xffaa66cc)
-            .setTodoDoneColor(0xffff8800)
-            .setUnOrderListColor(0xff00ddff)
-            .build();
-
     public SortRichEditor(Context context) {
         this(context, null);
     }
@@ -679,15 +663,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
         lp.rightMargin = DEFAULT_MARGIN;
         editText.setLayoutParams(lp);
 
-        markdown(editText);
         return editText;
-    }
-
-    private void markdown(MarkdownEditText editText) {
-        MarkdownProcessor mMarkdownProcessor = new MarkdownProcessor(EditorActivity.context);
-        mMarkdownProcessor.config(markdownConfiguration);
-        mMarkdownProcessor.factory(EditFactory.create());
-        mMarkdownProcessor.live(editText);
     }
 
     public void changeIsMarkdown() {
@@ -695,12 +671,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
         for (int i = 0; i < containerLayout.getChildCount(); ++i) {
             View child = containerLayout.getChildAt(i);
             if (child instanceof MarkdownEditText) {
-                MarkdownProcessor mMarkdownProcessor = new MarkdownProcessor(EditorActivity.context);
-                mMarkdownProcessor.factory(TextFactory.create());
-                mMarkdownProcessor.config(markdownConfiguration);
-                //Log.e("1 text", ((MarkdownEditText) child).getText().toString());
-                //Log.e("2 text", mMarkdownProcessor.parse(((MarkdownEditText) child).getText()).toString());
-                ((MarkdownEditText) child).setText(mMarkdownProcessor.parse(((MarkdownEditText) child).getText()));
+                ((DeletableEditText) child).render(isMarkdown);
             }
         }
     }

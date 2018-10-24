@@ -10,11 +10,13 @@ import android.view.inputmethod.InputConnectionWrapper;
 import android.widget.EditText;
 import android.widget.TextView;
 
+import com.se.npe.androidnote.EditorActivity;
 import com.yydcdut.markdown.MarkdownConfiguration;
 import com.yydcdut.markdown.MarkdownEditText;
 import com.yydcdut.markdown.MarkdownProcessor;
 import com.yydcdut.markdown.callback.OnTodoClickCallback;
 import com.yydcdut.markdown.loader.MDImageLoader;
+import com.yydcdut.markdown.syntax.edit.EditFactory;
 import com.yydcdut.markdown.syntax.text.TextFactory;
 import com.yydcdut.markdown.theme.ThemeSunburst;
 
@@ -23,18 +25,43 @@ import com.yydcdut.markdown.theme.ThemeSunburst;
  */
 public class DeletableEditText extends MarkdownEditText {
     private TextView md;
-    private MarkdownConfiguration markdownConfiguration;
-    private MarkdownProcessor processor;
+    private MarkdownConfiguration editTextMarkdownConfiguration;
+    private MarkdownConfiguration textViewMarkdownConfiguration;
+    private MarkdownProcessor editTextProcessor;
+    private MarkdownProcessor textViewProcessor;
 
     public DeletableEditText(Context context) {
         super(context);
         setPadding(0, 0, 0, 0);
         md = new TextView(context);
-        setMarkdown(context);
+        setEdieTextMarkdown(context);
+        setTextViewMarkdown(context);
     }
 
-    private void setMarkdown(Context context) {
-        markdownConfiguration = new MarkdownConfiguration.Builder(context)
+    private void setEdieTextMarkdown(Context context) {
+        editTextMarkdownConfiguration = new MarkdownConfiguration.Builder(context)
+                .setDefaultImageSize(50, 50)
+                .setBlockQuotesLineColor(0xff33b5e5)
+                .setHeader1RelativeSize(1.6f)
+                .setHeader2RelativeSize(1.5f)
+                .setHeader3RelativeSize(1.4f)
+                .setHeader4RelativeSize(1.3f)
+                .setHeader5RelativeSize(1.2f)
+                .setHeader6RelativeSize(1.1f)
+                .setHorizontalRulesColor(0xff99cc00)
+                .setCodeBgColor(0xffff4444)
+                .setTodoColor(0xffaa66cc)
+                .setTodoDoneColor(0xffff8800)
+                .setUnOrderListColor(0xff00ddff)
+                .build();
+        editTextProcessor = new MarkdownProcessor(context);
+        editTextProcessor.config(editTextMarkdownConfiguration);
+        editTextProcessor.factory(EditFactory.create());
+        editTextProcessor.live(this);
+    }
+
+    private void setTextViewMarkdown(Context context) {
+        textViewMarkdownConfiguration = new MarkdownConfiguration.Builder(context)
                 .setDefaultImageSize(50, 50)
                 .setBlockQuotesLineColor(0xff33b5e5)
                 .setHeader1RelativeSize(1.6f)
@@ -59,14 +86,14 @@ public class DeletableEditText extends MarkdownEditText {
                     }
                 })
                 .build();
-        processor = new MarkdownProcessor(context);
-        processor.factory(TextFactory.create());
-        processor.config(markdownConfiguration);
+        textViewProcessor = new MarkdownProcessor(context);
+        textViewProcessor.factory(TextFactory.create());
+        textViewProcessor.config(textViewMarkdownConfiguration);
     }
 
     public void render(boolean isRender) {
         if (isRender) {
-            md.setText(processor.parse(getText()));
+            md.setText(textViewProcessor.parse(getText()));
             md.setVisibility(VISIBLE);
             this.setVisibility(GONE);
         } else {
@@ -98,13 +125,13 @@ public class DeletableEditText extends MarkdownEditText {
 
             return super.deleteSurroundingText(beforeLength, afterLength);
         }
+    }
 
-        public TextView getMd() {
-            return md;
-        }
+    public TextView getMd() {
+        return md;
+    }
 
-        public void setMd(TextView md) {
-            this.md = md;
-        }
+    public void setMd(TextView md) {
+        this.md = md;
     }
 }

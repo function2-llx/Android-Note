@@ -62,9 +62,6 @@ public class EditorActivity extends AppCompatActivity {
     private Date createTime;
     public static final String VIEW_ONLY = "VIEW_ONLY";
 
-    private MarkdownProcessor mMarkdownProcessor;
-    public static EditorActivity context;
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activiry_editor, menu);
@@ -88,7 +85,6 @@ public class EditorActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
-        context = this;
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
         this.setTitle(this.getResources().getString(R.string.editor_title));
@@ -132,29 +128,6 @@ public class EditorActivity extends AppCompatActivity {
         } catch (IOException e) {
             Logger.log(LOG_TAG, e);
         }
-
-        //markdown();
-    }
-
-    private void markdown() {
-        MarkdownConfiguration markdownConfiguration = new MarkdownConfiguration.Builder(this)
-                .setDefaultImageSize(50, 50)
-                .setBlockQuotesLineColor(0xff33b5e5)
-                .setHeader1RelativeSize(1.6f)
-                .setHeader2RelativeSize(1.5f)
-                .setHeader3RelativeSize(1.4f)
-                .setHeader4RelativeSize(1.3f)
-                .setHeader5RelativeSize(1.2f)
-                .setHeader6RelativeSize(1.1f)
-                .setHorizontalRulesColor(0xff99cc00)
-                .setCodeBgColor(0xffff4444)
-                .setTodoColor(0xffaa66cc)
-                .setTodoDoneColor(0xffff8800)
-                .setUnOrderListColor(0xff00ddff)
-                .build();
-        mMarkdownProcessor = new MarkdownProcessor(this);
-        mMarkdownProcessor.config(markdownConfiguration);
-        mMarkdownProcessor.factory(EditFactory.create());
     }
 
     class PictureAsyncTask extends AsyncTask<Void, Void, Void> {
