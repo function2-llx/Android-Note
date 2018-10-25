@@ -1,7 +1,5 @@
 package com.se.npe.androidnote.models;
 
-import android.support.annotation.NonNull;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,21 +10,20 @@ import static org.junit.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 public class VideoDataTest {
 
-    private static final String EXAMPLE_MIX_IN = "test";
     private VideoData videoData;
     private VideoData videoDataEquals;
     private VideoData videoDataNotEquals;
 
     @Before
     public void setUp() {
-        videoData = getExampleVideoData(EXAMPLE_MIX_IN);
-        videoDataEquals = getExampleVideoData(EXAMPLE_MIX_IN);
-        videoDataNotEquals = getExampleVideoData(EXAMPLE_MIX_IN + EXAMPLE_MIX_IN);
+        videoData = DataExample.getExampleVideoData(DataExample.EXAMPLE_MIX_IN);
+        videoDataEquals = DataExample.getExampleVideoData(DataExample.EXAMPLE_MIX_IN);
+        videoDataNotEquals = DataExample.getExampleVideoData(DataExample.EXAMPLE_MIX_IN + DataExample.EXAMPLE_MIX_IN);
     }
 
     @Test
     public void getVideoPath() {
-        assertEquals(getExampleVideoPath(EXAMPLE_MIX_IN), videoData.getVideoPath());
+        assertEquals(DataExample.getExampleVideoPath(DataExample.EXAMPLE_MIX_IN), videoData.getVideoPath());
     }
 
     @Test
@@ -49,15 +46,5 @@ public class VideoDataTest {
     public void toStringTest() {
         assertEquals(videoData.toString(), videoDataEquals.toString());
         assertNotEquals(videoData.toString(), videoDataNotEquals.toString());
-    }
-
-    @NonNull
-    private VideoData getExampleVideoData(String mixIn) {
-        return new VideoData(getExampleVideoPath(mixIn));
-    }
-
-    @NonNull
-    private String getExampleVideoPath(String mixIn) {
-        return "This is the VideoData video path for " + mixIn;
     }
 }

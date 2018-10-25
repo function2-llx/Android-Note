@@ -1,7 +1,5 @@
 package com.se.npe.androidnote.models;
 
-import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
 import com.se.npe.androidnote.interfaces.IData;
@@ -61,7 +59,7 @@ public class TableOperateTest {
     @Test
     public void encodeNoteAndDecodeNote() {
         // Encode & Decode
-        List<IData> dataList = getExampleDataList("encode_decode");
+        List<IData> dataList = DataExample.getExampleDataList("encode_decode");
         assertEquals(dataList, tableOperate.decodeNote(tableOperate.encodeNote(dataList)));
     }
 
@@ -94,7 +92,7 @@ public class TableOperateTest {
     public void addNote() {
         noteList = new ArrayList<>();
         for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
-            Note note = getExampleNote(i);
+            Note note = DataExample.getExampleNote(String.valueOf(i));
             noteList.add(note);
             tableOperate.addNote(note);
             // SQL index starts at 1
@@ -107,7 +105,7 @@ public class TableOperateTest {
     public void setNoteAt() {
         // Set note at some index & Get notes
         for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
-            Note note = getExampleNote(i + NOTE_LIST_SIZE);
+            Note note = DataExample.getExampleNote(String.valueOf(i + NOTE_LIST_SIZE));
             // Old note get index -> New note set
             tableOperate.setNoteAt(noteList.get(i).getIndex(), note);
             noteList.set(i, note);
@@ -152,25 +150,5 @@ public class TableOperateTest {
         // Remove all notes & Add note
         removeAllNotes();
         addNote();
-    }
-
-    @NonNull
-    private Note getExampleNote(int data) {
-        // Create a new example note
-        String title = "This is the title for " + data;
-        List<IData> content = new ArrayList<>();
-        content.add(new TextData("This is the content for " + data));
-        return new Note(title, content);
-    }
-
-    @NonNull
-    private List<IData> getExampleDataList(String data) {
-        // Create a new example data list
-        List<IData> dataList = new ArrayList<>();
-        dataList.add(new TextData("This is the TextData text for " + data));
-        dataList.add(new PictureData("This is the PictureData picture path for " + data));
-        dataList.add(new SoundData("This is the SoundData sound path for " + data, "This is the SoundData text for " + data));
-        dataList.add(new VideoData("This is the VideoData video path for " + data));
-        return dataList;
     }
 }
