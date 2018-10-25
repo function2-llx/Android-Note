@@ -9,6 +9,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
+import android.content.res.AssetManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -17,8 +19,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,6 +37,10 @@ import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.sound.ResultPool;
 import com.se.npe.androidnote.util.Logger;
+import com.yydcdut.markdown.MarkdownConfiguration;
+import com.yydcdut.markdown.MarkdownEditText;
+import com.yydcdut.markdown.MarkdownProcessor;
+import com.yydcdut.markdown.syntax.edit.EditFactory;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -46,6 +52,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 
@@ -77,6 +84,9 @@ public class EditorActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menu_save:
                 Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
+                break;
+            case R.id.menu_markdown :
+                editor.changeIsMarkdown();
                 break;
             default:
                 break;
@@ -186,6 +196,49 @@ public class EditorActivity extends AppCompatActivity {
         intent.putExtra(PickerConfig.MAX_SELECT_SIZE, MAX_SIZE);
         intent.putExtra(PickerConfig.MAX_SELECT_COUNT, MAX_PICK);
         startActivityForResult(intent, code);
+    }
+
+    class PictureAsyncTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            OutputStream outputStream = null;
+            InputStream inputStream = null;
+            try {
+                File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "rxMarkdown");
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                outputStream = new FileOutputStream(dir.getAbsolutePath() + File.separator + "b.jpg");
+                AssetManager assetManager = getAssets();
+                inputStream = assetManager.open("b.jpg");
+                byte[] buffer = new byte[1024];
+                int read = 0;
+                while ((read = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, read);
+                }
+                outputStream.flush();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (outputStream != null) {
+                    try {
+                        outputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                try {
+                    if (inputStream != null) {
+                        inputStream.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
     }
 
     @Override

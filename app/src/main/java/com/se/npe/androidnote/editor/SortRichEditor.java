@@ -26,6 +26,8 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.googlecode.mp4parser.authoring.Edit;
+import com.se.npe.androidnote.EditorActivity;
 import com.se.npe.androidnote.R;
 import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.interfaces.IEditor;
@@ -34,6 +36,11 @@ import com.se.npe.androidnote.models.PictureData;
 import com.se.npe.androidnote.models.SoundData;
 import com.se.npe.androidnote.models.TextData;
 import com.se.npe.androidnote.models.VideoData;
+import com.yydcdut.markdown.MarkdownConfiguration;
+import com.yydcdut.markdown.MarkdownEditText;
+import com.yydcdut.markdown.MarkdownProcessor;
+import com.yydcdut.markdown.syntax.edit.EditFactory;
+import com.yydcdut.markdown.syntax.text.TextFactory;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -168,6 +175,8 @@ public class SortRichEditor extends ScrollView implements IEditor {
 
     private boolean destroyed = false;
 
+    private boolean isMarkdown = false;
+
     public SortRichEditor(Context context) {
         this(context, null);
     }
@@ -295,7 +304,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
         };
     }
 
-    private EditText getFirstText() {
+    private EditText generateFirstText() {
         EditText firstEdit = createEditText("");
         editTextHeightArray.put(Integer.parseInt(firstEdit.getTag().toString()), ViewGroup.LayoutParams.WRAP_CONTENT);
         editTextBackground = firstEdit.getBackground();
@@ -307,7 +316,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
         containerLayout = createContainer();
         parentLayout.addView(containerLayout);
 
-        containerLayout.addView(getFirstText());
+        containerLayout.addView(generateFirstText());
     }
 
     // stop the auto scroll of ScrollView
@@ -632,7 +641,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
     }
 
     private EditText createEditText(String hint) {
-        EditText editText = new DeletableEditText(getContext());
+        MarkdownEditText editText = new DeletableEditText(getContext());
         editText.setTag(viewTagID++);
         editText.setHint(hint);
         editText.setGravity(Gravity.TOP);
@@ -651,6 +660,16 @@ public class SortRichEditor extends ScrollView implements IEditor {
         editText.setLayoutParams(lp);
 
         return editText;
+    }
+
+    public void changeIsMarkdown() {
+        isMarkdown = !isMarkdown;
+        for (int i = 0; i < containerLayout.getChildCount(); ++i) {
+            View child = containerLayout.getChildAt(i);
+            if (child instanceof MarkdownEditText) {
+                ((DeletableEditText) child).render(isMarkdown);
+            }
+        }
     }
 
     // called by createPictureLayout & createVideoLayout & createSoundLayout
@@ -985,7 +1004,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 if (ref.containerLayout.getChildCount() != 0) {
                     View lastChild = ref.containerLayout.getChildAt(ref.containerLayout.getChildCount() - 1);
                     if (!(lastChild instanceof EditText)) {
-                        ref.containerLayout.addView(ref.getFirstText());
+                        ref.containerLayout.addView(ref.generateFirstText());
                     }
                 }
             }
