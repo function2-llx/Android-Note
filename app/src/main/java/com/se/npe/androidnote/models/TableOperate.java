@@ -114,16 +114,12 @@ public class TableOperate implements INoteCollection {
         }
         if (src.size() >= 2) string = string +TableConfig.Filesave.LINE_SEPERATOR+ src.get(src.size()-1);
         else if(src.size() == 1)string = string + src.get(src.size() - 1);
-        Log.d("debug0001","str1:"+string);
-        Log.d("debug0001","str2:"+Integer.toString(src.size()));
         return string;
     }
 
     public List<String> stringToListString(String src) {
-        Log.d("debug0001","str1"+src);
         if (src.length() == 0) return new ArrayList<String>();
         String[] strings = src.split(TableConfig.Filesave.LINE_SEPERATOR);
-        Log.d("debug0001","str2"+Integer.toString(strings.length));
         return Arrays.asList(strings);
     }
 
@@ -210,10 +206,7 @@ public class TableOperate implements INoteCollection {
             Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)));
             List<String> Taglist = temp.getTag();
             boolean flag = false;
-            Log.d("debug0001","title:"+temp.getTitle());
-            Log.d("debug0001","TagSize:"+Integer.toString(temp.getTag().size()));
             for(int i = 0;i < Taglist.size();i ++) {
-                Log.d("debug0001","Tag:"+Taglist.get(i));
                 if(Taglist.get(i).equals(Tag)){
                     flag = true;
                     break;
