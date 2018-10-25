@@ -9,10 +9,13 @@ import android.widget.TextView;
 
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
+import com.se.npe.androidnote.interfaces.IData;
+import com.se.npe.androidnote.models.FileOperate;
 import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 public class SplashActivity extends Activity {
     static class ResourceInit extends AsyncTask<Void, String, Void> {
