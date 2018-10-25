@@ -185,7 +185,15 @@ public class ListActivity extends AppCompatActivity {
 //        });
 
 //        this.enableDrag();
+
+
         this.enableRefresh();
+
+        this.slidingMenu = new SlidingMenu(this);
+        this.slidingMenu.setMode(SlidingMenu.LEFT);
+        this.slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+        slidingMenu.setBehindOffsetRes(R.dimen.sliding_menu_behind_witdh);
+        slidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
 
         while (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED) {
