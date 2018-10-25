@@ -103,10 +103,9 @@ public class TableOperate implements INoteCollection {
 
     public String listStringToString(List<String> src) {
         String string = "";
-        for (int i = 0; i < src.size() - 1; i++) {
+        for (int i = 0; i < src.size(); i++) {
             string = string + src.get(i) + TableConfig.FileSave.LINE_SEPARATOR;
         }
-        if (src.size() >= 2) string = string + TableConfig.FileSave.LINE_SEPARATOR;
         return string;
     }
 
@@ -200,8 +199,8 @@ public class TableOperate implements INoteCollection {
         ContentValues cValue = new ContentValues();
         cValue.put(TableConfig.Note.NOTE_TITLE, note.getTitle());
         cValue.put(TableConfig.Note.NOTE_CONTENT, encodeNote(note.getContent()));
-        cValue.put(TableConfig.Note.NOTE_START_TIME, Long.toString(note.getStarttime().getTime()));
-        cValue.put(TableConfig.Note.NOTE_MODIFY_TIME, Long.toString(note.getModifytime().getTime()));
+        cValue.put(TableConfig.Note.NOTE_START_TIME, Long.toString(note.getStartTime().getTime()));
+        cValue.put(TableConfig.Note.NOTE_MODIFY_TIME, Long.toString(note.getModifyTime().getTime()));
         cValue.put(TableConfig.Note.NOTE_TAG, listStringToString(note.getTag()));
         db.insert(TableConfig.TABLE_NAME, null, cValue);
         String sql = "select * from " + TableConfig.TABLE_NAME;
@@ -218,7 +217,7 @@ public class TableOperate implements INoteCollection {
     @Override
     public void setNote(Note note) {
         db.execSQL("update " + TableConfig.TABLE_NAME + " set " + TableConfig.Note.NOTE_TITLE + "=?," + TableConfig.Note.NOTE_TAG + "=?," + TableConfig.Note.NOTE_START_TIME + "=?," + TableConfig.Note.NOTE_MODIFY_TIME + "=?," + TableConfig.Note.NOTE_CONTENT + "=? where " + TableConfig.Note.NOTE_ID + "=?",
-                new Object[]{note.getTitle(), listStringToString(note.getTag()), Long.toString(note.getStarttime().getTime()), Long.toString(note.getModifytime().getTime()), encodeNote(note.getContent()), Integer.toString(note.getIndex())});
+                new Object[]{note.getTitle(), listStringToString(note.getTag()), Long.toString(note.getStartTime().getTime()), Long.toString(note.getModifyTime().getTime()), encodeNote(note.getContent()), Integer.toString(note.getIndex())});
 
         EventBus.getDefault().post(new DatabaseModifyEvent("modify note"));
     }

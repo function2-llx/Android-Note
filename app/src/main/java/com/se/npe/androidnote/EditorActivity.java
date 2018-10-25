@@ -1,12 +1,10 @@
 package com.se.npe.androidnote;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -17,13 +15,6 @@ import com.dmcbig.mediapicker.PickerActivity;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
-import com.iflytek.cloud.ErrorCode;
-import com.iflytek.cloud.InitListener;
-import com.iflytek.cloud.RecognizerListener;
-import com.iflytek.cloud.RecognizerResult;
-import com.iflytek.cloud.SpeechConstant;
-import com.iflytek.cloud.SpeechError;
-import com.iflytek.cloud.SpeechRecognizer;
 import com.se.npe.androidnote.editor.SortRichEditor;
 import com.se.npe.androidnote.events.NoteModifyEvent;
 import com.se.npe.androidnote.events.NoteSelectEvent;
@@ -102,7 +93,7 @@ public class EditorActivity extends AppCompatActivity {
         // deferred built, or we will get NPE
         if (oldNote != null) {
             editor.loadNote(oldNote);
-            this.createTime = oldNote.getStarttime();
+            this.createTime = oldNote.getStartTime();
         } else
             this.createTime = new Date();
 
@@ -165,8 +156,8 @@ public class EditorActivity extends AppCompatActivity {
         if (oldNote != null) {
             note.setIndex(oldNote.getIndex());
         }
-        note.setStarttime(this.createTime);
-        note.setModifytime(new Date());
+        note.setStartTime(this.createTime);
+        note.setModifyTime(new Date());
         EventBus.getDefault().post(new NoteModifyEvent(note));
 
         EventBus.getDefault().removeAllStickyEvents();

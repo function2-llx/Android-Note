@@ -66,8 +66,16 @@ public class DataExample {
     }
 
     @NonNull
+    static List<String> getExampleNoteTag(String mixIn) {
+        List<String> tags = new ArrayList<>();
+        tags.add("tag");
+        tags.add(mixIn);
+        return tags;
+    }
+
+    @NonNull
     static List<IData> getExampleDataList(String mixIn) {
-        // Create a new example data list
+        // data list <-> note content
         List<IData> dataList = new ArrayList<>();
         dataList.add(getExampleTextData(mixIn));
         dataList.add(getExamplePictureData(mixIn));
@@ -78,7 +86,6 @@ public class DataExample {
 
     @NonNull
     static Note getExampleNote(String mixIn) {
-        // Create a new example note
-        return new Note(getExampleNoteTitle(mixIn), getExampleDataList(mixIn));
+        return new Note(getExampleNoteTitle(mixIn), getExampleDataList(mixIn), getExampleNoteTag(mixIn));
     }
 }

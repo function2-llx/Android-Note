@@ -13,16 +13,10 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.view.ContextMenu;
-import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.SubMenu;
-import android.view.View;
-import android.widget.RadioButton;
 
-import com.marshalchen.ultimaterecyclerview.DragDropTouchListener;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.marshalchen.ultimaterecyclerview.itemTouchHelper.SimpleItemTouchHelperCallback;
 import com.se.npe.androidnote.adapters.NoteAdapter;
@@ -33,7 +27,6 @@ import com.se.npe.androidnote.models.TableOperate;
 import org.greenrobot.eventbus.EventBus;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
@@ -62,12 +55,12 @@ public class ListActivity extends AppCompatActivity {
             }
 
             case R.id.sort_created_time: {
-                noteAdapter.setComparator(Comparator.comparing(Note::getStarttime));
+                noteAdapter.setComparator(Comparator.comparing(Note::getStartTime));
                 break;
             }
 
             case R.id.sort_modified_time: {
-                noteAdapter.setComparator(Comparator.comparing(Note::getModifytime));
+                noteAdapter.setComparator(Comparator.comparing(Note::getModifyTime));
                 break;
             }
         }
