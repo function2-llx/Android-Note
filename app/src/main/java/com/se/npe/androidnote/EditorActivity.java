@@ -2,9 +2,11 @@ package com.se.npe.androidnote;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -38,8 +40,11 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -51,11 +56,14 @@ public class EditorActivity extends AppCompatActivity {
     private static final int PICKER_SOUND = 0;
     private static final int REQUEST_IMAGE_CAPTURE = 1;
     private static final int REQUEST_VIDEO_CAPTURE = 2;
+    private static final String OUTPUT_DIR =
+            Environment.getExternalStorageDirectory().getAbsolutePath() + "/AndroidNote/Media/";
 
     private SortRichEditor editor;
     private Note oldNote;
     private long startTime;
     private Date createTime;
+    private Uri tempMediaUri;
     public static final String VIEW_ONLY = "VIEW_ONLY";
 
     @Override
@@ -91,9 +99,9 @@ public class EditorActivity extends AppCompatActivity {
                     .setTitle("From")
                     .setSingleChoiceItems(new String[]{"Camera", "Gallery"}, -1, (dialog, which) -> {
                         if (which == 0) {
-                            takePictureOrVideo(REQUEST_IMAGE_CAPTURE);
+                            takeMedia(REQUEST_IMAGE_CAPTURE);
                         } else {
-                            pickPictureOrVideo(PickerConfig.PICKER_IMAGE);
+                            pickMedia(PickerConfig.PICKER_IMAGE);
                         }
                         dialog.cancel();
                     })
@@ -107,9 +115,9 @@ public class EditorActivity extends AppCompatActivity {
                     .setTitle("From")
                     .setSingleChoiceItems(new String[]{"Camera", "Gallery"}, -1, (dialog, which) -> {
                         if (which == 0) {
-                            takePictureOrVideo(REQUEST_VIDEO_CAPTURE);
+                            takeMedia(REQUEST_VIDEO_CAPTURE);
                         } else {
-                            pickPictureOrVideo(PickerConfig.PICKER_VIDEO);
+                            pickMedia(PickerConfig.PICKER_VIDEO);
                         }
                         dialog.cancel();
                     })
@@ -147,24 +155,39 @@ public class EditorActivity extends AppCompatActivity {
         }
     }
 
-    private File createTempPictureOrVideo() throws IOException {
-        // Create an image file name
-        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-        File storageDir = getExternalFilesDir(Environment.DIRECTORY_PICTURES);
-        return File.createTempFile(timeStamp, "", storageDir);
+    private void openCamera(int code) {
+        Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (hasSdcard()) {
+            SimpleDateFormat timeStampFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
+            String filename = timeStampFormat.format(new Date());
+            File tempFile = new File(Environment.getExternalStorageDirectory(), filename);
+            if (android.os.Build.VERSION.SDK_INT < 24) {
+                tempMediaUri = Uri.fromFile(tempFile);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, tempMediaUri);
+            } else {
+                ContentValues contentValues = new ContentValues(1);
+                contentValues.put(MediaStore.Images.Media.DATA, tempFile.getAbsolutePath());
+                tempMediaUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+                intent.putExtra(MediaStore.EXTRA_OUTPUT, tempMediaUri);
+            }
+        }
+        startActivityForResult(intent, code);
     }
 
-    private void takePictureOrVideo(int code) {
+    private static boolean hasSdcard() {
+        return Environment.getExternalStorageState().equals(
+                Environment.MEDIA_MOUNTED);
+    }
+
+    private void takeMedia(int code) {
         while (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) !=
                 PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA}, 10);
         }
-        Intent intent = new Intent(
-                code == REQUEST_IMAGE_CAPTURE ? MediaStore.ACTION_IMAGE_CAPTURE : MediaStore.ACTION_VIDEO_CAPTURE);
-        startActivityForResult(intent, code);
+        openCamera(code);
     }
 
-    private void pickPictureOrVideo(int code) {
+    private void pickMedia(int code) {
         Intent intent = new Intent(this, PickerActivity.class);
         intent.putExtra(PickerConfig.SELECT_MODE, code);
         intent.putExtra(PickerConfig.MAX_SELECT_SIZE, MAX_SIZE);
@@ -175,9 +198,6 @@ public class EditorActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (data == null) {
-            return;
-        }
         switch (requestCode) {
             case PickerConfig.PICKER_IMAGE: {
                 ArrayList<Media> select = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
@@ -202,21 +222,28 @@ public class EditorActivity extends AppCompatActivity {
             }
             break;
             case REQUEST_IMAGE_CAPTURE: {
-                Bitmap bitmap = data.getParcelableExtra("data");
                 try {
-                    File f = createTempPictureOrVideo();
+                    File f = new File(OUTPUT_DIR + tempMediaUri.getPath());
+                    if (!f.getParentFile().exists()) {
+                        f.getParentFile().mkdirs();
+                    }
+                    if (!f.exists()) {
+                        f.createNewFile();
+                    }
+                    InputStream fis = getContentResolver().openInputStream(tempMediaUri);
                     FileOutputStream fos = new FileOutputStream(f);
-                    bitmap.compress(Bitmap.CompressFormat.PNG, 100, fos);
-                    fos.flush();
+                    byte[] bytes = new byte[fis.available()];
+                    fis.read(bytes, 0, bytes.length);
+                    fos.write(bytes, 0, bytes.length);
+                    editor.addPicture(OUTPUT_DIR + tempMediaUri.getPath());
                     fos.close();
-                    editor.addPicture(f.getPath());
                 } catch (IOException e) {
                     Logger.log(LOG_TAG, e);
                 }
             }
             break;
             case REQUEST_VIDEO_CAPTURE: {
-                editor.addVideo(data.getData().getPath());
+                editor.addVideo(tempMediaUri.getPath());
             }
             break;
             default:
