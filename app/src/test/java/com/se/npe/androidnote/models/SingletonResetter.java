@@ -44,6 +44,8 @@ public class SingletonResetter {
     public static void resetTableOperateSingleton() {
         // "tableOperate" is the static variable name which holds the singleton TableOperate instance
         resetSingleton(TableOperate.class, "tableOperate");
+        // "configFile" is the static variable name which holds the singleton TableOperate File instance
+        resetSingleton(TableOperate.class, "configFile");
         // Delegate to reset DBManager singleton
         resetDBManagerSingleton(); // This function then delegate to reset MySQLiteOpenHelper singleton
     }

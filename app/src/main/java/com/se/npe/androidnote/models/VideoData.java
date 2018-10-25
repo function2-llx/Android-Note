@@ -50,6 +50,6 @@ public class VideoData implements IData {
 
     @Override
     public String toString() {
-        return "Video" + TableConfig.Filesave.LINE_SEPERATOR + videoPath;
+        return "Video" + TableConfig.Filesave.LINE_SEPARATOR + videoPath;
     }
 }

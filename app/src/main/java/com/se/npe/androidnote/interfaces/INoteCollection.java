@@ -16,6 +16,8 @@ public interface INoteCollection {
 
     List<Note> getSearchResult(String parameter);
 
+    List<Note> getSearchResultFuzzy(String parameter);
+
     void addNote(Note note);
 
     Note getNoteAt(int index);
@@ -24,7 +26,5 @@ public interface INoteCollection {
 
     void removeNoteAt(int index);
 
-    void loadFromFile(String fileName);
-
-    void saveToFile(String fileName);
+    void removeAllNotes();
 }
