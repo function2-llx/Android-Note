@@ -11,12 +11,14 @@ import android.widget.TextView;
 
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
+import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.models.FileOperate;
 import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
 import com.se.npe.androidnote.models.Note;
 
 import java.lang.ref.WeakReference;
+import java.util.ArrayList;
 
 public class SplashActivity extends Activity {
     static class ResourceInit extends AsyncTask<Void, String, Void> {
@@ -36,6 +38,18 @@ public class SplashActivity extends Activity {
             publishProgress("loading database...");
             TableConfig.SAVE_PATH = ref.get().getExternalFilesDir(null).getAbsolutePath()+ "/AndroidNote";
             TableOperate.init(ref.get());
+
+            Note note = new Note("12345",new ArrayList<IData>());
+            note.getTag().add("haha");
+            Log.d("debug0001","TaglistCheck"+Integer.toString(note.getTag().size()));
+            TableOperate.getInstance().addNote(note);
+            Note note2 = new Note("12345",new ArrayList<IData>());
+            note2.getTag().add("hehe");
+            TableOperate.getInstance().addNote(note2);
+
+            Log.d("debug0001","TagCheck"+Integer.toString(TableOperate.getInstance().getSearchResultFuzzy("12345").size()));
+            Log.d("debug0001","TagCheck"+Integer.toString(TableOperate.getInstance().getSearchResultFuzzyWithTag("12345","haha").size()));
+
             publishProgress("loading ifly...");
             SpeechUtility.createUtility(ref.get(), SpeechConstant.APPID + "=5bbc8c0f");
             return null;
