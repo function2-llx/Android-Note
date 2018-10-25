@@ -20,11 +20,9 @@ public interface INoteCollection {
 
     void addNote(Note note);
 
-    Note getNoteAt(int index);
+    void setNote(Note note);
 
-    void setNoteAt(int index, Note note);
-
-    void removeNoteAt(int index);
+    void removeNote(Note note);
 
     void removeAllNotes();
 }

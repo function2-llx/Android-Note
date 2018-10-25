@@ -215,7 +215,26 @@ public class TableOperate implements INoteCollection {
     }
 
     @Override
-    public Note getNoteAt(int index) {
+    public void setNote(Note note) {
+        db.execSQL("update " + TableConfig.TABLE_NAME + " set " + TableConfig.Note.NOTE_TITLE + "=?," + TableConfig.Note.NOTE_TAG + "=?," + TableConfig.Note.NOTE_START_TIME + "=?," + TableConfig.Note.NOTE_MODIFY_TIME + "=?," + TableConfig.Note.NOTE_CONTENT + "=? where " + TableConfig.Note.NOTE_ID + "=?",
+                new Object[]{note.getTitle(), listStringToString(note.getTag()), Long.toString(note.getStarttime().getTime()), Long.toString(note.getModifytime().getTime()), encodeNote(note.getContent()), Integer.toString(note.getIndex())});
+
+        EventBus.getDefault().post(new DatabaseModifyEvent("modify note"));
+    }
+
+    @Override
+    public void removeNote(Note note) {
+        db.execSQL("delete from " + TableConfig.TABLE_NAME + " where " + TableConfig.Note.NOTE_ID + "=?", new String[]{Integer.toString(note.getIndex())});
+
+        EventBus.getDefault().post(new DatabaseModifyEvent("delete note"));
+    }
+
+    @Override
+    public void removeAllNotes() {
+        db.delete(TableConfig.TABLE_NAME, null, null);
+    }
+
+    Note getNoteAt(int index) {
         ArrayList<Note> noteList = new ArrayList<Note>();
         Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME + " where " + TableConfig.Note.NOTE_ID + "= ?", new String[]{Integer.toString(index)});
         while (c.moveToNext()) {
@@ -224,27 +243,6 @@ public class TableOperate implements INoteCollection {
         }
         c.close();
         return noteList.get(0);
-    }
-
-    @Override
-    public void setNoteAt(int index, Note note) {
-        db.execSQL("update " + TableConfig.TABLE_NAME + " set " + TableConfig.Note.NOTE_TITLE + "=?," + TableConfig.Note.NOTE_TAG + "=?," + TableConfig.Note.NOTE_START_TIME + "=?," + TableConfig.Note.NOTE_MODIFY_TIME + "=?," + TableConfig.Note.NOTE_CONTENT + "=? where " + TableConfig.Note.NOTE_ID + "=?",
-                new Object[]{note.getTitle(), listStringToString(note.getTag()), Long.toString(note.getStarttime().getTime()), Long.toString(note.getModifytime().getTime()), encodeNote(note.getContent()), Integer.toString(index)});
-        note.setIndex(index);
-
-        EventBus.getDefault().post(new DatabaseModifyEvent("modify note"));
-    }
-
-    @Override
-    public void removeNoteAt(int index) {
-        db.execSQL("delete from " + TableConfig.TABLE_NAME + " where " + TableConfig.Note.NOTE_ID + "=?", new String[]{Integer.toString(index)});
-
-        EventBus.getDefault().post(new DatabaseModifyEvent("delete note"));
-    }
-
-    @Override
-    public void removeAllNotes() {
-        db.delete(TableConfig.TABLE_NAME, null, null);
     }
 
     @Override
@@ -259,20 +257,17 @@ public class TableOperate implements INoteCollection {
         if (note.getIndex() == -1)
             addNote(note);
         else
-            setNoteAt(note.getIndex(), note);
+            setNote(note);
         System.err.print(note.getTitle());
     }
 
     @Subscribe(sticky = true)
     public void onDeleteNote(NoteDeleteEvent event) {
-        this.removeNoteAt(event.getNote().getIndex());
+        this.removeNote(event.getNote());
     }
 
     @Subscribe(sticky = true)
     public void receiveClearEvent(ClearEvent event) {
-        int size = getAllNotes().size();
-        for (int i = 0; i < size; i++) {
-            removeNoteAt(0);
-        }
+        removeAllNotes();
     }
 }

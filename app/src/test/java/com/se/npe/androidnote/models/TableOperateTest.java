@@ -64,8 +64,82 @@ public class TableOperateTest {
     }
 
     @Test
+    public void listStringToStringToListString() {
+        // ListString -> String -> ListString
+        Note note = DataExample.getExampleNote("listString_string");
+        assertEquals(note.getTag(), tableOperate.stringToListString(tableOperate.listStringToString(note.getTag())));
+    }
+
+    @Test
     public void getAllNotes() {
         assertEquals(noteList, tableOperate.getAllNotes());
+    }
+
+    @Test
+    public void addNote() {
+        noteList = new ArrayList<>();
+        for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
+            Note note = DataExample.getExampleNote(String.valueOf(i));
+            tableOperate.addNote(note);
+            noteList.add(note);
+            // SQL index starts at 1
+            // noteList.get(i).getIndex() == i + 1
+            // if addNote() is invoked the first time
+        }
+    }
+
+    @Test
+    public void setNote() {
+        // Set some notes & Get notes
+        for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
+            // index does not change
+            int index = noteList.get(i).getIndex();
+            Note note = DataExample.getExampleNote(String.valueOf(i + NOTE_LIST_SIZE));
+            note.setIndex(index);
+            // Old note get index -> New note set
+            tableOperate.setNote(note);
+            noteList.set(i, note);
+            assertEquals(note, tableOperate.getNoteAt(note.getIndex()));
+        }
+        assertEquals(noteList, tableOperate.getAllNotes());
+    }
+
+    @Test
+    public void removeNote() {
+        // Remove some notes & Get notes
+        final int NOTE_LIST_SIZE_REMOVE = 4;
+        // Remove note at start, middle
+        for (int i = 0; i < NOTE_LIST_SIZE_REMOVE; ++i) {
+            // Old note get index -> New note remove
+            tableOperate.removeNote(noteList.get(i));
+            noteList.remove(i);
+            assertEquals(noteList, tableOperate.getAllNotes());
+        }
+        // Remove note at end
+        tableOperate.removeNote(noteList.get(noteList.size() - 1));
+        noteList.remove(noteList.size() - 1);
+        assertEquals(noteList, tableOperate.getAllNotes());
+        // Remove all notes one by one
+        for (int i = 0; i < noteList.size(); ++i) {
+            tableOperate.removeNote(noteList.get(i));
+        }
+        noteList.clear();
+        assertEquals(noteList, tableOperate.getAllNotes());
+        // Remove note before start/after end will not throw exception
+    }
+
+    @Test
+    public void removeAllNotes() {
+        tableOperate.removeAllNotes();
+        noteList.clear();
+        assertEquals(noteList, tableOperate.getAllNotes());
+    }
+
+    @Test
+    public void removeAllNotesAndAddNote() {
+        // Remove all notes & Add note
+        removeAllNotes();
+        addNote();
     }
 
     @Test
@@ -86,69 +160,5 @@ public class TableOperateTest {
     public void getNoteAtAfterEnd() {
         expectedException.expect(IndexOutOfBoundsException.class);
         tableOperate.getNoteAt(noteList.get(NOTE_LIST_SIZE - 1).getIndex() + 1); // noteList.get(NOTE_LIST_SIZE - 1).getIndex() == NOTE_LIST_SIZE
-    }
-
-    @Test
-    public void addNote() {
-        noteList = new ArrayList<>();
-        for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
-            Note note = DataExample.getExampleNote(String.valueOf(i));
-            noteList.add(note);
-            tableOperate.addNote(note);
-            // SQL index starts at 1
-            // noteList.get(i).getIndex() == i + 1
-            // if addNote() is invoked the first time
-        }
-    }
-
-    @Test
-    public void setNoteAt() {
-        // Set note at some index & Get notes
-        for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
-            Note note = DataExample.getExampleNote(String.valueOf(i + NOTE_LIST_SIZE));
-            // Old note get index -> New note set
-            tableOperate.setNoteAt(noteList.get(i).getIndex(), note);
-            noteList.set(i, note);
-            assertEquals(note, tableOperate.getNoteAt(note.getIndex()));
-        }
-        assertEquals(noteList, tableOperate.getAllNotes());
-    }
-
-    @Test
-    public void removeNoteAt() {
-        // Remove note at some index & Get notes
-        final int NOTE_LIST_SIZE_REMOVE = 4;
-        // Remove note at start, middle
-        for (int i = 0; i < NOTE_LIST_SIZE_REMOVE; ++i) {
-            // Old note get index -> New note remove
-            tableOperate.removeNoteAt(noteList.get(i).getIndex());
-            noteList.remove(i);
-            assertEquals(noteList, tableOperate.getAllNotes());
-        }
-        // Remove note at end
-        tableOperate.removeNoteAt(noteList.get(noteList.size() - 1).getIndex());
-        noteList.remove(noteList.size() - 1);
-        assertEquals(noteList, tableOperate.getAllNotes());
-        // Remove all notes one by one
-        for (int i = 0; i < noteList.size(); ++i) {
-            tableOperate.removeNoteAt(noteList.get(i).getIndex());
-        }
-        noteList.clear();
-        assertEquals(noteList, tableOperate.getAllNotes());
-        // Remove note before start/after end will not throw exception
-    }
-
-    @Test
-    public void removeAllNotes() {
-        tableOperate.removeAllNotes();
-        noteList.clear();
-        assertEquals(noteList, tableOperate.getAllNotes());
-    }
-
-    @Test
-    public void removeAllNotesAndAddNote() {
-        // Remove all notes & Add note
-        removeAllNotes();
-        addNote();
     }
 }
