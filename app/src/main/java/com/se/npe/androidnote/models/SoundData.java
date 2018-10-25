@@ -1,7 +1,5 @@
 package com.se.npe.androidnote.models;
 
-import android.view.View;
-
 import com.se.npe.androidnote.interfaces.IData;
 
 import java.util.Objects;
@@ -22,14 +20,17 @@ public class SoundData implements IData {
         this.text = text;
     }
 
-    public String getSoundPath() {
+    @Override
+    public String getType() {
+        return "Sound";
+    }
+
+    @Override
+    public String getPath() {
         return soundPath;
     }
 
-    public String getType() { return "Sound"; }
-
-    public String getPath() { return getSoundPath(); }
-
+    @Override
     public String getText() {
         return text;
     }

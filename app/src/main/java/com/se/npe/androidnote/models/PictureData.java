@@ -11,20 +11,24 @@ import com.se.npe.androidnote.interfaces.IData;
 public class PictureData implements IData {
     private String picturePath;
 
-    public PictureData(String picturePath)
-    {
+    public PictureData(String picturePath) {
         this.picturePath = picturePath;
     }
 
-    public String getPicturePath() {
+    @Override
+    public String getType() {
+        return "Pic";
+    }
+
+    @Override
+    public String getPath() {
         return picturePath;
     }
 
-    public String getType() { return "Pic"; }
-
-    public String getPath() { return getPicturePath(); }
-
-    public String getText() { return ""; }
+    @Override
+    public String getText() {
+        return "";
+    }
 
     @Override
     public boolean equals(Object o) {

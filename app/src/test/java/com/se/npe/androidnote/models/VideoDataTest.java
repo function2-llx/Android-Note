@@ -22,18 +22,23 @@ public class VideoDataTest {
     }
 
     @Test
-    public void getVideoPath() {
-        assertEquals(DataExample.getExampleVideoPath(DataExample.EXAMPLE_MIX_IN), videoData.getVideoPath());
+    public void getType() {
+        assertEquals("Video", videoData.getType());
+    }
+
+    @Test
+    public void getPath() {
+        assertEquals(DataExample.getExampleVideoPath(DataExample.EXAMPLE_MIX_IN), videoData.getPath());
     }
 
     @Test
     public void equalsTest() {
         // Equals VideoData are same
         assertTrue(videoDataEquals.equals(videoData));
-        assertEquals(videoData.getVideoPath(), videoDataEquals.getVideoPath());
+        assertEquals(videoData.getPath(), videoDataEquals.getPath());
         // Not equals VideoData are different
         assertFalse(videoDataNotEquals.equals(videoData));
-        assertNotEquals(videoData.getVideoPath(), videoDataNotEquals.getVideoPath());
+        assertNotEquals(videoData.getPath(), videoDataNotEquals.getPath());
     }
 
     @Test

@@ -27,6 +27,11 @@ public class TextDataTest {
     }
 
     @Test
+    public void getType() {
+        assertEquals("Text", textData.getType());
+    }
+
+    @Test
     public void equalsTest() {
         // Equals TextData are same
         assertTrue(textDataEquals.equals(textData));

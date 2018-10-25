@@ -22,16 +22,21 @@ public class PictureDataTest {
     }
 
     @Test
-    public void getPicturePath() {
-        assertEquals(DataExample.getExamplePicturePath(DataExample.EXAMPLE_MIX_IN), pictureData.getPicturePath());
+    public void getPath() {
+        assertEquals(DataExample.getExamplePicturePath(DataExample.EXAMPLE_MIX_IN), pictureData.getPath());
+    }
+
+    @Test
+    public void getType() {
+        assertEquals("Pic", pictureData.getType());
     }
 
     @Test
     public void equalsTest() {
         assertTrue(pictureDataEquals.equals(pictureData));
-        assertEquals(pictureData.getPicturePath(), pictureDataEquals.getPicturePath());
+        assertEquals(pictureData.getPath(), pictureDataEquals.getPath());
         assertFalse(pictureDataNotEquals.equals(pictureData));
-        assertNotEquals(pictureData.getPicturePath(), pictureDataNotEquals.getPicturePath());
+        assertNotEquals(pictureData.getPath(), pictureDataNotEquals.getPath());
     }
 
     @Test

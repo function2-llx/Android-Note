@@ -22,8 +22,13 @@ public class SoundDataTest {
     }
 
     @Test
-    public void getSoundPath() {
-        assertEquals(DataExample.getExampleSoundPath(DataExample.EXAMPLE_MIX_IN), soundData.getSoundPath());
+    public void getType() {
+        assertEquals("Sound", soundDataEquals.getType());
+    }
+
+    @Test
+    public void getPath() {
+        assertEquals(DataExample.getExampleSoundPath(DataExample.EXAMPLE_MIX_IN), soundData.getPath());
     }
 
     @Test
@@ -35,11 +40,11 @@ public class SoundDataTest {
     public void equalsTest() {
         // Equals SoundData are same
         assertTrue(soundDataEquals.equals(soundData));
-        assertEquals(soundData.getSoundPath(), soundDataEquals.getSoundPath());
+        assertEquals(soundData.getPath(), soundDataEquals.getPath());
         assertEquals(soundData.getText(), soundDataEquals.getText());
         // Not equals SoundData are different
         assertFalse(soundDataNotEquals.equals(soundData));
-        assertFalse(soundDataNotEquals.getSoundPath().equals(soundData.getSoundPath())
+        assertFalse(soundDataNotEquals.getPath().equals(soundData.getPath())
                 && soundDataNotEquals.getText().equals(soundData.getText()));
     }
 

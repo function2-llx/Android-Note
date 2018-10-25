@@ -20,15 +20,20 @@ public class VideoData implements IData {
         this.videoPath = videoPath;
     }
 
-    public String getVideoPath() {
+    @Override
+    public String getPath() {
         return videoPath;
     }
 
-    public String getPath() { return getVideoPath(); }
+    @Override
+    public String getType() {
+        return "Video";
+    }
 
-    public String getType() { return "Video"; }
-
-    public String getText() { return ""; }
+    @Override
+    public String getText() {
+        return "";
+    }
 
     @Override
     public boolean equals(Object o) {
