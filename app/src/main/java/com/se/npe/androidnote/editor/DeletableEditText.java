@@ -34,6 +34,7 @@ public class DeletableEditText extends MarkdownEditText {
         super(context);
         setPadding(0, 0, 0, 0);
         md = new TextView(context);
+        md.setTextSize(14);
         setEdieTextMarkdown(context);
         setTextViewMarkdown(context);
     }

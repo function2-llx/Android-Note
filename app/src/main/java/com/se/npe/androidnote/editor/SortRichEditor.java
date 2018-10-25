@@ -304,19 +304,11 @@ public class SortRichEditor extends ScrollView implements IEditor {
         };
     }
 
-    private EditText generateFirstText() {
-        EditText firstEdit = createEditText("");
-        editTextHeightArray.put(Integer.parseInt(firstEdit.getTag().toString()), ViewGroup.LayoutParams.WRAP_CONTENT);
-        editTextBackground = firstEdit.getBackground();
-        lastFocusEdit = firstEdit;
-        return firstEdit;
-    }
-
     private void initContainerLayout() {
         containerLayout = createContainer();
         parentLayout.addView(containerLayout);
 
-        containerLayout.addView(generateFirstText());
+        lastFocusEdit = insertEditTextAtIndex(0, "");
     }
 
     // stop the auto scroll of ScrollView
@@ -453,7 +445,9 @@ public class SortRichEditor extends ScrollView implements IEditor {
         int preIndex = 0;
         for (int i = 0; i < childCount; ++i) {
             child = containerLayout.getChildAt(i);
-            if (child instanceof ImageView) { // placeholder, not real image
+            if (child instanceof ImageView || (child instanceof TextView && !(child instanceof EditText))) {
+                // ImageView => place holder
+                // TextView but not EditText => rendered markdown
                 removeChildList.add(child);
                 continue;
             }
@@ -528,6 +522,9 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 }
                 sortChild.setLayoutParams(resetChildLayoutParams(sortChild));
                 containerLayout.addView(sortChild);
+                if (sortChild instanceof DeletableEditText) {
+                    containerLayout.addView(((DeletableEditText) sortChild).getMd());
+                }
             }
 
         } else {
@@ -640,8 +637,8 @@ public class SortRichEditor extends ScrollView implements IEditor {
         return placeholder;
     }
 
-    private EditText createEditText(String hint) {
-        MarkdownEditText editText = new DeletableEditText(getContext());
+    private DeletableEditText createEditText(String hint) {
+        DeletableEditText editText = new DeletableEditText(getContext());
         editText.setTag(viewTagID++);
         editText.setHint(hint);
         editText.setGravity(Gravity.TOP);
@@ -833,13 +830,14 @@ public class SortRichEditor extends ScrollView implements IEditor {
     }
 
     private EditText insertEditTextAtIndex(final int index, String editStr) {
-        EditText editText = createEditText("");
+        DeletableEditText editText = createEditText("");
         editText.setText(editStr);
         if (isViewOnly) {
             editText.setFocusable(false);
         }
         containerLayout.setLayoutTransition(null);
         containerLayout.addView(editText, index);
+        containerLayout.addView(editText.getMd(), index + 1);
         containerLayout.setLayoutTransition(mTransition);
         return editText;
     }
@@ -1004,7 +1002,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 if (ref.containerLayout.getChildCount() != 0) {
                     View lastChild = ref.containerLayout.getChildAt(ref.containerLayout.getChildCount() - 1);
                     if (!(lastChild instanceof EditText)) {
-                        ref.containerLayout.addView(ref.generateFirstText());
+                        ref.insertEditTextAtIndex(ref.containerLayout.getChildCount(), "");
                     }
                 }
             }
