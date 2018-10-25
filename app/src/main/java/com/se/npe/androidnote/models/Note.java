@@ -118,9 +118,9 @@ public class Note {
         List<IData> templist = getContent();
         for (int i = 0; i < templist.size(); i++) {
             if (picpath == null && templist.get(i).toString().charAt(0) == 'P') {
-                picpath = templist.get(i).toString().split(TableConfig.Filesave.LINE_SEPARATOR)[1];
+                picpath = templist.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
             } else if (text == null && templist.get(i).toString().charAt(0) == 'T') {
-                text = templist.get(i).toString().split(TableConfig.Filesave.LINE_SEPARATOR)[1];
+                text = templist.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
             }
         }
         if (text == null) text = "无预览文字";
@@ -186,7 +186,7 @@ public class Note {
         }
 
         String tempcontent = new String(b);
-        String[] StrArray = tempcontent.split(TableConfig.Filesave.LIST_SEPARATOR);
+        String[] StrArray = tempcontent.split(TableConfig.FileSave.LIST_SEPARATOR);
 
         title = StrArray[0];
 
@@ -217,19 +217,19 @@ public class Note {
         for (int i = 1; i < StrArray.length; i++) {
             Log.d("debug0001",StrArray[i]);
             if (StrArray[i].charAt(0) == 'S') {
-                String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPARATOR);
+                String[] tempArray = StrArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
                 SoundData tempSoundData = new SoundData(tempArray[1], tempArray[2]);
                 content.add(tempSoundData);
             } else if (StrArray[i].charAt(0) == 'T') {
-                String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPARATOR);
+                String[] tempArray = StrArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
                 TextData tempTextData = new TextData(tempArray[1]);
                 content.add(tempTextData);
             } else if (StrArray[i].charAt(0) == 'V') {
-                String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPARATOR);
+                String[] tempArray = StrArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
                 VideoData tempVideoData = new VideoData(tempArray[1]);
                 content.add(tempVideoData);
             } else if (StrArray[i].charAt(0) == 'P') {
-                String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPARATOR);
+                String[] tempArray = StrArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
                 PictureData tempPictureData = new PictureData(tempArray[1]);
                 content.add(tempPictureData);
             }
@@ -313,23 +313,23 @@ public class Note {
             Logger.log(LOG_TAG, e);
             return;
         }
-        String string = getTitle() + TableConfig.Filesave.LIST_SEPARATOR;
+        String string = getTitle() + TableConfig.FileSave.LIST_SEPARATOR;
 
         for (int i = 0; i < ContentList.size(); i++) {
             if(ContentList.get(i).getType() == "Pic") {
                 String newdir = TableConfig.SAVE_PATH+"/NoteSave/"+getTitle()+"_unzip/Picdata"+Integer.toString(i)+"."+FileOperate.getSuffix(ContentList.get(i).getPath());
-                string = string + "Picture" + TableConfig.Filesave.LINE_SEPARATOR + newdir;
+                string = string + "Picture" + TableConfig.FileSave.LINE_SEPARATOR + newdir;
             }
             else if(ContentList.get(i).getType() == "Sound"){
                 String newdir = TableConfig.SAVE_PATH+"/NoteSave/"+getTitle()+"_unzip/Sounddata"+Integer.toString(i)+"."+FileOperate.getSuffix(ContentList.get(i).getPath());
-                string = string + "Sound" + TableConfig.Filesave.LINE_SEPARATOR + newdir + TableConfig.Filesave.LINE_SEPARATOR + ContentList.get(i).getText();
+                string = string + "Sound" + TableConfig.FileSave.LINE_SEPARATOR + newdir + TableConfig.FileSave.LINE_SEPARATOR + ContentList.get(i).getText();
             }
             else if(ContentList.get(i).getType() == "Video"){
                 String newdir = TableConfig.SAVE_PATH+"/NoteSave/"+getTitle()+"_unzip/Videodata"+Integer.toString(i)+"."+FileOperate.getSuffix(ContentList.get(i).getPath());
-                string = string + "Video" + TableConfig.Filesave.LINE_SEPARATOR + newdir;
+                string = string + "Video" + TableConfig.FileSave.LINE_SEPARATOR + newdir;
             }
             else {
-                string = string + ContentList.get(i).toString() + TableConfig.Filesave.LIST_SEPARATOR;
+                string = string + ContentList.get(i).toString() + TableConfig.FileSave.LIST_SEPARATOR;
             }
         }
 

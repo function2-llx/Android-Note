@@ -1,7 +1,5 @@
 package com.se.npe.androidnote.models;
 
-import android.view.View;
-
 import com.se.npe.androidnote.interfaces.IData;
 
 import java.util.Objects;
@@ -50,6 +48,6 @@ public class VideoData implements IData {
 
     @Override
     public String toString() {
-        return "Video" + TableConfig.Filesave.LINE_SEPARATOR + videoPath;
+        return "Video" + TableConfig.FileSave.LINE_SEPARATOR + videoPath;
     }
 }

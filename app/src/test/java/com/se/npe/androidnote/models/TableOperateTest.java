@@ -71,8 +71,58 @@ public class TableOperateTest {
     }
 
     @Test
+    public void setSearchConfigAndGetSearchConfig() {
+        final int SEARCH_CONFIG = 0;
+        tableOperate.setSearchConfig(SEARCH_CONFIG);
+        assertEquals(SEARCH_CONFIG, tableOperate.getSearchConfig());
+    }
+
+    @Test
     public void getAllNotes() {
         assertEquals(noteList, tableOperate.getAllNotes());
+    }
+
+    @Test
+    public void getSearchResult() {
+        // Depends on example note
+        // Whole note list cannot be test - precise search
+        // Empty note list
+        assertEquals(new ArrayList<Note>(), tableOperate.getSearchResult("wtf???"));
+
+        List<Note> noteListSearched = new ArrayList<>();
+        // Search for 3 using old note
+        noteListSearched.add(this.noteList.get(3));
+        assertEquals(noteListSearched, tableOperate.getSearchResult(this.noteList.get(3).getTitle()));
+        noteListSearched.clear(); // Pay attention to clear noteListSearch
+        // Search for 3 using new note
+        // Not equals because new note has a different data
+        noteListSearched.add(DataExample.getExampleNote(String.valueOf(3)));
+        assertNotEquals(noteListSearched, tableOperate.getSearchResult(this.noteList.get(3).getTitle()));
+        noteListSearched.clear();
+    }
+
+    @Test
+    public void getSearchResultFuzzy() {
+        // Depends on example note
+        // Whole note list
+        assertEquals(this.noteList, tableOperate.getSearchResultFuzzy("title"));
+        assertNotSame(this.noteList, tableOperate.getSearchResultFuzzy("title"));
+        // Empty note list
+        assertEquals(new ArrayList<Note>(), tableOperate.getSearchResultFuzzy("wtf???"));
+
+        List<Note> noteListSearched = new ArrayList<>();
+        // Depends on addNote()
+        // Search for 3 using old note
+        noteListSearched.add(this.noteList.get(3));
+        noteListSearched.add(this.noteList.get(13));
+        assertEquals(noteListSearched, tableOperate.getSearchResultFuzzy("3"));
+        noteListSearched.clear(); // Pay attention to clear noteListSearch
+        // Search for 3 using new note
+        // Not equals because new note has a different data
+        noteListSearched.add(DataExample.getExampleNote(String.valueOf(3)));
+        noteListSearched.add(DataExample.getExampleNote(String.valueOf(13)));
+        assertNotEquals(noteListSearched, tableOperate.getSearchResultFuzzy("3"));
+        noteListSearched.clear();
     }
 
     @Test

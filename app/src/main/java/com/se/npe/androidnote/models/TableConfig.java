@@ -1,7 +1,7 @@
 package com.se.npe.androidnote.models;
 
 public class TableConfig {
-    public static String SAVE_PATH = "";
+    public static String SAVE_PATH = "build/save";
     public static final String TABLE_NAME = "AndroidNote";
 
     public static class Note {
@@ -13,7 +13,7 @@ public class TableConfig {
         public static final String NOTE_TAG = "note_tag";
     }
 
-    public static class Filesave {
+    public static class FileSave {
         public static final String LIST_SEPARATOR = "qwert";
         public static final String LINE_SEPARATOR = "asdfg";
     }

@@ -51,6 +51,6 @@ public class SoundData implements IData {
 
     @Override
     public String toString() {
-        return "Sound" + TableConfig.Filesave.LINE_SEPARATOR + soundPath + TableConfig.Filesave.LINE_SEPARATOR + text;
+        return "Sound" + TableConfig.FileSave.LINE_SEPARATOR + soundPath + TableConfig.FileSave.LINE_SEPARATOR + text;
     }
 }

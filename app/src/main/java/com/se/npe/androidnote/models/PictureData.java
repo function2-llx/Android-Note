@@ -42,6 +42,6 @@ public class PictureData implements IData {
 
     @Override
     public String toString() {
-        return "Picture" + TableConfig.Filesave.LINE_SEPARATOR + picturePath;
+        return "Picture" + TableConfig.FileSave.LINE_SEPARATOR + picturePath;
     }
 }

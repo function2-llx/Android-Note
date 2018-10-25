@@ -69,31 +69,31 @@ public class TableOperate implements INoteCollection {
     public String encodeNote(List<IData> src) {
         String string = "";
         for (int i = 0; i < src.size(); i++) {
-            string = string + src.get(i).toString() + TableConfig.Filesave.LIST_SEPARATOR;
+            string = string + src.get(i).toString() + TableConfig.FileSave.LIST_SEPARATOR;
         }
         return string;
     }
 
     public List<IData> decodeNote(String src) {
-        List<IData> content = new ArrayList<IData>();
-        String[] StrArray = src.split(TableConfig.Filesave.LIST_SEPARATOR);
-        for (int i = 0; i < StrArray.length; i++) {
-            Log.d("debug0001", "str:" + StrArray[i]);
-            if (StrArray[0].length() == 0) continue;
-            if (StrArray[i].charAt(0) == 'S') {
-                String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPARATOR);
+        List<IData> content = new ArrayList<>();
+        String[] strArray = src.split(TableConfig.FileSave.LIST_SEPARATOR);
+        for (int i = 0; i < strArray.length; i++) {
+            Log.d("debug0001", "str:" + strArray[i]);
+            if (strArray[0].length() == 0) continue;
+            if (strArray[i].charAt(0) == 'S') {
+                String[] tempArray = strArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
                 SoundData tempSoundData = new SoundData(tempArray[1], tempArray[2]);
                 content.add(tempSoundData);
-            } else if (StrArray[i].charAt(0) == 'T') {
-                String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPARATOR);
+            } else if (strArray[i].charAt(0) == 'T') {
+                String[] tempArray = strArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
                 TextData tempTextData = new TextData(tempArray[1]);
                 content.add(tempTextData);
-            } else if (StrArray[i].charAt(0) == 'V') {
-                String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPARATOR);
+            } else if (strArray[i].charAt(0) == 'V') {
+                String[] tempArray = strArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
                 VideoData tempVideoData = new VideoData(tempArray[1]);
                 content.add(tempVideoData);
-            } else if (StrArray[i].charAt(0) == 'P') {
-                String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPARATOR);
+            } else if (strArray[i].charAt(0) == 'P') {
+                String[] tempArray = strArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
                 PictureData tempPictureData = new PictureData(tempArray[1]);
                 content.add(tempPictureData);
             }
@@ -104,20 +104,20 @@ public class TableOperate implements INoteCollection {
     public String listStringToString(List<String> src) {
         String string = "";
         for (int i = 0; i < src.size() - 1; i++) {
-            string = string + src.get(i) + TableConfig.Filesave.LINE_SEPARATOR;
+            string = string + src.get(i) + TableConfig.FileSave.LINE_SEPARATOR;
         }
-        if (src.size() >= 2) string = string + TableConfig.Filesave.LINE_SEPARATOR;
+        if (src.size() >= 2) string = string + TableConfig.FileSave.LINE_SEPARATOR;
         return string;
     }
 
     public List<String> stringToListString(String src) {
-        if (src.length() == 0) return new ArrayList<String>();
-        String[] strings = src.split(TableConfig.Filesave.LINE_SEPARATOR);
+        if (src.length() == 0) return new ArrayList<>();
+        String[] strings = src.split(TableConfig.FileSave.LINE_SEPARATOR);
         return Arrays.asList(strings);
     }
 
     public static int getSearchConfig() {
-        InputStream inputStream = null;
+        InputStream inputStream;
         try {
             inputStream = new FileInputStream(configFile);
         } catch (FileNotFoundException e) {
@@ -131,13 +131,14 @@ public class TableOperate implements INoteCollection {
             if (len == -1) return -2;
         } catch (Exception e) {
             Logger.log(LOG_TAG, e);
+            return -2;
         }
-        String tempcontent = new String(b);
-        return Integer.parseInt(tempcontent);
+        String tempContent = new String(b);
+        return Integer.parseInt(tempContent);
     }
 
     public static void setSearchConfig(int x) {
-        OutputStream outputStream = null;
+        OutputStream outputStream;
         try {
             outputStream = new FileOutputStream(configFile);
         } catch (FileNotFoundException e) {
@@ -146,18 +147,18 @@ public class TableOperate implements INoteCollection {
         }
 
         String string = Integer.toString(x);
-
         byte[] bs = string.getBytes();
         try {
             outputStream.write(bs);
         } catch (IOException e) {
             Logger.log(LOG_TAG, e);
+            return;
         }
     }
 
     @Override
     public List<Note> getAllNotes() {
-        ArrayList<Note> noteList = new ArrayList<Note>();
+        ArrayList<Note> noteList = new ArrayList<>();
         Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME, null);
         while (c.moveToNext()) {
             Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)));
@@ -169,7 +170,7 @@ public class TableOperate implements INoteCollection {
 
     @Override
     public List<Note> getSearchResult(String parameter) {
-        ArrayList<Note> noteList = new ArrayList<Note>();
+        ArrayList<Note> noteList = new ArrayList<>();
         Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME + " where " + TableConfig.Note.NOTE_TITLE + "= ?", new String[]{parameter});
         while (c.moveToNext()) {
             Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)));
@@ -181,7 +182,7 @@ public class TableOperate implements INoteCollection {
 
     @Override
     public List<Note> getSearchResultFuzzy(String parameter) {
-        ArrayList<Note> noteList = new ArrayList<Note>();
+        ArrayList<Note> noteList = new ArrayList<>();
         String sql2 = "select * from " + TableConfig.TABLE_NAME
                 + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%'";
         Cursor c = db.rawQuery(sql2, null);
@@ -235,7 +236,7 @@ public class TableOperate implements INoteCollection {
     }
 
     Note getNoteAt(int index) {
-        ArrayList<Note> noteList = new ArrayList<Note>();
+        ArrayList<Note> noteList = new ArrayList<>();
         Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME + " where " + TableConfig.Note.NOTE_ID + "= ?", new String[]{Integer.toString(index)});
         while (c.moveToNext()) {
             Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)));
