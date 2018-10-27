@@ -17,10 +17,12 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.marshalchen.ultimaterecyclerview.itemTouchHelper.SimpleItemTouchHelperCallback;
+import com.se.npe.androidnote.adapters.GroupAdapter;
 import com.se.npe.androidnote.adapters.NoteAdapter;
 import com.se.npe.androidnote.events.NoteDeleteEvent;
 import com.se.npe.androidnote.models.Note;
@@ -44,6 +46,10 @@ public class ListActivity extends AppCompatActivity {
     private NoteAdapter noteAdapter, searchAdapter;
     private UltimateRecyclerView ultimateRecyclerView;
     private SlidingMenu slidingMenu;
+
+    public SlidingMenu getSlidingMenu() {
+        return slidingMenu;
+    }
 
     /* Options menu */
 
@@ -164,6 +170,7 @@ public class ListActivity extends AppCompatActivity {
         this.ultimateRecyclerView = this.findViewById(R.id.ultimate_recycler_view);
         this.ultimateRecyclerView.setLayoutManager(layoutManager);
 
+
         //magic do not touch
         List<Note> testNoteList = new ArrayList<>();
         testNoteList.add(new Note());
@@ -172,6 +179,7 @@ public class ListActivity extends AppCompatActivity {
         this.ultimateRecyclerView.setAdapter(noteAdapter);
         this.noteAdapter.notifyDataSetChanged();
         this.noteAdapter.clear();
+
 
         this.noteAdapter.updateList(TableOperate.getInstance().getAllNotes());
 
@@ -189,7 +197,8 @@ public class ListActivity extends AppCompatActivity {
 
 
         this.enableRefresh();
-        this.setSlidingMenu();
+
+//        this.setSlidingMenu();
 
         while (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED) {

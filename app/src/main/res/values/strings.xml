@@ -73,4 +73,5 @@
     <string name="shortcut_new_disable">New Unavailable</string>
     <string name="shortcut_new_long">New Note</string>
     <string name="shortcut_new_short">New Note</string>
+    <string name="group_all_notes">all notes</string>
 </resources>

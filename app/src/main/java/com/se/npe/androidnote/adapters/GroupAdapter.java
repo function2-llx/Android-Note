@@ -16,9 +16,11 @@ import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
+import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.marshalchen.ultimaterecyclerview.UltimateViewAdapter;
 import com.se.npe.androidnote.EditorActivity;
+import com.se.npe.androidnote.ListActivity;
 import com.se.npe.androidnote.R;
 import com.se.npe.androidnote.editor.PictureLoader;
 import com.se.npe.androidnote.events.NoteDeleteEvent;
@@ -39,39 +41,48 @@ import java.util.Date;
 import java.util.List;
 
 public class GroupAdapter extends UltimateViewAdapter<GroupAdapter.ViewHolder> {
-    private AppCompatActivity activity;
-    private List<String> tagList;
+    private List<String> groupList;
 
     /**
      * Adapt Note to item-like View
      *
      * @author llx
      */
+
+    ListActivity context;
+
+    public GroupAdapter(ListActivity context) {
+        this.context = context;
+    }
+
     public class ViewHolder extends UltimateRecyclerviewViewHolder implements View.OnClickListener{
-        TextView tag;
+        TextView groupName;
 
         public ViewHolder(View itemView) {
             super(itemView);
-
+            groupName = itemView.findViewById(R.id.text_view_group_name);
         }
 
-        public void setIamge(String imagePath)
-        {
+        private String getGroupName() {
+            return this.groupName.getText().toString();
+        }
+
+        void setGroup(String group) {
+            this.groupName.setText(group);
         }
 
         @Override
-        public void onClick(@NonNull View v) {
-
+        public void onClick(View v) {
+            if (getGroupName().equals(context.getString(R.string.group_all_notes))) {
+            }
         }
-
     }
 
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_list_item, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.sliding_menu_group_item, parent, false);
         final ViewHolder holder = new ViewHolder(v);
-        v.setOnClickListener(holder);
         return holder;
     }
 
@@ -80,11 +91,9 @@ public class GroupAdapter extends UltimateViewAdapter<GroupAdapter.ViewHolder> {
 
     }
 
-
-
     @Override
     public int getAdapterItemCount() {
-        return this.tagList.size();
+        return this.groupList.size();
     }
 
     /* header */
@@ -128,26 +137,27 @@ public class GroupAdapter extends UltimateViewAdapter<GroupAdapter.ViewHolder> {
         if (this.hasHeaderView())
             position--;
         // if (position < this.noteList.size() && position >= 0)
-        return this.tagList.get(position);
+        return this.groupList.get(position);
         // throw new IndexOutOfBoundsException("Note list out of range.");
     }
 
     /* Actions of Note in NoteCollection */
 
-    public void insert(String tag, int position) {
-        super.insertInternal(this.tagList, tag, position);
+    public void insert(String groupName, int position) {
+        super.insertInternal(this.groupList, groupName, position);
+
     }
 
     public void remove(int position) {
-        super.removeInternal(this.tagList, position);
+        super.removeInternal(this.groupList, position);
     }
 
     public void swapPositions(int from, int to) {
-        super.swapPositions(this.tagList, from, to);
+        super.swapPositions(this.groupList, from, to);
     }
 
     public void clear() {
-        super.clearInternal(this.tagList);
+        super.clearInternal(this.groupList);
     }
 
     /* Animation */
