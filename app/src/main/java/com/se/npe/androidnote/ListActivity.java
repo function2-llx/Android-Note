@@ -45,11 +45,7 @@ public class ListActivity extends AppCompatActivity {
     private LinearLayoutManager layoutManager;
     private NoteAdapter noteAdapter, searchAdapter;
     private UltimateRecyclerView ultimateRecyclerView;
-    private SlidingMenu slidingMenu;
 
-    public SlidingMenu getSlidingMenu() {
-        return slidingMenu;
-    }
 
     /* Options menu */
 
@@ -92,13 +88,23 @@ public class ListActivity extends AppCompatActivity {
             this.startActivity(intent);
         }
 
+        SubMenu sortMenu = menu.findItem(R.id.menu_sort).getSubMenu();
         int sortOptionId;
         int selectedId = TableOperate.getSearchConfig();
-        if (selectedId != -1)
-            sortOptionId = selectedId;
-        else sortOptionId = R.id.sort_title;
+        if (selectedId != -1) {
+            boolean flag = false;
+            for (int i = 0; i < sortMenu.size(); i++) {
+                if (sortMenu.getItem(i).getItemId() == selectedId) {
+                    flag = true;
+                    break;
+                }
+            }
+            if (!flag)
+                sortOptionId = R.id.sort_title;
+            else
+                sortOptionId = selectedId;
+        } else sortOptionId = R.id.sort_title;
 
-        SubMenu sortMenu = menu.findItem(R.id.menu_sort).getSubMenu();
         for (int i = 0; i < sortMenu.size(); i++) {
             MenuItem item = sortMenu.getItem(i);
             if (item.getItemId() == sortOptionId) {
@@ -108,16 +114,6 @@ public class ListActivity extends AppCompatActivity {
         }
 
         setSortOption(sortOptionId);
-
-//        SubMenu subMenu = menu.findItem(R.id.menu_sort).getSubMenu();
-//        final String[] sortOptions = getResources().getStringArray(R.array.sort_options_human_readable);
-//        for (int i = 0; i < sortOptions.length; i++) {
-//            if (subMenu.findItem(i) == null) {
-//                subMenu.add(MENU_SORT_GROUP_ID, i, i, sortOptions[i]);
-//            }
-//        }
-//
-//        subMenu.setGroupCheckable(MENU_SORT_GROUP_ID, true, true);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -211,15 +207,15 @@ public class ListActivity extends AppCompatActivity {
      * Configure search view to set hint & listener
      */
 
-    void setSlidingMenu() {
-        slidingMenu = new SlidingMenu(this);
-        slidingMenu.setMode(SlidingMenu.LEFT);
-        slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
-        slidingMenu.setBehindOffsetRes(R.dimen.sliding_menu_behind_witdh);
-        slidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
-        slidingMenu.setMenu(R.layout.sliding_menu_list);
-        slidingMenu.setTouchModeBehind(SlidingMenu.TOUCHMODE_FULLSCREEN);
-    }
+//    void setSlidingMenu() {
+//        slidingMenu = new SlidingMenu(this);
+//        slidingMenu.setMode(SlidingMenu.LEFT);
+//        slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+//        slidingMenu.setBehindOffsetRes(R.dimen.sliding_menu_behind_witdh);
+//        slidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
+//        slidingMenu.setMenu(R.layout.sliding_menu_list);
+//        slidingMenu.setTouchModeBehind(SlidingMenu.TOUCHMODE_FULLSCREEN);
+//    }
 
     private void configureSearchView(@NonNull SearchView searchView) {
         searchView.setQueryHint("search by title...");
