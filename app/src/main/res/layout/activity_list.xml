@@ -35,13 +35,24 @@
     </LinearLayout>
 
     <!--左滑-->
-    <LinearLayout
-        android:layout_width="240dp"
-        android:background="@color/grey"
-        android:layout_height="match_parent"
-        android:layout_gravity="start"
-        >
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_gravity="start" >
+
+        <android.support.design.widget.NavigationView
+            android:id="@+id/nav_view"
+            android:layout_width="wrap_content"
+            android:background="@color/white"
+            app:itemBackground="@color/white"
+            app:headerLayout="@layout/nav_header"
+            app:menu="@menu/navigation_menu"
+            android:layout_height="match_parent">
+
+        </android.support.design.widget.NavigationView>
     </LinearLayout>
+
+
 
 </android.support.v4.widget.DrawerLayout>
