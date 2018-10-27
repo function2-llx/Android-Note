@@ -12,10 +12,12 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
+import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.view.Window;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -159,8 +161,12 @@ public class ListActivity extends AppCompatActivity {
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+//        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_list);
-        this.setTitle(this.getResources().getString(R.string.list_title));
+//        this.setTitle(this.getResources().getString(R.string.list_title));
+
+        Toolbar toolbar = findViewById(R.id.toolbar);
+        setSupportActionBar(toolbar);
 
         this.layoutManager = new LinearLayoutManager(this);
         this.ultimateRecyclerView = this.findViewById(R.id.ultimate_recycler_view);

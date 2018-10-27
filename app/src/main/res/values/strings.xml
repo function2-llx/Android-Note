@@ -2,7 +2,7 @@
     <string name="app_name">AndroidNote</string>
 
     <string name="editor_title">Editor</string>
-    <string name="list_title">Notes list</string>
+    <string name="list_title">List of Notes</string>
 
     <string name="menu_search">Search</string>
     <string name="menu_sort">Sort</string>

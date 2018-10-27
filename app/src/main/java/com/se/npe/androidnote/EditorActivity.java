@@ -71,7 +71,9 @@ public class EditorActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
-        this.setTitle(this.getResources().getString(R.string.editor_title));
+
+        setSupportActionBar(findViewById(R.id.toolbar));
+
         EventBus.getDefault().register(this);
         editor = findViewById(R.id.rich_editor);
         final FloatingActionsMenu insertMedia = findViewById(R.id.insert_media);
