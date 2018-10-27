@@ -3,13 +3,17 @@ package com.se.npe.androidnote;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
@@ -18,6 +22,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.view.View;
 import android.view.Window;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -49,6 +54,12 @@ public class ListActivity extends AppCompatActivity {
     private LinearLayoutManager layoutManager;
     private NoteAdapter noteAdapter, searchAdapter;
     private UltimateRecyclerView ultimateRecyclerView;
+    private ActionBarDrawerToggle drawerToggle;
+    private DrawerArrowDrawable drawerArrowDrawable;
+    private DrawerLayout drawerLayout;
+    private Toolbar toolbar;
+    private AnimationDrawable animationDrawable;
+
 
 
     /* Options menu */
@@ -167,7 +178,7 @@ public class ListActivity extends AppCompatActivity {
         setContentView(R.layout.activity_list);
 //        this.setTitle(this.getResources().getString(R.string.list_title));
 
-        Toolbar toolbar = findViewById(R.id.toolbar);
+        toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
@@ -213,6 +224,15 @@ public class ListActivity extends AppCompatActivity {
         }
 
         initNavigationView();
+        initDrawerToggle();
+    }
+
+    private void initDrawerToggle() {
+
+        this.drawerLayout = findViewById(R.id.drawer_layout);
+        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close);
+        drawerToggle.syncState();
+
     }
 
     void initNavigationView() {
@@ -220,6 +240,15 @@ public class ListActivity extends AppCompatActivity {
         Menu menu = navigationView.getMenu();
         navigationView.setItemIconTintList(null);
         menu.add("test");
+        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+            @Override
+            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
+//                drawerLayout.closeDrawers();
+                if (menuItem.getItemId() == R.id.all_notes)
+                    ultimateRecyclerView.setAdapter(noteAdapter);
+                return true;
+            }
+        });
     }
 
     /**

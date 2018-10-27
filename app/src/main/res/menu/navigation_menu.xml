@@ -2,13 +2,18 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:title="@string/group_all_notes"
-        android:icon="@mipmap/icon_notes"
-        />
+        android:title="Groups"
+        >
+        <menu>
+            <item
+                android:title="@string/group_all_notes"
+                android:id="@+id/all_notes"
+                android:icon="@mipmap/icon_notes" />
+        </menu>
+    </item>
 
-    <item
-        android:title="@string/menu_settings"
-        android:icon="@mipmap/settings"
-        />
+    <!--<item-->
+        <!--android:title="@string/menu_settings"-->
+        <!--android:icon="@mipmap/settings" />-->
 
 </menu>

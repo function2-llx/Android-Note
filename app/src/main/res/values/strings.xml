@@ -74,4 +74,7 @@
     <string name="shortcut_new_long">New Note</string>
     <string name="shortcut_new_short">New Note</string>
     <string name="group_all_notes">All notes</string>
+
+    <string name="open">open</string>
+    <string name="close">close</string>
 </resources>
