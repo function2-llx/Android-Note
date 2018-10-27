@@ -16,6 +16,7 @@ import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.widget.ListView;
 
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
@@ -188,12 +189,7 @@ public class ListActivity extends AppCompatActivity {
 
 
         this.enableRefresh();
-
-        this.slidingMenu = new SlidingMenu(this);
-        this.slidingMenu.setMode(SlidingMenu.LEFT);
-        this.slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
-        slidingMenu.setBehindOffsetRes(R.dimen.sliding_menu_behind_witdh);
-        slidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
+        this.setSlidingMenu();
 
         while (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -205,6 +201,17 @@ public class ListActivity extends AppCompatActivity {
     /**
      * Configure search view to set hint & listener
      */
+
+    void setSlidingMenu() {
+        slidingMenu = new SlidingMenu(this);
+        slidingMenu.setMode(SlidingMenu.LEFT);
+        slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
+        slidingMenu.setBehindOffsetRes(R.dimen.sliding_menu_behind_witdh);
+        slidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
+        slidingMenu.setMenu(R.layout.sliding_menu_list);
+        slidingMenu.setTouchModeBehind(SlidingMenu.TOUCHMODE_FULLSCREEN);
+    }
+
     private void configureSearchView(@NonNull SearchView searchView) {
         searchView.setQueryHint("search by title...");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
