@@ -46,9 +46,6 @@ import java.util.List;
 public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
     private AppCompatActivity activity;
     private Comparator<Note> comparator = Comparator.comparing(Note::getTitle);
-    /**
-     * Implement INoteCollection
-     */
 
     public List<Note> getSearchResult(String parameter) {
         List<Note> ret = new ArrayList<>();

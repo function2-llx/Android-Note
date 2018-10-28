@@ -2,7 +2,7 @@
     <string name="app_name">AndroidNote</string>
 
     <string name="editor_title">Editor</string>
-    <string name="list_title">Notes list</string>
+    <string name="list_title">List of Notes</string>
 
     <string name="menu_search">Search</string>
     <string name="menu_sort">Sort</string>
@@ -73,4 +73,8 @@
     <string name="shortcut_new_disable">New Unavailable</string>
     <string name="shortcut_new_long">New Note</string>
     <string name="shortcut_new_short">New Note</string>
+    <string name="group_all_notes">All notes</string>
+
+    <string name="open">open</string>
+    <string name="close">close</string>
 </resources>
