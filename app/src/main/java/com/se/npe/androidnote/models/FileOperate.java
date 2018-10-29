@@ -26,12 +26,12 @@ public class FileOperate {
     }
 
     /**
-     * @Title: copyFileUsingStream
+     * @Title: copy
      * @Description: 使用Stream拷贝文件
      * @param: @param source
      * @param: @param dest
      */
-    public static void copyFileUsingStream(File source, File dest) {
+    public static void copy(File source, File dest) {
         try (InputStream is = new FileInputStream(source);
              OutputStream os = new FileOutputStream(dest)) {
             byte[] buffer = new byte[1024];

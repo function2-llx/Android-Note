@@ -281,15 +281,15 @@ public class Note {
                 srcFile = new File(ContentList.get(i).getPath());
                 FileOperate.getSuffix(ContentList.get(i).getPath());
                 desFile = new File(TableConfig.SAVE_PATH + "/NoteSave/TempFloder/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath()));
-                FileOperate.copyFileUsingStream(srcFile, desFile);
+                FileOperate.copy(srcFile, desFile);
             } else if (ContentList.get(i).getType() == "Sound") {
                 srcFile = new File(ContentList.get(i).getPath());
                 desFile = new File(TableConfig.SAVE_PATH + "/NoteSave/TempFloder/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath()));
-                FileOperate.copyFileUsingStream(srcFile, desFile);
+                FileOperate.copy(srcFile, desFile);
             } else if (ContentList.get(i).getType() == "Video") {
                 srcFile = new File(ContentList.get(i).getPath());
                 desFile = new File(TableConfig.SAVE_PATH + "/NoteSave/TempFloder/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath()));
-                FileOperate.copyFileUsingStream(srcFile, desFile);
+                FileOperate.copy(srcFile, desFile);
             }
         }
 
