@@ -80,12 +80,12 @@ public class ListActivity extends AppCompatActivity {
             }
 
             case R.id.sort_created_time: {
-                noteAdapter.setComparator(Comparator.comparing(Note::getStarttime));
+                noteAdapter.setComparator(Comparator.comparing(Note::getStartTime));
                 break;
             }
 
             case R.id.sort_modified_time: {
-                noteAdapter.setComparator(Comparator.comparing(Note::getModifytime));
+                noteAdapter.setComparator(Comparator.comparing(Note::getModifyTime));
                 break;
             }
         }

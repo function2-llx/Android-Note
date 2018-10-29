@@ -1,7 +1,5 @@
 package com.se.npe.androidnote.models;
 
-import android.support.annotation.NonNull;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -12,21 +10,25 @@ import static org.junit.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 public class TextDataTest {
 
-    private static final String EXAMPLE_MIX_IN = "test";
     private TextData textData;
     private TextData textDataEquals;
     private TextData textDataNotEquals;
 
     @Before
     public void setUp() {
-        textData = getExampleTextData(EXAMPLE_MIX_IN);
-        textDataEquals = getExampleTextData(EXAMPLE_MIX_IN);
-        textDataNotEquals = getExampleTextData(EXAMPLE_MIX_IN + EXAMPLE_MIX_IN);
+        textData = DataExample.getExampleTextData(DataExample.EXAMPLE_MIX_IN);
+        textDataEquals = DataExample.getExampleTextData(DataExample.EXAMPLE_MIX_IN);
+        textDataNotEquals = DataExample.getExampleTextData(DataExample.EXAMPLE_MIX_IN + DataExample.EXAMPLE_MIX_IN);
     }
 
     @Test
     public void getText() {
-        assertEquals(getExampleText(EXAMPLE_MIX_IN), textData.getText());
+        assertEquals(DataExample.getExampleText(DataExample.EXAMPLE_MIX_IN), textData.getText());
+    }
+
+    @Test
+    public void getType() {
+        assertEquals("Text", textData.getType());
     }
 
     @Test
@@ -49,15 +51,5 @@ public class TextDataTest {
     public void toStringTest() {
         assertEquals(textData.toString(), textDataEquals.toString());
         assertNotEquals(textData.toString(), textDataNotEquals.toString());
-    }
-
-    @NonNull
-    private TextData getExampleTextData(String mixIn) {
-        return new TextData(getExampleText(mixIn));
-    }
-
-    @NonNull
-    private String getExampleText(String mixIn) {
-        return "This is the TextData text for " + mixIn;
     }
 }

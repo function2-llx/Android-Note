@@ -36,8 +36,8 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
                 + TableConfig.Note.NOTE_ID + " integer not null primary key autoincrement,"
                 + TableConfig.Note.NOTE_TITLE + " verchar(50),"
                 + TableConfig.Note.NOTE_CONTENT + " TEXT,"
-                + TableConfig.Note.NOTE_STARTTIME + " TEXT,"
-                + TableConfig.Note.NOTE_MODIFYTIME + " TEXT,"
+                + TableConfig.Note.NOTE_START_TIME + " TEXT,"
+                + TableConfig.Note.NOTE_MODIFY_TIME + " TEXT,"
                 + TableConfig.Note.NOTE_TAG + " TEXT)");
     }
 
