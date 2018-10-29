@@ -105,20 +105,12 @@ public class Note {
         startTime = time;
     }
 
-    public void setStartTime() {
-        setStartTime(new Date());
-    }
-
     public Date getModifyTime() {
         return modifyTime;
     }
 
     public void setModifyTime(Date time) {
         modifyTime = time;
-    }
-
-    public void setModifyTime() {
-        setModifyTime(new Date());
     }
 
     public List<String> getTag() {

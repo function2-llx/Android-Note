@@ -1,7 +1,7 @@
 package com.se.npe.androidnote.models;
 
 public class TableConfig {
-    public static String SAVE_PATH = "build/save";
+    public static String SAVE_PATH = ""; // initialized in TableOperate.init()
     public static final String TABLE_NAME = "AndroidNote";
 
     public static class Note {

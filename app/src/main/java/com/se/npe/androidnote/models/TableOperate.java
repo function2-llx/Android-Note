@@ -6,7 +6,7 @@ import android.database.Cursor;
 import android.content.ContentValues;
 import android.util.Log;
 
-import com.se.npe.androidnote.events.ClearEvent;
+import com.se.npe.androidnote.events.NoteClearEvent;
 import com.se.npe.androidnote.events.NoteDeleteEvent;
 import com.se.npe.androidnote.events.NoteModifyEvent;
 import com.se.npe.androidnote.interfaces.IData;
@@ -38,6 +38,11 @@ public class TableOperate implements INoteCollection {
 
     public static void init(Context context) {
         tableOperate = new TableOperate(context);
+        TableConfig.SAVE_PATH = context.getExternalFilesDir(null).getAbsolutePath();
+        initConfigFile();
+    }
+
+    private static void initConfigFile() {
         File file = new File(TableConfig.SAVE_PATH + "/config");
         if (!file.exists()) {
             file.mkdirs();
@@ -263,11 +268,11 @@ public class TableOperate implements INoteCollection {
 
     @Subscribe(sticky = true)
     public void onDeleteNote(NoteDeleteEvent event) {
-        this.removeNote(event.getNote());
+        removeNote(event.getNote());
     }
 
     @Subscribe(sticky = true)
-    public void receiveClearEvent(ClearEvent event) {
+    public void onClearNote(NoteClearEvent event) {
         removeAllNotes();
     }
 }
