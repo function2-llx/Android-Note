@@ -163,15 +163,9 @@ public class Note {
         }
 
         //文件解压缩
-
-        try {
-            FileOperate.unzip(fileName, TableConfig.SAVE_PATH + "/NoteSave/TempFloder");
-        } catch (IOException e) {
-            Logger.log(LOG_TAG, e);
-        }
+        FileOperate.unzip(fileName, TableConfig.SAVE_PATH + "/NoteSave/TempFloder");
 
         //文件解压测试
-
         Log.d("debug0001", "TestFileUnzip");
         File fa[] = tempfloder.listFiles();
         for (int i = 0; i < fa.length; i++) {
@@ -287,27 +281,15 @@ public class Note {
                 srcFile = new File(ContentList.get(i).getPath());
                 FileOperate.getSuffix(ContentList.get(i).getPath());
                 desFile = new File(TableConfig.SAVE_PATH + "/NoteSave/TempFloder/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath()));
-                try {
-                    FileOperate.copyFileUsingStream(srcFile, desFile);
-                } catch (IOException e) {
-                    Logger.log(LOG_TAG, e);
-                }
+                FileOperate.copyFileUsingStream(srcFile, desFile);
             } else if (ContentList.get(i).getType() == "Sound") {
                 srcFile = new File(ContentList.get(i).getPath());
                 desFile = new File(TableConfig.SAVE_PATH + "/NoteSave/TempFloder/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath()));
-                try {
-                    FileOperate.copyFileUsingStream(srcFile, desFile);
-                } catch (IOException e) {
-                    Logger.log(LOG_TAG, e);
-                }
+                FileOperate.copyFileUsingStream(srcFile, desFile);
             } else if (ContentList.get(i).getType() == "Video") {
                 srcFile = new File(ContentList.get(i).getPath());
                 desFile = new File(TableConfig.SAVE_PATH + "/NoteSave/TempFloder/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath()));
-                try {
-                    FileOperate.copyFileUsingStream(srcFile, desFile);
-                } catch (IOException e) {
-                    Logger.log(LOG_TAG, e);
-                }
+                FileOperate.copyFileUsingStream(srcFile, desFile);
             }
         }
 
@@ -359,19 +341,13 @@ public class Note {
         }
 
         //文件压缩
+         FileOperate.zip(TableConfig.SAVE_PATH + "/NoteSave/TempFloder", TableConfig.SAVE_PATH + "/NoteSave/" + fileName + ".zip");
 
-        try {
-            FileOperate.zip(TableConfig.SAVE_PATH + "/NoteSave/TempFloder", TableConfig.SAVE_PATH + "/NoteSave/" + fileName + ".zip");
-        } catch (IOException e) {
-            Logger.log(LOG_TAG, e);
-        }
 
         //文件夹删除
-
         FileOperate.delete(TableConfig.SAVE_PATH + "/NoteSave/TempFloder");
 
         //文件存储测试
-
         Log.d("debug0001", "TestFileSave");
         File fa[] = notesave.listFiles();
         for (int i = 0; i < fa.length; i++) {
