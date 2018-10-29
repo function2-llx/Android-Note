@@ -83,7 +83,6 @@ public class TableOperate implements INoteCollection {
         List<IData> content = new ArrayList<>();
         String[] strArray = src.split(TableConfig.FileSave.LIST_SEPARATOR);
         for (int i = 0; i < strArray.length; i++) {
-            Log.d("debug0001", "str:" + strArray[i]);
             if (strArray[0].length() == 0) continue;
             if (strArray[i].charAt(0) == 'S') {
                 String[] tempArray = strArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
@@ -193,6 +192,27 @@ public class TableOperate implements INoteCollection {
         while (c.moveToNext()) {
             Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)));
             noteList.add(temp);
+        }
+        c.close();
+        return noteList;
+    }
+
+    public List<Note> getSearchResultFuzzyWithTag(String parameter,String Tag) {
+        ArrayList<Note> noteList = new ArrayList<Note>();
+        String sql2 = "select * from " + TableConfig.TABLE_NAME
+                + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%'";
+        Cursor c = db.rawQuery(sql2, null);
+        while (c.moveToNext()) {
+            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)));
+            List<String> Taglist = temp.getTag();
+            boolean flag = false;
+            for(int i = 0;i < Taglist.size();i ++) {
+                if(Taglist.get(i).equals(Tag)){
+                    flag = true;
+                    break;
+                }
+            }
+            if(flag)noteList.add(temp);
         }
         c.close();
         return noteList;
