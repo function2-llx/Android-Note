@@ -83,17 +83,17 @@ public class EditorActivity extends AppCompatActivity {
     private PlatformActionListener platformActionListener = new PlatformActionListener() {
         @Override
         public void onComplete(Platform platform, int i, HashMap<String, Object> hashMap) {
-            Log.e("kid","分享成功");
+            Logger.logInfo("kid", "分享成功");
         }
 
         @Override
         public void onError(Platform platform, int i, Throwable throwable) {
-            Log.e("kid","分享失败");
+            Logger.logError("kid", "分享失败");
         }
 
         @Override
         public void onCancel(Platform platform, int i) {
-            Log.e("kid","分享取消");
+            Logger.logInfo("kid", "分享取消");
         }
     };
 
