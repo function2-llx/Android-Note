@@ -1,5 +1,24 @@
 apply plugin: 'com.android.application'
 apply plugin: 'jacoco'
+apply plugin: 'com.mob.sdk'
+
+MobSDK {
+    appKey "28765cffe4a40"
+    appSecret "5f3c3c3c32e727d3fb2c874f7446150a"
+    ShareSDK {
+        devInfo {
+            Wechat {
+                appId "wxec99b1ef4e23b81e"
+                appSecret "38a4f8204cc784f81f9f0daaf31e02e3"
+//                userName "gh_afb25ac019c9"
+//                path "pages/index/index.html?id=1"
+//                withShareTicket true
+//                miniprogramType 2
+//                bypassApproval false
+            }
+        }
+    }
+}
 
 android {
     compileSdkVersion 28
@@ -92,6 +111,8 @@ dependencies {
     // Pdf dependencies
     implementation 'com.itextpdf:itextg:5.5.10'
     implementation project(path: ':SlidingMenu')
+
+    implementation 'com.tencent.mm.opensdk:wechat-sdk-android-with-mta:+'
 }
 
 task jacocoTestReport(type: JacocoReport) {
