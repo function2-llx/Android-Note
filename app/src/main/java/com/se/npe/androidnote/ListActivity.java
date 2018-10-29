@@ -30,6 +30,7 @@ import android.widget.TextView;
 import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.marshalchen.ultimaterecyclerview.itemTouchHelper.SimpleItemTouchHelperCallback;
+import com.mob.MobSDK;
 import com.se.npe.androidnote.adapters.GroupAdapter;
 import com.se.npe.androidnote.adapters.NoteAdapter;
 import com.se.npe.androidnote.events.NoteDeleteEvent;
@@ -42,6 +43,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
+
+import cn.sharesdk.framework.ShareSDK;
 
 
 /**
@@ -68,6 +71,7 @@ public class ListActivity extends AppCompatActivity {
 
     private void setSortOption(int sortOptionId) {
         TableOperate.setSearchConfig(sortOptionId);
+
 
         switch (sortOptionId) {
             case R.id.sort_title: {
@@ -214,9 +218,6 @@ public class ListActivity extends AppCompatActivity {
 
 
         this.enableRefresh();
-
-//        this.setSlidingMenu();
-
         while (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO},
@@ -225,6 +226,8 @@ public class ListActivity extends AppCompatActivity {
 
         initNavigationView();
         initDrawerToggle();
+//        MobSDK.init(this);
+
     }
 
     private void initDrawerToggle() {

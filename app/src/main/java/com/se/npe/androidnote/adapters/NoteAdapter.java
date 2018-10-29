@@ -286,7 +286,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
     }
 
     @Subscribe(sticky = true)
-    void onReceiveNoteChangeSignal(DatabaseModifyEvent signal) {
+    public void onReceiveNoteChangeSignal(DatabaseModifyEvent signal) {
         this.reloadNoteList();
     }
 }

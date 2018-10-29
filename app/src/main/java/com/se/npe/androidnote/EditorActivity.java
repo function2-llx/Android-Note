@@ -29,6 +29,7 @@ import com.dmcbig.mediapicker.PickerActivity;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.mob.MobSDK;
 import com.se.npe.androidnote.editor.SortRichEditor;
 import com.se.npe.androidnote.events.NoteModifyEvent;
 import com.se.npe.androidnote.events.NoteSelectEvent;
@@ -48,7 +49,14 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Objects;
+
+import cn.sharesdk.framework.Platform;
+import cn.sharesdk.framework.PlatformActionListener;
+import cn.sharesdk.framework.ShareSDK;
+import cn.sharesdk.onekeyshare.OnekeyShare;
+import cn.sharesdk.wechat.friends.Wechat;
 
 public class EditorActivity extends AppCompatActivity {
     private static final String LOG_TAG = EditorActivity.class.getSimpleName();
@@ -73,12 +81,49 @@ public class EditorActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    private PlatformActionListener platformActionListener = new PlatformActionListener() {
+        @Override
+        public void onComplete(Platform platform, int i, HashMap<String, Object> hashMap) {
+            Log.e("kid","分享成功");
+        }
+
+        @Override
+        public void onError(Platform platform, int i, Throwable throwable) {
+            Log.e("kid","分享失败");
+        }
+
+        @Override
+        public void onCancel(Platform platform, int i) {
+            Log.e("kid","分享取消");
+        }
+    };
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_save:
                 Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
                 break;
+
+            case R.id.share: {
+                OnekeyShare oks = new OnekeyShare();
+                oks.disableSSOWhenAuthorize();
+                oks.setTitle(getString(R.string.share));
+                oks.setTitleUrl("http://sharesdk.cn");
+                oks.setText("我是分享文本");
+//                oks.setImagePath(getRe);//确保SDcard下面存在此张图片
+                oks.setUrl("http://sharesdk.cn");
+                oks.setComment("我是测试评论文本");
+                oks.setSite(getString(R.string.app_name));
+                oks.setSiteUrl("http://sharesdk.cn");
+                oks.show(this);
+//                Platform wechatPlatform = ShareSDK.getPlatform(Wechat.NAME);
+//                Wechat.ShareParams sp = new Wechat.ShareParams();
+//                sp.setShareType(Wechat.SHARE_TEXT);
+//                sp.setTitle("test");
+//                wechatPlatform.setPlatformActionListener(this.platformActionListener);
+//                wechatPlatform.share(sp);
+            }
             default:
                 break;
         }
@@ -156,6 +201,8 @@ public class EditorActivity extends AppCompatActivity {
         } catch (IOException e) {
             Logger.log(LOG_TAG, e);
         }
+
+        MobSDK.init(this);
     }
 
     private void openCamera(int code) {

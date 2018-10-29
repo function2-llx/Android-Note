@@ -77,4 +77,6 @@
 
     <string name="open">open</string>
     <string name="close">close</string>
+    <string name="save">Save</string>
+    <string name="share">Share</string>
 </resources>
