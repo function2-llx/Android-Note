@@ -10,11 +10,16 @@ MobSDK {
             Wechat {
                 appId "wxec99b1ef4e23b81e"
                 appSecret "38a4f8204cc784f81f9f0daaf31e02e3"
+                bypassApproval false
 //                userName "gh_afb25ac019c9"
 //                path "pages/index/index.html?id=1"
 //                withShareTicket true
 //                miniprogramType 2
-//                bypassApproval false
+            }
+            WechatMoments {
+                appId "wxec99b1ef4e23b81e"
+                appSecret "38a4f8204cc784f81f9f0daaf31e02e3"
+                bypassApproval false
             }
         }
     }
