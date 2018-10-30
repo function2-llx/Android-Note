@@ -26,7 +26,6 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.googlecode.mp4parser.authoring.Edit;
 import com.se.npe.androidnote.EditorActivity;
 import com.se.npe.androidnote.R;
 import com.se.npe.androidnote.interfaces.IData;
