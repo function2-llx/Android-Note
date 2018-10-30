@@ -3,6 +3,7 @@ package com.se.npe.androidnote;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,6 +37,10 @@ import com.se.npe.androidnote.adapters.NoteAdapter;
 import com.se.npe.androidnote.events.NoteDeleteEvent;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.TableOperate;
+import com.yydcdut.markdown.MarkdownConfiguration;
+import com.yydcdut.markdown.MarkdownProcessor;
+import com.yydcdut.markdown.syntax.text.TextFactory;
+import com.yydcdut.markdown.theme.ThemeSunburst;
 
 import org.greenrobot.eventbus.EventBus;
 
