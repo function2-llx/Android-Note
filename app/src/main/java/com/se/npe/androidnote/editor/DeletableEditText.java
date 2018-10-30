@@ -24,10 +24,6 @@ import com.yydcdut.markdown.syntax.edit.EditFactory;
 import com.yydcdut.markdown.syntax.text.TextFactory;
 import com.yydcdut.markdown.theme.ThemeSunburst;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.stream.IntStream;
-
 /**
  * 处理软键盘回删按钮backSpace时回调OnKeyListener
  */
@@ -105,7 +101,7 @@ public class DeletableEditText extends MarkdownEditText {
 
     public void render(boolean isRender) {
         if (isRender) {
-            md.setText(textViewProcessor.parse(getText()));
+            md.setText(textViewProcessor.parse(getText().toString()));
             md.setVisibility(VISIBLE);
             this.setVisibility(GONE);
         } else {

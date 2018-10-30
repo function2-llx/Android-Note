@@ -10,6 +10,13 @@
         android:layout_height="match_parent"
         android:background="#fff" />
 
+    <com.yydcdut.markdowndemo.view.HorizontalEditScrollView
+        android:id="@+id/scroll_edit"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_alignParentBottom="true">
+    </com.yydcdut.markdowndemo.view.HorizontalEditScrollView>
+
     <com.getbase.floatingactionbutton.FloatingActionsMenu
         android:id="@+id/insert_media"
         android:layout_width="wrap_content"

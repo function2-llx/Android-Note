@@ -195,33 +195,6 @@ public class ListActivity extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO},
                     10);
         }
-
-        final TextView md = findViewById(R.id.tmp_md);
-        MarkdownConfiguration textViewMarkdownConfiguration = new MarkdownConfiguration.Builder(this)
-                .setDefaultImageSize(50, 50)
-                .setBlockQuotesLineColor(0xff33b5e5)
-                .setHeader1RelativeSize(1.6f)
-                .setHeader2RelativeSize(1.5f)
-                .setHeader3RelativeSize(1.4f)
-                .setHeader4RelativeSize(1.3f)
-                .setHeader5RelativeSize(1.2f)
-                .setHeader6RelativeSize(1.1f)
-                .setHorizontalRulesColor(0xff99cc00)
-                .setCodeBgColor(0xffff4444)
-                .setTodoColor(0xffaa66cc)
-                .setTodoDoneColor(0xffff8800)
-                .setUnOrderListColor(0xff00ddff)
-                .setHorizontalRulesHeight(1)
-                .setLinkFontColor(Color.BLUE)
-                .showLinkUnderline(false)
-                .setTheme(new ThemeSunburst())
-                .setOnTodoClickCallback((view, line, lineNumber) -> md.getText())
-                .build();
-        MarkdownProcessor textViewProcessor = new MarkdownProcessor(this);
-        textViewProcessor.factory(TextFactory.create());
-        textViewProcessor.config(textViewMarkdownConfiguration);
-        md.setText("fuck!!!");
-        //        md.setText(textViewProcessor.parse("1. 1\n1. 1\n1. 1\n"));
     }
 
     /**

@@ -9,21 +9,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#EEE9E9">
-
-        <TextView
-            android:id="@+id/tmp_md"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="hello world" />
-
-        <com.marshalchen.ultimaterecyclerview.UltimateRecyclerView
-            android:id="@+id/ultimate_recycler_view"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-
-
-        </com.marshalchen.ultimaterecyclerview.UltimateRecyclerView>
-
     </LinearLayout>
 
 </android.support.constraint.ConstraintLayout>
