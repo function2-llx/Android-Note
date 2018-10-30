@@ -2,6 +2,7 @@ package com.se.npe.androidnote.editor;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
 import android.view.View;
@@ -22,6 +23,10 @@ import com.yydcdut.markdown.loader.MDImageLoader;
 import com.yydcdut.markdown.syntax.edit.EditFactory;
 import com.yydcdut.markdown.syntax.text.TextFactory;
 import com.yydcdut.markdown.theme.ThemeSunburst;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.stream.IntStream;
 
 /**
  * 处理软键盘回删按钮backSpace时回调OnKeyListener
@@ -105,7 +110,22 @@ public class DeletableEditText extends MarkdownEditText {
 
     public void render(boolean isRender) {
         if (isRender) {
-            md.setText(textViewProcessor.parse(getText()));
+//            CharSequence rendered = textViewProcessor.parse(getText());
+//            Log.e("my", rendered.toString());
+//            Log.e("my", Arrays.asList(rendered.toString().getBytes()) + "");
+//            Log.e("my", rendered.length() + "");
+//            {
+//                IntStream s = rendered.chars();
+//                ArrayList<Integer> arr = new ArrayList<>();
+//                s.forEach((i) -> {
+//                    arr.add(i);
+//                });
+//                Log.e("my", arr.toString());
+//            }
+//            md.setText(textViewProcessor.parse(getText()));
+//            Log.e("my", textViewProcessor.parse(getText()) + "");
+//            Log.e("my", textViewProcessor.parse(getText()).toString());
+            md.setText(textViewProcessor.parse(getText()).toString());
             md.setVisibility(VISIBLE);
             this.setVisibility(GONE);
         } else {
