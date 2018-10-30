@@ -30,6 +30,7 @@ import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -46,21 +47,15 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
     private List<Note> noteList;
     private Comparator<Note> comparator = Comparator.comparing(Note::getTitle);
 
+    public NoteAdapter(AppCompatActivity activity) {
+        this.activity = activity;
+        EventBus.getDefault().register(this);
+    }
+
     public void setComparator(Comparator<Note> comparator) {
         this.comparator = comparator;
         Collections.sort(noteList, comparator);
         this.notifyDataSetChanged();
-    }
-
-    public void updateList(List<Note> list) {
-        noteList = list;
-        Collections.sort(noteList, comparator);
-        this.notifyDataSetChanged();
-    }
-
-    public NoteAdapter(List<Note> noteList, AppCompatActivity activity) {
-        this.noteList = noteList;
-        this.activity = activity;
     }
 
     /* ViewHolder */
@@ -87,6 +82,8 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 
     @Override
     public int getAdapterItemCount() {
+        if (noteList == null)
+            return 0;
         return this.noteList.size();
     }
 
@@ -129,6 +126,22 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 
     /* Actions of Note in NoteCollection */
 
+    // All notes
+    public void updateAllNotesList() {
+        updateList(TableOperate.getInstance().getAllNotes());
+    }
+
+    // Search for notes
+    public void updateSearchList(String searchParameter) {
+        updateList(TableOperate.getInstance().getSearchResultFuzzy(searchParameter));
+    }
+
+    private void updateList(@NonNull List<Note> list) {
+        noteList = list;
+        Collections.sort(noteList, comparator);
+        this.notifyDataSetChanged();
+    }
+
     public void insert(Note note, int position) {
         EventBus.getDefault().post(new NoteModifyEvent(note));
         super.insertInternal(this.noteList, note, position);
@@ -151,6 +164,12 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         // if (position < this.noteList.size() && position >= 0)
         return this.noteList.get(position);
         // throw new IndexOutOfBoundsException("Note list out of range.");
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        EventBus.getDefault().unregister(this);
+        super.finalize();
     }
 
     private void reloadNoteList() {
