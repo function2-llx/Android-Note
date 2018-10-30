@@ -68,7 +68,6 @@ public class EditorActivity extends AppCompatActivity {
 
     private SortRichEditor editor;
     private Note oldNote;
-    private long startTime;
     private Date createTime;
     private Uri tempMediaUri;
     public static final String VIEW_ONLY = "VIEW_ONLY";
@@ -85,8 +84,12 @@ public class EditorActivity extends AppCompatActivity {
             case R.id.menu_save:
                 Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
                 break;
-            case R.id.menu_markdown :
-                editor.changeIsMarkdown();
+            case R.id.menu_markdown:
+                if (editor.changeIsMarkdown()) {
+                    item.setTitle("Plain");
+                } else {
+                    item.setTitle("Markdown");
+                }
                 break;
             default:
                 break;

@@ -51,11 +51,11 @@ public class DeletableEditText extends MarkdownEditText {
         lp.leftMargin = 45;
         lp.rightMargin = 45;
         md.setLayoutParams(lp);
-        setEdieTextMarkdown(context);
+        setEditTextMarkdown(context);
         setTextViewMarkdown(context);
     }
 
-    private void setEdieTextMarkdown(Context context) {
+    private void setEditTextMarkdown(Context context) {
         MarkdownConfiguration editTextMarkdownConfiguration = new MarkdownConfiguration.Builder(context)
                 .setDefaultImageSize(50, 50)
                 .setBlockQuotesLineColor(0xff33b5e5)
@@ -96,12 +96,7 @@ public class DeletableEditText extends MarkdownEditText {
                 .setLinkFontColor(Color.BLUE)
                 .showLinkUnderline(false)
                 .setTheme(new ThemeSunburst())
-                .setOnTodoClickCallback(new OnTodoClickCallback() {
-                    @Override
-                    public CharSequence onTodoClicked(View view, String line, int lineNumber) {
-                        return md.getText();
-                    }
-                })
+                .setOnTodoClickCallback((view, line, lineNumber) -> md.getText())
                 .build();
         textViewProcessor = new MarkdownProcessor(context);
         textViewProcessor.factory(TextFactory.create());
@@ -110,22 +105,7 @@ public class DeletableEditText extends MarkdownEditText {
 
     public void render(boolean isRender) {
         if (isRender) {
-//            CharSequence rendered = textViewProcessor.parse(getText());
-//            Log.e("my", rendered.toString());
-//            Log.e("my", Arrays.asList(rendered.toString().getBytes()) + "");
-//            Log.e("my", rendered.length() + "");
-//            {
-//                IntStream s = rendered.chars();
-//                ArrayList<Integer> arr = new ArrayList<>();
-//                s.forEach((i) -> {
-//                    arr.add(i);
-//                });
-//                Log.e("my", arr.toString());
-//            }
-//            md.setText(textViewProcessor.parse(getText()));
-//            Log.e("my", textViewProcessor.parse(getText()) + "");
-//            Log.e("my", textViewProcessor.parse(getText()).toString());
-            md.setText(textViewProcessor.parse(getText()).toString());
+            md.setText(textViewProcessor.parse(getText()));
             md.setVisibility(VISIBLE);
             this.setVisibility(GONE);
         } else {

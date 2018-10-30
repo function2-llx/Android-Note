@@ -658,7 +658,8 @@ public class SortRichEditor extends ScrollView implements IEditor {
         return editText;
     }
 
-    public void changeIsMarkdown() {
+    // return true if is rendering now
+    public boolean changeIsMarkdown() {
         isMarkdown = !isMarkdown;
         for (int i = 0; i < containerLayout.getChildCount(); ++i) {
             View child = containerLayout.getChildAt(i);
@@ -666,6 +667,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 ((DeletableEditText) child).render(isMarkdown);
             }
         }
+        return isMarkdown;
     }
 
     // called by createPictureLayout & createVideoLayout & createSoundLayout
