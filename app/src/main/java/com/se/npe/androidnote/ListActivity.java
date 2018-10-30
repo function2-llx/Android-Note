@@ -146,12 +146,7 @@ public class ListActivity extends AppCompatActivity {
             }
 
             case R.id.clear: {
-                int size = noteAdapter.getAdapterItemCount();
-                for (int i = 0; i < size; i++) {
-                    Note note = noteAdapter.getItem(0);
-                    noteAdapter.remove(0);
-                    EventBus.getDefault().post(new NoteDeleteEvent(note));
-                }
+                noteAdapter.clear();
                 break;
             }
 
@@ -267,7 +262,6 @@ public class ListActivity extends AppCompatActivity {
 //        slidingMenu.setMenu(R.layout.sliding_menu_list);
 //        slidingMenu.setTouchModeBehind(SlidingMenu.TOUCHMODE_FULLSCREEN);
 //    }
-
     private void configureSearchView(@NonNull SearchView searchView) {
         searchView.setQueryHint("search by title...");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -300,19 +294,6 @@ public class ListActivity extends AppCompatActivity {
             // ultimateRecyclerView.scrollBy(0, -50);
             layoutManager.scrollToPosition(0);
         }, 500));
-    }
-
-    // drag the view
-    private void enableDrag() {
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(noteAdapter);
-        itemTouchHelper = new ItemTouchHelper(callback);
-        itemTouchHelper.attachToRecyclerView(ultimateRecyclerView.mRecyclerView);
-        noteAdapter.setOnDragStartListener(new NoteAdapter.OnStartDragListener() {
-            @Override
-            public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
-                itemTouchHelper.startDrag(viewHolder);
-            }
-        });
     }
 
     @Override
