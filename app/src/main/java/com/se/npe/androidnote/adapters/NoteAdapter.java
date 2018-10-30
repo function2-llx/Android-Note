@@ -24,13 +24,10 @@ import com.se.npe.androidnote.events.NoteModifyEvent;
 import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.TableOperate;
-import com.se.npe.androidnote.events.DatabaseModifyEvent;
 
 import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -49,7 +46,6 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 
     public NoteAdapter(AppCompatActivity activity) {
         this.activity = activity;
-        EventBus.getDefault().register(this);
     }
 
     public void setComparator(Comparator<Note> comparator) {
@@ -164,21 +160,6 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         // if (position < this.noteList.size() && position >= 0)
         return this.noteList.get(position);
         // throw new IndexOutOfBoundsException("Note list out of range.");
-    }
-
-    @Override
-    protected void finalize() throws Throwable {
-        EventBus.getDefault().unregister(this);
-        super.finalize();
-    }
-
-    private void reloadNoteList() {
-        this.updateList(TableOperate.getInstance().getAllNotes());
-    }
-
-    @Subscribe(sticky = true)
-    public void onReceiveNoteChangeSignal(DatabaseModifyEvent signal) {
-        this.reloadNoteList();
     }
 
     /**

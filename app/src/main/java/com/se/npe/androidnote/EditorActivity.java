@@ -303,16 +303,28 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onPause() {
+        super.onPause();
         Note note = editor.buildNote();
-        editor.destroy();
         if (oldNote != null) {
             note.setIndex(oldNote.getIndex());
         }
         note.setStartTime(this.createTime);
         note.setModifyTime(new Date());
         EventBus.getDefault().post(new NoteModifyEvent(note));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+//        Note note = editor.buildNote();
+        editor.destroy();
+//        if (oldNote != null) {
+//            note.setIndex(oldNote.getIndex());
+//        }
+//        note.setStartTime(this.createTime);
+//        note.setModifyTime(new Date());
+//        EventBus.getDefault().post(new NoteModifyEvent(note));
 
         EventBus.getDefault().removeAllStickyEvents();
         EventBus.getDefault().unregister(this);
