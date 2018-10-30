@@ -992,11 +992,11 @@ public class SortRichEditor extends ScrollView implements IEditor {
                     if (data instanceof TextData) {
                         ref.insertEditTextAtIndex(currentChild, ((TextData) data).getText());
                     } else if (data instanceof PictureData) {
-                        ref.insertPictureAtIndex(currentChild, ((PictureData) data).getPicturePath());
+                        ref.insertPictureAtIndex(currentChild, ((PictureData) data).getPath());
                     } else if (data instanceof VideoData) {
-                        ref.insertVideoAtIndex(currentChild, ((VideoData) data).getVideoPath());
+                        ref.insertVideoAtIndex(currentChild, ((VideoData) data).getPath());
                     } else if (data instanceof SoundData) {
-                        ref.insertSoundAtIndex(currentChild, ((SoundData) data).getSoundPath());
+                        ref.insertSoundAtIndex(currentChild, ((SoundData) data).getPath());
                         ref.lastAddedSoundPlayer.getEditText().setText(((SoundData) data).getText());
                     }
                 }

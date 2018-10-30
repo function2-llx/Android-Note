@@ -69,14 +69,14 @@ public class NotePdfConverter implements INoteFileConverter {
                 if (data instanceof TextData) {
                     document.add(new Paragraph(((TextData) data).getText()));
                 } else if (data instanceof PictureData) {
-                    Image image = Image.getInstance(((PictureData) data).getPicturePath());
+                    Image image = Image.getInstance(((PictureData) data).getPath());
                     document.add(image);
                 } else if (data instanceof SoundData) {
                     document.add(new Paragraph(((SoundData) data).getText()));
                 } else if (data instanceof VideoData) {
                     // retrieve the first bitmap of the video
                     MediaMetadataRetriever retriever = new MediaMetadataRetriever();
-                    retriever.setDataSource(((VideoData) data).getVideoPath());
+                    retriever.setDataSource(((VideoData) data).getPath());
                     Bitmap bitmap = retriever.getFrameAtTime(0, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
                     // convert bitmap to byte array
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();

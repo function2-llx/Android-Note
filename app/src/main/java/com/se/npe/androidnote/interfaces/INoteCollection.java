@@ -16,15 +16,13 @@ public interface INoteCollection {
 
     List<Note> getSearchResult(String parameter);
 
+    List<Note> getSearchResultFuzzy(String parameter);
+
     void addNote(Note note);
 
-    Note getNoteAt(int index);
+    void setNote(Note note);
 
-    void setNoteAt(int index, Note note);
+    void removeNote(Note note);
 
-    void removeNoteAt(int index);
-
-    void loadFromFile(String fileName);
-
-    void saveToFile(String fileName);
+    void removeAllNotes();
 }

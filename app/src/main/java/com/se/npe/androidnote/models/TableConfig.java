@@ -1,21 +1,20 @@
 package com.se.npe.androidnote.models;
 
 public class TableConfig {
-    public static String SAVE_PATH;
+    public static String SAVE_PATH = ""; // initialized in TableOperate.init()
     public static final String TABLE_NAME = "AndroidNote";
 
-    public static class Note{
-        public static final String NOTE_ID="id";
-        public static final String NOTE_TITLE="note_title";
-        public static final String NOTE_CONTENT="note_content";
-        public static final String NOTE_STARTTIME="note_starttime";
-        public static final String NOTE_MODIFYTIME="note_modifytime";
-        public static final String NOTE_TAG="note_tag";
+    public static class Note {
+        public static final String NOTE_ID = "id";
+        public static final String NOTE_TITLE = "note_title";
+        public static final String NOTE_CONTENT = "note_content";
+        public static final String NOTE_START_TIME = "note_start_time";
+        public static final String NOTE_MODIFY_TIME = "note_modify_time";
+        public static final String NOTE_TAG = "note_tag";
     }
 
-    public static class Filesave
-    {
-        public static final String LIST_SEPERATOR="qwert";
-        public static final String LINE_SEPERATOR="asdfg";
+    public static class FileSave {
+        public static final String LIST_SEPARATOR = "qwert";
+        public static final String LINE_SEPARATOR = "asdfg";
     }
 }

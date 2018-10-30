@@ -1,11 +1,13 @@
 package com.se.npe.androidnote.models;
 
-import android.graphics.Bitmap;
-import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 
+import com.se.npe.androidnote.events.NoteClearEvent;
+import com.se.npe.androidnote.events.NoteDeleteEvent;
+import com.se.npe.androidnote.events.NoteModifyEvent;
 import com.se.npe.androidnote.interfaces.IData;
 
+import org.greenrobot.eventbus.EventBus;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -15,6 +17,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -50,6 +53,17 @@ public class TableOperateTest {
     }
 
     @Test
+    public void initConfigFile() {
+        // successfully create dir
+        File configDir = new File(TableConfig.SAVE_PATH + "/config");
+        assertNotNull(configDir);
+        // successfully create file
+        File configFile = new File(TableConfig.SAVE_PATH + "/config/searchconfig.txt");
+        assertNotNull(configFile);
+        assertNotNull(configDir.listFiles());
+    }
+
+    @Test
     public void getInstance() {
         // Check TableOperate is properly set up
         TableOperate tableOperate2 = TableOperate.getInstance();
@@ -61,13 +75,137 @@ public class TableOperateTest {
     @Test
     public void encodeNoteAndDecodeNote() {
         // Encode & Decode
-        List<IData> dataList = getExampleDataList("encode_decode");
+        List<IData> dataList = DataExample.getExampleDataList("encode_decode");
         assertEquals(dataList, tableOperate.decodeNote(tableOperate.encodeNote(dataList)));
+    }
+
+    @Test
+    public void listStringToStringToListString() {
+        // ListString -> String -> ListString
+        Note note = DataExample.getExampleNote("listString_string");
+        assertEquals(note.getTag(), tableOperate.stringToListString(tableOperate.listStringToString(note.getTag())));
+    }
+
+    @Test
+    public void setSearchConfigAndGetSearchConfig() {
+        final int SEARCH_CONFIG = 0;
+        TableOperate.setSearchConfig(SEARCH_CONFIG);
+        assertEquals(SEARCH_CONFIG, TableOperate.getSearchConfig());
     }
 
     @Test
     public void getAllNotes() {
         assertEquals(noteList, tableOperate.getAllNotes());
+    }
+
+    @Test
+    public void getSearchResult() {
+        // Depends on example note
+        // Whole note list cannot be test - precise search
+        // Empty note list
+        assertEquals(new ArrayList<Note>(), tableOperate.getSearchResult("wtf???"));
+
+        List<Note> noteListSearched = new ArrayList<>();
+        // Search for 3 using old note
+        noteListSearched.add(this.noteList.get(3));
+        assertEquals(noteListSearched, tableOperate.getSearchResult(this.noteList.get(3).getTitle()));
+        noteListSearched.clear(); // Pay attention to clear noteListSearch
+        // Search for 3 using new note
+        // Not equals because new note has a different data
+        noteListSearched.add(DataExample.getExampleNote(String.valueOf(3)));
+        assertNotEquals(noteListSearched, tableOperate.getSearchResult(this.noteList.get(3).getTitle()));
+        noteListSearched.clear();
+    }
+
+    @Test
+    public void getSearchResultFuzzy() {
+        // Depends on example note
+        // Whole note list
+        assertEquals(this.noteList, tableOperate.getSearchResultFuzzy("title"));
+        assertNotSame(this.noteList, tableOperate.getSearchResultFuzzy("title"));
+        // Empty note list
+        assertEquals(new ArrayList<Note>(), tableOperate.getSearchResultFuzzy("wtf???"));
+
+        List<Note> noteListSearched = new ArrayList<>();
+        // Depends on addNote()
+        // Search for 3 using old note
+        noteListSearched.add(this.noteList.get(3));
+        noteListSearched.add(this.noteList.get(13));
+        assertEquals(noteListSearched, tableOperate.getSearchResultFuzzy("3"));
+        noteListSearched.clear(); // Pay attention to clear noteListSearch
+        // Search for 3 using new note
+        // Not equals because new note has a different data
+        noteListSearched.add(DataExample.getExampleNote(String.valueOf(3)));
+        noteListSearched.add(DataExample.getExampleNote(String.valueOf(13)));
+        assertNotEquals(noteListSearched, tableOperate.getSearchResultFuzzy("3"));
+        noteListSearched.clear();
+    }
+
+    @Test
+    public void addNote() {
+        noteList = new ArrayList<>();
+        for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
+            Note note = DataExample.getExampleNote(String.valueOf(i));
+            tableOperate.addNote(note);
+            noteList.add(note);
+            // SQL index starts at 1
+            // noteList.get(i).getIndex() == i + 1
+            // if addNote() is invoked the first time
+        }
+    }
+
+    @Test
+    public void setNote() {
+        // Set some notes & Get notes
+        for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
+            // index does not change
+            int index = noteList.get(i).getIndex();
+            Note note = DataExample.getExampleNote(String.valueOf(i + NOTE_LIST_SIZE));
+            note.setIndex(index);
+            // Old note get index -> New note set
+            tableOperate.setNote(note);
+            noteList.set(i, note);
+            assertEquals(note, tableOperate.getNoteAt(note.getIndex()));
+        }
+        assertEquals(noteList, tableOperate.getAllNotes());
+    }
+
+    @Test
+    public void removeNote() {
+        // Remove some notes & Get notes
+        final int NOTE_LIST_SIZE_REMOVE = 4;
+        // Remove note at start, middle
+        for (int i = 0; i < NOTE_LIST_SIZE_REMOVE; ++i) {
+            // Old note get index -> New note remove
+            tableOperate.removeNote(noteList.get(i));
+            noteList.remove(i);
+            assertEquals(noteList, tableOperate.getAllNotes());
+        }
+        // Remove note at end
+        tableOperate.removeNote(noteList.get(noteList.size() - 1));
+        noteList.remove(noteList.size() - 1);
+        assertEquals(noteList, tableOperate.getAllNotes());
+        // Remove all notes one by one
+        for (int i = 0; i < noteList.size(); ++i) {
+            tableOperate.removeNote(noteList.get(i));
+        }
+        noteList.clear();
+        assertEquals(noteList, tableOperate.getAllNotes());
+        // Remove note before start/after end will not throw exception
+    }
+
+    @Test
+    public void removeAllNotes() {
+        tableOperate.removeAllNotes();
+        noteList.clear();
+        assertEquals(noteList, tableOperate.getAllNotes());
+    }
+
+    @Test
+    public void removeAllNotesAndAddNote() {
+        // Remove all notes & Add note
+        removeAllNotes();
+        addNote();
     }
 
     @Test
@@ -91,86 +229,53 @@ public class TableOperateTest {
     }
 
     @Test
-    public void addNote() {
-        noteList = new ArrayList<>();
+    public void onReceiveNote() {
+        // add note
         for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
-            Note note = getExampleNote(i);
+            Note note = DataExample.getExampleNote(String.valueOf(i + NOTE_LIST_SIZE));
+            EventBus.getDefault().post(new NoteModifyEvent(note));
             noteList.add(note);
-            tableOperate.addNote(note);
-            // SQL index starts at 1
-            // noteList.get(i).getIndex() == i + 1
-            // if addNote() is invoked the first time
+            assertEquals(noteList, tableOperate.getAllNotes());
         }
-    }
-
-    @Test
-    public void setNoteAt() {
-        // Set note at some index & Get notes
+        // set note
         for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
-            Note note = getExampleNote(i + NOTE_LIST_SIZE);
+            // index does not change
+            int index = noteList.get(i).getIndex();
+            Note note = DataExample.getExampleNote(String.valueOf(i + NOTE_LIST_SIZE + NOTE_LIST_SIZE));
+            note.setIndex(index);
             // Old note get index -> New note set
-            tableOperate.setNoteAt(noteList.get(i).getIndex(), note);
+            EventBus.getDefault().post(new NoteModifyEvent(note));
             noteList.set(i, note);
-            assertEquals(note, tableOperate.getNoteAt(note.getIndex()));
+            assertEquals(noteList, tableOperate.getAllNotes());
         }
-        assertEquals(noteList, tableOperate.getAllNotes());
     }
 
     @Test
-    public void removeNoteAt() {
-        // Remove note at some index & Get notes
+    public void onDeleteNote() {
         final int NOTE_LIST_SIZE_REMOVE = 4;
         // Remove note at start, middle
         for (int i = 0; i < NOTE_LIST_SIZE_REMOVE; ++i) {
             // Old note get index -> New note remove
-            tableOperate.removeNoteAt(noteList.get(i).getIndex());
+            EventBus.getDefault().post(new NoteDeleteEvent(noteList.get(i)));
             noteList.remove(i);
             assertEquals(noteList, tableOperate.getAllNotes());
         }
         // Remove note at end
-        tableOperate.removeNoteAt(noteList.get(noteList.size() - 1).getIndex());
+        EventBus.getDefault().post(new NoteDeleteEvent(noteList.get(noteList.size() - 1)));
         noteList.remove(noteList.size() - 1);
         assertEquals(noteList, tableOperate.getAllNotes());
         // Remove all notes one by one
         for (int i = 0; i < noteList.size(); ++i) {
-            tableOperate.removeNoteAt(noteList.get(i).getIndex());
+            EventBus.getDefault().post(new NoteDeleteEvent(noteList.get(i)));
         }
         noteList.clear();
         assertEquals(noteList, tableOperate.getAllNotes());
-        // Remove note before start/after end will not throw exception
     }
 
     @Test
-    public void removeAllNotes() {
-        tableOperate.removeAllNotes();
+    public void onClearNote() {
+        EventBus.getDefault().post(new NoteClearEvent());
         noteList.clear();
         assertEquals(noteList, tableOperate.getAllNotes());
-    }
-
-    @Test
-    public void removeAllNotesAndAddNote() {
-        // Remove all notes & Add note
-        removeAllNotes();
-        addNote();
-    }
-
-    @NonNull
-    private Note getExampleNote(int data) {
-        // Create a new example note
-        String title = "This is the title for " + data;
-        List<IData> content = new ArrayList<>();
-        content.add(new TextData("This is the content for " + data));
-        return new Note(title, content);
-    }
-
-    @NonNull
-    private List<IData> getExampleDataList(String data) {
-        // Create a new example data list
-        List<IData> dataList = new ArrayList<>();
-        dataList.add(new TextData("This is the TextData text for " + data));
-        dataList.add(new PictureData("This is the PictureData picture path for " + data));
-        dataList.add(new SoundData("This is the SoundData sound path for " + data, "This is the SoundData text for " + data));
-        dataList.add(new VideoData("This is the VideoData video path for " + data));
-        return dataList;
     }
 }

@@ -31,6 +31,7 @@ import com.dmcbig.mediapicker.PickerActivity;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.mob.MobSDK;
 import com.se.npe.androidnote.editor.SortRichEditor;
 import com.se.npe.androidnote.events.NoteModifyEvent;
 import com.se.npe.androidnote.events.NoteSelectEvent;
@@ -55,6 +56,14 @@ import java.text.SimpleDateFormat;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Objects;
+
+import cn.sharesdk.framework.Platform;
+import cn.sharesdk.framework.PlatformActionListener;
+import cn.sharesdk.framework.ShareSDK;
+import cn.sharesdk.onekeyshare.OnekeyShare;
+import cn.sharesdk.wechat.friends.Wechat;
 
 public class EditorActivity extends AppCompatActivity {
     private static final String LOG_TAG = EditorActivity.class.getSimpleName();
@@ -78,6 +87,23 @@ public class EditorActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
+    private PlatformActionListener platformActionListener = new PlatformActionListener() {
+        @Override
+        public void onComplete(Platform platform, int i, HashMap<String, Object> hashMap) {
+            Logger.logInfo("kid", "分享成功");
+        }
+
+        @Override
+        public void onError(Platform platform, int i, Throwable throwable) {
+            Logger.logError("kid", "分享失败");
+        }
+
+        @Override
+        public void onCancel(Platform platform, int i) {
+            Logger.logInfo("kid", "分享取消");
+        }
+    };
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -91,6 +117,25 @@ public class EditorActivity extends AppCompatActivity {
                     item.setTitle("Markdown");
                 }
                 break;
+            case R.id.share: {
+                OnekeyShare oks = new OnekeyShare();
+                oks.disableSSOWhenAuthorize();
+                oks.setTitle(getString(R.string.share));
+                oks.setTitleUrl("http://sharesdk.cn");
+                oks.setText("我是分享文本");
+//                oks.setImagePath(getRe);//确保SDcard下面存在此张图片
+                oks.setUrl("http://sharesdk.cn");
+                oks.setComment("我是测试评论文本");
+                oks.setSite(getString(R.string.app_name));
+                oks.setSiteUrl("http://sharesdk.cn");
+                oks.show(this);
+//                Platform wechatPlatform = ShareSDK.getPlatform(Wechat.NAME);
+//                Wechat.ShareParams sp = new Wechat.ShareParams();
+//                sp.setShareType(Wechat.SHARE_TEXT);
+//                sp.setTitle("test");
+//                wechatPlatform.setPlatformActionListener(this.platformActionListener);
+//                wechatPlatform.share(sp);
+            }
             default:
                 break;
         }
@@ -101,7 +146,11 @@ public class EditorActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
-        this.setTitle(this.getResources().getString(R.string.editor_title));
+
+        setSupportActionBar(findViewById(R.id.toolbar));
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
+        getSupportActionBar().setHomeButtonEnabled(true);
+
         EventBus.getDefault().register(this);
         editor = findViewById(R.id.rich_editor);
         final FloatingActionsMenu insertMedia = findViewById(R.id.insert_media);
@@ -154,7 +203,7 @@ public class EditorActivity extends AppCompatActivity {
         // deferred built, or we will get NPE
         if (oldNote != null) {
             editor.loadNote(oldNote);
-            this.createTime = oldNote.getStarttime();
+            this.createTime = oldNote.getStartTime();
         } else
             this.createTime = new Date();
 
@@ -164,6 +213,8 @@ public class EditorActivity extends AppCompatActivity {
         } catch (IOException e) {
             Logger.log(LOG_TAG, e);
         }
+
+        MobSDK.init(this);
     }
 
     private void openCamera(int code) {
@@ -315,8 +366,8 @@ public class EditorActivity extends AppCompatActivity {
         if (oldNote != null) {
             note.setIndex(oldNote.getIndex());
         }
-        note.setStarttime(this.createTime);
-        note.setModifytime(new Date());
+        note.setStartTime(this.createTime);
+        note.setModifyTime(new Date());
         EventBus.getDefault().post(new NoteModifyEvent(note));
 
         EventBus.getDefault().removeAllStickyEvents();

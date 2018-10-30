@@ -9,8 +9,12 @@
     </item>
     <item
         android:id="@+id/menu_save"
-        android:title="Save"
+        android:title="@string/save"
         app:showAsAction="always"
         >
     </item>
+    <item
+        android:id="@+id/share"
+        android:title="@string/share" />
+
 </menu>
