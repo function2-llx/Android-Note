@@ -2,13 +2,11 @@ package com.se.npe.androidnote.models;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.database.Cursor;
 import android.content.ContentValues;
 import android.util.Log;
 
-import com.se.npe.androidnote.events.ClearEvent;
+import com.se.npe.androidnote.events.NoteClearEvent;
 import com.se.npe.androidnote.events.NoteDeleteEvent;
 import com.se.npe.androidnote.events.NoteModifyEvent;
 import com.se.npe.androidnote.interfaces.IData;
@@ -35,28 +33,28 @@ public class TableOperate implements INoteCollection {
 
     private DBManager manager;
     private SQLiteDatabase db;
-    private static File configfile;
+    private static File configFile;
     private static TableOperate tableOperate;
 
     public static void init(Context context) {
         tableOperate = new TableOperate(context);
-        File filepath = new File(TableConfig.SAVE_PATH);
-        if(!filepath.exists()) {
-            filepath.mkdir();
-        }
-        File file = new File(TableConfig.SAVE_PATH+"/Config");
+        TableConfig.SAVE_PATH = context.getExternalFilesDir(null).getAbsolutePath();
+        initConfigFile();
+    }
+
+    private static void initConfigFile() {
+        File file = new File(TableConfig.SAVE_PATH + "/config");
         if (!file.exists()) {
             file.mkdirs();
         }
-        configfile = new File(TableConfig.SAVE_PATH+"/Config/searchconfig.txt");
+        configFile = new File(TableConfig.SAVE_PATH + "/config/searchconfig.txt");
         try {
-            if(!configfile.exists()) {
-                configfile.createNewFile();
+            if (!configFile.exists()) {
+                configFile.createNewFile();
                 setSearchConfig(-1);
             }
-        }
-        catch (IOException c) {
-            c.printStackTrace();
+        } catch (IOException e) {
+            Logger.log(LOG_TAG, e);
         }
     }
 
@@ -76,30 +74,30 @@ public class TableOperate implements INoteCollection {
     public String encodeNote(List<IData> src) {
         String string = "";
         for (int i = 0; i < src.size(); i++) {
-            string = string + src.get(i).toString() + TableConfig.Filesave.LIST_SEPERATOR;
+            string = string + src.get(i).toString() + TableConfig.FileSave.LIST_SEPARATOR;
         }
         return string;
     }
 
     public List<IData> decodeNote(String src) {
-        List<IData> content = new ArrayList<IData>();
-        String[] StrArray = src.split(TableConfig.Filesave.LIST_SEPERATOR);
-        for (int i = 0; i < StrArray.length; i++) {
-            if (StrArray[0].length() == 0) continue;
-            if (StrArray[i].charAt(0) == 'S') {
-                String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPERATOR);
+        List<IData> content = new ArrayList<>();
+        String[] strArray = src.split(TableConfig.FileSave.LIST_SEPARATOR);
+        for (int i = 0; i < strArray.length; i++) {
+            if (strArray[0].length() == 0) continue;
+            if (strArray[i].charAt(0) == 'S') {
+                String[] tempArray = strArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
                 SoundData tempSoundData = new SoundData(tempArray[1], tempArray[2]);
                 content.add(tempSoundData);
-            } else if (StrArray[i].charAt(0) == 'T') {
-                String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPERATOR);
+            } else if (strArray[i].charAt(0) == 'T') {
+                String[] tempArray = strArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
                 TextData tempTextData = new TextData(tempArray[1]);
                 content.add(tempTextData);
-            } else if (StrArray[i].charAt(0) == 'V') {
-                String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPERATOR);
+            } else if (strArray[i].charAt(0) == 'V') {
+                String[] tempArray = strArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
                 VideoData tempVideoData = new VideoData(tempArray[1]);
                 content.add(tempVideoData);
-            } else if (StrArray[i].charAt(0) == 'P') {
-                String[] tempArray = StrArray[i].split(TableConfig.Filesave.LINE_SEPERATOR);
+            } else if (strArray[i].charAt(0) == 'P') {
+                String[] tempArray = strArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
                 PictureData tempPictureData = new PictureData(tempArray[1]);
                 content.add(tempPictureData);
             }
@@ -109,61 +107,61 @@ public class TableOperate implements INoteCollection {
 
     public String listStringToString(List<String> src) {
         String string = "";
-        for (int i = 0; i < src.size() - 1; i++) {
-            string = string + src.get(i) + TableConfig.Filesave.LINE_SEPERATOR;
+        for (int i = 0; i < src.size(); i++) {
+            string = string + src.get(i) + TableConfig.FileSave.LINE_SEPARATOR;
         }
-        if (src.size() >= 2) string = string +TableConfig.Filesave.LINE_SEPERATOR+ src.get(src.size()-1);
-        else if(src.size() == 1)string = string + src.get(src.size() - 1);
         return string;
     }
 
     public List<String> stringToListString(String src) {
-        if (src.length() == 0) return new ArrayList<String>();
-        String[] strings = src.split(TableConfig.Filesave.LINE_SEPERATOR);
+        if (src.length() == 0) return new ArrayList<>();
+        String[] strings = src.split(TableConfig.FileSave.LINE_SEPARATOR);
         return Arrays.asList(strings);
     }
 
     public static int getSearchConfig() {
-        InputStream inputStream = null;
+        InputStream inputStream;
         try {
-            inputStream = new FileInputStream(configfile);
+            inputStream = new FileInputStream(configFile);
         } catch (FileNotFoundException e) {
             Logger.log(LOG_TAG, e);
             return -2;
         }
 
-        byte b[] = new byte[(int) configfile.length()];
+        byte b[] = new byte[(int) configFile.length()];
         try {
             int len = inputStream.read(b);
             if (len == -1) return -2;
         } catch (Exception e) {
             Logger.log(LOG_TAG, e);
+            return -2;
         }
-        String tempcontent = new String(b);
-        return Integer.parseInt(tempcontent);
+        String tempContent = new String(b);
+        return Integer.parseInt(tempContent);
     }
 
     public static void setSearchConfig(int x) {
-        OutputStream outputStream = null;
+        OutputStream outputStream;
         try {
-            outputStream = new FileOutputStream(configfile);
+            outputStream = new FileOutputStream(configFile);
         } catch (FileNotFoundException e) {
             Logger.log(LOG_TAG, e);
             return;
         }
 
         String string = Integer.toString(x);
-
         byte[] bs = string.getBytes();
         try {
             outputStream.write(bs);
         } catch (IOException e) {
             Logger.log(LOG_TAG, e);
+            return;
         }
     }
 
+    @Override
     public List<Note> getAllNotes() {
-        ArrayList<Note> noteList = new ArrayList<Note>();
+        ArrayList<Note> noteList = new ArrayList<>();
         Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME, null);
         while (c.moveToNext()) {
             Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)));
@@ -173,8 +171,9 @@ public class TableOperate implements INoteCollection {
         return noteList;
     }
 
+    @Override
     public List<Note> getSearchResult(String parameter) {
-        ArrayList<Note> noteList = new ArrayList<Note>();
+        ArrayList<Note> noteList = new ArrayList<>();
         Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME + " where " + TableConfig.Note.NOTE_TITLE + "= ?", new String[]{parameter});
         while (c.moveToNext()) {
             Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)));
@@ -184,8 +183,9 @@ public class TableOperate implements INoteCollection {
         return noteList;
     }
 
+    @Override
     public List<Note> getSearchResultFuzzy(String parameter) {
-        ArrayList<Note> noteList = new ArrayList<Note>();
+        ArrayList<Note> noteList = new ArrayList<>();
         String sql2 = "select * from " + TableConfig.TABLE_NAME
                 + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%'";
         Cursor c = db.rawQuery(sql2, null);
@@ -218,13 +218,14 @@ public class TableOperate implements INoteCollection {
         return noteList;
     }
 
+    @Override
     public void addNote(Note note) {
         Log.d("debug0001", "insert into " + TableConfig.TABLE_NAME + " values(" + note.getTitle() + "," + encodeNote(note.getContent()) + ")");
         ContentValues cValue = new ContentValues();
         cValue.put(TableConfig.Note.NOTE_TITLE, note.getTitle());
         cValue.put(TableConfig.Note.NOTE_CONTENT, encodeNote(note.getContent()));
-        cValue.put(TableConfig.Note.NOTE_STARTTIME, Long.toString(note.getStarttime().getTime()));
-        cValue.put(TableConfig.Note.NOTE_MODIFYTIME, Long.toString(note.getModifytime().getTime()));
+        cValue.put(TableConfig.Note.NOTE_START_TIME, Long.toString(note.getStartTime().getTime()));
+        cValue.put(TableConfig.Note.NOTE_MODIFY_TIME, Long.toString(note.getModifyTime().getTime()));
         cValue.put(TableConfig.Note.NOTE_TAG, listStringToString(note.getTag()));
         db.insert(TableConfig.TABLE_NAME, null, cValue);
         String sql = "select * from " + TableConfig.TABLE_NAME;
@@ -238,8 +239,28 @@ public class TableOperate implements INoteCollection {
         EventBus.getDefault().post(new DatabaseModifyEvent("new note"));
     }
 
-    public Note getNoteAt(int index) {
-        ArrayList<Note> noteList = new ArrayList<Note>();
+    @Override
+    public void setNote(Note note) {
+        db.execSQL("update " + TableConfig.TABLE_NAME + " set " + TableConfig.Note.NOTE_TITLE + "=?," + TableConfig.Note.NOTE_TAG + "=?," + TableConfig.Note.NOTE_START_TIME + "=?," + TableConfig.Note.NOTE_MODIFY_TIME + "=?," + TableConfig.Note.NOTE_CONTENT + "=? where " + TableConfig.Note.NOTE_ID + "=?",
+                new Object[]{note.getTitle(), listStringToString(note.getTag()), Long.toString(note.getStartTime().getTime()), Long.toString(note.getModifyTime().getTime()), encodeNote(note.getContent()), Integer.toString(note.getIndex())});
+
+        EventBus.getDefault().post(new DatabaseModifyEvent("modify note"));
+    }
+
+    @Override
+    public void removeNote(Note note) {
+        db.execSQL("delete from " + TableConfig.TABLE_NAME + " where " + TableConfig.Note.NOTE_ID + "=?", new String[]{Integer.toString(note.getIndex())});
+
+        EventBus.getDefault().post(new DatabaseModifyEvent("delete note"));
+    }
+
+    @Override
+    public void removeAllNotes() {
+        db.delete(TableConfig.TABLE_NAME, null, null);
+    }
+
+    Note getNoteAt(int index) {
+        ArrayList<Note> noteList = new ArrayList<>();
         Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME + " where " + TableConfig.Note.NOTE_ID + "= ?", new String[]{Integer.toString(index)});
         while (c.moveToNext()) {
             Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)));
@@ -247,32 +268,6 @@ public class TableOperate implements INoteCollection {
         }
         c.close();
         return noteList.get(0);
-    }
-
-    public void setNoteAt(int index, Note note) {
-        db.execSQL("update " + TableConfig.TABLE_NAME + " set " + TableConfig.Note.NOTE_TITLE + "=?," + TableConfig.Note.NOTE_TAG + "=?," + TableConfig.Note.NOTE_STARTTIME + "=?," + TableConfig.Note.NOTE_MODIFYTIME + "=?," + TableConfig.Note.NOTE_CONTENT + "=? where " + TableConfig.Note.NOTE_ID + "=?",
-                new Object[]{note.getTitle(), listStringToString(note.getTag()), Long.toString(note.getStarttime().getTime()), Long.toString(note.getModifytime().getTime()), encodeNote(note.getContent()), Integer.toString(index)});
-        note.setIndex(index);
-
-        EventBus.getDefault().post(new DatabaseModifyEvent("modify note"));
-    }
-
-    public void removeNoteAt(int index) {
-        db.execSQL("delete from " + TableConfig.TABLE_NAME + " where " + TableConfig.Note.NOTE_ID + "=?", new String[]{Integer.toString(index)});
-
-        EventBus.getDefault().post(new DatabaseModifyEvent("delete note"));
-    }
-
-    public void removeAllNotes() {
-        db.delete(TableConfig.TABLE_NAME, null, null);
-    }
-
-    public void loadFromFile(String fileName) {
-
-    }
-
-    public void saveToFile(String fileName) {
-
     }
 
     @Override
@@ -287,21 +282,17 @@ public class TableOperate implements INoteCollection {
         if (note.getIndex() == -1)
             addNote(note);
         else
-            setNoteAt(note.getIndex(), note);
+            setNote(note);
         System.err.print(note.getTitle());
     }
 
     @Subscribe(sticky = true)
     public void onDeleteNote(NoteDeleteEvent event) {
-        this.removeNoteAt(event.getNote().getIndex());
+        removeNote(event.getNote());
     }
 
-    @Subscribe (sticky = true)
-    public void receiveClearEvent(ClearEvent event)
-    {
-        int size = getAllNotes().size();
-        for (int i = 0; i < size; i++) {
-            removeNoteAt(0);
-        }
+    @Subscribe(sticky = true)
+    public void onClearNote(NoteClearEvent event) {
+        removeAllNotes();
     }
 }

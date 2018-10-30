@@ -102,7 +102,9 @@ dependencies {
     testImplementation "org.robolectric:robolectric:3.8"
 
     implementation 'org.greenrobot:eventbus:3.0.0'
+    // View dependencies
     implementation 'com.marshalchen.ultimaterecyclerview:library:0.7.3'
+    implementation project(path: ':lib:SlidingMenu')
     configurations.all {
         exclude group: 'com.android.support', module: 'support-v13'
     }
@@ -115,8 +117,6 @@ dependencies {
     implementation files('libs/Sunflower.jar')
     // Pdf dependencies
     implementation 'com.itextpdf:itextg:5.5.10'
-    implementation project(path: ':SlidingMenu')
-
 }
 
 task jacocoTestReport(type: JacocoReport) {

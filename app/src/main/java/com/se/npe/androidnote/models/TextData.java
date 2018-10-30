@@ -1,7 +1,5 @@
 package com.se.npe.androidnote.models;
 
-import android.view.View;
-
 import com.se.npe.androidnote.interfaces.IData;
 
 import java.util.Objects;
@@ -20,13 +18,20 @@ public class TextData implements IData {
         this.text = text;
     }
 
+    @Override
     public String getText() {
         return text;
     }
 
-    public String getPath() { return ""; }
+    @Override
+    public String getPath() {
+        return "";
+    }
 
-    public String getType() { return "Text"; }
+    @Override
+    public String getType() {
+        return "Text";
+    }
 
     @Override
     public boolean equals(Object o) {

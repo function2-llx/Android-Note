@@ -7,10 +7,8 @@ import android.support.v7.widget.RecyclerView;
 
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
@@ -29,7 +27,6 @@ import com.se.npe.androidnote.events.DatabaseModifyEvent;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import org.w3c.dom.Text;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -199,8 +196,8 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         Note.PreviewData data = note.getPreview();
         holder.setTitle(data.title);
         holder.setText(data.text);
-        holder.setCreateDate(note.getStarttime());
-        holder.setModifyDate(note.getModifytime());
+        holder.setCreateDate(note.getStartTime());
+        holder.setModifyDate(note.getModifyTime());
         holder.setIamge(data.picturePath);
     }
 

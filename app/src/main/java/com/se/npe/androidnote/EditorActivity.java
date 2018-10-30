@@ -18,7 +18,6 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -84,17 +83,17 @@ public class EditorActivity extends AppCompatActivity {
     private PlatformActionListener platformActionListener = new PlatformActionListener() {
         @Override
         public void onComplete(Platform platform, int i, HashMap<String, Object> hashMap) {
-            Log.e("kid","分享成功");
+            Logger.logInfo("kid", "分享成功");
         }
 
         @Override
         public void onError(Platform platform, int i, Throwable throwable) {
-            Log.e("kid","分享失败");
+            Logger.logError("kid", "分享失败");
         }
 
         @Override
         public void onCancel(Platform platform, int i) {
-            Log.e("kid","分享取消");
+            Logger.logInfo("kid", "分享取消");
         }
     };
 
@@ -191,7 +190,7 @@ public class EditorActivity extends AppCompatActivity {
         // deferred built, or we will get NPE
         if (oldNote != null) {
             editor.loadNote(oldNote);
-            this.createTime = oldNote.getStarttime();
+            this.createTime = oldNote.getStartTime();
         } else
             this.createTime = new Date();
 
@@ -311,8 +310,8 @@ public class EditorActivity extends AppCompatActivity {
         if (oldNote != null) {
             note.setIndex(oldNote.getIndex());
         }
-        note.setStarttime(this.createTime);
-        note.setModifytime(new Date());
+        note.setStartTime(this.createTime);
+        note.setModifyTime(new Date());
         EventBus.getDefault().post(new NoteModifyEvent(note));
 
         EventBus.getDefault().removeAllStickyEvents();
