@@ -1,5 +1,8 @@
 package com.se.npe.androidnote.adapters;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +12,7 @@ import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -132,6 +136,10 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         updateList(TableOperate.getInstance().getSearchResultFuzzy(searchParameter));
     }
 
+    public void updateGroupNotesList(String groupName) {
+        this.updateList(TableOperate.getInstance().getAllNotesWithGroup(groupName));
+    }
+
     private void updateList(@NonNull List<Note> list) {
         noteList = list;
         Collections.sort(noteList, comparator);
@@ -234,6 +242,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
             PopupMenu menu = new PopupMenu(activity, v);
             menu.getMenuInflater().inflate(R.menu.list_item_options, menu.getMenu());
             menu.setOnMenuItemClickListener(item -> {
+                Note selectedNote = getItem(getAdapterPosition());
                 switch (item.getItemId()) {
                     case R.id.delete: {
                         remove(getAdapterPosition());
@@ -241,12 +250,38 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
                     }
 
                     case R.id.preview: {
-                        Note selectedNote = getItem(getAdapterPosition());
                         EventBus.getDefault().postSticky(new NoteSelectEvent(selectedNote));
                         Intent intent = new Intent(activity, EditorActivity.class);
                         intent.putExtra(EditorActivity.VIEW_ONLY, true);
                         activity.startActivity(intent);
                         break;
+                    }
+
+                    case R.id.set_group: {
+                        View dialogView = View.inflate(activity, R.layout.set_group_dialog, null);
+                        EditText editText = dialogView.findViewById(R.id.edit_text);
+                        editText.setText(selectedNote.getGroupName());
+
+                        AlertDialog.Builder builder = new AlertDialog.Builder(activity);
+                        builder.setTitle("group name");
+                        builder.setView(dialogView);
+                        builder.setPositiveButton("confirm", null);
+                        builder.setNegativeButton("cancel", null);
+
+                        AlertDialog dialog = builder.create();
+                        dialog.setCancelable(false);
+                        dialog.show();
+                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                String groupName = editText.getText().toString();
+                                if (!groupName.isEmpty()) {
+                                    selectedNote.setGroupName(groupName);
+                                    assert selectedNote.getGroupName() == groupName;
+                                    dialog.cancel();
+                                }
+                            }
+                        });
                     }
                 }
                 return true;

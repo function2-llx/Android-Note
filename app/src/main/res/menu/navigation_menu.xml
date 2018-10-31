@@ -2,8 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <item
-        android:title="Groups"
-        >
+        android:id="@+id/groups"
+        android:title="@string/groups" >
         <menu>
             <item
                 android:title="@string/group_all_notes"

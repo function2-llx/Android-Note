@@ -213,14 +213,19 @@ public class ListActivity extends AppCompatActivity {
     void initNavigationView() {
         NavigationView navigationView = findViewById(R.id.nav_view);
         Menu menu = navigationView.getMenu();
+        SubMenu groupMenu = menu.findItem(R.id.groups).getSubMenu();
         navigationView.setItemIconTintList(null);
-        menu.add("test");
+        for (String groupName: TableOperate.getInstance().getAllGroup()) {
+            groupMenu.add(groupName);
+        }
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
 //                drawerLayout.closeDrawers();
                 if (menuItem.getItemId() == R.id.all_notes)
-                    ultimateRecyclerView.setAdapter(noteAdapter);
+                    noteAdapter.updateAllNotesList();
+                else
+                    noteAdapter.updateGroupNotesList(menuItem.getTitle().toString());
                 return true;
             }
         });
