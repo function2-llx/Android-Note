@@ -29,7 +29,6 @@ import android.widget.TextView;
 import com.se.npe.androidnote.EditorActivity;
 import com.se.npe.androidnote.R;
 import com.se.npe.androidnote.interfaces.IData;
-import com.se.npe.androidnote.interfaces.IEditor;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.PictureData;
 import com.se.npe.androidnote.models.SoundData;
@@ -38,6 +37,7 @@ import com.se.npe.androidnote.models.VideoData;
 import com.yydcdut.markdown.MarkdownConfiguration;
 import com.yydcdut.markdown.MarkdownEditText;
 import com.yydcdut.markdown.MarkdownProcessor;
+import com.yydcdut.markdown.MarkdownTextView;
 import com.yydcdut.markdown.syntax.edit.EditFactory;
 import com.yydcdut.markdown.syntax.text.TextFactory;
 
@@ -51,7 +51,7 @@ import java.util.function.Consumer;
 
 import cn.jzvd.Jzvd;
 
-public class SortRichEditor extends ScrollView implements IEditor {
+public class SortRichEditor extends ScrollView {
     private static final int TITLE_WORD_LIMIT_COUNT = 30;
 
     // when sorting, the default height that text and media reduce to
@@ -176,6 +176,8 @@ public class SortRichEditor extends ScrollView implements IEditor {
 
     private boolean isMarkdown = false;
 
+    private HorizontalEditScrollView markdownController = null;
+
     public SortRichEditor(Context context) {
         this(context, null);
     }
@@ -299,6 +301,9 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 showOrHideKeyboard(false);
             } else if (v instanceof EditText && hasFocus) {
                 lastFocusEdit = (EditText) v;
+                if (v instanceof DeletableEditText && markdownController != null) {
+                    ((DeletableEditText) v).setController(markdownController);
+                }
             }
         };
     }
@@ -774,11 +779,6 @@ public class SortRichEditor extends ScrollView implements IEditor {
 
     private void insertMediaAtIndex(int index, RelativeLayout mediaLayout) {
         if (index > 0) {
-            View currChild = containerLayout.getChildAt(index);
-            // a placeholder for future text inset
-            if (currChild instanceof RelativeLayout) {
-                insertPlaceholder(index);
-            }
             int lastIndex = index - 1;
             View child = containerLayout.getChildAt(lastIndex);
             if (child instanceof RelativeLayout && !isViewOnly) {
@@ -910,38 +910,20 @@ public class SortRichEditor extends ScrollView implements IEditor {
         }
     }
 
-    @Override
     public void addPicture(String picturePath) {
         prepareAddMedia();
         insertMedia(index -> insertPictureAtIndex(index, picturePath));
     }
 
-    @Override
     public void addVideo(String videoPath) {
         prepareAddMedia();
         insertMedia(index -> insertVideoAtIndex(index, videoPath));
     }
 
-    @Override
     public EditText addSound(String soundPath) {
         prepareAddMedia();
         insertMedia(index -> insertSoundAtIndex(index, soundPath));
         return lastAddedSoundPlayer.getEditText();
-    }
-
-    @Override
-    public void addText(String text) {
-        // only when it is necessary...
-        if (containerLayout.getChildCount() == 0
-                || !(containerLayout.getChildAt(containerLayout.getChildCount() - 1) instanceof EditText))
-            insertEditTextAtIndex(containerLayout.getChildCount(), text);
-    }
-
-    public void setEditText(EditText editText, String text) {
-        editText.setText(text);
-        lastFocusEdit = editText;
-        editText.requestFocus();
-        editText.setSelection(text.length());
     }
 
     // well, I have to say I like C++ better for the deterministic resource freeing
@@ -1010,12 +992,10 @@ public class SortRichEditor extends ScrollView implements IEditor {
         }
     }
 
-    @Override
     public void loadNote(Note note) {
         postDelayed(new NoteLoader(this, note), 50);
     }
 
-    @Override
     public Note buildNote() {
         List<IData> contentList = new ArrayList<>();
         int num = containerLayout.getChildCount();
@@ -1043,14 +1023,19 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 contentList.add(data);
             }
         }
-        Note note = new Note(title.getText().toString().trim(), contentList);
-
-        return note;
+        return new Note(title.getText().toString().trim(), contentList);
     }
 
     public void setViewOnly() {
         isViewOnly = true;
         title.setFocusable(false);
+    }
+
+    public void setMarkdownController(HorizontalEditScrollView markdownController) {
+        this.markdownController = markdownController;
+        if (lastFocusEdit instanceof DeletableEditText) {
+            ((DeletableEditText) lastFocusEdit).setController(markdownController);
+        }
     }
 
     private class ViewDragHelperCallBack extends ViewDragHelper.Callback {

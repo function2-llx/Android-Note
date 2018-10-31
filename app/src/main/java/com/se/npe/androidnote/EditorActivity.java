@@ -199,6 +199,9 @@ public class EditorActivity extends AppCompatActivity {
         if (getIntent().getBooleanExtra(VIEW_ONLY, false)) {
             editor.setViewOnly();
             insertMedia.setVisibility(View.GONE);
+            findViewById(R.id.sound_player_text).setVisibility(View.GONE);
+        } else {
+            editor.setMarkdownController(findViewById(R.id.scroll_edit));
         }
         // deferred built, or we will get NPE
         if (oldNote != null) {

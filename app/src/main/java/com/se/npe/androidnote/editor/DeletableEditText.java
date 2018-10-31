@@ -30,6 +30,7 @@ import com.yydcdut.markdown.theme.ThemeSunburst;
 public class DeletableEditText extends MarkdownEditText {
     private TextView md;
     private MarkdownProcessor textViewProcessor;
+    MarkdownConfiguration editTextMarkdownConfiguration;
 
     public DeletableEditText(Context context) {
         super(context);
@@ -52,7 +53,7 @@ public class DeletableEditText extends MarkdownEditText {
     }
 
     private void setEditTextMarkdown(Context context) {
-        MarkdownConfiguration editTextMarkdownConfiguration = new MarkdownConfiguration.Builder(context)
+        editTextMarkdownConfiguration = new MarkdownConfiguration.Builder(context)
                 .setDefaultImageSize(50, 50)
                 .setBlockQuotesLineColor(0xff33b5e5)
                 .setHeader1RelativeSize(1.6f)
@@ -108,6 +109,10 @@ public class DeletableEditText extends MarkdownEditText {
             md.setVisibility(GONE);
             this.setVisibility(VISIBLE);
         }
+    }
+
+    public void setController(HorizontalEditScrollView controller) {
+        controller.setEditTextAndConfig(this, editTextMarkdownConfiguration);
     }
 
     @Override
