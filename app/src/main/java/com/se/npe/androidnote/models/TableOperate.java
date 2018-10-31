@@ -323,6 +323,14 @@ public class TableOperate implements INoteCollection {
         super.finalize();
     }
 
+    public void modify(Note note) {
+        if (note.getIndex() == -1)
+            addNote(note);
+        else
+            setNote(note);
+
+    }
+
     @Subscribe(sticky = true)
     public void onReceiveNote(NoteModifyEvent event) {
         Note note = event.getNote();

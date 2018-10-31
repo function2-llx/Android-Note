@@ -149,7 +149,8 @@ public class ListActivity extends AppCompatActivity {
 
     @Override
     public void setTitle(CharSequence title) {
-        getSupportActionBar().setTitle(title);
+        Objects.requireNonNull(getSupportActionBar()).setTitle(title);
+
     }
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
