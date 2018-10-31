@@ -197,7 +197,7 @@ public class TableOperate implements INoteCollection {
         return noteList;
     }
 
-    public List<Note> getSearchResultFuzzyWithTag(String parameter,String Tag) {
+    public List<Note> getSearchResultFuzzyWithTag(String parameter, String Tag) {
         ArrayList<Note> noteList = new ArrayList<Note>();
         String sql2 = "select * from " + TableConfig.TABLE_NAME
                 + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%'";
@@ -206,13 +206,13 @@ public class TableOperate implements INoteCollection {
             Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)));
             List<String> Taglist = temp.getTag();
             boolean flag = false;
-            for(int i = 0;i < Taglist.size();i ++) {
-                if(Taglist.get(i).equals(Tag)){
+            for (int i = 0; i < Taglist.size(); i++) {
+                if (Taglist.get(i).equals(Tag)) {
                     flag = true;
                     break;
                 }
             }
-            if(flag)noteList.add(temp);
+            if (flag) noteList.add(temp);
         }
         c.close();
         return noteList;
@@ -235,23 +235,17 @@ public class TableOperate implements INoteCollection {
         cursor.close();
         Log.d("debug0001", Integer.toString(count));
         note.setIndex(count);
-
-        EventBus.getDefault().post(new DatabaseModifyEvent("new note"));
     }
 
     @Override
     public void setNote(Note note) {
         db.execSQL("update " + TableConfig.TABLE_NAME + " set " + TableConfig.Note.NOTE_TITLE + "=?," + TableConfig.Note.NOTE_TAG + "=?," + TableConfig.Note.NOTE_START_TIME + "=?," + TableConfig.Note.NOTE_MODIFY_TIME + "=?," + TableConfig.Note.NOTE_CONTENT + "=? where " + TableConfig.Note.NOTE_ID + "=?",
                 new Object[]{note.getTitle(), listStringToString(note.getTag()), Long.toString(note.getStartTime().getTime()), Long.toString(note.getModifyTime().getTime()), encodeNote(note.getContent()), Integer.toString(note.getIndex())});
-
-        EventBus.getDefault().post(new DatabaseModifyEvent("modify note"));
     }
 
     @Override
     public void removeNote(Note note) {
         db.execSQL("delete from " + TableConfig.TABLE_NAME + " where " + TableConfig.Note.NOTE_ID + "=?", new String[]{Integer.toString(note.getIndex())});
-
-        EventBus.getDefault().post(new DatabaseModifyEvent("delete note"));
     }
 
     @Override

@@ -9,6 +9,8 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
+import android.content.res.AssetManager;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -17,6 +19,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.FileProvider;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -35,6 +38,10 @@ import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.sound.ResultPool;
 import com.se.npe.androidnote.util.Logger;
+import com.yydcdut.markdown.MarkdownConfiguration;
+import com.yydcdut.markdown.MarkdownEditText;
+import com.yydcdut.markdown.MarkdownProcessor;
+import com.yydcdut.markdown.syntax.edit.EditFactory;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -46,6 +53,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -69,7 +77,6 @@ public class EditorActivity extends AppCompatActivity {
 
     private SortRichEditor editor;
     private Note oldNote;
-    private long startTime;
     private Date createTime;
     private Uri tempMediaUri;
     public static final String VIEW_ONLY = "VIEW_ONLY";
@@ -103,7 +110,13 @@ public class EditorActivity extends AppCompatActivity {
             case R.id.menu_save:
                 Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
                 break;
-
+            case R.id.menu_markdown:
+                if (editor.changeIsMarkdown()) {
+                    item.setTitle("Plain");
+                } else {
+                    item.setTitle("Markdown");
+                }
+                break;
             case R.id.share: {
                 OnekeyShare oks = new OnekeyShare();
                 oks.disableSSOWhenAuthorize();
@@ -239,6 +252,49 @@ public class EditorActivity extends AppCompatActivity {
         startActivityForResult(intent, code);
     }
 
+    class PictureAsyncTask extends AsyncTask<Void, Void, Void> {
+        @Override
+        protected Void doInBackground(Void... params) {
+            OutputStream outputStream = null;
+            InputStream inputStream = null;
+            try {
+                File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "rxMarkdown");
+                if (!dir.exists()) {
+                    dir.mkdirs();
+                }
+                outputStream = new FileOutputStream(dir.getAbsolutePath() + File.separator + "b.jpg");
+                AssetManager assetManager = getAssets();
+                inputStream = assetManager.open("b.jpg");
+                byte[] buffer = new byte[1024];
+                int read = 0;
+                while ((read = inputStream.read(buffer)) != -1) {
+                    outputStream.write(buffer, 0, read);
+                }
+                outputStream.flush();
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } finally {
+                if (outputStream != null) {
+                    try {
+                        outputStream.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                try {
+                    if (inputStream != null) {
+                        inputStream.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            return null;
+        }
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -303,16 +359,28 @@ public class EditorActivity extends AppCompatActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
+    protected void onPause() {
+        super.onPause();
         Note note = editor.buildNote();
-        editor.destroy();
         if (oldNote != null) {
             note.setIndex(oldNote.getIndex());
         }
         note.setStartTime(this.createTime);
         note.setModifyTime(new Date());
         EventBus.getDefault().post(new NoteModifyEvent(note));
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+//        Note note = editor.buildNote();
+        editor.destroy();
+//        if (oldNote != null) {
+//            note.setIndex(oldNote.getIndex());
+//        }
+//        note.setStartTime(this.createTime);
+//        note.setModifyTime(new Date());
+//        EventBus.getDefault().post(new NoteModifyEvent(note));
 
         EventBus.getDefault().removeAllStickyEvents();
         EventBus.getDefault().unregister(this);
