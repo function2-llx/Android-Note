@@ -1,7 +1,9 @@
 package com.se.npe.androidnote.editor;
 
 import android.animation.LayoutTransition;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
@@ -26,6 +28,7 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.donkingliang.labels.LabelsView;
 import com.se.npe.androidnote.EditorActivity;
@@ -269,46 +272,57 @@ public class SortRichEditor extends ScrollView implements IEditor {
     }
 
     private void initTagLayout() {
-        /*
-        *
-        <com.donkingliang.labels.LabelsView xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/labels"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:labelBackground="@drawable/label_bg"
-            app:labelTextColor="@drawable/label_text_color"
-            app:labelTextPaddingBottom="5dp"
-            app:labelTextPaddingLeft="10dp"
-            app:labelTextPaddingRight="10dp"
-            app:labelTextPaddingTop="5dp"
-            app:labelTextSize="14sp"
-            app:lineMargin="10dp"
-            app:maxSelect="5"
-            app:selectType="SINGLE"
-            app:wordMargin="10dp" />*/
-        LabelsView labelsView = new LabelsView(getContext());
-        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        final LabelsView labelsView = new LabelsView(getContext());
+        final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         lp.leftMargin = DEFAULT_MARGIN;
         lp.rightMargin = DEFAULT_MARGIN;
         lp.topMargin = DEFAULT_MARGIN;
         labelsView.setLayoutParams(lp);
         labelsView.setLabelBackgroundResource(R.drawable.label_bg);
-        labelsView.setLabelTextColor(R.drawable.label_text_color);
-        labelsView.setLabelTextPadding(dip2px(10), dip2px(5),
-                dip2px(10), dip2px(5));
+        labelsView.setLabelTextPadding(dip2px(10)
+                , dip2px(5), dip2px(10), dip2px(5));
         labelsView.setLabelTextSize(dip2px(14));
         labelsView.setLineMargin(10);
         labelsView.setMaxSelect(5);
         labelsView.setSelectType(LabelsView.SelectType.SINGLE);
         labelsView.setWordMargin(10);
         ArrayList<String> label = new ArrayList<>();
-        label.add("Android");
-        label.add("IOS");
-        label.add("前端");
-        label.add("后台");
-        label.add("微信开发");
-        label.add("游戏开发");
+        label.add("+");
+        label.add("-");
         labelsView.setLabels(label);
+        labelsView.getLabels();
+        labelsView.setOnLabelClickListener(new LabelsView.OnLabelClickListener() {
+            @Override
+            public void onLabelClick(TextView label, Object data, int position) {
+                if (position == labelsView.getLabels().size() - 2) {
+                    final EditText editText = new EditText(getContext());
+                    editText.setLayoutParams(lp);
+                    AlertDialog.Builder inputDialog =
+                            new AlertDialog.Builder(getContext());
+                    inputDialog.setTitle("Tag Name").setView(editText);
+                    inputDialog.setPositiveButton("Ok",
+                            (dialog, which) -> {
+                                String input = editText.getText().toString();
+                                if (input.isEmpty()) {
+                                    Toast.makeText(getContext(), "Input is empty", Toast.LENGTH_SHORT).show();
+                                } else {
+                                    ArrayList<String> list = new ArrayList<>(labelsView.getLabels());
+                                    list.add(list.size() - 2, input);
+                                    labelsView.setLabels(list);
+                                }
+                            }).show();
+                } else if (position == labelsView.getLabels().size() - 1) {
+                    ArrayList<String> list = new ArrayList<>(labelsView.getLabels());
+                    List<Integer> remove = labelsView.getSelectLabels();
+                    for (int i = 0; i < remove.size(); ++i) {
+                        if (remove.get(i) < labelsView.getLabels().size() - 2) {
+                            list.remove(remove.get(i) - i);
+                        }
+                    }
+                    labelsView.setLabels(list);
+                }
+            }
+        });
         parentLayout.addView(labelsView);
     }
 
