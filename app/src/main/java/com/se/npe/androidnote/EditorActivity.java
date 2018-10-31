@@ -107,6 +107,7 @@ public class EditorActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+
             case R.id.menu_save:
                 Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
                 break;

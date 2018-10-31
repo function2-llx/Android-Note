@@ -277,7 +277,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
                                 String groupName = editText.getText().toString();
                                 if (!groupName.isEmpty()) {
                                     selectedNote.setGroupName(groupName);
-                                    assert selectedNote.getGroupName() == groupName;
+                                    EventBus.getDefault().post(new NoteModifyEvent(selectedNote));
                                     dialog.cancel();
                                 }
                             }

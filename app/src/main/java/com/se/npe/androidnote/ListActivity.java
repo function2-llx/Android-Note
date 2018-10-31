@@ -147,6 +147,11 @@ public class ListActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void setTitle(CharSequence title) {
+        getActionBar().setTitle(title);
+    }
+
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -166,17 +171,7 @@ public class ListActivity extends AppCompatActivity {
         this.ultimateRecyclerView.setAdapter(noteAdapter);
         this.noteAdapter.updateAllNotesList();
 
-//        this.ultimateRecyclerView.reenableLoadmore();
-//        this.noteAdapter.setCustomLoadMoreView(LayoutInflater.from(this).inflate(R.layout.custom_bottom_progressbar, null));
-//        ultimateRecyclerView.setOnLoadMoreListener((itemsCount, maxLastVisiblePosition) -> {
-//            Handler handler = new Handler();
-//            handler.postDelayed(() -> {
-//                noteList.add(new Note());
-//                noteAdapter.notifyDataSetChanged();
-//            }, 1000);
-//        });
 
-//        this.enableDrag();
 
         this.enableRefresh();
         while (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
@@ -188,6 +183,17 @@ public class ListActivity extends AppCompatActivity {
         initNavigationView();
         initDrawerToggle();
 //        MobSDK.init(this);
+        //        this.ultimateRecyclerView.reenableLoadmore();
+//        this.noteAdapter.setCustomLoadMoreView(LayoutInflater.from(this).inflate(R.layout.custom_bottom_progressbar, null));
+//        ultimateRecyclerView.setOnLoadMoreListener((itemsCount, maxLastVisiblePosition) -> {
+//            Handler handler = new Handler();
+//            handler.postDelayed(() -> {
+//                noteList.add(new Note());
+//                noteAdapter.notifyDataSetChanged();
+//            }, 1000);
+//        });
+
+//        this.enableDrag();
 
     }
 
@@ -215,17 +221,20 @@ public class ListActivity extends AppCompatActivity {
         Menu menu = navigationView.getMenu();
         SubMenu groupMenu = menu.findItem(R.id.groups).getSubMenu();
         navigationView.setItemIconTintList(null);
-        for (String groupName: TableOperate.getInstance().getAllGroup()) {
+        for (String groupName: TableOperate.getInstance().getAllGroup())
             groupMenu.add(groupName);
-        }
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
 //                drawerLayout.closeDrawers();
-                if (menuItem.getItemId() == R.id.all_notes)
+                if (menuItem.getItemId() == R.id.all_notes) {
                     noteAdapter.updateAllNotesList();
-                else
-                    noteAdapter.updateGroupNotesList(menuItem.getTitle().toString());
+                    setTitle(getString(R.string.list_title));
+                } else {
+                    String groupName = menuItem.getTitle().toString();
+                    noteAdapter.updateGroupNotesList(groupName);
+                    setTitle(groupName);
+                }
                 return true;
             }
         });
