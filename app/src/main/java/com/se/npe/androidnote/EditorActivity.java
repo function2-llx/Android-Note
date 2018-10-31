@@ -121,6 +121,7 @@ public class EditorActivity extends AppCompatActivity {
                 note.setStartTime(createTime);
                 note.setModifyTime(new Date());
                 TableOperate.getInstance().modify(note);
+                oldNote = note;
                 Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
                 break;
             }
