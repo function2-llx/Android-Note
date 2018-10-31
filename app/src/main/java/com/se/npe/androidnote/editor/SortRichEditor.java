@@ -552,7 +552,7 @@ public class SortRichEditor extends ScrollView {
         // if the last view is not an edit text, add one
         int lastIndex = containerLayout.getChildCount() - 1;
         View view = containerLayout.getChildAt(lastIndex);
-        if (!(view instanceof EditText)) {
+        if (!(view instanceof TextView)) {
             insertEditTextAtIndex(lastIndex + 1, "");
         }
     }
@@ -565,13 +565,15 @@ public class SortRichEditor extends ScrollView {
                 View pre = containerLayout.getChildAt(editIndex - 1);
                 if (pre instanceof RelativeLayout || pre instanceof ImageView) {
                     onMediaDeleteClick(pre);
-                } else if (pre instanceof EditText) { // concat content of the two text views
+                } else if (pre instanceof TextView) { // concat content of the two text views
                     String str1 = editTxt.getText().toString();
-                    EditText preEdit = (EditText) pre;
+                    EditText preEdit = (EditText) containerLayout.getChildAt(editIndex - 2);
                     String str2 = preEdit.getText().toString();
 
                     containerLayout.setLayoutTransition(null);
-                    containerLayout.removeView(editTxt);
+                    // remove edit index for 2 times to both move the edit text and the text view
+                    containerLayout.removeViewAt(editIndex);
+                    containerLayout.removeViewAt(editIndex);
                     containerLayout.setLayoutTransition(mTransition);
 
                     // hack android studio's check(it gives a warning for str2 + str1)
@@ -741,11 +743,6 @@ public class SortRichEditor extends ScrollView {
     }
 
     private void prepareAddMedia() {
-        View firstView = containerLayout.getChildAt(0);
-        if (containerLayout.getChildCount() == 1 && firstView == lastFocusEdit) {
-            lastFocusEdit = (EditText) firstView;
-            lastFocusEdit.setHint("");
-        }
         if (isSort) {
             isSort = false;
             endSortUI();
@@ -754,26 +751,9 @@ public class SortRichEditor extends ScrollView {
     }
 
     private void insertMedia(Consumer<Integer> indexInsert) {
-        String lastEditStr = lastFocusEdit.getText().toString();
-        int cursorIndex = lastFocusEdit.getSelectionStart();
-        String lastStr = lastEditStr.substring(0, cursorIndex).trim();
         int lastEditIndex = containerLayout.indexOfChild(lastFocusEdit);
-
-        if (lastEditStr.length() == 0 || lastStr.length() == 0) {
-            // If the edit text is empty, or the cursor is at 0
-            // insert the image directly, and the edit text can be moved down.
-            indexInsert.accept(lastEditIndex);
-        } else {
-            // or the edit text needs to be split
-            lastFocusEdit.setText(lastStr);
-            String editStr2 = lastEditStr.substring(cursorIndex).trim();
-            if (containerLayout.getChildCount() - 1 == lastEditIndex || editStr2.length() > 0) {
-                lastFocusEdit = insertEditTextAtIndex(lastEditIndex + 1, editStr2);
-                lastFocusEdit.requestFocus();
-                lastFocusEdit.setSelection(0);
-            }
-            indexInsert.accept(lastEditIndex + 1);
-        }
+        // + 2 to skip the text view
+        indexInsert.accept(lastEditIndex + 2);
         showOrHideKeyboard(false);
     }
 
