@@ -40,6 +40,8 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
                 + TableConfig.Note.NOTE_MODIFY_TIME + " TEXT,"
                 + TableConfig.Note.NOTE_TAG + " TEXT,"
                 + TableConfig.Note.NOTE_GROUP + " TEXT)");
+        sqLiteDatabase.execSQL("create table if not exists " + TableConfig.GROUP_TABLE + "("
+                + TableConfig.Group.GROUP_NAME + " TEXT)");
     }
 
     /**
