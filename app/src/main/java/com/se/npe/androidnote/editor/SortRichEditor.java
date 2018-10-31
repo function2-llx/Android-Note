@@ -2,6 +2,7 @@ package com.se.npe.androidnote.editor;
 
 import android.animation.LayoutTransition;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
@@ -26,6 +27,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
+import com.donkingliang.labels.LabelsView;
 import com.se.npe.androidnote.EditorActivity;
 import com.se.npe.androidnote.R;
 import com.se.npe.androidnote.interfaces.IData;
@@ -190,6 +192,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
         initParentLayout();
         initTitleLayout();
         initLineView();
+        initTagLayout();
         initContainerLayout();
 
         viewDragHelper = ViewDragHelper.create(containerLayout, 1.5f, new ViewDragHelperCallBack());
@@ -263,6 +266,50 @@ public class SortRichEditor extends ScrollView implements IEditor {
 
         titleLayout.addView(title);
         titleLayout.addView(textLimit);
+    }
+
+    private void initTagLayout() {
+        /*
+        *
+        <com.donkingliang.labels.LabelsView xmlns:app="http://schemas.android.com/apk/res-auto"
+            android:id="@+id/labels"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:labelBackground="@drawable/label_bg"
+            app:labelTextColor="@drawable/label_text_color"
+            app:labelTextPaddingBottom="5dp"
+            app:labelTextPaddingLeft="10dp"
+            app:labelTextPaddingRight="10dp"
+            app:labelTextPaddingTop="5dp"
+            app:labelTextSize="14sp"
+            app:lineMargin="10dp"
+            app:maxSelect="5"
+            app:selectType="SINGLE"
+            app:wordMargin="10dp" />*/
+        LabelsView labelsView = new LabelsView(getContext());
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        lp.leftMargin = DEFAULT_MARGIN;
+        lp.rightMargin = DEFAULT_MARGIN;
+        lp.topMargin = DEFAULT_MARGIN;
+        labelsView.setLayoutParams(lp);
+        labelsView.setLabelBackgroundResource(R.drawable.label_bg);
+        labelsView.setLabelTextColor(R.drawable.label_text_color);
+        labelsView.setLabelTextPadding(dip2px(10), dip2px(5),
+                dip2px(10), dip2px(5));
+        labelsView.setLabelTextSize(dip2px(14));
+        labelsView.setLineMargin(10);
+        labelsView.setMaxSelect(5);
+        labelsView.setSelectType(LabelsView.SelectType.SINGLE);
+        labelsView.setWordMargin(10);
+        ArrayList<String> label = new ArrayList<>();
+        label.add("Android");
+        label.add("IOS");
+        label.add("前端");
+        label.add("后台");
+        label.add("微信开发");
+        label.add("游戏开发");
+        labelsView.setLabels(label);
+        parentLayout.addView(labelsView);
     }
 
     private void initParentLayout() {
