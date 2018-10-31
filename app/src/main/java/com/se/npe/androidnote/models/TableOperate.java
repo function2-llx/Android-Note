@@ -197,20 +197,31 @@ public class TableOperate implements INoteCollection {
         return noteList;
     }
 
+    public void addGroup(String groupName) {
+        ContentValues cValue = new ContentValues();
+        cValue.put(TableConfig.Group.GROUP_NAME, groupName);
+        db.insert(TableConfig.GROUP_TABLE, null, cValue);
+    }
+
+    public void removeGroup(String groupName){
+        db.execSQL("delete from " + TableConfig.GROUP_TABLE + " where " + TableConfig.Group.GROUP_NAME + "=?", new String[]{groupName});
+        List<Note> noteList = getAllNotesWithGroup(groupName);
+        for(int i = 0;i < noteList.size();i ++){
+            removeNote(noteList.get(i));
+        }
+    }
+
     public List<String> getAllGroup() {
         ArrayList<String> groupnameList = new ArrayList<>();
-        Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME, null);
+        Cursor c = db.rawQuery("select * from " + TableConfig.GROUP_TABLE, null);
         while (c.moveToNext()) {
-            if(!groupnameList.contains(c.getString(6))) {
-                groupnameList.add(c.getString(6));
-            }
+            groupnameList.add(c.getString(0));
         }
         c.close();
         return groupnameList;
     }
 
-    public List<Note> getSearchResultFuzzyWithGroup(String parameter, String groupName)
-    {
+    public List<Note> getSearchResultFuzzyWithGroup(String parameter, String groupName) {
         ArrayList<Note> noteList = new ArrayList<Note>();
         String sql2 = "select * from " + TableConfig.TABLE_NAME
                 + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%'";
