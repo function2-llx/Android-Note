@@ -48,6 +48,7 @@ public class DeletableEditText extends MarkdownEditText {
         lp.leftMargin = 45;
         lp.rightMargin = 45;
         md.setLayoutParams(lp);
+        md.setVisibility(GONE);
         setEditTextMarkdown(context);
         setTextViewMarkdown(context);
     }
@@ -142,9 +143,5 @@ public class DeletableEditText extends MarkdownEditText {
 
     public TextView getMd() {
         return md;
-    }
-
-    public void setMd(TextView md) {
-        this.md = md;
     }
 }

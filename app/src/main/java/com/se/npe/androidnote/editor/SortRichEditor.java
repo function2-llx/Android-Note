@@ -755,12 +755,18 @@ public class SortRichEditor extends ScrollView {
         // + 2 to skip the text view
         indexInsert.accept(lastEditIndex + 2);
         showOrHideKeyboard(false);
+        if (!(containerLayout.getChildAt(containerLayout.getChildCount() - 1) instanceof TextView)) {
+            insertEditTextAtIndex(containerLayout.getChildCount(), "");
+        }
     }
 
     private void insertMediaAtIndex(int index, RelativeLayout mediaLayout) {
         if (index > 0) {
-            int lastIndex = index - 1;
-            View child = containerLayout.getChildAt(lastIndex);
+            View child = containerLayout.getChildAt(index);
+            if (child instanceof RelativeLayout && !isViewOnly) {
+                insertPlaceholder(index);
+            }
+            child = containerLayout.getChildAt(index - 1);
             if (child instanceof RelativeLayout && !isViewOnly) {
                 insertPlaceholder(index++);
             }
@@ -952,19 +958,19 @@ public class SortRichEditor extends ScrollView {
                 for (IData data : content) {
                     int currentChild = ref.containerLayout.getChildCount();
                     if (data instanceof TextData) {
-                        ref.insertEditTextAtIndex(currentChild, ((TextData) data).getText());
+                        ref.insertEditTextAtIndex(currentChild, data.getText());
                     } else if (data instanceof PictureData) {
-                        ref.insertPictureAtIndex(currentChild, ((PictureData) data).getPath());
+                        ref.insertPictureAtIndex(currentChild, data.getPath());
                     } else if (data instanceof VideoData) {
-                        ref.insertVideoAtIndex(currentChild, ((VideoData) data).getPath());
+                        ref.insertVideoAtIndex(currentChild, data.getPath());
                     } else if (data instanceof SoundData) {
-                        ref.insertSoundAtIndex(currentChild, ((SoundData) data).getPath());
-                        ref.lastAddedSoundPlayer.getEditText().setText(((SoundData) data).getText());
+                        ref.insertSoundAtIndex(currentChild, data.getPath());
+                        ref.lastAddedSoundPlayer.getEditText().setText(data.getText());
                     }
                 }
                 if (ref.containerLayout.getChildCount() != 0) {
                     View lastChild = ref.containerLayout.getChildAt(ref.containerLayout.getChildCount() - 1);
-                    if (!(lastChild instanceof EditText)) {
+                    if (!(lastChild instanceof TextView)) {
                         ref.insertEditTextAtIndex(ref.containerLayout.getChildCount(), "");
                     }
                 }
