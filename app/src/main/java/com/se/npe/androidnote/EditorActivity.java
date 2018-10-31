@@ -116,6 +116,10 @@ public class EditorActivity extends AppCompatActivity {
 
             case R.id.menu_save: {
                 Note note = editor.buildNote();
+                if (oldNote != null)
+                    note.setIndex(oldNote.getIndex());
+                note.setStartTime(createTime);
+                note.setModifyTime(new Date());
                 TableOperate.getInstance().modify(note);
                 Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
                 break;
