@@ -59,6 +59,7 @@ public class Note {
     private Date modifyTime = new Date(0);
     private List<String> tag;
     private int indexDB = -1;
+    private String groupName = "NoGroup";
 
     public Note() {
         this.title = "this is tile for " + indexDB;
@@ -78,13 +79,14 @@ public class Note {
         this.tag = tag;
     }
 
-    public Note(String title, List<IData> content, int index, String timeStart, String timeModify, List<String> tag) {
+    public Note(String title, List<IData> content, int index, String timeStart, String timeModify, List<String> tag, String groupName) {
         this.indexDB = index;
         this.title = title;
         this.content = content;
         this.tag = tag;
         this.startTime.setTime(Long.parseLong(timeStart));
         this.modifyTime.setTime(Long.parseLong(timeModify));
+        this.groupName = groupName;
     }
 
     public String getTitle() {
@@ -94,6 +96,10 @@ public class Note {
     public void setTitle(String title) {
         this.title = title;
     }
+
+    public String getGroupName() { return groupName; }
+
+    public void setGroupName(String groupName) { this.groupName = groupName; }
 
     public List<IData> getContent() {
         return content;
