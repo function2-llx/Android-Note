@@ -87,7 +87,6 @@ public class ListActivity extends AppCompatActivity {
                 }
             }
         }
-
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -181,7 +180,7 @@ public class ListActivity extends AppCompatActivity {
                     10);
         }
 
-        initNavigationView();
+        setNavigationView();
         initDrawerToggle();
 //        MobSDK.init(this);
         //        this.ultimateRecyclerView.reenableLoadmore();
@@ -214,16 +213,17 @@ public class ListActivity extends AppCompatActivity {
         this.drawerLayout = findViewById(R.id.drawer_layout);
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close);
         drawerToggle.syncState();
-
     }
 
-    void initNavigationView() {
+    public void setNavigationView() {
         NavigationView navigationView = findViewById(R.id.nav_view);
         Menu menu = navigationView.getMenu();
         SubMenu groupMenu = menu.findItem(R.id.groups).getSubMenu();
         navigationView.setItemIconTintList(null);
+        groupMenu.clear();
         for (String groupName: TableOperate.getInstance().getAllGroup())
             groupMenu.add(groupName);
+
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
@@ -254,6 +254,7 @@ public class ListActivity extends AppCompatActivity {
 //        slidingMenu.setMenu(R.layout.sliding_menu_list);
 //        slidingMenu.setTouchModeBehind(SlidingMenu.TOUCHMODE_FULLSCREEN);
 //    }
+
     private void configureSearchView(@NonNull SearchView searchView) {
         searchView.setQueryHint("search by title...");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {

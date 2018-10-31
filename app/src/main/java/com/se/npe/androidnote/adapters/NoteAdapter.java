@@ -20,6 +20,7 @@ import android.widget.TextView;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.marshalchen.ultimaterecyclerview.UltimateViewAdapter;
 import com.se.npe.androidnote.EditorActivity;
+import com.se.npe.androidnote.ListActivity;
 import com.se.npe.androidnote.R;
 import com.se.npe.androidnote.editor.PictureLoader;
 import com.se.npe.androidnote.events.NoteClearEvent;
@@ -44,17 +45,17 @@ import java.util.Locale;
  * @author llx
  */
 public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
-    private AppCompatActivity activity;
+    private ListActivity activity;
     private List<Note> noteList;
     private Comparator<Note> comparator = Comparator.comparing(Note::getTitle);
 
-    public NoteAdapter(AppCompatActivity activity) {
+    public NoteAdapter(ListActivity activity) {
         this.activity = activity;
     }
 
     public void setComparator(Comparator<Note> comparator) {
         this.comparator = comparator;
-        Collections.sort(noteList, comparator);
+        noteList.sort(comparator);
         this.notifyDataSetChanged();
     }
 
@@ -142,7 +143,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 
     private void updateList(@NonNull List<Note> list) {
         noteList = list;
-        Collections.sort(noteList, comparator);
+        noteList.sort(comparator);
         this.notifyDataSetChanged();
     }
 
@@ -224,9 +225,8 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         public void setImage(String imagePath) {
             if (imagePath.isEmpty())
                 this.imageView.setImageBitmap(null);    //clear the previous image
-            else {
+            else
                 new PictureLoader(imageView, getScreenWidth() / 3).execute(imagePath);
-            }
         }
 
         @Override
@@ -277,8 +277,9 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
                                 String groupName = editText.getText().toString();
                                 if (!groupName.isEmpty()) {
                                     selectedNote.setGroupName(groupName);
-                                    EventBus.getDefault().post(new NoteModifyEvent(selectedNote));
+                                    TableOperate.getInstance().modify(selectedNote);
                                     dialog.cancel();
+                                    activity.setNavigationView();
                                 }
                             }
                         });
