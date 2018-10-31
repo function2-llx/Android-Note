@@ -203,11 +203,39 @@ public class TableOperate implements INoteCollection {
         while (c.moveToNext()) {
             if(!groupnameList.contains(c.getString(6))) {
                 groupnameList.add(c.getString(6));
-                Log.d("debug0001","GroupTest:"+c.getString(6));
             }
         }
         c.close();
         return groupnameList;
+    }
+
+    public List<Note> getSearchResultFuzzyWithGroup(String parameter, String groupName)
+    {
+        ArrayList<Note> noteList = new ArrayList<Note>();
+        String sql2 = "select * from " + TableConfig.TABLE_NAME
+                + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%'";
+        Cursor c = db.rawQuery(sql2, null);
+        while (c.moveToNext()) {
+            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)),c.getString(6));
+            if(groupName.equals(temp.getGroupName())){
+                noteList.add(temp);
+            }
+        }
+        c.close();
+        return noteList;
+    }
+
+    public List<Note> getAllNotesWithGroup(String groupName) {
+        ArrayList<Note> noteList = new ArrayList<>();
+        Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME, null);
+        while (c.moveToNext()) {
+            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)),c.getString(6));
+            if(groupName.equals(temp.getGroupName())){
+                noteList.add(temp);
+            }
+        }
+        c.close();
+        return noteList;
     }
 
     public List<Note> getSearchResultFuzzyWithTag(String parameter, String Tag) {
