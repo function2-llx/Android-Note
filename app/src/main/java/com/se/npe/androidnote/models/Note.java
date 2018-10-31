@@ -39,11 +39,17 @@ public class Note {
         String text;
         public @NonNull
         String picturePath;
+        public @NonNull
+        Date startTime;
+        public @NonNull
+        Date modifyTime;
 
-        public PreviewData(@NonNull String title, @NonNull String text, @NonNull String picturePath) {
+        public PreviewData(@NonNull String title, @NonNull String text, @NonNull String picturePath, @NonNull Date startTime, @NonNull Date modifyTime) {
             this.title = title;
             this.text = text;
             this.picturePath = picturePath;
+            this.startTime = startTime;
+            this.modifyTime = modifyTime;
         }
     }
 
@@ -131,18 +137,18 @@ public class Note {
 
     public PreviewData getPreview() {
         String text = null;
-        String picpath = null;
-        List<IData> templist = getContent();
-        for (int i = 0; i < templist.size(); i++) {
-            if (picpath == null && templist.get(i).toString().charAt(0) == 'P') {
-                picpath = templist.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
-            } else if (text == null && templist.get(i).toString().charAt(0) == 'T') {
-                text = templist.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
+        String picPath = null;
+        List<IData> content = getContent();
+        for (int i = 0; i < content.size(); i++) {
+            if (picPath == null && content.get(i).toString().charAt(0) == 'P') {
+                picPath = content.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
+            } else if (text == null && content.get(i).toString().charAt(0) == 'T') {
+                text = content.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
             }
         }
         if (text == null) text = "无预览文字";
-        if (picpath == null) picpath = "";
-        return new Note.PreviewData(title, text, picpath);
+        if (picPath == null) picPath = "";
+        return new Note.PreviewData(title, text, picPath, startTime, modifyTime);
     }
 
     public void loadFromFile(String fileName) {
@@ -341,7 +347,7 @@ public class Note {
         }
 
         //文件压缩
-         FileOperate.zip(TableConfig.SAVE_PATH + "/NoteSave/TempFloder", TableConfig.SAVE_PATH + "/NoteSave/" + fileName + ".zip");
+        FileOperate.zip(TableConfig.SAVE_PATH + "/NoteSave/TempFloder", TableConfig.SAVE_PATH + "/NoteSave/" + fileName + ".zip");
 
 
         //文件夹删除
