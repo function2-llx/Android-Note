@@ -164,7 +164,7 @@ public class TableOperate implements INoteCollection {
         ArrayList<Note> noteList = new ArrayList<>();
         Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME, null);
         while (c.moveToNext()) {
-            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)));
+            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)),c.getString(6));
             noteList.add(temp);
         }
         c.close();
@@ -176,7 +176,7 @@ public class TableOperate implements INoteCollection {
         ArrayList<Note> noteList = new ArrayList<>();
         Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME + " where " + TableConfig.Note.NOTE_TITLE + "= ?", new String[]{parameter});
         while (c.moveToNext()) {
-            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)));
+            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)),c.getString(6));
             noteList.add(temp);
         }
         c.close();
@@ -190,11 +190,24 @@ public class TableOperate implements INoteCollection {
                 + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%'";
         Cursor c = db.rawQuery(sql2, null);
         while (c.moveToNext()) {
-            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)));
+            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)),c.getString(6));
             noteList.add(temp);
         }
         c.close();
         return noteList;
+    }
+
+    public List<String> getAllGroup() {
+        ArrayList<String> groupnameList = new ArrayList<>();
+        Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME, null);
+        while (c.moveToNext()) {
+            if(!groupnameList.contains(c.getString(6))) {
+                groupnameList.add(c.getString(6));
+                Log.d("debug0001","GroupTest:"+c.getString(6));
+            }
+        }
+        c.close();
+        return groupnameList;
     }
 
     public List<Note> getSearchResultFuzzyWithTag(String parameter, String Tag) {
@@ -203,7 +216,7 @@ public class TableOperate implements INoteCollection {
                 + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%'";
         Cursor c = db.rawQuery(sql2, null);
         while (c.moveToNext()) {
-            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)));
+            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)),c.getString(6));
             List<String> Taglist = temp.getTag();
             boolean flag = false;
             for (int i = 0; i < Taglist.size(); i++) {
@@ -227,6 +240,7 @@ public class TableOperate implements INoteCollection {
         cValue.put(TableConfig.Note.NOTE_START_TIME, Long.toString(note.getStartTime().getTime()));
         cValue.put(TableConfig.Note.NOTE_MODIFY_TIME, Long.toString(note.getModifyTime().getTime()));
         cValue.put(TableConfig.Note.NOTE_TAG, listStringToString(note.getTag()));
+        cValue.put(TableConfig.Note.NOTE_GROUP, note.getGroupName());
         db.insert(TableConfig.TABLE_NAME, null, cValue);
         String sql = "select * from " + TableConfig.TABLE_NAME;
         Cursor cursor = db.rawQuery(sql, null);
@@ -239,8 +253,8 @@ public class TableOperate implements INoteCollection {
 
     @Override
     public void setNote(Note note) {
-        db.execSQL("update " + TableConfig.TABLE_NAME + " set " + TableConfig.Note.NOTE_TITLE + "=?," + TableConfig.Note.NOTE_TAG + "=?," + TableConfig.Note.NOTE_START_TIME + "=?," + TableConfig.Note.NOTE_MODIFY_TIME + "=?," + TableConfig.Note.NOTE_CONTENT + "=? where " + TableConfig.Note.NOTE_ID + "=?",
-                new Object[]{note.getTitle(), listStringToString(note.getTag()), Long.toString(note.getStartTime().getTime()), Long.toString(note.getModifyTime().getTime()), encodeNote(note.getContent()), Integer.toString(note.getIndex())});
+        db.execSQL("update " + TableConfig.TABLE_NAME + " set " + TableConfig.Note.NOTE_TITLE + "=?," + TableConfig.Note.NOTE_TAG + "=?," + TableConfig.Note.NOTE_START_TIME + "=?," + TableConfig.Note.NOTE_MODIFY_TIME + "=?,"+ TableConfig.Note.NOTE_GROUP + "=?," + TableConfig.Note.NOTE_CONTENT + "=? where " + TableConfig.Note.NOTE_ID + "=?",
+                new Object[]{note.getTitle(), listStringToString(note.getTag()), Long.toString(note.getStartTime().getTime()), Long.toString(note.getModifyTime().getTime()),note.getGroupName() ,encodeNote(note.getContent()), Integer.toString(note.getIndex())});
     }
 
     @Override
@@ -257,7 +271,7 @@ public class TableOperate implements INoteCollection {
         ArrayList<Note> noteList = new ArrayList<>();
         Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME + " where " + TableConfig.Note.NOTE_ID + "= ?", new String[]{Integer.toString(index)});
         while (c.moveToNext()) {
-            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)));
+            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)),c.getString(6));
             noteList.add(temp);
         }
         c.close();

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.util.Log;
 import android.widget.TextView;
 
 import com.iflytek.cloud.SpeechConstant;
@@ -13,6 +14,7 @@ import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.models.FileOperate;
 import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
+import com.se.npe.androidnote.models.Note;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -34,6 +36,15 @@ public class SplashActivity extends Activity {
         protected Void doInBackground(Void... voids) {
             publishProgress("loading database...");
             TableOperate.init(ref.get());
+
+            Log.d("debug0001","Tablesize:"+Integer.toString(TableOperate.getInstance().getAllNotes().size()));
+            TableOperate.getInstance().addNote(new Note());
+            Log.d("debug0001","Tablesize:"+Integer.toString(TableOperate.getInstance().getAllNotes().size()));
+
+            Log.d("debug0001","GroupCheck:"+TableOperate.getInstance().getAllNotes().get(0).getGroupName());
+
+            TableOperate.getInstance().getAllGroup();
+
             publishProgress("loading ifly...");
             SpeechUtility.createUtility(ref.get(), SpeechConstant.APPID + "=5bbc8c0f");
             return null;
