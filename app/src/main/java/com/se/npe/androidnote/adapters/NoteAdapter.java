@@ -232,11 +232,21 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         @Override
         public boolean onLongClick(@NonNull View v) {
             PopupMenu menu = new PopupMenu(activity, v);
-            menu.getMenuInflater().inflate(R.menu.activity_list_context_menu, menu.getMenu());
+            menu.getMenuInflater().inflate(R.menu.list_item_options, menu.getMenu());
             menu.setOnMenuItemClickListener(item -> {
                 switch (item.getItemId()) {
                     case R.id.delete: {
                         remove(getAdapterPosition());
+                        break;
+                    }
+
+                    case R.id.preview: {
+                        Note selectedNote = getItem(getAdapterPosition());
+                        EventBus.getDefault().postSticky(new NoteSelectEvent(selectedNote));
+                        Intent intent = new Intent(activity, EditorActivity.class);
+                        intent.putExtra(EditorActivity.VIEW_ONLY, true);
+                        activity.startActivity(intent);
+                        break;
                     }
                 }
                 return true;
