@@ -3,7 +3,6 @@ package com.se.npe.androidnote.editor;
 import android.animation.LayoutTransition;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -26,7 +25,6 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.se.npe.androidnote.EditorActivity;
 import com.se.npe.androidnote.R;
 import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.models.Note;
@@ -34,12 +32,7 @@ import com.se.npe.androidnote.models.PictureData;
 import com.se.npe.androidnote.models.SoundData;
 import com.se.npe.androidnote.models.TextData;
 import com.se.npe.androidnote.models.VideoData;
-import com.yydcdut.markdown.MarkdownConfiguration;
 import com.yydcdut.markdown.MarkdownEditText;
-import com.yydcdut.markdown.MarkdownProcessor;
-import com.yydcdut.markdown.MarkdownTextView;
-import com.yydcdut.markdown.syntax.edit.EditFactory;
-import com.yydcdut.markdown.syntax.text.TextFactory;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -99,9 +92,6 @@ public class SortRichEditor extends ScrollView {
                 = SOUND_LAYOUT_PARAM.rightMargin
                 = DEFAULT_MARGIN;
     }
-
-    // save the background of edit text before sorting(because sorting will change it)
-    private Drawable editTextBackground;
 
     // unique id of a child(of containerLayout), stored in the 'tag' of view
     // (store by setTag, retrieve by getTag)
@@ -402,7 +392,7 @@ public class SortRichEditor extends ScrollView {
             if (child == lastFocusEdit) {
                 child.requestFocus();
             }
-            child.setBackground(editTextBackground);
+            child.setBackground(null);
             layoutParams.height = editTextHeightArray.get(Integer.parseInt(child.getTag().toString()));
         }
         return layoutParams;
@@ -643,10 +633,9 @@ public class SortRichEditor extends ScrollView {
         return placeholder;
     }
 
-    private DeletableEditText createEditText(String hint) {
+    private DeletableEditText createEditText() {
         DeletableEditText editText = new DeletableEditText(getContext());
         editText.setTag(viewTagID++);
-        editText.setHint(hint);
         editText.setGravity(Gravity.TOP);
         editText.setCursorVisible(true);
         editText.setBackgroundResource(android.R.color.transparent);
@@ -817,7 +806,7 @@ public class SortRichEditor extends ScrollView {
     }
 
     private EditText insertEditTextAtIndex(final int index, String editStr) {
-        DeletableEditText editText = createEditText("");
+        DeletableEditText editText = createEditText();
         editText.setText(editStr);
         if (isViewOnly) {
             editText.setFocusable(false);
