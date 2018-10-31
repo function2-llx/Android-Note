@@ -14,6 +14,12 @@ public class TableConfig {
         public static final String NOTE_GROUP = "note_group";
     }
 
+    public static final String GROUP_TABLE = "GroupTable";
+
+    public static class Group {
+        public static final String GROUP_NAME = "group_name";
+    }
+
     public static class FileSave {
         public static final String LIST_SEPARATOR = "qwert";
         public static final String LINE_SEPARATOR = "asdfg";
