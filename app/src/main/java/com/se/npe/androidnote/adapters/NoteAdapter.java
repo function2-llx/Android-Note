@@ -139,17 +139,17 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
     }
 
     public void insert(Note note, int position) {
-        EventBus.getDefault().post(new NoteModifyEvent(note));
+        TableOperate.getInstance().addNote(note);
         super.insertInternal(this.noteList, note, position);
     }
 
     public void remove(int position) {
-        EventBus.getDefault().post(new NoteDeleteEvent(getItem(position)));
+        TableOperate.getInstance().removeNote(getItem(position));
         super.removeInternal(this.noteList, position);
     }
 
     public void clear() {
-        EventBus.getDefault().post(new NoteClearEvent());
+        TableOperate.getInstance().removeAllNotes();
         super.clearInternal(this.noteList);
     }
 
