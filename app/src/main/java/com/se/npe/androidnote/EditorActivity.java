@@ -30,6 +30,7 @@ import com.mob.MobSDK;
 import com.se.npe.androidnote.editor.SortRichEditor;
 import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
+import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
 import com.se.npe.androidnote.sound.ResultPool;
 import com.se.npe.androidnote.util.Logger;
@@ -66,8 +67,10 @@ public class EditorActivity extends AppCompatActivity {
     private SortRichEditor editor;
     private Note oldNote;
     private Date createTime;
+    private String currentGroup = "";
     private Uri tempMediaUri;
     public static final String VIEW_ONLY = "VIEW_ONLY";
+    public static final String CURRENT_GROUP = "CURRENT_GROUP";
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -107,8 +110,10 @@ public class EditorActivity extends AppCompatActivity {
                     note.setIndex(oldNote.getIndex());
                 note.setStartTime(createTime);
                 note.setModifyTime(new Date());
+                note.setGroupName(currentGroup);
                 TableOperate.getInstance().modify(note);
                 oldNote = note;
+
                 Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
                 break;
             }
@@ -206,6 +211,9 @@ public class EditorActivity extends AppCompatActivity {
         } else {
             editor.setMarkdownController(findViewById(R.id.scroll_edit));
         }
+
+        this.currentGroup = getIntent().getStringExtra(CURRENT_GROUP);
+
         // deferred built, or we will get NPE
         if (oldNote != null) {
             editor.loadNote(oldNote);
