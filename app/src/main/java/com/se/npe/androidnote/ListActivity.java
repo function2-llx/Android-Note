@@ -1,18 +1,19 @@
 package com.se.npe.androidnote;
 
 import android.Manifest;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
-import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.SearchView;
@@ -20,17 +21,18 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.se.npe.androidnote.adapters.NoteAdapter;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.TableOperate;
-import com.yydcdut.markdown.MarkdownConfiguration;
-import com.yydcdut.markdown.MarkdownProcessor;
-import com.yydcdut.markdown.syntax.text.TextFactory;
-import com.yydcdut.markdown.theme.ThemeSunburst;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -46,6 +48,13 @@ public class ListActivity extends AppCompatActivity {
     private ActionBarDrawerToggle drawerToggle;
     private DrawerLayout drawerLayout;
     private Toolbar toolbar;
+    NavigationView navigationView;
+    SubMenu groupMenu;
+    String currentGroup = "";
+
+    public String getCurrentGroup() {
+        return currentGroup;
+    }
 
     /* Options menu */
 
@@ -87,7 +96,6 @@ public class ListActivity extends AppCompatActivity {
                 }
             }
         }
-
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -96,6 +104,7 @@ public class ListActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menu_new_note: {
                 Intent intent = new Intent(ListActivity.this, EditorActivity.class);
+                intent.putExtra(EditorActivity.CURRENT_GROUP, currentGroup);
                 this.startActivity(intent);
                 break;
             }
@@ -150,7 +159,6 @@ public class ListActivity extends AppCompatActivity {
     @Override
     public void setTitle(CharSequence title) {
         Objects.requireNonNull(getSupportActionBar()).setTitle(title);
-
     }
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -172,8 +180,6 @@ public class ListActivity extends AppCompatActivity {
         this.ultimateRecyclerView.setAdapter(noteAdapter);
         this.noteAdapter.updateAllNotesList();
 
-
-
         this.enableRefresh();
         while (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -181,7 +187,7 @@ public class ListActivity extends AppCompatActivity {
                     10);
         }
 
-        initNavigationView();
+        setNavigationView();
         initDrawerToggle();
 //        MobSDK.init(this);
         //        this.ultimateRecyclerView.reenableLoadmore();
@@ -200,7 +206,7 @@ public class ListActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        noteAdapter.updateAllNotesList();
+        updateList();
         super.onResume();
     }
 
@@ -214,28 +220,101 @@ public class ListActivity extends AppCompatActivity {
         this.drawerLayout = findViewById(R.id.drawer_layout);
         drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close);
         drawerToggle.syncState();
-
     }
 
-    void initNavigationView() {
-        NavigationView navigationView = findViewById(R.id.nav_view);
+    private void refreshGroups() {
+        groupMenu.removeGroup(R.id.group_groups);
+        List<String> allGroups = TableOperate.getInstance().getAllGroup();
+        for (int i = 0; i < allGroups.size(); i++) {
+            groupMenu.add(R.id.group_groups, Menu.NONE, Menu.NONE, allGroups.get(i));
+        }
+    }
+
+    public void setNavigationView() {
+        this.navigationView = findViewById(R.id.nav_view);
         Menu menu = navigationView.getMenu();
-        SubMenu groupMenu = menu.findItem(R.id.groups).getSubMenu();
+        this.groupMenu = menu.findItem(R.id.groups).getSubMenu();
         navigationView.setItemIconTintList(null);
-        for (String groupName: TableOperate.getInstance().getAllGroup())
-            groupMenu.add(groupName);
+
+        refreshGroups();
+
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
 //                drawerLayout.closeDrawers();
-                if (menuItem.getItemId() == R.id.all_notes) {
-                    noteAdapter.updateAllNotesList();
-                    setTitle(getString(R.string.list_title));
-                } else {
-                    String groupName = menuItem.getTitle().toString();
-                    noteAdapter.updateGroupNotesList(groupName);
-                    setTitle(groupName);
+                switch (menuItem.getGroupId()) {
+                    case R.id.group_all_notes: {
+                        noteAdapter.updateAllNotesList();
+                        currentGroup = "";
+                        setTitle(getString(R.string.list_title));
+                        break;
+                    }
+
+                    case R.id.group_groups: {
+                        String groupName = menuItem.getTitle().toString();
+                        noteAdapter.updateGroupNotesList(groupName);
+                        currentGroup = groupName;
+                        setTitle(groupName);
+                        break;
+                    }
+
+                    case R.id.group_manage: {
+                        List<String> allGroups = TableOperate.getInstance().getAllGroup();
+                        String[] allGroupsArray = allGroups.toArray(new String[0]);
+                        switch (menuItem.getItemId()) {
+                            case R.id.new_group: {
+                                EditText editText = new EditText(ListActivity.this);
+                                AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
+                                builder.setTitle("New group");
+                                builder.setPositiveButton("add", null);
+                                builder.setNegativeButton("cancel", null);
+                                builder.setView(editText);
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        String groupName = editText.getText().toString();
+                                        if (groupName.isEmpty())
+                                            Toast.makeText(ListActivity.this, "input something?", Toast.LENGTH_SHORT).show();
+                                        else if (allGroups.contains(groupName))
+                                            Toast.makeText(ListActivity.this, groupName + " already exist", Toast.LENGTH_SHORT).show();
+                                        else {
+                                            TableOperate.getInstance().addGroup(groupName);
+                                            refreshGroups();
+                                            dialog.cancel();
+                                        }
+                                    }
+                                });
+                                break;
+                            }
+
+                            case R.id.remove_group: {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
+                                builder.setTitle("remove group");
+                                boolean selected[] = new boolean[allGroupsArray.length];
+                                builder.setMultiChoiceItems(allGroupsArray, new boolean[allGroupsArray.length], new DialogInterface.OnMultiChoiceClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                                        selected[which] = isChecked;
+                                    }
+                                });
+                                builder.setNegativeButton("cancel", null);
+                                builder.setPositiveButton("confirm", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        for (int i = 0; i < allGroupsArray.length; i++)
+                                            if (selected[i])
+                                                TableOperate.getInstance().removeGroup(allGroupsArray[i]);
+                                        refreshGroups();
+                                    }
+                                });
+                                builder.show();
+                            }
+                        }
+                    }
                 }
+
                 return true;
             }
         });
@@ -254,6 +333,7 @@ public class ListActivity extends AppCompatActivity {
 //        slidingMenu.setMenu(R.layout.sliding_menu_list);
 //        slidingMenu.setTouchModeBehind(SlidingMenu.TOUCHMODE_FULLSCREEN);
 //    }
+
     private void configureSearchView(@NonNull SearchView searchView) {
         searchView.setQueryHint("search by title...");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -276,10 +356,17 @@ public class ListActivity extends AppCompatActivity {
         });
     }
 
+    public void updateList() {
+        if (currentGroup.isEmpty())
+            noteAdapter.updateAllNotesList();
+        else
+            noteAdapter.updateGroupNotesList(currentGroup);
+    }
+
     // refresh the list
     private void enableRefresh() {
         this.ultimateRecyclerView.setDefaultOnRefreshListener(() -> new Handler().postDelayed(() -> {
-            noteAdapter.updateAllNotesList();
+            updateList();
             ListActivity.this.ultimateRecyclerView.setRefreshing(false);
             layoutManager.scrollToPosition(0);
         }, 500));

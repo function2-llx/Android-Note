@@ -5,11 +5,8 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
-import android.os.Build;
 import android.content.res.AssetManager;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
@@ -18,8 +15,6 @@ import android.provider.MediaStore;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.FileProvider;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -33,29 +28,24 @@ import com.dmcbig.mediapicker.entity.Media;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.mob.MobSDK;
 import com.se.npe.androidnote.editor.SortRichEditor;
-import com.se.npe.androidnote.events.NoteModifyEvent;
 import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.NotePdfConverter;
+import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
 import com.se.npe.androidnote.sound.ResultPool;
 import com.se.npe.androidnote.util.Logger;
-import com.yydcdut.markdown.MarkdownConfiguration;
-import com.yydcdut.markdown.MarkdownEditText;
-import com.yydcdut.markdown.MarkdownProcessor;
-import com.yydcdut.markdown.syntax.edit.EditFactory;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
 import java.io.OutputStream;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -63,9 +53,7 @@ import java.util.Objects;
 
 import cn.sharesdk.framework.Platform;
 import cn.sharesdk.framework.PlatformActionListener;
-import cn.sharesdk.framework.ShareSDK;
 import cn.sharesdk.onekeyshare.OnekeyShare;
-import cn.sharesdk.wechat.friends.Wechat;
 
 public class EditorActivity extends AppCompatActivity {
     private static final String LOG_TAG = EditorActivity.class.getSimpleName();
@@ -80,8 +68,10 @@ public class EditorActivity extends AppCompatActivity {
     private SortRichEditor editor;
     private Note oldNote;
     private Date createTime;
+    private String currentGroup = "";
     private Uri tempMediaUri;
     public static final String VIEW_ONLY = "VIEW_ONLY";
+    public static final String CURRENT_GROUP = "CURRENT_GROUP";
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -121,8 +111,10 @@ public class EditorActivity extends AppCompatActivity {
                     note.setIndex(oldNote.getIndex());
                 note.setStartTime(createTime);
                 note.setModifyTime(new Date());
+                note.setGroupName(currentGroup);
                 TableOperate.getInstance().modify(note);
                 oldNote = note;
+
                 Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
                 break;
             }
@@ -231,6 +223,9 @@ public class EditorActivity extends AppCompatActivity {
         } else {
             editor.setMarkdownController(findViewById(R.id.scroll_edit));
         }
+
+        this.currentGroup = getIntent().getStringExtra(CURRENT_GROUP);
+
         // deferred built, or we will get NPE
         if (oldNote != null) {
             editor.loadNote(oldNote);

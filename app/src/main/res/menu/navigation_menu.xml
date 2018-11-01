@@ -3,12 +3,36 @@
 
     <item
         android:id="@+id/groups"
+        android:icon="@mipmap/icon_group"
         android:title="@string/groups" >
         <menu>
-            <item
-                android:title="@string/group_all_notes"
-                android:id="@+id/all_notes"
-                android:icon="@mipmap/icon_notes" />
+            <group
+                android:id="@+id/group_all_notes">
+                <item
+                    android:title="@string/group_all_notes"
+                    android:id="@+id/all_notes"
+                    android:icon="@mipmap/icon_notes" />
+            </group>
+            <group
+                android:id="@+id/group_groups" />
+
+        </menu>
+    </item>
+
+    <item
+        android:title="@string/manage_groups" >
+        <menu>
+            <group
+                android:id="@+id/group_manage" >
+                <item
+                    android:id="@+id/new_group"
+                    android:title="@string/new_group"
+                    android:icon="@mipmap/icon_add_group"
+                    />
+                <item
+                    android:id="@+id/remove_group"
+                    android:title="@string/remove_group" />
+            </group>
         </menu>
     </item>
 
