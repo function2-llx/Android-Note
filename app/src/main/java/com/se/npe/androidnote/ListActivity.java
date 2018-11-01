@@ -74,28 +74,50 @@ public class ListActivity extends AppCompatActivity {
         }
 
         SubMenu sortMenu = menu.findItem(R.id.menu_sort).getSubMenu();
-        boolean newSortOption = true;
+
         int sortOptionId = TableOperate.getSearchConfig();
-        if (sortOptionId != -1) { // used sort option
+
+        //determine whether there is a legal sort option id
+        boolean flag = false;
+        if (sortOptionId != -1)
             for (int i = 0; i < sortMenu.size(); i++) {
-                MenuItem item = sortMenu.getItem(i);
-                if (item.getItemId() == sortOptionId) {
-                    newSortOption = false;
-                    item.setChecked(true);
+                if (sortMenu.getItem(i).getItemId() == sortOptionId) {
+                    flag = true;
                     break;
                 }
             }
+
+        //if there is no available sort option, sort by title
+        if (!flag)
+            sortOptionId = R.id.sort_title;
+
+        setSortOption(sortOptionId);
+
+        for (int i = 0; i < sortMenu.size(); i++) {
+            MenuItem item = sortMenu.getItem(i);
+            if (item.getItemId() == sortOptionId)
+                item.setChecked(true);
         }
-        if (newSortOption) { // initialize sort option
-            setSortOption(R.id.sort_title);
-            for (int i = 0; i < sortMenu.size(); i++) {
-                MenuItem item = sortMenu.getItem(i);
-                if (item.getItemId() == R.id.sort_title) {
-                    item.setChecked(true);
-                    break;
-                }
-            }
-        }
+//        if (sortOptionId != -1) { // used sort option
+//            for (int i = 0; i < sortMenu.size(); i++) {
+//                MenuItem item = sortMenu.getItem(i);
+//                if (item.getItemId() == sortOptionId) {
+//                    newSortOption = false;
+//                    item.setChecked(true);
+//                    break;
+//                }
+//            }
+//        }
+//        if (newSortOption) { // initialize sort option
+//            setSortOption(R.id.sort_title);
+//            for (int i = 0; i < sortMenu.size(); i++) {
+//                MenuItem item = sortMenu.getItem(i);
+//                if (item.getItemId() == R.id.sort_title) {
+//                    item.setChecked(true);
+//                    break;
+//                }
+//            }
+//        }
         return super.onCreateOptionsMenu(menu);
     }
 
