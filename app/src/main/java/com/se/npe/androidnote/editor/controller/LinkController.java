@@ -55,8 +55,8 @@ public class LinkController {
 
         private void init(Context context) {
             View v = LayoutInflater.from(context).inflate(R.layout.dialog_link, this, true);
-            mDescriptionEditText = (EditText) v.findViewById(R.id.edit_description_link);
-            mLinkEditText = (EditText) v.findViewById(R.id.edit_link);
+            mDescriptionEditText = v.findViewById(R.id.edit_description_link);
+            mLinkEditText = v.findViewById(R.id.edit_link);
         }
 
         public void clear() {
@@ -97,21 +97,13 @@ public class LinkController {
     private void initDialog() {
         mAlertDialog = new AlertDialog.Builder(mRxMDEditText.getContext())
                 .setView(mLinkDialogView)
-                .setPositiveButton("确定", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                        String description = mLinkDialogView.getDescription();
-                        String link = mLinkDialogView.getLink();
-                        doRealLink(description, link);
-                    }
+                .setPositiveButton("确定", (dialog, which) -> {
+                    dialog.dismiss();
+                    String description = mLinkDialogView.getDescription();
+                    String link = mLinkDialogView.getLink();
+                    doRealLink(description, link);
                 })
-                .setNegativeButton("取消", new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        dialog.dismiss();
-                    }
-                })
+                .setNegativeButton("取消", (dialog, which) -> dialog.dismiss())
                 .setTitle("Link")
                 .setCancelable(false)
                 .create();

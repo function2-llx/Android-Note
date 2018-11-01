@@ -38,11 +38,9 @@ public class ListController {
             if (mdUnOrderListSpan != null) {
                 if (mdUnOrderListSpan.getNested() == 0) {
                     mRxMDEditText.getText().delete(position, position + "* ".length());
-//                    mRxMDEditText.getText().removeSpan(mdUnOrderListSpan);
                     return;
                 }
                 mRxMDEditText.getText().delete(position, position + 1);
-//                mRxMDEditText.getText().removeSpan(mdUnOrderListSpan);
                 return;
             }
             mRxMDEditText.getText().insert(position, "* ");
@@ -53,21 +51,16 @@ public class ListController {
                 Toast.makeText(mRxMDEditText.getContext(), "无法操作多行", Toast.LENGTH_SHORT).show();
                 return;
             }
-//            int selectedStart = mRxMDEditText.getSelectionStart();
-//            int selectedEnd = mRxMDEditText.getSelectionEnd();
             MDUnOrderListSpan mdUnOrderListSpan = Utils.getSpans(mRxMDEditText, start, end, MDUnOrderListSpan.class);
             if (mdUnOrderListSpan != null) {
                 if (mdUnOrderListSpan.getNested() == 0) {
                     mRxMDEditText.getText().delete(position0, position0 + "* ".length());
-//                    mRxMDEditText.setSelection(selectedStart - "* ".length(), selectedEnd - "* ".length());
                     return;
                 }
                 mRxMDEditText.getText().delete(position0, position0 + 1);
-//                mRxMDEditText.setSelection(selectedStart - 1, selectedEnd - 1);
                 return;
             }
             mRxMDEditText.getText().insert(position0, "* ");
-//            mRxMDEditText.setSelection(selectedStart + "* ".length(), selectedEnd + "* ".length());
         }
     }
 
@@ -103,18 +96,14 @@ public class ListController {
                 Toast.makeText(mRxMDEditText.getContext(), "无法操作多行", Toast.LENGTH_SHORT).show();
                 return;
             }
-//            int selectedStart = mRxMDEditText.getSelectionStart();
-//            int selectedEnd = mRxMDEditText.getSelectionEnd();
             MDOrderListSpan mdOrderListSpan = Utils.getSpans(mRxMDEditText, start, end, MDOrderListSpan.class);
             if (mdOrderListSpan != null) {
                 if (mdOrderListSpan.getNested() == 0) {
                     int deleteLength = position0 + mdOrderListSpan.getNested() + (mdOrderListSpan.getNumber() / 10 + 1) + ". ".length();
                     mRxMDEditText.getText().delete(position0, deleteLength);
-//                    mRxMDEditText.setSelection(selectedStart - deleteLength, selectedEnd - deleteLength);
                     return;
                 }
                 mRxMDEditText.getText().delete(position0, position0 + 1);
-//                mRxMDEditText.setSelection(selectedStart - 1, selectedEnd - 1);
                 return;
             }
             if (position0 == 0) {
@@ -128,10 +117,8 @@ public class ListController {
                     }
                     sb.append((mdBeforeLineOrderListSpan.getNumber() + 1)).append(". ");
                     mRxMDEditText.getText().insert(position0, sb.toString());
-//                    mRxMDEditText.setSelection(selectedStart + sb.length(), selectedEnd + sb.length());
                 } else {
                     mRxMDEditText.getText().insert(position0, "1. ");
-//                    mRxMDEditText.setSelection(selectedStart + "1. ".length(), selectedEnd + "1. ".length());
                 }
             }
         }

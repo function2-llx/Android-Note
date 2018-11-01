@@ -112,6 +112,8 @@ public class HeaderController {
             case 6:
                 mRxMDEditText.getText().delete(startPosition, startPosition + "###### ".length());
                 break;
+            default:
+                break;
         }
     }
 
@@ -134,6 +136,8 @@ public class HeaderController {
                 break;
             case 6:
                 mRxMDEditText.getText().insert(startPosition, "###### ");
+                break;
+            default:
                 break;
         }
     }

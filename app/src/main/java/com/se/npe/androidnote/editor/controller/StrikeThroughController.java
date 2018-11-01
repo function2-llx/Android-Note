@@ -23,6 +23,7 @@ import com.yydcdut.markdown.MarkdownEditText;
 
 public class StrikeThroughController {
     private MarkdownEditText mRxMDEditText;
+    private static final String DELETE_LINE = "~~";
 
     public StrikeThroughController(MarkdownEditText rxMDEditText) {
         mRxMDEditText = rxMDEditText;
@@ -32,7 +33,8 @@ public class StrikeThroughController {
         int start = mRxMDEditText.getSelectionStart();
         int end = mRxMDEditText.getSelectionEnd();
         if (start == end) {
-            mRxMDEditText.getText().insert(start, "~~~~");
+            // double delete line(pair)
+            mRxMDEditText.getText().insert(start, DELETE_LINE + DELETE_LINE);
             mRxMDEditText.setSelection(start + 2, end + 2);
         } else if (end - start > 4) {//选中了4个以上
             int position0 = Utils.findBeforeNewLineChar(mRxMDEditText.getText(), start) + 1;
@@ -42,20 +44,20 @@ public class StrikeThroughController {
                 return;
             }
             Editable editable = mRxMDEditText.getText();
-            if ("~~".equals(editable.subSequence(Utils.safePosition(start, editable), Utils.safePosition(start + "~~".length(), editable)).toString()) &&
-                    "~~".equals(editable.subSequence(Utils.safePosition(end - "~~".length(), editable), Utils.safePosition(end, editable)).toString())) {
-                mRxMDEditText.getText().delete(end - "~~".length(), end);
-                mRxMDEditText.getText().delete(start, start + "~~".length());
-                mRxMDEditText.setSelection(start, end - "~~".length() * 2);
+            if (DELETE_LINE.equals(editable.subSequence(Utils.safePosition(start, editable), Utils.safePosition(start + DELETE_LINE.length(), editable)).toString()) &&
+                    DELETE_LINE.equals(editable.subSequence(Utils.safePosition(end - DELETE_LINE.length(), editable), Utils.safePosition(end, editable)).toString())) {
+                mRxMDEditText.getText().delete(end - DELETE_LINE.length(), end);
+                mRxMDEditText.getText().delete(start, start + DELETE_LINE.length());
+                mRxMDEditText.setSelection(start, end - DELETE_LINE.length() * 2);
             } else {
-                mRxMDEditText.getText().insert(end, "~~");
-                mRxMDEditText.getText().insert(start, "~~");
-                mRxMDEditText.setSelection(start, end + "~~".length() * 2);
+                mRxMDEditText.getText().insert(end, DELETE_LINE);
+                mRxMDEditText.getText().insert(start, DELETE_LINE);
+                mRxMDEditText.setSelection(start, end + DELETE_LINE.length() * 2);
             }
         } else {
-            mRxMDEditText.getText().insert(end, "~~");
-            mRxMDEditText.getText().insert(start, "~~");
-            mRxMDEditText.setSelection(start, end + "~~".length() * 2);
+            mRxMDEditText.getText().insert(end, DELETE_LINE);
+            mRxMDEditText.getText().insert(start, DELETE_LINE);
+            mRxMDEditText.setSelection(start, end + DELETE_LINE.length() * 2);
         }
     }
 }
