@@ -1,7 +1,10 @@
 package com.se.npe.androidnote.editor;
 
 import android.animation.LayoutTransition;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
@@ -24,7 +27,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.donkingliang.labels.LabelsView;
 import com.se.npe.androidnote.R;
 import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.models.Note;
@@ -166,6 +171,8 @@ public class SortRichEditor extends ScrollView {
 
     private boolean isMarkdown = false;
 
+    private LabelsView tags;
+
     private HorizontalEditScrollView markdownController = null;
 
     public SortRichEditor(Context context) {
@@ -182,6 +189,7 @@ public class SortRichEditor extends ScrollView {
         initParentLayout();
         initTitleLayout();
         initLineView();
+        initTag();
         initContainerLayout();
 
         viewDragHelper = ViewDragHelper.create(containerLayout, 1.5f, new ViewDragHelperCallBack());
@@ -255,6 +263,57 @@ public class SortRichEditor extends ScrollView {
 
         titleLayout.addView(title);
         titleLayout.addView(textLimit);
+    }
+
+    private void initTag() {
+        tags = new LabelsView(getContext());
+        final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        lp.leftMargin = DEFAULT_MARGIN;
+        lp.rightMargin = DEFAULT_MARGIN;
+        lp.topMargin = DEFAULT_MARGIN;
+        tags.setLayoutParams(lp);
+        tags.setLabelBackgroundResource(R.drawable.label_bg);
+        tags.setLabelTextPadding(dip2px(10)
+                , dip2px(5), dip2px(10), dip2px(5));
+        tags.setLabelTextSize(dip2px(14));
+        tags.setLineMargin(10);
+        tags.setWordMargin(10);
+        ArrayList<String> labels = new ArrayList<>();
+        labels.add("Add");
+        labels.add("Delete");
+        tags.setLabels(labels);
+        tags.setSelectType(LabelsView.SelectType.MULTI);
+
+        tags.setOnLabelClickListener((label, data, position) -> {
+            if (position == tags.getLabels().size() - 2) {
+                final EditText editText = new EditText(getContext());
+                editText.setLayoutParams(lp);
+                AlertDialog.Builder inputDialog =
+                        new AlertDialog.Builder(getContext());
+                inputDialog.setTitle("Tag Name").setView(editText);
+                inputDialog.setPositiveButton("Ok",
+                        (dialog, which) -> {
+                            String input = editText.getText().toString();
+                            if (input.isEmpty()) {
+                                Toast.makeText(getContext(), "Input is empty", Toast.LENGTH_SHORT).show();
+                            } else {
+                                ArrayList<String> list = new ArrayList<>(tags.getLabels());
+                                list.add(list.size() - 2, input);
+                                tags.setLabels(list);
+                            }
+                        }).show();
+            } else if (position == tags.getLabels().size() - 1) {
+                ArrayList<String> list = new ArrayList<>(tags.getLabels());
+                List<Integer> remove = tags.getSelectLabels();
+                for (int i = 0; i < remove.size(); ++i) {
+                    if (remove.get(i) < tags.getLabels().size() - 2) {
+                        list.remove(remove.get(i) - i);
+                    }
+                }
+                tags.setLabels(list);
+            }
+        });
+        parentLayout.addView(tags);
     }
 
     private void initParentLayout() {
@@ -964,6 +1023,9 @@ public class SortRichEditor extends ScrollView {
                     }
                 }
             }
+            ArrayList<String> tagList = new ArrayList<>(note.getTag());
+            tagList.addAll(ref.tags.getLabels());
+            ref.tags.setLabels(tagList);
         }
     }
 
@@ -998,7 +1060,13 @@ public class SortRichEditor extends ScrollView {
                 contentList.add(data);
             }
         }
-        return new Note(title.getText().toString().trim(), contentList);
+        Note note = new Note(title.getText().toString().trim(), contentList);
+        ArrayList<String> tagList = new ArrayList<>(tags.getLabels());
+        // remove the last add & delete
+        tagList.remove(tagList.size() - 1);
+        tagList.remove(tagList.size() - 1);
+        note.setTag(tagList);
+        return note;
     }
 
     public void setViewOnly() {
