@@ -322,15 +322,19 @@ public class SortRichEditor extends ScrollView {
                 1000);
         emptyView.setLayoutParams(lp);
         emptyView.setOnClickListener(v -> {
-            int childCount = containerLayout.getChildCount();
-            if (childCount == 0 || !(containerLayout.getChildAt(childCount - 1) instanceof TextView)) {
-                insertEditTextAtIndex(childCount, "");
+            if (isSort) {
+                endSortUI();
+            } else {
+                int childCount = containerLayout.getChildCount();
+                if (childCount == 0 || !(containerLayout.getChildAt(childCount - 1) instanceof TextView)) {
+                    insertEditTextAtIndex(childCount, "");
+                }
+                DeletableEditText lastEdit = (DeletableEditText)
+                        containerLayout.getChildAt(containerLayout.getChildCount() - 2);
+                lastEdit.requestFocus();
+                lastEdit.setController(markdownController);
+                lastFocusEdit = lastEdit;
             }
-            DeletableEditText lastEdit = (DeletableEditText)
-                    containerLayout.getChildAt(containerLayout.getChildCount() - 2);
-            lastEdit.requestFocus();
-            lastEdit.setController(markdownController);
-            lastFocusEdit = lastEdit;
         });
         parentLayout.addView(emptyView);
     }
@@ -936,6 +940,8 @@ public class SortRichEditor extends ScrollView {
                 if (Math.abs(ev.getY() - preY) >= viewDragHelper.getTouchSlop()) {
                     showOrHideKeyboard(false);
                 }
+                break;
+            default:
                 break;
         }
         return super.onTouchEvent(ev);

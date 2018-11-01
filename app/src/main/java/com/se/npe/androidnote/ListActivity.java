@@ -153,6 +153,8 @@ public class ListActivity extends AppCompatActivity {
                 noteAdapter.setComparator(Comparator.comparing(Note::getModifyTime));
                 break;
             }
+            default:
+                break;
         }
     }
 
@@ -310,9 +312,16 @@ public class ListActivity extends AppCompatActivity {
                                     }
                                 });
                                 builder.show();
+                                break;
                             }
+
+                            default:
+                                break;
                         }
+                        break;
                     }
+                    default:
+                        break;
                 }
 
                 return true;

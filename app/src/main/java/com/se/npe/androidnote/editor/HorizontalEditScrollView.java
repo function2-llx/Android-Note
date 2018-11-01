@@ -175,10 +175,8 @@ public class HorizontalEditScrollView extends FrameLayout implements View.OnClic
 
     @Override
     public boolean onLongClick(View v) {
-        switch (v.getId()) {
-            case R.id.img_block_quote:
-                mBlockQuotesController.addNestedBlockQuotes();
-                break;
+        if (v.getId() == R.id.img_block_quote) {
+            mBlockQuotesController.addNestedBlockQuotes();
         }
         return true;
     }
