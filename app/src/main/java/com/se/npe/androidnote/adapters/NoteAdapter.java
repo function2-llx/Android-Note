@@ -234,6 +234,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
             Note selectedNote = getItem(getAdapterPosition());
             EventBus.getDefault().postSticky(new NoteSelectEvent(selectedNote));
             Intent intent = new Intent(activity, EditorActivity.class);
+            intent.putExtra(EditorActivity.CURRENT_GROUP, activity.getCurrentGroup());
             activity.startActivity(intent);
         }
 
@@ -253,6 +254,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
                         EventBus.getDefault().postSticky(new NoteSelectEvent(selectedNote));
                         Intent intent = new Intent(activity, EditorActivity.class);
                         intent.putExtra(EditorActivity.VIEW_ONLY, true);
+                        intent.putExtra(EditorActivity.CURRENT_GROUP, activity.getCurrentGroup());
                         activity.startActivity(intent);
                         break;
                     }
@@ -265,13 +267,19 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
                         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                         builder.setTitle("set group");
                         builder.setView(dialogView);
-                        builder.setPositiveButton("confirm", null);
-                        builder.setNegativeButton("cancel", null);
-                        builder.setSingleChoiceItems(groupName.toArray(new String[0]), 0, new DialogInterface.OnClickListener() {
+                        final int[] selected = {0};
+                        builder.setPositiveButton("confirm", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
-                                selectedNote.setGroupName(groupName.get(which));
+                                selectedNote.setGroupName(groupName.get(selected[0]));
                                 TableOperate.getInstance().modify(selectedNote);
+                            }
+                        });
+                        builder.setNegativeButton("cancel", null);
+                        builder.setSingleChoiceItems(groupName.toArray(new String[0]), selected[0], new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                selected[0] = which;
                             }
                         });
                         builder.show();

@@ -59,7 +59,7 @@ public class Note {
     private Date modifyTime = new Date(0);
     private List<String> tag;
     private int indexDB = -1;
-    private String groupName = "NoGroup";
+    private String groupName = "";
 
     public Note() {
         this.title = "this is tile for " + indexDB;

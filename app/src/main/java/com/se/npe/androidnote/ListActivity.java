@@ -23,6 +23,9 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.Toast;
 
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.se.npe.androidnote.adapters.NoteAdapter;
@@ -53,6 +56,11 @@ public class ListActivity extends AppCompatActivity {
     private Toolbar toolbar;
     NavigationView navigationView;
     SubMenu groupMenu;
+    String currentGroup = "";
+
+    public String getCurrentGroup() {
+        return currentGroup;
+    }
 
     /* Options menu */
 
@@ -102,6 +110,7 @@ public class ListActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menu_new_note: {
                 Intent intent = new Intent(ListActivity.this, EditorActivity.class);
+                intent.putExtra(EditorActivity.CURRENT_GROUP, currentGroup);
                 this.startActivity(intent);
                 break;
             }
@@ -162,7 +171,6 @@ public class ListActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 //        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_list);
-        TableOperate.getInstance().addGroup("test");
 //        this.setTitle(this.getResources().getString(R.string.list_title));
 
         toolbar = findViewById(R.id.toolbar);
@@ -204,7 +212,7 @@ public class ListActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        noteAdapter.updateAllNotesList();
+        updateList();
         super.onResume();
     }
 
@@ -240,7 +248,11 @@ public class ListActivity extends AppCompatActivity {
     }
 
     private void refreshGroups() {
-
+        groupMenu.removeGroup(R.id.group_groups);
+        List<String> allGroups = TableOperate.getInstance().getAllGroup();
+        for (int i = 0; i < allGroups.size(); i++) {
+            groupMenu.add(R.id.group_groups, i + 1, Menu.NONE, allGroups.get(i));
+        }
     }
 
     public void setNavigationView() {
@@ -249,8 +261,10 @@ public class ListActivity extends AppCompatActivity {
         this.groupMenu = menu.findItem(R.id.groups).getSubMenu();
         navigationView.setItemIconTintList(null);
 
-        for (String groupName: TableOperate.getInstance().getAllGroup())
-            groupMenu.add(R.id.group_groups, Menu.NONE, Menu.NONE, groupName);
+        refreshGroups();
+
+//        for (String groupName: TableOperate.getInstance().getAllGroup())
+//            groupMenu.add(R.id.group_groups, Menu.NONE, Menu.NONE, groupName);
 
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
@@ -260,6 +274,7 @@ public class ListActivity extends AppCompatActivity {
                 switch (menuItem.getGroupId()) {
                     case R.id.group_all_notes: {
                         noteAdapter.updateAllNotesList();
+                        currentGroup = "";
                         setTitle(getString(R.string.list_title));
                         break;
                     }
@@ -267,16 +282,39 @@ public class ListActivity extends AppCompatActivity {
                     case R.id.group_groups: {
                         String groupName = menuItem.getTitle().toString();
                         noteAdapter.updateGroupNotesList(groupName);
+                        currentGroup = groupName;
                         setTitle(groupName);
                         break;
                     }
 
                     case R.id.group_manage: {
-                        List<String> allGroups =TableOperate.getInstance().getAllGroup();
-                        String[] allGroupsArray = TableOperate.getInstance().getAllGroup().toArray(new String[0]);
+                        List<String> allGroups = TableOperate.getInstance().getAllGroup();
+                        String[] allGroupsArray = allGroups.toArray(new String[0]);
                         switch (menuItem.getItemId()) {
-                            case R.id.add_group: {
-
+                            case R.id.new_group: {
+                                EditText editText = new EditText(ListActivity.this);
+                                AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
+                                builder.setTitle("New group");
+                                builder.setPositiveButton("add", null);
+                                builder.setNegativeButton("cancel", null);
+                                builder.setView(editText);
+                                AlertDialog dialog = builder.create();
+                                dialog.show();
+                                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                                    @Override
+                                    public void onClick(View v) {
+                                        String groupName = editText.getText().toString();
+                                        if (groupName.isEmpty())
+                                            Toast.makeText(ListActivity.this, "input something?", Toast.LENGTH_SHORT).show();
+                                        else if (allGroups.contains(groupName))
+                                            Toast.makeText(ListActivity.this, "already exist", Toast.LENGTH_SHORT).show();
+                                        else {
+                                            TableOperate.getInstance().addGroup(groupName);
+                                            refreshGroups();
+                                            dialog.cancel();
+                                        }
+                                    }
+                                });
                                 break;
                             }
 
@@ -297,6 +335,7 @@ public class ListActivity extends AppCompatActivity {
                                         for (int i = 0; i < allGroupsArray.length; i++)
                                             if (selected[i])
                                                 TableOperate.getInstance().removeGroup(allGroupsArray[i]);
+                                        refreshGroups();
                                     }
                                 });
                                 builder.show();
@@ -346,10 +385,17 @@ public class ListActivity extends AppCompatActivity {
         });
     }
 
+    void updateList() {
+        if (currentGroup.isEmpty())
+            noteAdapter.updateAllNotesList();
+        else
+            noteAdapter.updateGroupNotesList(currentGroup);
+    }
+
     // refresh the list
     private void enableRefresh() {
         this.ultimateRecyclerView.setDefaultOnRefreshListener(() -> new Handler().postDelayed(() -> {
-            noteAdapter.updateAllNotesList();
+            updateList();
             ListActivity.this.ultimateRecyclerView.setRefreshing(false);
             layoutManager.scrollToPosition(0);
         }, 500));
