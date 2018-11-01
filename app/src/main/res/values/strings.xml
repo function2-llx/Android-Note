@@ -83,4 +83,6 @@
     <string name="share">Share</string>
     <string name="set_group">set group</string>
     <string name="groups">Groups</string>
+    <string name="add_group">add group</string>
+    <string name="remove_group">remove group</string>
 </resources>

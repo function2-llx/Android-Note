@@ -258,31 +258,39 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
                     }
 
                     case R.id.set_group: {
+                        List<String> groupName = TableOperate.getInstance().getAllGroup();
+
                         View dialogView = View.inflate(activity, R.layout.set_group_dialog, null);
-                        EditText editText = dialogView.findViewById(R.id.edit_text);
-                        editText.setText(selectedNote.getGroupName());
 
                         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
-                        builder.setTitle("group name");
+                        builder.setTitle("set group");
                         builder.setView(dialogView);
                         builder.setPositiveButton("confirm", null);
                         builder.setNegativeButton("cancel", null);
-
-                        AlertDialog dialog = builder.create();
-                        dialog.setCancelable(false);
-                        dialog.show();
-                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                        builder.setSingleChoiceItems(groupName.toArray(new String[0]), 0, new DialogInterface.OnClickListener() {
                             @Override
-                            public void onClick(View v) {
-                                String groupName = editText.getText().toString();
-                                if (!groupName.isEmpty()) {
-                                    selectedNote.setGroupName(groupName);
-                                    TableOperate.getInstance().modify(selectedNote);
-                                    dialog.cancel();
-
-                                }
+                            public void onClick(DialogInterface dialog, int which) {
+                                selectedNote.setGroupName(groupName.get(which));
+                                TableOperate.getInstance().modify(selectedNote);
                             }
                         });
+                        builder.show();
+
+//                        AlertDialog dialog = builder.create();
+//                        dialog.setCancelable(false);
+//                        dialog.show();
+//                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+//                            @Override
+//                            public void onClick(View v) {
+////                                String groupName = editText.getText().toString();
+////                                if (!groupName.isEmpty()) {
+////                                    selectedNote.setGroupName(groupName);
+////                                    TableOperate.getInstance().modify(selectedNote);
+////                                    dialog.cancel();
+////                                }
+//                                dialog.cancel();
+//                            }
+//                        });
                     }
                 }
                 return true;
