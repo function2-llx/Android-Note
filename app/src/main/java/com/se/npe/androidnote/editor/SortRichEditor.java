@@ -7,7 +7,6 @@ import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.ViewDragHelper;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -40,6 +39,7 @@ import com.yydcdut.markdown.MarkdownEditText;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -116,10 +116,6 @@ public class SortRichEditor extends ScrollView {
     private LinearLayout parentLayout;
 
     private LinearLayout containerLayout;
-
-    private OnKeyListener editTextKeyListener;
-
-    private OnClickListener deleteListener;
 
     private OnFocusChangeListener focusListener;
 
@@ -290,21 +286,25 @@ public class SortRichEditor extends ScrollView {
                 editText.setLayoutParams(lp);
                 AlertDialog.Builder inputDialog =
                         new AlertDialog.Builder(getContext());
-                inputDialog.setTitle("Tag Name").setView(editText);
+                inputDialog.setTitle("Tag name").setView(editText);
                 inputDialog.setPositiveButton("Ok",
                         (dialog, which) -> {
-                            String input = editText.getText().toString();
+                            tags.clearAllSelect();
+                            String input = editText.getText().toString().trim();
+                            ArrayList<String> list = new ArrayList<>(tags.getLabels());
                             if (input.isEmpty()) {
                                 Toast.makeText(getContext(), "Input is empty", Toast.LENGTH_SHORT).show();
+                            } else if (list.contains(input)) {
+                                Toast.makeText(getContext(), "Duplicate tag", Toast.LENGTH_SHORT).show();
                             } else {
-                                ArrayList<String> list = new ArrayList<>(tags.getLabels());
                                 list.add(list.size() - 2, input);
                                 tags.setLabels(list);
                             }
                         }).show();
             } else if (position == tags.getLabels().size() - 1) {
                 ArrayList<String> list = new ArrayList<>(tags.getLabels());
-                List<Integer> remove = tags.getSelectLabels();
+                ArrayList<Integer> remove = new ArrayList<>(tags.getSelectLabels());
+                Collections.sort(remove);
                 for (int i = 0; i < remove.size(); ++i) {
                     if (remove.get(i) < tags.getLabels().size() - 2) {
                         list.remove(remove.get(i) - i);
@@ -322,15 +322,19 @@ public class SortRichEditor extends ScrollView {
                 1000);
         emptyView.setLayoutParams(lp);
         emptyView.setOnClickListener(v -> {
-            int childCount = containerLayout.getChildCount();
-            if (childCount == 0 || !(containerLayout.getChildAt(childCount - 1) instanceof TextView)) {
-                insertEditTextAtIndex(childCount, "");
+            if (isSort) {
+                endSortUI();
+            } else {
+                int childCount = containerLayout.getChildCount();
+                if (childCount == 0 || !(containerLayout.getChildAt(childCount - 1) instanceof TextView)) {
+                    insertEditTextAtIndex(childCount, "");
+                }
+                DeletableEditText lastEdit = (DeletableEditText)
+                        containerLayout.getChildAt(containerLayout.getChildCount() - 2);
+                lastEdit.requestFocus();
+                lastEdit.setController(markdownController);
+                lastFocusEdit = lastEdit;
             }
-            DeletableEditText lastEdit = (DeletableEditText)
-                    containerLayout.getChildAt(containerLayout.getChildCount() - 2);
-            lastEdit.requestFocus();
-            lastEdit.setController(markdownController);
-            lastFocusEdit = lastEdit;
         });
         parentLayout.addView(emptyView);
     }
@@ -346,24 +350,6 @@ public class SortRichEditor extends ScrollView {
     }
 
     private void initListener() {
-        // when pressing delete key, some view need to be merged
-        // i.e, two edit texts were separated by an image view
-        // and the image view is now deleted, then the two edit texts are merged
-        editTextKeyListener = (v, keyCode, event) -> {
-            if (event.getAction() == KeyEvent.ACTION_DOWN
-                    && event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
-                EditText edit = (EditText) v;
-                onBackspacePress(edit);
-            }
-            return false;
-        };
-
-        // delete a media
-        deleteListener = v -> {
-            RelativeLayout parentView = (RelativeLayout) v.getParent();
-            onMediaDeleteClick(parentView);
-        };
-
         focusListener = (v, hasFocus) -> {
             if (v instanceof RelativeLayout) { // media
                 showOrHideKeyboard(false);
@@ -648,7 +634,7 @@ public class SortRichEditor extends ScrollView {
     }
 
     // delete the view containing media(triggered by the delete button)
-    // @param view is the whole RelativeLayout
+    // @param view is the whole RelativeLayout or the placeholder(ImageView)
     private void onMediaDeleteClick(View view) {
         if (!mTransition.isRunning()) {
             int index = containerLayout.indexOfChild(view);
@@ -672,6 +658,16 @@ public class SortRichEditor extends ScrollView {
             if (child instanceof ImageView) {
                 // if the view here is a placeholder, delete it together
                 containerLayout.removeView(child);
+            }
+            if (view instanceof RelativeLayout) {
+                View media = ((RelativeLayout) view).getChildAt(0);
+                if (media instanceof SoundPlayer) {
+                    ((SoundPlayer) media).destroy();
+                } else if (media instanceof VideoPlayer) {
+                    if (((VideoPlayer) media).getJzvdStd().isCurrentPlay()) {
+                        ((VideoPlayer) media).getJzvdStd().onAutoCompletion();
+                    }
+                }
             }
             containerLayout.removeView(view);
         }
@@ -712,7 +708,17 @@ public class SortRichEditor extends ScrollView {
         editText.setBackgroundResource(android.R.color.transparent);
         editText.setTextColor(Color.parseColor("#333333"));
         editText.setTextSize(14);
-        editText.setOnKeyListener(editTextKeyListener);
+        // when pressing delete key, some view need to be merged
+        // i.e, two edit texts were separated by an image view
+        // and the image view is now deleted, then the two edit texts are merged
+        editText.setOnKeyListener((v, keyCode, event) -> {
+            if (event.getAction() == KeyEvent.ACTION_DOWN
+                    && event.getKeyCode() == KeyEvent.KEYCODE_DEL) {
+                EditText edit = (EditText) v;
+                onBackspacePress(edit);
+            }
+            return false;
+        });
         editText.setOnFocusChangeListener(focusListener);
 
         LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
@@ -763,7 +769,10 @@ public class SortRichEditor extends ScrollView {
         setFocusOnView(layout, true);
 
         closeImage.setTag(layout.getTag());
-        closeImage.setOnClickListener(deleteListener);
+        closeImage.setOnClickListener(v -> {
+            RelativeLayout parentView = (RelativeLayout) v.getParent();
+            onMediaDeleteClick(parentView);
+        });
 
         layout.setLayoutParams(params);
         return layout;
@@ -931,6 +940,8 @@ public class SortRichEditor extends ScrollView {
                 if (Math.abs(ev.getY() - preY) >= viewDragHelper.getTouchSlop()) {
                     showOrHideKeyboard(false);
                 }
+                break;
+            default:
                 break;
         }
         return super.onTouchEvent(ev);

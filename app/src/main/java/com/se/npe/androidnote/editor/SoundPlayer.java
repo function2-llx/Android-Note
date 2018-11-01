@@ -42,11 +42,11 @@ public class SoundPlayer extends RelativeLayout {
     private ProgressBar progressBar;
     private EditText editText;
 
-    public SoundPlayer(Context context) {
+    SoundPlayer(Context context) {
         this(context, null);
     }
 
-    public SoundPlayer(Context context, AttributeSet attrs) {
+    SoundPlayer(Context context, AttributeSet attrs) {
         super(context, attrs);
         LayoutInflater.from(context).inflate(R.layout.sound_player, this);
         mediaPlayer = new MediaPlayer();
