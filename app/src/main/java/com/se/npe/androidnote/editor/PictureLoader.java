@@ -13,7 +13,6 @@ public class PictureLoader extends AsyncTask<String, Void, Bitmap> {
     private int resultWidth; // always fill the width
 
     public PictureLoader(ImageView target, int resultWidth) {
-        super();
         this.target = new WeakReference<>(target);
         this.resultWidth = resultWidth;
     }

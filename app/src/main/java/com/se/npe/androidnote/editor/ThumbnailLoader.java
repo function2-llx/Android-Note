@@ -11,8 +11,7 @@ import java.lang.ref.WeakReference;
 public class ThumbnailLoader extends AsyncTask<String, Void, Bitmap> {
     private WeakReference<ImageView> target;
 
-    public ThumbnailLoader(ImageView target) {
-        super();
+    ThumbnailLoader(ImageView target) {
         this.target = new WeakReference<>(target);
     }
 
