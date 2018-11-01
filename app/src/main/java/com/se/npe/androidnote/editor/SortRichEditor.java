@@ -3,12 +3,11 @@ package com.se.npe.androidnote.editor;
 import android.animation.LayoutTransition;
 import android.app.AlertDialog;
 import android.content.Context;
-import android.content.DialogInterface;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.ViewDragHelper;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -191,6 +190,7 @@ public class SortRichEditor extends ScrollView {
         initLineView();
         initTag();
         initContainerLayout();
+        initEmptyView();
 
         viewDragHelper = ViewDragHelper.create(containerLayout, 1.5f, new ViewDragHelperCallBack());
     }
@@ -314,6 +314,25 @@ public class SortRichEditor extends ScrollView {
             }
         });
         parentLayout.addView(tags);
+    }
+
+    private void initEmptyView() {
+        RelativeLayout emptyView = new RelativeLayout(getContext());
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                1000);
+        emptyView.setLayoutParams(lp);
+        emptyView.setOnClickListener(v -> {
+            int childCount = containerLayout.getChildCount();
+            if (childCount == 0 || !(containerLayout.getChildAt(childCount - 1) instanceof TextView)) {
+                insertEditTextAtIndex(childCount, "");
+            }
+            DeletableEditText lastEdit = (DeletableEditText)
+                    containerLayout.getChildAt(containerLayout.getChildCount() - 2);
+            lastEdit.requestFocus();
+            lastEdit.setController(markdownController);
+            lastFocusEdit = lastEdit;
+        });
+        parentLayout.addView(emptyView);
     }
 
     private void initParentLayout() {
@@ -597,13 +616,6 @@ public class SortRichEditor extends ScrollView {
                 preChild = child;
             }
         }
-
-        // if the last view is not an edit text, add one
-        int lastIndex = containerLayout.getChildCount() - 1;
-        View view = containerLayout.getChildAt(lastIndex);
-        if (!(view instanceof TextView)) {
-            insertEditTextAtIndex(lastIndex + 1, "");
-        }
     }
 
     private void onBackspacePress(EditText editTxt) {
@@ -803,9 +815,6 @@ public class SortRichEditor extends ScrollView {
         // + 2 to skip the text view
         indexInsert.accept(lastEditIndex + 2);
         showOrHideKeyboard(false);
-        if (!(containerLayout.getChildAt(containerLayout.getChildCount() - 1) instanceof TextView)) {
-            insertEditTextAtIndex(containerLayout.getChildCount(), "");
-        }
     }
 
     private void insertMediaAtIndex(int index, RelativeLayout mediaLayout) {
@@ -1014,12 +1023,6 @@ public class SortRichEditor extends ScrollView {
                     } else if (data instanceof SoundData) {
                         ref.insertSoundAtIndex(currentChild, data.getPath());
                         ref.lastAddedSoundPlayer.getEditText().setText(data.getText());
-                    }
-                }
-                if (ref.containerLayout.getChildCount() != 0) {
-                    View lastChild = ref.containerLayout.getChildAt(ref.containerLayout.getChildCount() - 1);
-                    if (!(lastChild instanceof TextView)) {
-                        ref.insertEditTextAtIndex(ref.containerLayout.getChildCount(), "");
                     }
                 }
             }
