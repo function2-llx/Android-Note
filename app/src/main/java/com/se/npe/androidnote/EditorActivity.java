@@ -150,6 +150,8 @@ public class EditorActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
