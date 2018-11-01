@@ -11,6 +11,13 @@ public class TableConfig {
         public static final String NOTE_START_TIME = "note_start_time";
         public static final String NOTE_MODIFY_TIME = "note_modify_time";
         public static final String NOTE_TAG = "note_tag";
+        public static final String NOTE_GROUP = "note_group";
+    }
+
+    public static final String GROUP_TABLE = "GroupTable";
+
+    public static class Group {
+        public static final String GROUP_NAME = "group_name";
     }
 
     public static class FileSave {

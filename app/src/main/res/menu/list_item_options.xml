@@ -1,9 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:title="@string/preview"
-        android:id="@+id/preview" />
+        android:id="@+id/preview"
+        android:title="@string/preview" />
     <item
         android:id="@+id/delete"
         android:title="@string/delete" />
+
+    <item android:id="@+id/set_group"
+        android:title="@string/set_group" />
 </menu>

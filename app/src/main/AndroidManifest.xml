@@ -8,10 +8,12 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <!--读取网络信息状态 -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!--获取当前wifi状态 -->
+    <!--获取当前WiFi状态 -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <!--允许程序改变网络连接状态 -->
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <!--允许程序改变WiFi连接状态-->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <!--读取手机信息权限 -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <!--读取联系人权限，上传联系人需要用到此权限 -->
@@ -20,14 +22,10 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!--外存储读权限，构建语法需要用到此权限 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-
-
-    <!-- 短信验证登陆功能需要添加次权限来自动填充验证码，用不到可以去掉 -->
-    <uses-permission android:name="android.permission.RECEIVE_SMS" />
-
-    <!--配置权限，用来记录应用配置信息 -->
-    <!--Permission is only granted to system apps -->
-    <!--<uses-permission android:name="android.permission.WRITE_SETTINGS" />-->
+    <!--获取账户信息，用于分享功能-->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <!--改变账户信息，用于分享功能-->
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
     <!--手机定位信息，用来为语义等功能提供定位，提供更精准的服务-->
     <!--定位信息是敏感信息，可通过Setting.setLocationEnable(false)关闭定位请求 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -72,5 +70,40 @@
             </intent-filter>
         </activity>
 
+        <!-- MobSDK有关分享的activity -->
+        <activity
+            android:name="com.mob.tools.MobUIShell"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:windowSoftInputMode="stateHidden|adjustResize">
+            <!--QQ分享回调-->
+            <intent-filter>
+                <!--从QQ得到的AppId-->
+                <data android:scheme="tencent100371282" />
+                <action android:name="android.intent.action.VIEW" />
+
+                <category android:name="android.intent.category.BROWSABLE" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+            <!-- 调用新浪原生SDK，需要注册的回调activity -->
+            <intent-filter>
+                <action android:name="com.sina.weibo.sdk.action.ACTION_SDK_REQ_ACTIVITY" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <!--微信分享回调 -->
+        <activity
+            android:name=".share.wechat.WXEntryActivity"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:exported="true"
+            android:screenOrientation="portrait"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+        <!-- 填写您从Mob开发者后台中得到的AppKey和AppSecret -->
+        <meta-data
+            android:name="Mob-AppKey"
+            android:value="28765cffe4a40" />
+        <meta-data
+            android:name="Mob-AppSecret"
+            android:value="5f3c3c3c32e727d3fb2c874f7446150a" />
     </application>
 </manifest>

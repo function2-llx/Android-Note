@@ -14,27 +14,15 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.graphics.drawable.DrawerArrowDrawable;
 import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.SearchView;
 import android.support.v7.widget.Toolbar;
-import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
-import android.view.View;
-import android.view.Window;
-import android.widget.ListView;
-import android.widget.TextView;
 
-import com.jeremyfeinstein.slidingmenu.lib.SlidingMenu;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
-import com.marshalchen.ultimaterecyclerview.itemTouchHelper.SimpleItemTouchHelperCallback;
-import com.mob.MobSDK;
-import com.se.npe.androidnote.adapters.GroupAdapter;
 import com.se.npe.androidnote.adapters.NoteAdapter;
-import com.se.npe.androidnote.events.NoteDeleteEvent;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.TableOperate;
 import com.yydcdut.markdown.MarkdownConfiguration;
@@ -42,15 +30,8 @@ import com.yydcdut.markdown.MarkdownProcessor;
 import com.yydcdut.markdown.syntax.text.TextFactory;
 import com.yydcdut.markdown.theme.ThemeSunburst;
 
-import org.greenrobot.eventbus.EventBus;
-
-import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
-
-import cn.sharesdk.framework.ShareSDK;
-
 
 /**
  * show a list of the preview of note(data stored in noteCollection)
@@ -60,42 +41,13 @@ import cn.sharesdk.framework.ShareSDK;
  */
 public class ListActivity extends AppCompatActivity {
     private LinearLayoutManager layoutManager;
-    private NoteAdapter noteAdapter, searchAdapter;
+    private NoteAdapter noteAdapter;
     private UltimateRecyclerView ultimateRecyclerView;
     private ActionBarDrawerToggle drawerToggle;
-    private DrawerArrowDrawable drawerArrowDrawable;
     private DrawerLayout drawerLayout;
     private Toolbar toolbar;
-    private AnimationDrawable animationDrawable;
-
-
 
     /* Options menu */
-
-    final static int MENU_SORT_GROUP_ID = 2333;
-
-    private void setSortOption(int sortOptionId) {
-        TableOperate.setSearchConfig(sortOptionId);
-
-
-        switch (sortOptionId) {
-            case R.id.sort_title: {
-                noteAdapter.setComparator(Comparator.comparing(Note::getTitle));
-                break;
-            }
-
-            case R.id.sort_created_time: {
-                noteAdapter.setComparator(Comparator.comparing(Note::getStartTime));
-                break;
-            }
-
-            case R.id.sort_modified_time: {
-                noteAdapter.setComparator(Comparator.comparing(Note::getModifyTime));
-                break;
-            }
-        }
-    }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -113,31 +65,29 @@ public class ListActivity extends AppCompatActivity {
         }
 
         SubMenu sortMenu = menu.findItem(R.id.menu_sort).getSubMenu();
-        int sortOptionId;
-        int selectedId = TableOperate.getSearchConfig();
-        if (selectedId != -1) {
-            boolean flag = false;
+        boolean newSortOption = true;
+        int sortOptionId = TableOperate.getSearchConfig();
+        if (sortOptionId != -1) { // used sort option
             for (int i = 0; i < sortMenu.size(); i++) {
-                if (sortMenu.getItem(i).getItemId() == selectedId) {
-                    flag = true;
+                MenuItem item = sortMenu.getItem(i);
+                if (item.getItemId() == sortOptionId) {
+                    newSortOption = false;
+                    item.setChecked(true);
                     break;
                 }
             }
-            if (!flag)
-                sortOptionId = R.id.sort_title;
-            else
-                sortOptionId = selectedId;
-        } else sortOptionId = R.id.sort_title;
-
-        for (int i = 0; i < sortMenu.size(); i++) {
-            MenuItem item = sortMenu.getItem(i);
-            if (item.getItemId() == sortOptionId) {
-                item.setChecked(true);
-                break;
+        }
+        if (newSortOption) { // initialize sort option
+            setSortOption(R.id.sort_title);
+            for (int i = 0; i < sortMenu.size(); i++) {
+                MenuItem item = sortMenu.getItem(i);
+                if (item.getItemId() == R.id.sort_title) {
+                    item.setChecked(true);
+                    break;
+                }
             }
         }
 
-        setSortOption(sortOptionId);
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -151,12 +101,7 @@ public class ListActivity extends AppCompatActivity {
             }
 
             case R.id.clear: {
-                int size = noteAdapter.getAdapterItemCount();
-                for (int i = 0; i < size; i++) {
-                    Note note = noteAdapter.getItem(0);
-                    noteAdapter.remove(0);
-                    EventBus.getDefault().post(new NoteDeleteEvent(note));
-                }
+                noteAdapter.clear();
                 break;
             }
 
@@ -181,6 +126,33 @@ public class ListActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    private void setSortOption(int sortOptionId) {
+        TableOperate.setSearchConfig(sortOptionId);
+
+        switch (sortOptionId) {
+            case R.id.sort_title: {
+                noteAdapter.setComparator(Comparator.comparing(Note::getTitle));
+                break;
+            }
+
+            case R.id.sort_created_time: {
+                noteAdapter.setComparator(Comparator.comparing(Note::getStartTime));
+                break;
+            }
+
+            case R.id.sort_modified_time: {
+                noteAdapter.setComparator(Comparator.comparing(Note::getModifyTime));
+                break;
+            }
+        }
+    }
+
+    @Override
+    public void setTitle(CharSequence title) {
+        Objects.requireNonNull(getSupportActionBar()).setTitle(title);
+
+    }
+
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 //        requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -196,30 +168,10 @@ public class ListActivity extends AppCompatActivity {
         this.ultimateRecyclerView = this.findViewById(R.id.ultimate_recycler_view);
         this.ultimateRecyclerView.setLayoutManager(layoutManager);
 
-
-        //magic do not touch
-        List<Note> testNoteList = new ArrayList<>();
-        testNoteList.add(new Note());
-        this.noteAdapter = new NoteAdapter(testNoteList, this);
-        EventBus.getDefault().register(noteAdapter);
+        this.noteAdapter = new NoteAdapter(this);
         this.ultimateRecyclerView.setAdapter(noteAdapter);
-        this.noteAdapter.notifyDataSetChanged();
-        this.noteAdapter.clear();
+        this.noteAdapter.updateAllNotesList();
 
-
-        this.noteAdapter.updateList(TableOperate.getInstance().getAllNotes());
-
-//        this.ultimateRecyclerView.reenableLoadmore();
-//        this.noteAdapter.setCustomLoadMoreView(LayoutInflater.from(this).inflate(R.layout.custom_bottom_progressbar, null));
-//        ultimateRecyclerView.setOnLoadMoreListener((itemsCount, maxLastVisiblePosition) -> {
-//            Handler handler = new Handler();
-//            handler.postDelayed(() -> {
-//                noteList.add(new Note());
-//                noteAdapter.notifyDataSetChanged();
-//            }, 1000);
-//        });
-
-//        this.enableDrag();
 
 
         this.enableRefresh();
@@ -232,7 +184,29 @@ public class ListActivity extends AppCompatActivity {
         initNavigationView();
         initDrawerToggle();
 //        MobSDK.init(this);
+        //        this.ultimateRecyclerView.reenableLoadmore();
+//        this.noteAdapter.setCustomLoadMoreView(LayoutInflater.from(this).inflate(R.layout.custom_bottom_progressbar, null));
+//        ultimateRecyclerView.setOnLoadMoreListener((itemsCount, maxLastVisiblePosition) -> {
+//            Handler handler = new Handler();
+//            handler.postDelayed(() -> {
+//                noteList.add(new Note());
+//                noteAdapter.notifyDataSetChanged();
+//            }, 1000);
+//        });
 
+//        this.enableDrag();
+
+    }
+
+    @Override
+    protected void onResume() {
+        noteAdapter.updateAllNotesList();
+        super.onResume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 
     private void initDrawerToggle() {
@@ -246,14 +220,22 @@ public class ListActivity extends AppCompatActivity {
     void initNavigationView() {
         NavigationView navigationView = findViewById(R.id.nav_view);
         Menu menu = navigationView.getMenu();
+        SubMenu groupMenu = menu.findItem(R.id.groups).getSubMenu();
         navigationView.setItemIconTintList(null);
-        menu.add("test");
+        for (String groupName: TableOperate.getInstance().getAllGroup())
+            groupMenu.add(groupName);
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
 //                drawerLayout.closeDrawers();
-                if (menuItem.getItemId() == R.id.all_notes)
-                    ultimateRecyclerView.setAdapter(noteAdapter);
+                if (menuItem.getItemId() == R.id.all_notes) {
+                    noteAdapter.updateAllNotesList();
+                    setTitle(getString(R.string.list_title));
+                } else {
+                    String groupName = menuItem.getTitle().toString();
+                    noteAdapter.updateGroupNotesList(groupName);
+                    setTitle(groupName);
+                }
                 return true;
             }
         });
@@ -272,21 +254,18 @@ public class ListActivity extends AppCompatActivity {
 //        slidingMenu.setMenu(R.layout.sliding_menu_list);
 //        slidingMenu.setTouchModeBehind(SlidingMenu.TOUCHMODE_FULLSCREEN);
 //    }
-
     private void configureSearchView(@NonNull SearchView searchView) {
         searchView.setQueryHint("search by title...");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                searchAdapter = new NoteAdapter(TableOperate.getInstance().getSearchResultFuzzy(query), ListActivity.this);
-                ultimateRecyclerView.setAdapter(searchAdapter);
+                noteAdapter.updateSearchList(query);
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                searchAdapter = new NoteAdapter(TableOperate.getInstance().getSearchResultFuzzy(newText), ListActivity.this);
-                ultimateRecyclerView.setAdapter(searchAdapter);
+                noteAdapter.updateSearchList(newText);
                 return true;
             }
         });
@@ -297,40 +276,12 @@ public class ListActivity extends AppCompatActivity {
         });
     }
 
-    //refresh the list
+    // refresh the list
     private void enableRefresh() {
         this.ultimateRecyclerView.setDefaultOnRefreshListener(() -> new Handler().postDelayed(() -> {
-            noteAdapter.updateList(TableOperate.getInstance().getAllNotes());
+            noteAdapter.updateAllNotesList();
             ListActivity.this.ultimateRecyclerView.setRefreshing(false);
-            // ultimateRecyclerView.scrollBy(0, -50);
             layoutManager.scrollToPosition(0);
         }, 500));
     }
-
-    // drag the view
-    private void enableDrag() {
-        ItemTouchHelper.Callback callback = new SimpleItemTouchHelperCallback(noteAdapter);
-        itemTouchHelper = new ItemTouchHelper(callback);
-        itemTouchHelper.attachToRecyclerView(ultimateRecyclerView.mRecyclerView);
-        noteAdapter.setOnDragStartListener(new NoteAdapter.OnStartDragListener() {
-            @Override
-            public void onStartDrag(RecyclerView.ViewHolder viewHolder) {
-                itemTouchHelper.startDrag(viewHolder);
-            }
-        });
-    }
-
-    @Override
-    protected void onDestroy() {
-        EventBus.getDefault().unregister(noteAdapter);
-        super.onDestroy();
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-    }
-
-    private ItemTouchHelper itemTouchHelper;
-
 }

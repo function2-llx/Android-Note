@@ -39,11 +39,17 @@ public class Note {
         String text;
         public @NonNull
         String picturePath;
+        public @NonNull
+        Date startTime;
+        public @NonNull
+        Date modifyTime;
 
-        public PreviewData(@NonNull String title, @NonNull String text, @NonNull String picturePath) {
+        public PreviewData(@NonNull String title, @NonNull String text, @NonNull String picturePath, @NonNull Date startTime, @NonNull Date modifyTime) {
             this.title = title;
             this.text = text;
             this.picturePath = picturePath;
+            this.startTime = startTime;
+            this.modifyTime = modifyTime;
         }
     }
 
@@ -53,6 +59,7 @@ public class Note {
     private Date modifyTime = new Date(0);
     private List<String> tag;
     private int indexDB = -1;
+    private String groupName = "NoGroup";
 
     public Note() {
         this.title = "this is tile for " + indexDB;
@@ -72,13 +79,14 @@ public class Note {
         this.tag = tag;
     }
 
-    public Note(String title, List<IData> content, int index, String timeStart, String timeModify, List<String> tag) {
+    public Note(String title, List<IData> content, int index, String timeStart, String timeModify, List<String> tag, String groupName) {
         this.indexDB = index;
         this.title = title;
         this.content = content;
         this.tag = tag;
         this.startTime.setTime(Long.parseLong(timeStart));
         this.modifyTime.setTime(Long.parseLong(timeModify));
+        this.groupName = groupName;
     }
 
     public String getTitle() {
@@ -88,6 +96,10 @@ public class Note {
     public void setTitle(String title) {
         this.title = title;
     }
+
+    public String getGroupName() { return groupName; }
+
+    public void setGroupName(String groupName) { this.groupName = groupName; }
 
     public List<IData> getContent() {
         return content;
@@ -131,18 +143,18 @@ public class Note {
 
     public PreviewData getPreview() {
         String text = null;
-        String picpath = null;
-        List<IData> templist = getContent();
-        for (int i = 0; i < templist.size(); i++) {
-            if (picpath == null && templist.get(i).toString().charAt(0) == 'P') {
-                picpath = templist.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
-            } else if (text == null && templist.get(i).toString().charAt(0) == 'T') {
-                text = templist.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
+        String picPath = null;
+        List<IData> content = getContent();
+        for (int i = 0; i < content.size(); i++) {
+            if (picPath == null && content.get(i).toString().charAt(0) == 'P') {
+                picPath = content.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
+            } else if (text == null && content.get(i).toString().charAt(0) == 'T') {
+                text = content.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
             }
         }
         if (text == null) text = "无预览文字";
-        if (picpath == null) picpath = "";
-        return new Note.PreviewData(title, text, picpath);
+        if (picPath == null) picPath = "";
+        return new Note.PreviewData(title, text, picPath, startTime, modifyTime);
     }
 
     public void loadFromFile(String fileName) {
@@ -341,7 +353,7 @@ public class Note {
         }
 
         //文件压缩
-         FileOperate.zip(TableConfig.SAVE_PATH + "/NoteSave/TempFloder", TableConfig.SAVE_PATH + "/NoteSave/" + fileName + ".zip");
+        FileOperate.zip(TableConfig.SAVE_PATH + "/NoteSave/TempFloder", TableConfig.SAVE_PATH + "/NoteSave/" + fileName + ".zip");
 
 
         //文件夹删除

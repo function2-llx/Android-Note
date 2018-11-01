@@ -36,6 +36,7 @@ import com.se.npe.androidnote.editor.SortRichEditor;
 import com.se.npe.androidnote.events.NoteModifyEvent;
 import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
+import com.se.npe.androidnote.models.TableOperate;
 import com.se.npe.androidnote.sound.ResultPool;
 import com.se.npe.androidnote.util.Logger;
 import com.yydcdut.markdown.MarkdownConfiguration;
@@ -107,9 +108,24 @@ public class EditorActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_save:
+
+            case android.R.id.home: {
+                finish();
+                break;
+            }
+
+            case R.id.menu_save: {
+                Note note = editor.buildNote();
+                if (oldNote != null)
+                    note.setIndex(oldNote.getIndex());
+                note.setStartTime(createTime);
+                note.setModifyTime(new Date());
+                TableOperate.getInstance().modify(note);
+                oldNote = note;
                 Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
                 break;
+            }
+
             case R.id.menu_markdown:
                 if (editor.changeIsMarkdown()) {
                     item.setTitle("Plain");
@@ -199,6 +215,9 @@ public class EditorActivity extends AppCompatActivity {
         if (getIntent().getBooleanExtra(VIEW_ONLY, false)) {
             editor.setViewOnly();
             insertMedia.setVisibility(View.GONE);
+            findViewById(R.id.sound_player_text).setVisibility(View.GONE);
+        } else {
+            editor.setMarkdownController(findViewById(R.id.scroll_edit));
         }
         // deferred built, or we will get NPE
         if (oldNote != null) {
@@ -358,17 +377,29 @@ public class EditorActivity extends AppCompatActivity {
         super.onBackPressed();
     }
 
+//    @Override
+//    protected void onPause() {
+//        super.onPause();
+//        Note note = editor.buildNote();
+//        if (oldNote != null) {
+//            note.setIndex(oldNote.getIndex());
+//        }
+//        note.setStartTime(this.createTime);
+//        note.setModifyTime(new Date());
+//        EventBus.getDefault().post(new NoteModifyEvent(note));
+//    }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        Note note = editor.buildNote();
+//        Note note = editor.buildNote();
         editor.destroy();
-        if (oldNote != null) {
-            note.setIndex(oldNote.getIndex());
-        }
-        note.setStartTime(this.createTime);
-        note.setModifyTime(new Date());
-        EventBus.getDefault().post(new NoteModifyEvent(note));
+//        if (oldNote != null) {
+//            note.setIndex(oldNote.getIndex());
+//        }
+//        note.setStartTime(this.createTime);
+//        note.setModifyTime(new Date());
+//        EventBus.getDefault().post(new NoteModifyEvent(note));
 
         EventBus.getDefault().removeAllStickyEvents();
         EventBus.getDefault().unregister(this);

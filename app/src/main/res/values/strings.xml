@@ -17,6 +17,8 @@
     <string name="sort_remind">Sort by remind data</string>
 
     <string name="title_capacity">%d/%d</string>
+    <string name="note_create_time">create: %s</string>
+    <string name="note_modify_time">modify: %s</string>
     <!-- Toolbar -->
     <string name="action_licenses">Licenses</string>
     <string name="action_settings">Settings</string>
@@ -79,4 +81,6 @@
     <string name="close">close</string>
     <string name="save">Save</string>
     <string name="share">Share</string>
+    <string name="set_group">set group</string>
+    <string name="groups">Groups</string>
 </resources>
