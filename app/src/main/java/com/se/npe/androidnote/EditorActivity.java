@@ -144,6 +144,7 @@ public class EditorActivity extends AppCompatActivity {
 //                sp.setTitle("test");
 //                wechatPlatform.setPlatformActionListener(this.platformActionListener);
 //                wechatPlatform.share(sp);
+                break;
             }
 
             case R.id.export: {
