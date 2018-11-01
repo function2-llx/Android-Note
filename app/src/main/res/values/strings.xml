@@ -81,6 +81,7 @@
     <string name="close">close</string>
     <string name="save">Save</string>
     <string name="share">Share</string>
+    <string name="export">Export</string>
     <string name="set_group">set group</string>
     <string name="groups">Groups</string>
 </resources>

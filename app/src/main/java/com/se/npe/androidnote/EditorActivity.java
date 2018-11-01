@@ -36,6 +36,7 @@ import com.se.npe.androidnote.editor.SortRichEditor;
 import com.se.npe.androidnote.events.NoteModifyEvent;
 import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
+import com.se.npe.androidnote.models.NotePdfConverter;
 import com.se.npe.androidnote.models.TableOperate;
 import com.se.npe.androidnote.sound.ResultPool;
 import com.se.npe.androidnote.util.Logger;
@@ -152,6 +153,17 @@ public class EditorActivity extends AppCompatActivity {
 //                wechatPlatform.setPlatformActionListener(this.platformActionListener);
 //                wechatPlatform.share(sp);
             }
+
+            case R.id.export: {
+                Note note = editor.buildNote();
+                note.setStartTime(createTime);
+                note.setModifyTime(new Date());
+                NotePdfConverter notePdfConverter = new NotePdfConverter(getApplicationContext());
+                notePdfConverter.exportNoteToFile(note, "test");
+                Toast.makeText(this, "Exported", Toast.LENGTH_SHORT).show();
+                break;
+            }
+
             default:
                 break;
         }

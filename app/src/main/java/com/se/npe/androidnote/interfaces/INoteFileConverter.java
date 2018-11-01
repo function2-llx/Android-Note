@@ -48,11 +48,15 @@ public interface INoteFileConverter {
 
         String exportFilePath = getExportFilePath(context, fileName);
         File exportFile = new File(exportFilePath);
-        // delete original file
-        exportFile.delete();
-        // create file
         try {
-            exportFile.createNewFile();
+            // delete original file
+            if (exportFile.exists() && exportDir.delete()) {
+                throw new IOException("delete fails");
+            }
+            // create file
+            if (!exportFile.createNewFile()) {
+                throw new IOException("createNewFile fails");
+            }
         } catch (IOException e) {
             Logger.log("CreateFile", e);
         }
@@ -67,6 +71,7 @@ public interface INoteFileConverter {
 
     @NonNull
     static String getExportFilePath(@NonNull Context context, String fileName) {
+        // ".pdf" will be automatically appended by ITextPdf
         return getExportDirPath(context) + fileName;
     }
 }
