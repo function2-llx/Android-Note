@@ -279,7 +279,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
                                     selectedNote.setGroupName(groupName);
                                     TableOperate.getInstance().modify(selectedNote);
                                     dialog.cancel();
-                                    activity.setNavigationView();
+
                                 }
                             }
                         });

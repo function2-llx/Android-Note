@@ -30,7 +30,9 @@ import com.yydcdut.markdown.MarkdownProcessor;
 import com.yydcdut.markdown.syntax.text.TextFactory;
 import com.yydcdut.markdown.theme.ThemeSunburst;
 
+import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -46,6 +48,8 @@ public class ListActivity extends AppCompatActivity {
     private ActionBarDrawerToggle drawerToggle;
     private DrawerLayout drawerLayout;
     private Toolbar toolbar;
+    NavigationView navigationView;
+    SubMenu groupMenu;
 
     /* Options menu */
 
@@ -215,12 +219,31 @@ public class ListActivity extends AppCompatActivity {
         drawerToggle.syncState();
     }
 
+    public void addGroupInNavigation(String groupName) {
+        groupMenu.add(groupName);
+    }
+
+    public void removeGroupInNavigation(String groupName) {
+
+    }
+
+    private List<String> getNavigationGroupList() {
+        List<String> navigationGroupList = new ArrayList<>();
+        for (int i = 1; i < groupMenu.size(); i++)
+            navigationGroupList.add(groupMenu.getItem(i).getTitle().toString());
+        return navigationGroupList;
+    }
+
+    private boolean hasGroupInNavigation(String groupName) {
+        return getNavigationGroupList().contains(groupName);
+    }
+
     public void setNavigationView() {
-        NavigationView navigationView = findViewById(R.id.nav_view);
+        this.navigationView = findViewById(R.id.nav_view);
         Menu menu = navigationView.getMenu();
-        SubMenu groupMenu = menu.findItem(R.id.groups).getSubMenu();
+        this.groupMenu = menu.findItem(R.id.groups).getSubMenu();
         navigationView.setItemIconTintList(null);
-        groupMenu.clear();
+
         for (String groupName: TableOperate.getInstance().getAllGroup())
             groupMenu.add(groupName);
 

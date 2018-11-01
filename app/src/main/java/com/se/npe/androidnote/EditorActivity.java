@@ -36,6 +36,7 @@ import com.se.npe.androidnote.editor.SortRichEditor;
 import com.se.npe.androidnote.events.NoteModifyEvent;
 import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
+import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
 import com.se.npe.androidnote.sound.ResultPool;
 import com.se.npe.androidnote.util.Logger;
@@ -122,6 +123,7 @@ public class EditorActivity extends AppCompatActivity {
                 note.setModifyTime(new Date());
                 TableOperate.getInstance().modify(note);
                 oldNote = note;
+
                 Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
                 break;
             }
