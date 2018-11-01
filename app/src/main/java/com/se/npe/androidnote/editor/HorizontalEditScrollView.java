@@ -168,6 +168,8 @@ public class HorizontalEditScrollView extends FrameLayout implements View.OnClic
             case R.id.img_link:
                 mLinkController.doImage();
                 break;
+            default:
+                break;
         }
     }
 
