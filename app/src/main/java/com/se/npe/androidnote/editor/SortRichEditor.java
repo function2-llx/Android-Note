@@ -39,6 +39,7 @@ import com.yydcdut.markdown.MarkdownEditText;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -285,21 +286,25 @@ public class SortRichEditor extends ScrollView {
                 editText.setLayoutParams(lp);
                 AlertDialog.Builder inputDialog =
                         new AlertDialog.Builder(getContext());
-                inputDialog.setTitle("Tag Name").setView(editText);
+                inputDialog.setTitle("Tag name").setView(editText);
                 inputDialog.setPositiveButton("Ok",
                         (dialog, which) -> {
-                            String input = editText.getText().toString();
+                            tags.clearAllSelect();
+                            String input = editText.getText().toString().trim();
+                            ArrayList<String> list = new ArrayList<>(tags.getLabels());
                             if (input.isEmpty()) {
                                 Toast.makeText(getContext(), "Input is empty", Toast.LENGTH_SHORT).show();
+                            } else if (list.contains(input)) {
+                                Toast.makeText(getContext(), "Duplicate tag", Toast.LENGTH_SHORT).show();
                             } else {
-                                ArrayList<String> list = new ArrayList<>(tags.getLabels());
                                 list.add(list.size() - 2, input);
                                 tags.setLabels(list);
                             }
                         }).show();
             } else if (position == tags.getLabels().size() - 1) {
                 ArrayList<String> list = new ArrayList<>(tags.getLabels());
-                List<Integer> remove = tags.getSelectLabels();
+                ArrayList<Integer> remove = new ArrayList<>(tags.getSelectLabels());
+                Collections.sort(remove);
                 for (int i = 0; i < remove.size(); ++i) {
                     if (remove.get(i) < tags.getLabels().size() - 2) {
                         list.remove(remove.get(i) - i);
