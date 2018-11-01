@@ -77,6 +77,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         holder.setTitle(data.title);
         holder.setText(data.text);
         holder.setCreateDate(data.startTime);
+        holder.setGroup(data.groupName);
         holder.setModifyDate(data.modifyTime);
         holder.setImage(data.picturePath);
     }
@@ -177,7 +178,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
      * @author llx
      */
     public class ViewHolder extends UltimateRecyclerviewViewHolder implements View.OnClickListener, View.OnLongClickListener {
-        private TextView title, text;
+        private TextView title, text, group;
         private TextView createTimeDisplayer, modifyTimeDisplayer;
         private ImageView imageView;
         int screenWidth = -1;
@@ -196,6 +197,10 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
             // title & text
             this.title = itemView.findViewById(R.id.text_view_title);
             this.text = itemView.findViewById(R.id.text_view_text);
+
+            //group the note belongs to
+            this.group = itemView.findViewById(R.id.text_view_group);
+
             // create & modify time
             int textWidth = getScreenWidth() / 3 * 2;
             this.createTimeDisplayer = itemView.findViewById(R.id.text_view_create_time);
@@ -212,6 +217,13 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 
         public void setText(String text) {
             this.text.setText(text);
+        }
+
+        public void setGroup(String group) {
+            if (group.isEmpty())
+                this.group.setText("");
+            else
+                this.group.setText("group: " + group);
         }
 
         public void setCreateDate(Date date) {
@@ -273,6 +285,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
                             public void onClick(DialogInterface dialog, int which) {
                                 selectedNote.setGroupName(groupName.get(selected[0]));
                                 TableOperate.getInstance().modify(selectedNote);
+                                activity.updateList();
                             }
                         });
                         builder.setNegativeButton("cancel", null);
@@ -299,6 +312,12 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 //                                dialog.cancel();
 //                            }
 //                        });
+                    }
+
+                    case R.id.remove_from_current_group: {
+                        selectedNote.setGroupName("");
+                        TableOperate.getInstance().modify(selectedNote);
+                        activity.updateList();
                     }
                 }
                 return true;

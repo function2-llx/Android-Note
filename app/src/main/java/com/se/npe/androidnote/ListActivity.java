@@ -228,30 +228,11 @@ public class ListActivity extends AppCompatActivity {
         drawerToggle.syncState();
     }
 
-    public void addGroupInNavigation(String groupName) {
-        groupMenu.add(groupName);
-    }
-
-    public void removeGroupInNavigation(String groupName) {
-
-    }
-
-    private List<String> getNavigationGroupList() {
-        List<String> navigationGroupList = new ArrayList<>();
-        for (int i = 1; i < groupMenu.size(); i++)
-            navigationGroupList.add(groupMenu.getItem(i).getTitle().toString());
-        return navigationGroupList;
-    }
-
-    private boolean hasGroupInNavigation(String groupName) {
-        return getNavigationGroupList().contains(groupName);
-    }
-
     private void refreshGroups() {
         groupMenu.removeGroup(R.id.group_groups);
         List<String> allGroups = TableOperate.getInstance().getAllGroup();
         for (int i = 0; i < allGroups.size(); i++) {
-            groupMenu.add(R.id.group_groups, i + 1, Menu.NONE, allGroups.get(i));
+            groupMenu.add(R.id.group_groups, Menu.NONE, Menu.NONE, allGroups.get(i));
         }
     }
 
@@ -262,10 +243,6 @@ public class ListActivity extends AppCompatActivity {
         navigationView.setItemIconTintList(null);
 
         refreshGroups();
-
-//        for (String groupName: TableOperate.getInstance().getAllGroup())
-//            groupMenu.add(R.id.group_groups, Menu.NONE, Menu.NONE, groupName);
-
 
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -307,7 +284,7 @@ public class ListActivity extends AppCompatActivity {
                                         if (groupName.isEmpty())
                                             Toast.makeText(ListActivity.this, "input something?", Toast.LENGTH_SHORT).show();
                                         else if (allGroups.contains(groupName))
-                                            Toast.makeText(ListActivity.this, "already exist", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(ListActivity.this, groupName + " already exist", Toast.LENGTH_SHORT).show();
                                         else {
                                             TableOperate.getInstance().addGroup(groupName);
                                             refreshGroups();
@@ -385,7 +362,7 @@ public class ListActivity extends AppCompatActivity {
         });
     }
 
-    void updateList() {
+    public void updateList() {
         if (currentGroup.isEmpty())
             noteAdapter.updateAllNotesList();
         else

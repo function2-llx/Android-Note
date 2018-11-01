@@ -37,6 +37,10 @@ public class Note {
         String title;
         public @NonNull
         String text;
+
+        public @NonNull
+        String groupName;
+
         public @NonNull
         String picturePath;
         public @NonNull
@@ -44,9 +48,10 @@ public class Note {
         public @NonNull
         Date modifyTime;
 
-        public PreviewData(@NonNull String title, @NonNull String text, @NonNull String picturePath, @NonNull Date startTime, @NonNull Date modifyTime) {
+        public PreviewData(@NonNull String title, @NonNull String text, @NonNull String groupName, @NonNull String picturePath, @NonNull Date startTime, @NonNull Date modifyTime) {
             this.title = title;
             this.text = text;
+            this.groupName = groupName;
             this.picturePath = picturePath;
             this.startTime = startTime;
             this.modifyTime = modifyTime;
@@ -154,7 +159,7 @@ public class Note {
         }
         if (text == null) text = "无预览文字";
         if (picPath == null) picPath = "";
-        return new Note.PreviewData(title, text, picPath, startTime, modifyTime);
+        return new Note.PreviewData(title, text, groupName, picPath, startTime, modifyTime);
     }
 
     public void loadFromFile(String fileName) {
