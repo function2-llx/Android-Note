@@ -1,11 +1,13 @@
 package com.se.npe.androidnote.editor;
 
 import android.animation.LayoutTransition;
+import android.app.AlertDialog;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.widget.ViewDragHelper;
 import android.text.Editable;
 import android.text.InputFilter;
@@ -24,7 +26,9 @@ import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
+import com.donkingliang.labels.LabelsView;
 import com.se.npe.androidnote.R;
 import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.models.Note;
@@ -166,6 +170,8 @@ public class SortRichEditor extends ScrollView {
 
     private boolean isMarkdown = false;
 
+    private LabelsView tags;
+
     private HorizontalEditScrollView markdownController = null;
 
     public SortRichEditor(Context context) {
@@ -182,7 +188,9 @@ public class SortRichEditor extends ScrollView {
         initParentLayout();
         initTitleLayout();
         initLineView();
+        initTag();
         initContainerLayout();
+        initEmptyView();
 
         viewDragHelper = ViewDragHelper.create(containerLayout, 1.5f, new ViewDragHelperCallBack());
     }
@@ -255,6 +263,76 @@ public class SortRichEditor extends ScrollView {
 
         titleLayout.addView(title);
         titleLayout.addView(textLimit);
+    }
+
+    private void initTag() {
+        tags = new LabelsView(getContext());
+        final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        lp.leftMargin = DEFAULT_MARGIN;
+        lp.rightMargin = DEFAULT_MARGIN;
+        lp.topMargin = DEFAULT_MARGIN;
+        tags.setLayoutParams(lp);
+        tags.setLabelBackgroundResource(R.drawable.label_bg);
+        tags.setLabelTextPadding(dip2px(10)
+                , dip2px(5), dip2px(10), dip2px(5));
+        tags.setLabelTextSize(dip2px(14));
+        tags.setLineMargin(10);
+        tags.setWordMargin(10);
+        ArrayList<String> labels = new ArrayList<>();
+        labels.add("Add");
+        labels.add("Delete");
+        tags.setLabels(labels);
+        tags.setSelectType(LabelsView.SelectType.MULTI);
+
+        tags.setOnLabelClickListener((label, data, position) -> {
+            if (position == tags.getLabels().size() - 2) {
+                final EditText editText = new EditText(getContext());
+                editText.setLayoutParams(lp);
+                AlertDialog.Builder inputDialog =
+                        new AlertDialog.Builder(getContext());
+                inputDialog.setTitle("Tag Name").setView(editText);
+                inputDialog.setPositiveButton("Ok",
+                        (dialog, which) -> {
+                            String input = editText.getText().toString();
+                            if (input.isEmpty()) {
+                                Toast.makeText(getContext(), "Input is empty", Toast.LENGTH_SHORT).show();
+                            } else {
+                                ArrayList<String> list = new ArrayList<>(tags.getLabels());
+                                list.add(list.size() - 2, input);
+                                tags.setLabels(list);
+                            }
+                        }).show();
+            } else if (position == tags.getLabels().size() - 1) {
+                ArrayList<String> list = new ArrayList<>(tags.getLabels());
+                List<Integer> remove = tags.getSelectLabels();
+                for (int i = 0; i < remove.size(); ++i) {
+                    if (remove.get(i) < tags.getLabels().size() - 2) {
+                        list.remove(remove.get(i) - i);
+                    }
+                }
+                tags.setLabels(list);
+            }
+        });
+        parentLayout.addView(tags);
+    }
+
+    private void initEmptyView() {
+        RelativeLayout emptyView = new RelativeLayout(getContext());
+        RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                1000);
+        emptyView.setLayoutParams(lp);
+        emptyView.setOnClickListener(v -> {
+            int childCount = containerLayout.getChildCount();
+            if (childCount == 0 || !(containerLayout.getChildAt(childCount - 1) instanceof TextView)) {
+                insertEditTextAtIndex(childCount, "");
+            }
+            DeletableEditText lastEdit = (DeletableEditText)
+                    containerLayout.getChildAt(containerLayout.getChildCount() - 2);
+            lastEdit.requestFocus();
+            lastEdit.setController(markdownController);
+            lastFocusEdit = lastEdit;
+        });
+        parentLayout.addView(emptyView);
     }
 
     private void initParentLayout() {
@@ -538,13 +616,6 @@ public class SortRichEditor extends ScrollView {
                 preChild = child;
             }
         }
-
-        // if the last view is not an edit text, add one
-        int lastIndex = containerLayout.getChildCount() - 1;
-        View view = containerLayout.getChildAt(lastIndex);
-        if (!(view instanceof TextView)) {
-            insertEditTextAtIndex(lastIndex + 1, "");
-        }
     }
 
     private void onBackspacePress(EditText editTxt) {
@@ -744,9 +815,6 @@ public class SortRichEditor extends ScrollView {
         // + 2 to skip the text view
         indexInsert.accept(lastEditIndex + 2);
         showOrHideKeyboard(false);
-        if (!(containerLayout.getChildAt(containerLayout.getChildCount() - 1) instanceof TextView)) {
-            insertEditTextAtIndex(containerLayout.getChildCount(), "");
-        }
     }
 
     private void insertMediaAtIndex(int index, RelativeLayout mediaLayout) {
@@ -957,13 +1025,10 @@ public class SortRichEditor extends ScrollView {
                         ref.lastAddedSoundPlayer.getEditText().setText(data.getText());
                     }
                 }
-                if (ref.containerLayout.getChildCount() != 0) {
-                    View lastChild = ref.containerLayout.getChildAt(ref.containerLayout.getChildCount() - 1);
-                    if (!(lastChild instanceof TextView)) {
-                        ref.insertEditTextAtIndex(ref.containerLayout.getChildCount(), "");
-                    }
-                }
             }
+            ArrayList<String> tagList = new ArrayList<>(note.getTag());
+            tagList.addAll(ref.tags.getLabels());
+            ref.tags.setLabels(tagList);
         }
     }
 
@@ -998,7 +1063,13 @@ public class SortRichEditor extends ScrollView {
                 contentList.add(data);
             }
         }
-        return new Note(title.getText().toString().trim(), contentList);
+        Note note = new Note(title.getText().toString().trim(), contentList);
+        ArrayList<String> tagList = new ArrayList<>(tags.getLabels());
+        // remove the last add & delete
+        tagList.remove(tagList.size() - 1);
+        tagList.remove(tagList.size() - 1);
+        note.setTag(tagList);
+        return note;
     }
 
     public void setViewOnly() {
