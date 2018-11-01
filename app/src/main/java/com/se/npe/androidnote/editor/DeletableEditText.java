@@ -2,24 +2,18 @@ package com.se.npe.androidnote.editor;
 
 import android.content.Context;
 import android.graphics.Color;
-import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
-import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputConnectionWrapper;
-import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import com.se.npe.androidnote.EditorActivity;
 import com.yydcdut.markdown.MarkdownConfiguration;
 import com.yydcdut.markdown.MarkdownEditText;
 import com.yydcdut.markdown.MarkdownProcessor;
-import com.yydcdut.markdown.callback.OnTodoClickCallback;
-import com.yydcdut.markdown.loader.MDImageLoader;
 import com.yydcdut.markdown.syntax.edit.EditFactory;
 import com.yydcdut.markdown.syntax.text.TextFactory;
 import com.yydcdut.markdown.theme.ThemeSunburst;

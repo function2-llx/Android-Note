@@ -16,7 +16,6 @@
 package com.se.npe.androidnote.editor;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
@@ -24,8 +23,6 @@ import android.view.View;
 import android.widget.FrameLayout;
 
 import com.se.npe.androidnote.R;
-import com.yydcdut.markdown.MarkdownConfiguration;
-import com.yydcdut.markdown.MarkdownEditText;
 import com.se.npe.androidnote.editor.controller.BlockQuotesController;
 import com.se.npe.androidnote.editor.controller.CenterAlignController;
 import com.se.npe.androidnote.editor.controller.CodeController;
@@ -36,6 +33,8 @@ import com.se.npe.androidnote.editor.controller.ListController;
 import com.se.npe.androidnote.editor.controller.StrikeThroughController;
 import com.se.npe.androidnote.editor.controller.StyleController;
 import com.se.npe.androidnote.editor.controller.TodoController;
+import com.yydcdut.markdown.MarkdownConfiguration;
+import com.yydcdut.markdown.MarkdownEditText;
 
 public class HorizontalEditScrollView extends FrameLayout implements View.OnClickListener,
         View.OnLongClickListener {
