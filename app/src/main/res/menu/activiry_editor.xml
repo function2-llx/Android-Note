@@ -3,18 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/menu_markdown"
-        android:title="Markdown"
-        app:showAsAction="always"
-        >
+        android:title="@string/markdown"
+        app:showAsAction="always" >
     </item>
     <item
         android:id="@+id/menu_save"
         android:title="@string/save"
-        app:showAsAction="always"
-        >
+        android:icon="@mipmap/icon_save"
+        app:showAsAction="always" >
     </item>
     <item
         android:id="@+id/share"
+        app:showAsAction="ifRoom"
+        android:icon="@mipmap/icon_share"
         android:title="@string/share" />
 
 </menu>
