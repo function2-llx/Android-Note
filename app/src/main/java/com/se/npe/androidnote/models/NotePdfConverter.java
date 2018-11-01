@@ -16,6 +16,8 @@ import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.DocumentFont;
+import com.itextpdf.text.pdf.PdfDictionary;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.draw.LineSeparator;
 import com.se.npe.androidnote.interfaces.IData;
@@ -60,11 +62,6 @@ public class NotePdfConverter implements INoteFileConverter {
         document.open();
 
         // pdf document settings
-//        try {
-//            BaseFont baseFont = BaseFont.createFont("STSong-Light", BaseFont.IDENTITY_H, BaseFont.NOT_EMBEDDED);
-//        } catch (Exception e) {
-//            Logger.log(EXCEPTION_TAG, e);
-//        }
         document.setPageSize(PageSize.A4);
         document.addCreationDate();
         document.addCreator("AndroidNote");
@@ -73,10 +70,20 @@ public class NotePdfConverter implements INoteFileConverter {
         LineSeparator lineSeparator = new LineSeparator();
         lineSeparator.setLineColor(new BaseColor(0, 0, 0, 68));
         // font
-        Font titleFont = new Font(Font.FontFamily.TIMES_ROMAN, 18.0f, Font.BOLDITALIC);
+        Font titleFont = new Font(Font.FontFamily.TIMES_ROMAN, 22.0f, Font.BOLD);
         Font keywordFont = new Font(Font.FontFamily.TIMES_ROMAN, 14.0f, Font.ITALIC);
         Font paragraphFont = new Font(Font.FontFamily.TIMES_ROMAN, 14.0f, Font.NORMAL);
         Font footerFont = new Font(Font.FontFamily.TIMES_ROMAN, 12.0f, Font.ITALIC);
+        // font support Chinese
+        try {
+            BaseFont baseFont = BaseFont.createFont("STSong-Light", "UniGB-UCS2-H", BaseFont.NOT_EMBEDDED);
+            titleFont = new Font(baseFont, 22.0f, Font.BOLD);
+            keywordFont = new Font(baseFont, 14.0f, Font.ITALIC);
+            paragraphFont = new Font(baseFont, 14.0f, Font.NORMAL);
+            footerFont = new Font(baseFont, 12.0f, Font.ITALIC);
+        } catch (Exception e) {
+            Logger.log(EXCEPTION_TAG, e);
+        }
 
         // write pdf document
         // title
@@ -99,13 +106,16 @@ public class NotePdfConverter implements INoteFileConverter {
         }
         // tag
         List<String> noteTags = note.getTag();
+        StringBuilder noteTagString = new StringBuilder("Tag:");
         for (String noteTag : noteTags) {
             document.addKeywords(noteTag);
-            try {
-                document.add(new Paragraph("Tag: " + noteTag, keywordFont));
-            } catch (DocumentException e) {
-                Logger.log(EXCEPTION_TAG, e);
-            }
+            noteTagString.append(' ');
+            noteTagString.append(noteTag);
+        }
+        try {
+            document.add(new Paragraph(noteTagString.toString(), keywordFont));
+        } catch (DocumentException e) {
+            Logger.log(EXCEPTION_TAG, e);
         }
         // content
         List<IData> noteContent = note.getContent();

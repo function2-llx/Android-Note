@@ -50,7 +50,7 @@ public interface INoteFileConverter {
         File exportFile = new File(exportFilePath);
         try {
             // delete original file
-            if (exportFile.exists() && exportDir.delete()) {
+            if (exportFile.exists() && !exportFile.delete()) {
                 throw new IOException("delete fails");
             }
             // create file
