@@ -4,17 +4,24 @@
     <item
         android:id="@+id/menu_markdown"
         android:title="Markdown"
-        app:showAsAction="always"
-        >
+        app:showAsAction="always">
+
     </item>
     <item
         android:id="@+id/menu_save"
         android:title="@string/save"
-        app:showAsAction="always"
-        >
+        app:showAsAction="always">
+
     </item>
     <item
         android:id="@+id/share"
-        android:title="@string/share" />
+        android:title="@string/share">
+
+    </item>
+    <item
+        android:id="@+id/export"
+        android:title="@string/export">
+
+    </item>
 
 </menu>

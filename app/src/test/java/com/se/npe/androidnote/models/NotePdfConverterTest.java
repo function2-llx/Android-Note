@@ -1,5 +1,6 @@
 package com.se.npe.androidnote.models;
 
+import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 
 import com.se.npe.androidnote.interfaces.INoteFileConverter;
@@ -10,20 +11,21 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
+import java.io.File;
+
 import static org.junit.Assert.*;
 
 @RunWith(RobolectricTestRunner.class)
 public class NotePdfConverterTest {
 
-    private static final String EXAMPLE_MIX_IN = "test";
-    private String exportDir;
+    Context context;
     private NotePdfConverter notePdfConverter;
 
     @Before
     public void setUp() {
         AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
-        notePdfConverter = new NotePdfConverter(activity.getApplicationContext());
-        exportDir = INoteFileConverter.getExportDirPath(activity.getApplicationContext());
+        context = activity.getApplicationContext();
+        notePdfConverter = new NotePdfConverter(context);
     }
 
     @Test
@@ -32,7 +34,12 @@ public class NotePdfConverterTest {
 
     @Test
     public void exportNoteToFile() {
-        Note note = DataExample.getExampleNote(EXAMPLE_MIX_IN);
-        notePdfConverter.exportNoteToFile(note, EXAMPLE_MIX_IN + ".pdf");
+        Note note = DataExample.getExampleNote(DataExample.EXAMPLE_MIX_IN);
+        notePdfConverter.exportNoteToFile(note, DataExample.EXAMPLE_MIX_IN);
+
+        File exportDir = new File(INoteFileConverter.getExportDirPath(context));
+        File exportFile = new File(INoteFileConverter.getExportFilePath(context, DataExample.EXAMPLE_MIX_IN + ".pdf"));
+        assertTrue(exportFile.exists());
+        assertNotEquals(0, exportDir.listFiles().length);
     }
 }
