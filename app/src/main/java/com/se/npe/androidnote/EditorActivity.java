@@ -100,20 +100,14 @@ public class EditorActivity extends AppCompatActivity {
         switch (item.getItemId()) {
 
             case android.R.id.home: {
+                editor.destroy();
+                save();
                 finish();
                 break;
             }
 
             case R.id.menu_save: {
-                Note note = editor.buildNote();
-                if (oldNote != null)
-                    note.setIndex(oldNote.getIndex());
-                note.setStartTime(createTime);
-                note.setModifyTime(new Date());
-                note.setGroupName(currentGroup);
-                TableOperate.getInstance().modify(note);
-                oldNote = note;
-
+                save();
                 Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
                 break;
             }
@@ -143,6 +137,8 @@ public class EditorActivity extends AppCompatActivity {
 //                sp.setTitle("test");
 //                wechatPlatform.setPlatformActionListener(this.platformActionListener);
 //                wechatPlatform.share(sp);
+
+                break;
             }
             default:
                 break;
@@ -150,7 +146,16 @@ public class EditorActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    
+    private void save() {
+        Note note = editor.buildNote();
+        if (oldNote != null)
+            note.setIndex(oldNote.getIndex());
+        note.setStartTime(createTime);
+        note.setModifyTime(new Date());
+        note.setGroupName(currentGroup);
+        TableOperate.getInstance().modify(note);
+        oldNote = note;
+    }
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -370,6 +375,7 @@ public class EditorActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
+        save();
         editor.destroy();
         super.onBackPressed();
     }

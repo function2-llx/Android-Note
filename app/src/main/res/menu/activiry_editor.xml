@@ -4,8 +4,8 @@
     <item
         android:id="@+id/menu_markdown"
         android:title="@string/markdown"
-        app:showAsAction="always" >
-    </item>
+        android:icon="@mipmap/icon_markdown"
+        app:showAsAction="always" />
     <item
         android:id="@+id/menu_save"
         android:title="@string/save"
@@ -14,7 +14,7 @@
     </item>
     <item
         android:id="@+id/share"
-        app:showAsAction="ifRoom"
+        app:showAsAction="always"
         android:icon="@mipmap/icon_share"
         android:title="@string/share" />
 
