@@ -3,7 +3,6 @@ package com.se.npe.androidnote.editor;
 import android.animation.LayoutTransition;
 import android.content.Context;
 import android.graphics.Color;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.os.AsyncTask;
 import android.support.annotation.NonNull;
@@ -26,20 +25,14 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.se.npe.androidnote.EditorActivity;
 import com.se.npe.androidnote.R;
 import com.se.npe.androidnote.interfaces.IData;
-import com.se.npe.androidnote.interfaces.IEditor;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.PictureData;
 import com.se.npe.androidnote.models.SoundData;
 import com.se.npe.androidnote.models.TextData;
 import com.se.npe.androidnote.models.VideoData;
-import com.yydcdut.markdown.MarkdownConfiguration;
 import com.yydcdut.markdown.MarkdownEditText;
-import com.yydcdut.markdown.MarkdownProcessor;
-import com.yydcdut.markdown.syntax.edit.EditFactory;
-import com.yydcdut.markdown.syntax.text.TextFactory;
 
 import java.lang.ref.WeakReference;
 import java.util.ArrayList;
@@ -51,7 +44,7 @@ import java.util.function.Consumer;
 
 import cn.jzvd.Jzvd;
 
-public class SortRichEditor extends ScrollView implements IEditor {
+public class SortRichEditor extends ScrollView {
     private static final int TITLE_WORD_LIMIT_COUNT = 30;
 
     // when sorting, the default height that text and media reduce to
@@ -99,9 +92,6 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 = SOUND_LAYOUT_PARAM.rightMargin
                 = DEFAULT_MARGIN;
     }
-
-    // save the background of edit text before sorting(because sorting will change it)
-    private Drawable editTextBackground;
 
     // unique id of a child(of containerLayout), stored in the 'tag' of view
     // (store by setTag, retrieve by getTag)
@@ -175,6 +165,8 @@ public class SortRichEditor extends ScrollView implements IEditor {
     private boolean destroyed = false;
 
     private boolean isMarkdown = false;
+
+    private HorizontalEditScrollView markdownController = null;
 
     public SortRichEditor(Context context) {
         this(context, null);
@@ -299,6 +291,9 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 showOrHideKeyboard(false);
             } else if (v instanceof EditText && hasFocus) {
                 lastFocusEdit = (EditText) v;
+                if (v instanceof DeletableEditText && markdownController != null) {
+                    ((DeletableEditText) v).setController(markdownController);
+                }
             }
         };
     }
@@ -397,7 +392,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
             if (child == lastFocusEdit) {
                 child.requestFocus();
             }
-            child.setBackground(editTextBackground);
+            child.setBackground(null);
             layoutParams.height = editTextHeightArray.get(Integer.parseInt(child.getTag().toString()));
         }
         return layoutParams;
@@ -547,7 +542,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
         // if the last view is not an edit text, add one
         int lastIndex = containerLayout.getChildCount() - 1;
         View view = containerLayout.getChildAt(lastIndex);
-        if (!(view instanceof EditText)) {
+        if (!(view instanceof TextView)) {
             insertEditTextAtIndex(lastIndex + 1, "");
         }
     }
@@ -560,13 +555,15 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 View pre = containerLayout.getChildAt(editIndex - 1);
                 if (pre instanceof RelativeLayout || pre instanceof ImageView) {
                     onMediaDeleteClick(pre);
-                } else if (pre instanceof EditText) { // concat content of the two text views
+                } else if (pre instanceof TextView) { // concat content of the two text views
                     String str1 = editTxt.getText().toString();
-                    EditText preEdit = (EditText) pre;
+                    EditText preEdit = (EditText) containerLayout.getChildAt(editIndex - 2);
                     String str2 = preEdit.getText().toString();
 
                     containerLayout.setLayoutTransition(null);
-                    containerLayout.removeView(editTxt);
+                    // remove edit index for 2 times to both move the edit text and the text view
+                    containerLayout.removeViewAt(editIndex);
+                    containerLayout.removeViewAt(editIndex);
                     containerLayout.setLayoutTransition(mTransition);
 
                     // hack android studio's check(it gives a warning for str2 + str1)
@@ -636,10 +633,9 @@ public class SortRichEditor extends ScrollView implements IEditor {
         return placeholder;
     }
 
-    private DeletableEditText createEditText(String hint) {
+    private DeletableEditText createEditText() {
         DeletableEditText editText = new DeletableEditText(getContext());
         editText.setTag(viewTagID++);
-        editText.setHint(hint);
         editText.setGravity(Gravity.TOP);
         editText.setCursorVisible(true);
         editText.setBackgroundResource(android.R.color.transparent);
@@ -736,11 +732,6 @@ public class SortRichEditor extends ScrollView implements IEditor {
     }
 
     private void prepareAddMedia() {
-        View firstView = containerLayout.getChildAt(0);
-        if (containerLayout.getChildCount() == 1 && firstView == lastFocusEdit) {
-            lastFocusEdit = (EditText) firstView;
-            lastFocusEdit.setHint("");
-        }
         if (isSort) {
             isSort = false;
             endSortUI();
@@ -749,38 +740,22 @@ public class SortRichEditor extends ScrollView implements IEditor {
     }
 
     private void insertMedia(Consumer<Integer> indexInsert) {
-        String lastEditStr = lastFocusEdit.getText().toString();
-        int cursorIndex = lastFocusEdit.getSelectionStart();
-        String lastStr = lastEditStr.substring(0, cursorIndex).trim();
         int lastEditIndex = containerLayout.indexOfChild(lastFocusEdit);
-
-        if (lastEditStr.length() == 0 || lastStr.length() == 0) {
-            // If the edit text is empty, or the cursor is at 0
-            // insert the image directly, and the edit text can be moved down.
-            indexInsert.accept(lastEditIndex);
-        } else {
-            // or the edit text needs to be split
-            lastFocusEdit.setText(lastStr);
-            String editStr2 = lastEditStr.substring(cursorIndex).trim();
-            if (containerLayout.getChildCount() - 1 == lastEditIndex || editStr2.length() > 0) {
-                lastFocusEdit = insertEditTextAtIndex(lastEditIndex + 1, editStr2);
-                lastFocusEdit.requestFocus();
-                lastFocusEdit.setSelection(0);
-            }
-            indexInsert.accept(lastEditIndex + 1);
-        }
+        // + 2 to skip the text view
+        indexInsert.accept(lastEditIndex + 2);
         showOrHideKeyboard(false);
+        if (!(containerLayout.getChildAt(containerLayout.getChildCount() - 1) instanceof TextView)) {
+            insertEditTextAtIndex(containerLayout.getChildCount(), "");
+        }
     }
 
     private void insertMediaAtIndex(int index, RelativeLayout mediaLayout) {
         if (index > 0) {
-            View currChild = containerLayout.getChildAt(index);
-            // a placeholder for future text inset
-            if (currChild instanceof RelativeLayout) {
+            View child = containerLayout.getChildAt(index);
+            if (child instanceof RelativeLayout && !isViewOnly) {
                 insertPlaceholder(index);
             }
-            int lastIndex = index - 1;
-            View child = containerLayout.getChildAt(lastIndex);
+            child = containerLayout.getChildAt(index - 1);
             if (child instanceof RelativeLayout && !isViewOnly) {
                 insertPlaceholder(index++);
             }
@@ -831,7 +806,7 @@ public class SortRichEditor extends ScrollView implements IEditor {
     }
 
     private EditText insertEditTextAtIndex(final int index, String editStr) {
-        DeletableEditText editText = createEditText("");
+        DeletableEditText editText = createEditText();
         editText.setText(editStr);
         if (isViewOnly) {
             editText.setFocusable(false);
@@ -910,38 +885,20 @@ public class SortRichEditor extends ScrollView implements IEditor {
         }
     }
 
-    @Override
     public void addPicture(String picturePath) {
         prepareAddMedia();
         insertMedia(index -> insertPictureAtIndex(index, picturePath));
     }
 
-    @Override
     public void addVideo(String videoPath) {
         prepareAddMedia();
         insertMedia(index -> insertVideoAtIndex(index, videoPath));
     }
 
-    @Override
     public EditText addSound(String soundPath) {
         prepareAddMedia();
         insertMedia(index -> insertSoundAtIndex(index, soundPath));
         return lastAddedSoundPlayer.getEditText();
-    }
-
-    @Override
-    public void addText(String text) {
-        // only when it is necessary...
-        if (containerLayout.getChildCount() == 0
-                || !(containerLayout.getChildAt(containerLayout.getChildCount() - 1) instanceof EditText))
-            insertEditTextAtIndex(containerLayout.getChildCount(), text);
-    }
-
-    public void setEditText(EditText editText, String text) {
-        editText.setText(text);
-        lastFocusEdit = editText;
-        editText.requestFocus();
-        editText.setSelection(text.length());
     }
 
     // well, I have to say I like C++ better for the deterministic resource freeing
@@ -990,19 +947,19 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 for (IData data : content) {
                     int currentChild = ref.containerLayout.getChildCount();
                     if (data instanceof TextData) {
-                        ref.insertEditTextAtIndex(currentChild, ((TextData) data).getText());
+                        ref.insertEditTextAtIndex(currentChild, data.getText());
                     } else if (data instanceof PictureData) {
-                        ref.insertPictureAtIndex(currentChild, ((PictureData) data).getPath());
+                        ref.insertPictureAtIndex(currentChild, data.getPath());
                     } else if (data instanceof VideoData) {
-                        ref.insertVideoAtIndex(currentChild, ((VideoData) data).getPath());
+                        ref.insertVideoAtIndex(currentChild, data.getPath());
                     } else if (data instanceof SoundData) {
-                        ref.insertSoundAtIndex(currentChild, ((SoundData) data).getPath());
-                        ref.lastAddedSoundPlayer.getEditText().setText(((SoundData) data).getText());
+                        ref.insertSoundAtIndex(currentChild, data.getPath());
+                        ref.lastAddedSoundPlayer.getEditText().setText(data.getText());
                     }
                 }
                 if (ref.containerLayout.getChildCount() != 0) {
                     View lastChild = ref.containerLayout.getChildAt(ref.containerLayout.getChildCount() - 1);
-                    if (!(lastChild instanceof EditText)) {
+                    if (!(lastChild instanceof TextView)) {
                         ref.insertEditTextAtIndex(ref.containerLayout.getChildCount(), "");
                     }
                 }
@@ -1010,12 +967,10 @@ public class SortRichEditor extends ScrollView implements IEditor {
         }
     }
 
-    @Override
     public void loadNote(Note note) {
         postDelayed(new NoteLoader(this, note), 50);
     }
 
-    @Override
     public Note buildNote() {
         List<IData> contentList = new ArrayList<>();
         int num = containerLayout.getChildCount();
@@ -1043,14 +998,19 @@ public class SortRichEditor extends ScrollView implements IEditor {
                 contentList.add(data);
             }
         }
-        Note note = new Note(title.getText().toString().trim(), contentList);
-
-        return note;
+        return new Note(title.getText().toString().trim(), contentList);
     }
 
     public void setViewOnly() {
         isViewOnly = true;
         title.setFocusable(false);
+    }
+
+    public void setMarkdownController(HorizontalEditScrollView markdownController) {
+        this.markdownController = markdownController;
+        if (lastFocusEdit instanceof DeletableEditText) {
+            ((DeletableEditText) lastFocusEdit).setController(markdownController);
+        }
     }
 
     private class ViewDragHelperCallBack extends ViewDragHelper.Callback {
