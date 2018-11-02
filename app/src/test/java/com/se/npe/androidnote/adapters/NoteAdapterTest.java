@@ -2,9 +2,13 @@ package com.se.npe.androidnote.adapters;
 
 import android.Manifest;
 import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.view.MenuItem;
+import android.widget.PopupMenu;
 
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.se.npe.androidnote.ListActivity;
+import com.se.npe.androidnote.ListActivityTest;
 import com.se.npe.androidnote.PermissionTest;
 import com.se.npe.androidnote.R;
 import com.se.npe.androidnote.models.DataExample;
@@ -19,12 +23,14 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
+import org.robolectric.shadows.ShadowPopupMenu;
 
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
 import static org.junit.Assert.*;
+import static org.robolectric.Shadows.shadowOf;
 
 @RunWith(RobolectricTestRunner.class)
 public class NoteAdapterTest {
@@ -32,13 +38,14 @@ public class NoteAdapterTest {
     private NoteAdapter noteAdapter;
     private static final int NOTE_LIST_SIZE = 20;
     private List<Note> noteList;
+    private ListActivity activity;
     private UltimateRecyclerView ultimateRecyclerView;
 
     @Before
     public void setUp() {
         TableOperate.init(RuntimeEnvironment.application.getApplicationContext()); // workaround for TableOperate.init()
         PermissionTest.grantPermission(RuntimeEnvironment.application, Manifest.permission.RECORD_AUDIO); // workaround for permission RECORD_AUDIO
-        ListActivity activity = Robolectric.setupActivity(ListActivity.class);
+        activity = Robolectric.setupActivity(ListActivity.class);
         ultimateRecyclerView = activity.findViewById(R.id.ultimate_recycler_view);
         noteAdapter = new NoteAdapter(activity);
 
@@ -189,19 +196,42 @@ public class NoteAdapterTest {
 
     @Test
     public void createViewHolder() {
-        ultimateRecyclerView.setLayoutManager(new LinearLayoutManager(RuntimeEnvironment.application.getApplicationContext()));
+        ultimateRecyclerView.setLayoutManager(new LinearLayoutManager(activity.getApplicationContext()));
         ultimateRecyclerView.setAdapter(noteAdapter);
     }
 
     @Test
     public void clickViewHolder() {
         createViewHolder();
-        ultimateRecyclerView.getChildAt(0).performClick();
+        // click view holder
+        RecyclerView.ViewHolder viewHolder = ultimateRecyclerView.mRecyclerView.findViewHolderForAdapterPosition(0);
+        viewHolder.itemView.performClick();
+        // check EditorActivity is properly started
+        ListActivityTest.checkListActivityStartEditorActivity(activity, false, "");
     }
 
     @Test
     public void longClickViewHolder() {
         createViewHolder();
-        ultimateRecyclerView.getChildAt(0).performLongClick();
+        // long click view holder
+        RecyclerView.ViewHolder viewHolder = ultimateRecyclerView.mRecyclerView.findViewHolderForAdapterPosition(0);
+        viewHolder.itemView.performLongClick();
+        // check preview is properly done
+        clickLatestPopupMenuItem(R.id.preview);
+        ListActivityTest.checkListActivityStartEditorActivity(activity, true, "");
+        // check delete is properly done
+        clickLatestPopupMenuItem(R.id.delete);
+        noteList.remove(0);
+        assertEquals(noteList, noteAdapter.getItems());
+    }
+
+    private void clickLatestPopupMenuItem(int popupMenuItemId) {
+        PopupMenu popupMenu = ShadowPopupMenu.getLatestPopupMenu();
+        ShadowPopupMenu shadowPopupMenu = shadowOf(popupMenu);
+        // check popup menu is showing
+        assertTrue(shadowPopupMenu.isShowing());
+        // click popup menu item
+        MenuItem menuItem = popupMenu.getMenu().findItem(popupMenuItemId);
+        shadowPopupMenu.getOnMenuItemClickListener().onMenuItemClick(menuItem);
     }
 }
