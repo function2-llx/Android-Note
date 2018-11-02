@@ -27,6 +27,7 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Arrays;
+import java.util.Objects;
 
 public class TableOperate implements INoteCollection {
     private static final String LOG_TAG = Note.class.getSimpleName();
@@ -38,7 +39,7 @@ public class TableOperate implements INoteCollection {
 
     public static void init(Context context) {
         tableOperate = new TableOperate(context);
-        TableConfig.SAVE_PATH = context.getExternalFilesDir(null).getAbsolutePath();
+        TableConfig.SAVE_PATH = Objects.requireNonNull(context.getExternalFilesDir(null)).getAbsolutePath();
         initConfigFile();
     }
 

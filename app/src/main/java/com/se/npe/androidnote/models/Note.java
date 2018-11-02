@@ -185,8 +185,7 @@ public class Note {
         //文件解压测试
         Log.d("debug0001", "TestFileUnzip");
         File fa[] = tempfloder.listFiles();
-        for (int i = 0; i < fa.length; i++) {
-            File fs = fa[i];
+        for (File fs : fa) {
             if (fs.isDirectory()) {
                 Log.d("debug0001", fs.getPath() + "目录");
             } else {
@@ -227,8 +226,7 @@ public class Note {
         Log.d("debug0001", "TestFileMove");
         File unzip = new File(TableConfig.SAVE_PATH + "/NoteSave/" + title + "_unzip");
         File fax[] = unzip.listFiles();
-        for (int i = 0; i < fax.length; i++) {
-            File fs = fax[i];
+        for (File fs : fax) {
             if (fs.isDirectory()) {
                 Log.d("debug0001", fs.getPath() + "目录");
             } else {
@@ -270,7 +268,13 @@ public class Note {
         }
     }
 
-    public void saveToFile(String fileName) {
+
+    /**
+     *
+     * @param fileName name of file to be saved
+     * @return  absolute path of the saved file
+     */
+    public String saveToFile(String fileName) {
 
         //文件夹生成
 
@@ -294,19 +298,23 @@ public class Note {
         List<IData> ContentList = getContent();
 
         for (int i = 0; i < ContentList.size(); i++) {
-            if (ContentList.get(i).getType() == "Pic") {
-                srcFile = new File(ContentList.get(i).getPath());
-                FileOperate.getSuffix(ContentList.get(i).getPath());
-                desFile = new File(TableConfig.SAVE_PATH + "/NoteSave/TempFloder/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath()));
-                FileOperate.copy(srcFile, desFile);
-            } else if (ContentList.get(i).getType() == "Sound") {
-                srcFile = new File(ContentList.get(i).getPath());
-                desFile = new File(TableConfig.SAVE_PATH + "/NoteSave/TempFloder/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath()));
-                FileOperate.copy(srcFile, desFile);
-            } else if (ContentList.get(i).getType() == "Video") {
-                srcFile = new File(ContentList.get(i).getPath());
-                desFile = new File(TableConfig.SAVE_PATH + "/NoteSave/TempFloder/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath()));
-                FileOperate.copy(srcFile, desFile);
+            switch (ContentList.get(i).getType()) {
+                case "Pic":
+                    srcFile = new File(ContentList.get(i).getPath());
+                    FileOperate.getSuffix(ContentList.get(i).getPath());
+                    desFile = new File(TableConfig.SAVE_PATH + "/NoteSave/TempFloder/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath()));
+                    FileOperate.copy(srcFile, desFile);
+                    break;
+                case "Sound":
+                    srcFile = new File(ContentList.get(i).getPath());
+                    desFile = new File(TableConfig.SAVE_PATH + "/NoteSave/TempFloder/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath()));
+                    FileOperate.copy(srcFile, desFile);
+                    break;
+                case "Video":
+                    srcFile = new File(ContentList.get(i).getPath());
+                    desFile = new File(TableConfig.SAVE_PATH + "/NoteSave/TempFloder/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath()));
+                    FileOperate.copy(srcFile, desFile);
+                    break;
             }
         }
 
@@ -325,26 +333,34 @@ public class Note {
             outputStream = new FileOutputStream(file);
         } catch (FileNotFoundException e) {
             Logger.log(LOG_TAG, e);
-            return;
+            return "fuck";
         }
-        String string = getTitle() + TableConfig.FileSave.LIST_SEPARATOR;
+        StringBuilder string = new StringBuilder(getTitle() + TableConfig.FileSave.LIST_SEPARATOR);
 
         for (int i = 0; i < ContentList.size(); i++) {
-            if (ContentList.get(i).getType() == "Pic") {
-                String newdir = TableConfig.SAVE_PATH + "/NoteSave/" + getTitle() + "_unzip/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
-                string = string + "Picture" + TableConfig.FileSave.LINE_SEPARATOR + newdir;
-            } else if (ContentList.get(i).getType() == "Sound") {
-                String newdir = TableConfig.SAVE_PATH + "/NoteSave/" + getTitle() + "_unzip/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
-                string = string + "Sound" + TableConfig.FileSave.LINE_SEPARATOR + newdir + TableConfig.FileSave.LINE_SEPARATOR + ContentList.get(i).getText();
-            } else if (ContentList.get(i).getType() == "Video") {
-                String newdir = TableConfig.SAVE_PATH + "/NoteSave/" + getTitle() + "_unzip/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
-                string = string + "Video" + TableConfig.FileSave.LINE_SEPARATOR + newdir;
-            } else {
-                string = string + ContentList.get(i).toString() + TableConfig.FileSave.LIST_SEPARATOR;
+            switch (ContentList.get(i).getType()) {
+                case "Pic": {
+                    String newdir = TableConfig.SAVE_PATH + "/NoteSave/" + getTitle() + "_unzip/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
+                    string.append("Picture").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir);
+                    break;
+                }
+                case "Sound": {
+                    String newdir = TableConfig.SAVE_PATH + "/NoteSave/" + getTitle() + "_unzip/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
+                    string.append("Sound").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LINE_SEPARATOR).append(ContentList.get(i).getText());
+                    break;
+                }
+                case "Video": {
+                    String newdir = TableConfig.SAVE_PATH + "/NoteSave/" + getTitle() + "_unzip/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
+                    string.append("Video").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir);
+                    break;
+                }
+                default:
+                    string.append(ContentList.get(i).toString()).append(TableConfig.FileSave.LIST_SEPARATOR);
+                    break;
             }
         }
 
-        byte[] bs = string.getBytes();
+        byte[] bs = string.toString().getBytes();
         try {
             outputStream.write(bs);
         } catch (IOException e) {
@@ -358,6 +374,7 @@ public class Note {
         }
 
         //文件压缩
+        String zipFileName = TableConfig.SAVE_PATH + "/NoteSave/" + fileName + ".zip";
         FileOperate.zip(TableConfig.SAVE_PATH + "/NoteSave/TempFloder", TableConfig.SAVE_PATH + "/NoteSave/" + fileName + ".zip");
 
 
@@ -367,14 +384,17 @@ public class Note {
         //文件存储测试
         Log.d("debug0001", "TestFileSave");
         File fa[] = notesave.listFiles();
-        for (int i = 0; i < fa.length; i++) {
-            File fs = fa[i];
+        for (File fs : fa) {
             if (fs.isDirectory()) {
                 Log.d("debug0001", fs.getPath() + "目录");
             } else {
                 Log.d("debug0001", fs.getPath() + "文件");
             }
         }
+
+        if (!new File(zipFileName).exists()) throw new AssertionError();
+
+        return zipFileName;
     }
 
     @Override
