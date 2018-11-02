@@ -4,13 +4,11 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
@@ -21,7 +19,6 @@ import com.se.npe.androidnote.EditorActivity;
 import com.se.npe.androidnote.ListActivity;
 import com.se.npe.androidnote.R;
 import com.se.npe.androidnote.editor.PictureLoader;
-import com.se.npe.androidnote.events.NoteModifyEvent;
 import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.TableOperate;
@@ -29,7 +26,6 @@ import com.se.npe.androidnote.models.TableOperate;
 import org.greenrobot.eventbus.EventBus;
 
 import java.text.SimpleDateFormat;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
@@ -159,13 +155,15 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         super.clearInternal(this.noteList);
     }
 
-    private Note getItem(int position) {
+    Note getItem(int position) {
         // Subtract the first one used by header
         if (this.hasHeaderView())
             position--;
-        // if (position < this.noteList.size() && position >= 0)
         return this.noteList.get(position);
-        // throw new IndexOutOfBoundsException("Note list out of range.");
+    }
+
+    List<Note> getItems() {
+        return this.noteList;
     }
 
     /**

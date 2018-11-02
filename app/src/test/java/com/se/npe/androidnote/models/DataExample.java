@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DataExample {
-    static final String EXAMPLE_MIX_IN = "test";
+    public static final String EXAMPLE_MIX_IN = "test";
 
     // Path
     @NonNull
@@ -97,7 +97,7 @@ public class DataExample {
     }
 
     @NonNull
-    static Note getExampleNote(String mixIn) {
+    public static Note getExampleNote(String mixIn) {
         return new Note(getExampleNoteTitle(mixIn), getExampleDataList(mixIn), getExampleNoteTag(mixIn));
     }
 
