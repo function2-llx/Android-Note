@@ -392,8 +392,6 @@ public class Note {
             }
         }
 
-        if (!new File(zipFileName).exists()) throw new AssertionError();
-
         return zipFileName;
     }
 

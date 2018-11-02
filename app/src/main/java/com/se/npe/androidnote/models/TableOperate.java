@@ -38,8 +38,10 @@ public class TableOperate implements INoteCollection {
     private static TableOperate tableOperate;
 
     public static void init(Context context) {
+
         tableOperate = new TableOperate(context);
         TableConfig.SAVE_PATH = Objects.requireNonNull(context.getExternalFilesDir(null)).getAbsolutePath();
+//        TableConfig.SAVE_PATH = "sdcard";
         initConfigFile();
     }
 
@@ -83,22 +85,22 @@ public class TableOperate implements INoteCollection {
     public List<IData> decodeNote(String src) {
         List<IData> content = new ArrayList<>();
         String[] strArray = src.split(TableConfig.FileSave.LIST_SEPARATOR);
-        for (int i = 0; i < strArray.length; i++) {
+        for (String aStrArray : strArray) {
             if (strArray[0].length() == 0) continue;
-            if (strArray[i].charAt(0) == 'S') {
-                String[] tempArray = strArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
+            if (aStrArray.charAt(0) == 'S') {
+                String[] tempArray = aStrArray.split(TableConfig.FileSave.LINE_SEPARATOR);
                 SoundData tempSoundData = new SoundData(tempArray[1], tempArray[2]);
                 content.add(tempSoundData);
-            } else if (strArray[i].charAt(0) == 'T') {
-                String[] tempArray = strArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
+            } else if (aStrArray.charAt(0) == 'T') {
+                String[] tempArray = aStrArray.split(TableConfig.FileSave.LINE_SEPARATOR);
                 TextData tempTextData = new TextData(tempArray[1]);
                 content.add(tempTextData);
-            } else if (strArray[i].charAt(0) == 'V') {
-                String[] tempArray = strArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
+            } else if (aStrArray.charAt(0) == 'V') {
+                String[] tempArray = aStrArray.split(TableConfig.FileSave.LINE_SEPARATOR);
                 VideoData tempVideoData = new VideoData(tempArray[1]);
                 content.add(tempVideoData);
-            } else if (strArray[i].charAt(0) == 'P') {
-                String[] tempArray = strArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
+            } else if (aStrArray.charAt(0) == 'P') {
+                String[] tempArray = aStrArray.split(TableConfig.FileSave.LINE_SEPARATOR);
                 PictureData tempPictureData = new PictureData(tempArray[1]);
                 content.add(tempPictureData);
             }
@@ -156,7 +158,6 @@ public class TableOperate implements INoteCollection {
             outputStream.write(bs);
         } catch (IOException e) {
             Logger.log(LOG_TAG, e);
-            return;
         }
     }
 

@@ -103,15 +103,14 @@ public class EditorActivity extends AppCompatActivity {
 
     private void shareWechat(Platform weChat, Platform.ShareParams sp) {
 
-        sp.setTitle("标题");
-//        sp.setText("我是共用的参数，这几个平台都有text参数要求，提取出来啦");
-//        sp.setImageUrl("https://hmls.hfbank.com.cn/hfapp-api/9.png");
-        sp.setShareType(Platform.SHARE_FILE);
+        Note note = editor.buildNote();
+        sp.setTitle(note.getTitle());
+        sp.setComment("我在 Android Note 给你分享了一个笔记，赶紧来看看吧！");
         String filename = editor.buildNote().saveToFile("temp");
-        if (!new File(filename).exists())
-            throw new AssertionError();
+//        String filename = "/storage/emulated/0/font/b5875cfe20f69c6d0c9f94f203c8fc91.apk";
+        sp.setImageUrl("https://hmls.hfbank.com.cn/hfapp-api/9.png");
+        sp.setShareType(Platform.SHARE_FILE);
         sp.setFilePath(filename);
-// 执行图文分享
         weChat.share(sp);
     }
 
