@@ -16,6 +16,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -53,7 +54,11 @@ import java.util.Objects;
 
 import cn.sharesdk.framework.Platform;
 import cn.sharesdk.framework.PlatformActionListener;
+import cn.sharesdk.framework.ShareSDK;
 import cn.sharesdk.onekeyshare.OnekeyShare;
+import cn.sharesdk.onekeyshare.ShareContentCustomizeCallback;
+import cn.sharesdk.wechat.friends.Wechat;
+import cn.sharesdk.wechat.utils.WXFileObject;
 
 public class EditorActivity extends AppCompatActivity {
     private static final String LOG_TAG = EditorActivity.class.getSimpleName();
@@ -96,6 +101,19 @@ public class EditorActivity extends AppCompatActivity {
         }
     };
 
+    private void shareWechat(Platform weChat, Platform.ShareParams sp) {
+
+        Note note = editor.buildNote();
+        sp.setTitle(note.getTitle());
+        sp.setComment("我在 Android Note 给你分享了一个笔记，赶紧来看看吧！");
+        String filename = editor.buildNote().saveToFile("temp");
+//        String filename = "/storage/emulated/0/font/b5875cfe20f69c6d0c9f94f203c8fc91.apk";
+        sp.setImageUrl("https://hmls.hfbank.com.cn/hfapp-api/9.png");
+        sp.setShareType(Platform.SHARE_FILE);
+        sp.setFilePath(filename);
+        weChat.share(sp);
+    }
+
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -123,21 +141,17 @@ public class EditorActivity extends AppCompatActivity {
             case R.id.share: {
                 OnekeyShare oks = new OnekeyShare();
                 oks.disableSSOWhenAuthorize();
-                oks.setTitle(getString(R.string.share));
-                oks.setTitleUrl("http://sharesdk.cn");
-                oks.setText("我是分享文本");
-//                oks.setImagePath(getRe);//确保SDcard下面存在此张图片
-                oks.setUrl("http://sharesdk.cn");
-                oks.setComment("我是测试评论文本");
-                oks.setSite(getString(R.string.app_name));
-                oks.setSiteUrl("http://sharesdk.cn");
+                oks.setShareContentCustomizeCallback(new ShareContentCustomizeCallback() {
+                    @Override
+                    public void onShare(Platform platform, Platform.ShareParams paramsToShare) {
+                        if (platform.getName().equals(Wechat.NAME))
+                            shareWechat(platform, paramsToShare);
+                    }
+                });
                 oks.show(this);
-//                Platform wechatPlatform = ShareSDK.getPlatform(Wechat.NAME);
-//                Wechat.ShareParams sp = new Wechat.ShareParams();
-//                sp.setShareType(Wechat.SHARE_TEXT);
-//                sp.setTitle("test");
-//                wechatPlatform.setPlatformActionListener(this.platformActionListener);
-//                wechatPlatform.share(sp);
+
+
+
                 break;
             }
 
@@ -156,6 +170,8 @@ public class EditorActivity extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
+
+
 
     private void save() {
         Note note = editor.buildNote();
