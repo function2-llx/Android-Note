@@ -4,6 +4,7 @@ import android.Manifest;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -131,6 +132,10 @@ public class ListActivity extends AppCompatActivity {
                 break;
             }
 
+            case R.id.menu_open: {
+                break;
+            }
+
             case R.id.clear: {
                 noteAdapter.clear();
                 break;
@@ -249,9 +254,9 @@ public class ListActivity extends AppCompatActivity {
     private void refreshGroups() {
         groupMenu.removeGroup(R.id.group_groups);
         List<String> allGroups = TableOperate.getInstance().getAllGroup();
-        for (int i = 0; i < allGroups.size(); i++) {
-            groupMenu.add(R.id.group_groups, Menu.NONE, Menu.NONE, allGroups.get(i));
-        }
+
+        for (String groupName: allGroups)
+            groupMenu.add(R.id.group_groups, Menu.NONE, Menu.NONE, groupName);
     }
 
     public void setNavigationView() {
