@@ -128,7 +128,11 @@ public class ListActivity extends AppCompatActivity {
                     final Uri uri = data.getData();
                     String path = FileUtils.getPath(this, uri);
                     File file = new File(path);
+
                     Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
+                    Note note = new Note();
+                    note.loadFromFile(path);
+                    TableOperate.getInstance().modify(note);
                 }
                 break;
             }
