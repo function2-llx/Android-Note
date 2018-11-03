@@ -43,6 +43,7 @@ import java.io.FileNotFoundException;
 import java.security.Provider;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -127,11 +128,13 @@ public class ListActivity extends AppCompatActivity {
                 if (resultCode == RESULT_OK) {
                     final Uri uri = data.getData();
                     String path = FileUtils.getPath(this, uri);
-                    File file = new File(path);
 
                     Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
                     Note note = new Note();
                     note.loadFromFile(path);
+                    Date date = new Date();
+                    note.setStartTime(date);
+                    note.setModifyTime(date);
                     TableOperate.getInstance().modify(note);
                 }
                 break;
