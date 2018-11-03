@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.util.Log;
 
 import com.se.npe.androidnote.events.NoteClearEvent;
@@ -18,7 +20,6 @@ import org.greenrobot.eventbus.Subscribe;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -40,7 +41,6 @@ public class TableOperate implements INoteCollection {
 
         tableOperate = new TableOperate(context);
         TableConfig.SAVE_PATH = Objects.requireNonNull(context.getExternalFilesDir(null)).getAbsolutePath();
-//        TableConfig.SAVE_PATH = "sdcard";
         initConfigFile();
     }
 
@@ -52,8 +52,9 @@ public class TableOperate implements INoteCollection {
         configFile = new File(TableConfig.SAVE_PATH + "/config/searchconfig.txt");
         try {
             if (!configFile.exists()) {
-                configFile.createNewFile();
-                setSearchConfig(-1);
+                if (!configFile.createNewFile())
+                    throw new IOException("Creating config file fails");
+                setSearchConfig(TableConfig.Sorter.SORTER_FIELDS[0]);
             }
         } catch (IOException e) {
             Logger.log(LOG_TAG, e);
@@ -73,15 +74,16 @@ public class TableOperate implements INoteCollection {
         EventBus.getDefault().register(this);
     }
 
-    public String encodeNote(List<IData> src) {
-        String string = "";
-        for (int i = 0; i < src.size(); i++) {
-            string = string + src.get(i).toString() + TableConfig.FileSave.LIST_SEPARATOR;
+    String encodeNote(List<IData> src) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (IData data : src) {
+            stringBuilder.append(data.toString());
+            stringBuilder.append(TableConfig.FileSave.LIST_SEPARATOR);
         }
-        return string;
+        return stringBuilder.toString();
     }
 
-    public List<IData> decodeNote(String src) {
+    List<IData> decodeNote(String src) {
         List<IData> content = new ArrayList<>();
         String[] strArray = src.split(TableConfig.FileSave.LIST_SEPARATOR);
         for (String aStrArray : strArray) {
@@ -107,53 +109,37 @@ public class TableOperate implements INoteCollection {
         return content;
     }
 
-    public String listStringToString(List<String> src) {
-        String string = "";
-        for (int i = 0; i < src.size(); i++) {
-            string = string + src.get(i) + TableConfig.FileSave.LINE_SEPARATOR;
+    String listStringToString(List<String> src) {
+        StringBuilder stringBuilder = new StringBuilder();
+        for (String string : src) {
+            stringBuilder.append(string);
+            stringBuilder.append(TableConfig.FileSave.LIST_SEPARATOR);
         }
-        return string;
+        return stringBuilder.toString();
     }
 
-    public List<String> stringToListString(String src) {
+    List<String> stringToListString(String src) {
         if (src.length() == 0) return new ArrayList<>();
         String[] strings = src.split(TableConfig.FileSave.LINE_SEPARATOR);
         return Arrays.asList(strings);
     }
 
-    public static int getSearchConfig() {
-        InputStream inputStream;
-        try {
-            inputStream = new FileInputStream(configFile);
-        } catch (FileNotFoundException e) {
-            Logger.log(LOG_TAG, e);
-            return -2;
-        }
-
-        byte b[] = new byte[(int) configFile.length()];
-        try {
+    @Nullable
+    public static String getSearchConfig() {
+        try (InputStream inputStream = new FileInputStream(configFile)) {
+            byte[] b = new byte[(int) configFile.length()];
             int len = inputStream.read(b);
-            if (len == -1) return -2;
-        } catch (Exception e) {
+            if (len == -1) return null;
+            return new String(b);
+        } catch (IOException e) {
             Logger.log(LOG_TAG, e);
-            return -2;
+            return null;
         }
-        String tempContent = new String(b);
-        return Integer.parseInt(tempContent);
     }
 
-    public static void setSearchConfig(int x) {
-        OutputStream outputStream;
-        try {
-            outputStream = new FileOutputStream(configFile);
-        } catch (FileNotFoundException e) {
-            Logger.log(LOG_TAG, e);
-            return;
-        }
-
-        String string = Integer.toString(x);
-        byte[] bs = string.getBytes();
-        try {
+    public static void setSearchConfig(@NonNull String searchConfig) {
+        try (OutputStream outputStream = new FileOutputStream(configFile)) {
+            byte[] bs = searchConfig.getBytes();
             outputStream.write(bs);
         } catch (IOException e) {
             Logger.log(LOG_TAG, e);
@@ -165,7 +151,7 @@ public class TableOperate implements INoteCollection {
         ArrayList<Note> noteList = new ArrayList<>();
         Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME, null);
         while (c.moveToNext()) {
-            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)),c.getString(6));
+            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)), c.getString(6));
             noteList.add(temp);
         }
         c.close();
@@ -177,7 +163,7 @@ public class TableOperate implements INoteCollection {
         ArrayList<Note> noteList = new ArrayList<>();
         Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME + " where " + TableConfig.Note.NOTE_TITLE + "= ?", new String[]{parameter});
         while (c.moveToNext()) {
-            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)),c.getString(6));
+            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)), c.getString(6));
             noteList.add(temp);
         }
         c.close();
@@ -191,7 +177,7 @@ public class TableOperate implements INoteCollection {
                 + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%'";
         Cursor c = db.rawQuery(sql2, null);
         while (c.moveToNext()) {
-            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)),c.getString(6));
+            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)), c.getString(6));
             noteList.add(temp);
         }
         c.close();
@@ -204,10 +190,10 @@ public class TableOperate implements INoteCollection {
         db.insert(TableConfig.GROUP_TABLE, null, cValue);
     }
 
-    public void removeGroup(String groupName){
+    public void removeGroup(String groupName) {
         db.execSQL("delete from " + TableConfig.GROUP_TABLE + " where " + TableConfig.Group.GROUP_NAME + "=?", new String[]{groupName});
         List<Note> noteList = getAllNotesWithGroup(groupName);
-        for(int i = 0;i < noteList.size();i ++){
+        for (int i = 0; i < noteList.size(); i++) {
             removeNote(noteList.get(i));
         }
     }
@@ -223,13 +209,13 @@ public class TableOperate implements INoteCollection {
     }
 
     public List<Note> getSearchResultFuzzyWithGroup(String parameter, String groupName) {
-        ArrayList<Note> noteList = new ArrayList<Note>();
+        ArrayList<Note> noteList = new ArrayList<>();
         String sql2 = "select * from " + TableConfig.TABLE_NAME
                 + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%'";
         Cursor c = db.rawQuery(sql2, null);
         while (c.moveToNext()) {
-            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)),c.getString(6));
-            if(groupName.equals(temp.getGroupName())){
+            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)), c.getString(6));
+            if (groupName.equals(temp.getGroupName())) {
                 noteList.add(temp);
             }
         }
@@ -241,8 +227,8 @@ public class TableOperate implements INoteCollection {
         ArrayList<Note> noteList = new ArrayList<>();
         Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME, null);
         while (c.moveToNext()) {
-            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)),c.getString(6));
-            if(groupName.equals(temp.getGroupName())){
+            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)), c.getString(6));
+            if (groupName.equals(temp.getGroupName())) {
                 noteList.add(temp);
             }
         }
@@ -250,17 +236,17 @@ public class TableOperate implements INoteCollection {
         return noteList;
     }
 
-    public List<Note> getSearchResultFuzzyWithTag(String parameter, String Tag) {
-        ArrayList<Note> noteList = new ArrayList<Note>();
+    public List<Note> getSearchResultFuzzyWithTag(String parameter, String tag) {
+        ArrayList<Note> noteList = new ArrayList<>();
         String sql2 = "select * from " + TableConfig.TABLE_NAME
                 + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%'";
         Cursor c = db.rawQuery(sql2, null);
         while (c.moveToNext()) {
-            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)),c.getString(6));
-            List<String> Taglist = temp.getTag();
+            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)), c.getString(6));
+            List<String> taglist = temp.getTag();
             boolean flag = false;
-            for (int i = 0; i < Taglist.size(); i++) {
-                if (Taglist.get(i).equals(Tag)) {
+            for (int i = 0; i < taglist.size(); i++) {
+                if (taglist.get(i).equals(tag)) {
                     flag = true;
                     break;
                 }
@@ -293,8 +279,8 @@ public class TableOperate implements INoteCollection {
 
     @Override
     public void setNote(Note note) {
-        db.execSQL("update " + TableConfig.TABLE_NAME + " set " + TableConfig.Note.NOTE_TITLE + "=?," + TableConfig.Note.NOTE_TAG + "=?," + TableConfig.Note.NOTE_START_TIME + "=?," + TableConfig.Note.NOTE_MODIFY_TIME + "=?,"+ TableConfig.Note.NOTE_GROUP + "=?," + TableConfig.Note.NOTE_CONTENT + "=? where " + TableConfig.Note.NOTE_ID + "=?",
-                new Object[]{note.getTitle(), listStringToString(note.getTag()), Long.toString(note.getStartTime().getTime()), Long.toString(note.getModifyTime().getTime()),note.getGroupName() ,encodeNote(note.getContent()), Integer.toString(note.getIndex())});
+        db.execSQL("update " + TableConfig.TABLE_NAME + " set " + TableConfig.Note.NOTE_TITLE + "=?," + TableConfig.Note.NOTE_TAG + "=?," + TableConfig.Note.NOTE_START_TIME + "=?," + TableConfig.Note.NOTE_MODIFY_TIME + "=?," + TableConfig.Note.NOTE_GROUP + "=?," + TableConfig.Note.NOTE_CONTENT + "=? where " + TableConfig.Note.NOTE_ID + "=?",
+                new Object[]{note.getTitle(), listStringToString(note.getTag()), Long.toString(note.getStartTime().getTime()), Long.toString(note.getModifyTime().getTime()), note.getGroupName(), encodeNote(note.getContent()), Integer.toString(note.getIndex())});
     }
 
     @Override
@@ -311,7 +297,7 @@ public class TableOperate implements INoteCollection {
         ArrayList<Note> noteList = new ArrayList<>();
         Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME + " where " + TableConfig.Note.NOTE_ID + "= ?", new String[]{Integer.toString(index)});
         while (c.moveToNext()) {
-            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)),c.getString(6));
+            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)), c.getString(6));
             noteList.add(temp);
         }
         c.close();
