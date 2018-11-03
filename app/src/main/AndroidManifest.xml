@@ -22,6 +22,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!--外存储读权限，构建语法需要用到此权限 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    
     <!--获取账户信息，用于分享功能-->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <!--改变账户信息，用于分享功能-->
@@ -105,5 +106,22 @@
         <meta-data
             android:name="Mob-AppSecret"
             android:value="5f3c3c3c32e727d3fb2c874f7446150a" />
+
+        <activity
+            android:name="com.ipaulpro.afilechooser.FileChooserActivity"
+            android:icon="@drawable/ic_chooser"
+            android:enabled="@bool/use_activity"
+            android:exported="true"
+            android:label="@string/choose_file" >
+            <intent-filter>
+                <action android:name="android.intent.action.GET_CONTENT" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.OPENABLE" />
+
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
+
     </application>
 </manifest>

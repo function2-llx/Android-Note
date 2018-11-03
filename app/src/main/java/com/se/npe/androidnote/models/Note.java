@@ -175,12 +175,12 @@ public class Note {
             notesave.mkdirs();
         }
         File tempfloder = new File(TableConfig.SAVE_PATH + "/NoteSave/TempFloder");
-        if (!tempfloder.exists()) {
-            tempfloder.mkdirs();
-        }
+        //if (!tempfloder.exists()) {
+        //    tempfloder.mkdirs();
+        //}
 
         //文件解压缩
-        FileOperate.unzip(fileName, TableConfig.SAVE_PATH + "/NoteSave/TempFloder");
+        FileOperate.unzip(fileName, TableConfig.SAVE_PATH + "/NoteSave");
 
         //文件解压测试
         Log.d("debug0001", "TestFileUnzip");
@@ -341,17 +341,17 @@ public class Note {
             switch (ContentList.get(i).getType()) {
                 case "Pic": {
                     String newdir = TableConfig.SAVE_PATH + "/NoteSave/" + getTitle() + "_unzip/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
-                    string.append("Picture").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir);
+                    string.append("Picture").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LIST_SEPARATOR);
                     break;
                 }
                 case "Sound": {
                     String newdir = TableConfig.SAVE_PATH + "/NoteSave/" + getTitle() + "_unzip/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
-                    string.append("Sound").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LINE_SEPARATOR).append(ContentList.get(i).getText());
+                    string.append("Sound").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LINE_SEPARATOR).append(ContentList.get(i).getText()).append(TableConfig.FileSave.LIST_SEPARATOR);
                     break;
                 }
                 case "Video": {
                     String newdir = TableConfig.SAVE_PATH + "/NoteSave/" + getTitle() + "_unzip/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
-                    string.append("Video").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir);
+                    string.append("Video").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LIST_SEPARATOR);
                     break;
                 }
                 default:

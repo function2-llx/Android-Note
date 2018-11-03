@@ -1,16 +1,21 @@
 package com.se.npe.androidnote;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -25,13 +30,20 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.ipaulpro.afilechooser.FileChooserActivity;
+import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.se.npe.androidnote.adapters.NoteAdapter;
+import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.TableOperate;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.security.Provider;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
@@ -98,27 +110,36 @@ public class ListActivity extends AppCompatActivity {
             if (item.getItemId() == sortOptionId)
                 item.setChecked(true);
         }
-//        if (sortOptionId != -1) { // used sort option
-//            for (int i = 0; i < sortMenu.size(); i++) {
-//                MenuItem item = sortMenu.getItem(i);
-//                if (item.getItemId() == sortOptionId) {
-//                    newSortOption = false;
-//                    item.setChecked(true);
-//                    break;
-//                }
-//            }
-//        }
-//        if (newSortOption) { // initialize sort option
-//            setSortOption(R.id.sort_title);
-//            for (int i = 0; i < sortMenu.size(); i++) {
-//                MenuItem item = sortMenu.getItem(i);
-//                if (item.getItemId() == R.id.sort_title) {
-//                    item.setChecked(true);
-//                    break;
-//                }
-//            }
-//        }
+
         return super.onCreateOptionsMenu(menu);
+    }
+
+    private Uri getContentUri(File file) {
+        System.err.println(file);
+        return FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileprovider", file);
+    }
+    //Can only use lower 16 bits for requestCode
+    private static final int REQUEST_FILE_CHOOSE = 23333;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        switch (requestCode) {
+            case REQUEST_FILE_CHOOSE: {
+                if (resultCode == RESULT_OK) {
+                    final Uri uri = data.getData();
+                    String path = FileUtils.getPath(this, uri);
+
+                    Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
+                    Note note = new Note();
+                    note.loadFromFile(path);
+                    Date date = new Date();
+                    note.setStartTime(date);
+                    note.setModifyTime(date);
+                    TableOperate.getInstance().modify(note);
+                }
+                break;
+            }
+        }
     }
 
     @Override
@@ -128,6 +149,13 @@ public class ListActivity extends AppCompatActivity {
                 Intent intent = new Intent(ListActivity.this, EditorActivity.class);
                 intent.putExtra(EditorActivity.CURRENT_GROUP, currentGroup);
                 this.startActivity(intent);
+                break;
+            }
+
+            case R.id.menu_open: {
+                Intent getContentIntent = FileUtils.createGetContentIntent();
+                Intent intent = Intent.createChooser(getContentIntent, "Select a file");
+                startActivityForResult(intent, REQUEST_FILE_CHOOSE);
                 break;
             }
 
@@ -249,9 +277,9 @@ public class ListActivity extends AppCompatActivity {
     private void refreshGroups() {
         groupMenu.removeGroup(R.id.group_groups);
         List<String> allGroups = TableOperate.getInstance().getAllGroup();
-        for (int i = 0; i < allGroups.size(); i++) {
-            groupMenu.add(R.id.group_groups, Menu.NONE, Menu.NONE, allGroups.get(i));
-        }
+
+        for (String groupName: allGroups)
+            groupMenu.add(R.id.group_groups, Menu.NONE, Menu.NONE, groupName);
     }
 
     public void setNavigationView() {
