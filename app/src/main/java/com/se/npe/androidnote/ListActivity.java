@@ -1,19 +1,15 @@
 package com.se.npe.androidnote;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.FileProvider;
 import android.support.v4.widget.DrawerLayout;
@@ -30,19 +26,14 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import com.ipaulpro.afilechooser.FileChooserActivity;
 import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.se.npe.androidnote.adapters.NoteAdapter;
-import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
+import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.security.Provider;
-import java.util.ArrayList;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
@@ -72,6 +63,7 @@ public class ListActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
+        // search
         this.getMenuInflater().inflate(R.menu.activity_list, menu);
         MenuItem searchItem = menu.findItem(R.id.action_search);
         SearchView searchView = (SearchView) searchItem.getActionView();
@@ -85,29 +77,13 @@ public class ListActivity extends AppCompatActivity {
             this.startActivity(intent);
         }
 
+        // sort
         SubMenu sortMenu = menu.findItem(R.id.menu_sort).getSubMenu();
 
-        int sortOptionId = TableOperate.getSearchConfig();
-
-        //determine whether there is a legal sort option id
-        boolean flag = false;
-        if (sortOptionId != -1)
-            for (int i = 0; i < sortMenu.size(); i++) {
-                if (sortMenu.getItem(i).getItemId() == sortOptionId) {
-                    flag = true;
-                    break;
-                }
-            }
-
-        //if there is no available sort option, sort by title
-        if (!flag)
-            sortOptionId = R.id.sort_title;
-
-        setSortOption(sortOptionId);
-
+        String sortField = TableOperate.getSearchConfig();
         for (int i = 0; i < sortMenu.size(); i++) {
             MenuItem item = sortMenu.getItem(i);
-            if (item.getItemId() == sortOptionId)
+            if (TableConfig.Sorter.SORTER_OPTION_TO_FIELD.get(item.getItemId()).equals(sortField))
                 item.setChecked(true);
         }
 
@@ -166,46 +142,23 @@ public class ListActivity extends AppCompatActivity {
 
             case R.id.sort_title: {
                 item.setChecked(true);
-                setSortOption(R.id.sort_title);
+                noteAdapter.setSortField(TableConfig.Sorter.SORTER_OPTION_TO_FIELD.get(R.id.sort_title));
                 break;
             }
 
             case R.id.sort_created_time: {
                 item.setChecked(true);
-                setSortOption(R.id.sort_created_time);
+                noteAdapter.setSortField(TableConfig.Sorter.SORTER_OPTION_TO_FIELD.get(R.id.sort_created_time));
                 break;
             }
 
             case R.id.sort_modified_time: {
                 item.setChecked(true);
-                setSortOption(R.id.sort_modified_time);
+                noteAdapter.setSortField(TableConfig.Sorter.SORTER_OPTION_TO_FIELD.get(R.id.sort_modified_time));
                 break;
             }
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    private void setSortOption(int sortOptionId) {
-        TableOperate.setSearchConfig(sortOptionId);
-
-        switch (sortOptionId) {
-            case R.id.sort_title: {
-                noteAdapter.setComparator(Comparator.comparing(Note::getTitle));
-                break;
-            }
-
-            case R.id.sort_created_time: {
-                noteAdapter.setComparator(Comparator.comparing(Note::getStartTime));
-                break;
-            }
-
-            case R.id.sort_modified_time: {
-                noteAdapter.setComparator(Comparator.comparing(Note::getModifyTime));
-                break;
-            }
-            default:
-                break;
-        }
     }
 
     @Override

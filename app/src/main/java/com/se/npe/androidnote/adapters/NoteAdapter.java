@@ -21,6 +21,7 @@ import com.se.npe.androidnote.R;
 import com.se.npe.androidnote.editor.PictureLoader;
 import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
+import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
 
 import org.greenrobot.eventbus.EventBus;
@@ -39,16 +40,12 @@ import java.util.Locale;
 public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
     private ListActivity activity;
     private List<Note> noteList;
-    private Comparator<Note> comparator = Comparator.comparing(Note::getTitle);
+    private Comparator<Note> comparator;
 
     public NoteAdapter(ListActivity activity) {
         this.activity = activity;
-    }
-
-    public void setComparator(Comparator<Note> comparator) {
-        this.comparator = comparator;
-        noteList.sort(comparator);
-        this.notifyDataSetChanged();
+        String wtf = TableOperate.getSearchConfig();
+        this.comparator = TableConfig.Sorter.SORTER_FIELD_TO_COMPARATOR.get(TableOperate.getSearchConfig());
     }
 
     /* ViewHolder */
@@ -130,12 +127,20 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         updateList(TableOperate.getInstance().getSearchResultFuzzy(searchParameter));
     }
 
+    // Group notes
     public void updateGroupNotesList(String groupName) {
         this.updateList(TableOperate.getInstance().getAllNotesWithGroup(groupName));
     }
 
     private void updateList(@NonNull List<Note> list) {
         noteList = list;
+        noteList.sort(comparator);
+        this.notifyDataSetChanged();
+    }
+
+    public void setSortField(String sortField) {
+        TableOperate.setSearchConfig(sortField);
+        this.comparator = TableConfig.Sorter.SORTER_FIELD_TO_COMPARATOR.get(sortField);
         noteList.sort(comparator);
         this.notifyDataSetChanged();
     }
