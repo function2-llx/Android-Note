@@ -107,6 +107,21 @@
             android:name="Mob-AppSecret"
             android:value="5f3c3c3c32e727d3fb2c874f7446150a" />
 
+        <activity
+            android:name="com.ipaulpro.afilechooser.FileChooserActivity"
+            android:icon="@drawable/ic_chooser"
+            android:exported="true"
+            android:label="@string/choose_file" >
+            <intent-filter>
+                <action android:name="android.intent.action.GET_CONTENT" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.OPENABLE" />
+
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
+
 
     </application>
 </manifest>

@@ -30,8 +30,11 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.ipaulpro.afilechooser.FileChooserActivity;
+import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.se.npe.androidnote.adapters.NoteAdapter;
+import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.TableOperate;
 
@@ -114,6 +117,23 @@ public class ListActivity extends AppCompatActivity {
         System.err.println(file);
         return FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileprovider", file);
     }
+    //Can only use lower 16 bits for requestCode
+    private static final int REQUEST_FILE_CHOOSE = 23333;
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        switch (requestCode) {
+            case REQUEST_FILE_CHOOSE: {
+                if (resultCode == RESULT_OK) {
+                    final Uri uri = data.getData();
+                    String path = FileUtils.getPath(this, uri);
+                    File file = new File(path);
+                    Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
+                }
+                break;
+            }
+        }
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -126,16 +146,9 @@ public class ListActivity extends AppCompatActivity {
             }
 
             case R.id.menu_open: {
-//                String path = "/storage/emulated/0/tencent/MicroMsg/";
-//                File file = new File(path);
-
-                Uri uri = this.getContentUri(new File(getFilesDir() + "/notes/"));
-
-                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-                intent.addCategory(Intent.CATEGORY_DEFAULT);
-                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-                intent.setDataAndType(uri, "file/*");
-                startActivity(intent);
+                Intent getContentIntent = FileUtils.createGetContentIntent();
+                Intent intent = Intent.createChooser(getContentIntent, "Select a file");
+                startActivityForResult(intent, REQUEST_FILE_CHOOSE);
                 break;
             }
 
