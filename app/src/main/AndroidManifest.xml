@@ -22,6 +22,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!--外存储读权限，构建语法需要用到此权限 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    
     <!--获取账户信息，用于分享功能-->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <!--改变账户信息，用于分享功能-->
@@ -105,5 +106,7 @@
         <meta-data
             android:name="Mob-AppSecret"
             android:value="5f3c3c3c32e727d3fb2c874f7446150a" />
+
+
     </application>
 </manifest>

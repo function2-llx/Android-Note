@@ -1,17 +1,21 @@
 package com.se.npe.androidnote;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
+import android.os.Environment;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.FileProvider;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -31,6 +35,9 @@ import com.se.npe.androidnote.adapters.NoteAdapter;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.TableOperate;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.security.Provider;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
@@ -99,27 +106,13 @@ public class ListActivity extends AppCompatActivity {
             if (item.getItemId() == sortOptionId)
                 item.setChecked(true);
         }
-//        if (sortOptionId != -1) { // used sort option
-//            for (int i = 0; i < sortMenu.size(); i++) {
-//                MenuItem item = sortMenu.getItem(i);
-//                if (item.getItemId() == sortOptionId) {
-//                    newSortOption = false;
-//                    item.setChecked(true);
-//                    break;
-//                }
-//            }
-//        }
-//        if (newSortOption) { // initialize sort option
-//            setSortOption(R.id.sort_title);
-//            for (int i = 0; i < sortMenu.size(); i++) {
-//                MenuItem item = sortMenu.getItem(i);
-//                if (item.getItemId() == R.id.sort_title) {
-//                    item.setChecked(true);
-//                    break;
-//                }
-//            }
-//        }
+
         return super.onCreateOptionsMenu(menu);
+    }
+
+    private Uri getContentUri(File file) {
+        System.err.println(file);
+        return FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileprovider", file);
     }
 
     @Override
@@ -133,6 +126,16 @@ public class ListActivity extends AppCompatActivity {
             }
 
             case R.id.menu_open: {
+//                String path = "/storage/emulated/0/tencent/MicroMsg/";
+//                File file = new File(path);
+
+                Uri uri = this.getContentUri(new File(getFilesDir() + "/notes/"));
+
+                Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+                intent.addCategory(Intent.CATEGORY_DEFAULT);
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+                intent.setDataAndType(uri, "file/*");
+                startActivity(intent);
                 break;
             }
 

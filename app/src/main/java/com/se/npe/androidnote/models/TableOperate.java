@@ -1,9 +1,9 @@
 package com.se.npe.androidnote.models;
 
-import android.content.Context;
-import android.database.sqlite.SQLiteDatabase;
-import android.database.Cursor;
 import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.se.npe.androidnote.events.NoteClearEvent;
@@ -11,7 +11,6 @@ import com.se.npe.androidnote.events.NoteDeleteEvent;
 import com.se.npe.androidnote.events.NoteModifyEvent;
 import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.interfaces.INoteCollection;
-import com.se.npe.androidnote.events.DatabaseModifyEvent;
 import com.se.npe.androidnote.util.Logger;
 
 import org.greenrobot.eventbus.EventBus;
@@ -25,8 +24,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Objects;
 
 public class TableOperate implements INoteCollection {
