@@ -175,12 +175,12 @@ public class Note {
             notesave.mkdirs();
         }
         File tempfloder = new File(TableConfig.SAVE_PATH + "/NoteSave/TempFloder");
-        if (!tempfloder.exists()) {
-            tempfloder.mkdirs();
-        }
+        //if (!tempfloder.exists()) {
+        //    tempfloder.mkdirs();
+        //}
 
         //文件解压缩
-        FileOperate.unzip(fileName, TableConfig.SAVE_PATH + "/NoteSave/TempFloder");
+        FileOperate.unzip(fileName, TableConfig.SAVE_PATH + "/NoteSave");
 
         //文件解压测试
         Log.d("debug0001", "TestFileUnzip");
