@@ -166,6 +166,8 @@ public class SortRichEditor extends ScrollView {
 
     private boolean isMarkdown = false;
 
+    private RelativeLayout emptyView;
+
     private LabelsView tags;
 
     private HorizontalEditScrollView markdownController = null;
@@ -317,7 +319,7 @@ public class SortRichEditor extends ScrollView {
     }
 
     private void initEmptyView() {
-        RelativeLayout emptyView = new RelativeLayout(getContext());
+        emptyView = new RelativeLayout(getContext());
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
                 1000);
         emptyView.setLayoutParams(lp);
@@ -885,13 +887,14 @@ public class SortRichEditor extends ScrollView {
     private EditText insertEditTextAtIndex(final int index, String editStr) {
         DeletableEditText editText = createEditText();
         editText.setText(editStr);
-        if (isViewOnly) {
-            editText.setFocusable(false);
-        }
         containerLayout.setLayoutTransition(null);
         containerLayout.addView(editText, index);
         containerLayout.addView(editText.getMd(), index + 1);
         containerLayout.setLayoutTransition(mTransition);
+        if (isViewOnly) {
+            editText.setFocusable(false);
+            editText.render(isMarkdown /* true */);
+        }
         return editText;
     }
 
@@ -1085,6 +1088,10 @@ public class SortRichEditor extends ScrollView {
 
     public void setViewOnly() {
         isViewOnly = true;
+        isMarkdown = true;
+        tags.setVisibility(GONE);
+        // prevent adding text
+        emptyView.setOnClickListener(null);
         title.setFocusable(false);
     }
 
