@@ -103,7 +103,6 @@ public class EditorActivity extends AppCompatActivity {
     };
 
     private void shareWechat(Platform weChat, Platform.ShareParams sp) {
-
         Note note = editor.buildNote();
         sp.setTitle(note.getTitle() + ".note");
         String filename = editor.buildNote().saveToFile("temp");
@@ -117,7 +116,7 @@ public class EditorActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
 
-            case R.id.home: {
+            case android.R.id.home: {
                 editor.destroy();
                 save();
                 finish();
@@ -142,15 +141,13 @@ public class EditorActivity extends AppCompatActivity {
             case R.id.share: {
                 OnekeyShare oks = new OnekeyShare();
                 oks.disableSSOWhenAuthorize();
-                oks.setShareContentCustomizeCallback(new ShareContentCustomizeCallback() {
-                    @Override
-                    public void onShare(Platform platform, Platform.ShareParams paramsToShare) {
-                        if (platform.getName().equals(Wechat.NAME))
-                            shareWechat(platform, paramsToShare);
-                    }
-                });
+                oks.setShareContentCustomizeCallback(
+                        (platform, paramsToShare) -> {
+                            if (platform.getName().equals(Wechat.NAME))
+                                shareWechat(platform, paramsToShare);
+                        }
+                );
                 oks.show(this);
-
 
                 break;
             }
@@ -276,16 +273,14 @@ public class EditorActivity extends AppCompatActivity {
         SimpleDateFormat timeStampFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
         String filename = timeStampFormat.format(new Date());
         File tempFile = new File(Environment.getExternalStorageDirectory(), filename);
-        if (android.os.Build.VERSION.SDK_INT < 24) {
-            tempMediaUri = Uri.fromFile(tempFile);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, tempMediaUri);
-        } else {
-            ContentValues contentValues = new ContentValues(1);
-            contentValues.put(code == REQUEST_IMAGE_CAPTURE ? MediaStore.Images.Media.DATA : MediaStore.Video.Media.DATA,
-                    tempFile.getAbsolutePath());
-            tempMediaUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
-            intent.putExtra(MediaStore.EXTRA_OUTPUT, tempMediaUri);
-        }
+
+        // open picture for android 7.0+
+        ContentValues contentValues = new ContentValues(1);
+        contentValues.put(code == REQUEST_IMAGE_CAPTURE ? MediaStore.Images.Media.DATA : MediaStore.Video.Media.DATA,
+                tempFile.getAbsolutePath());
+        tempMediaUri = getContentResolver().insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, contentValues);
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, tempMediaUri);
+
         startActivityForResult(intent, code);
     }
 
@@ -415,14 +410,7 @@ public class EditorActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-//        Note note = editor.buildNote();
         editor.destroy();
-//        if (oldNote != null) {
-//            note.setIndex(oldNote.getIndex());
-//        }
-//        note.setStartTime(this.createTime);
-//        note.setModifyTime(new Date());
-//        EventBus.getDefault().post(new NoteModifyEvent(note));
 
         EventBus.getDefault().removeAllStickyEvents();
         EventBus.getDefault().unregister(this);
