@@ -365,8 +365,9 @@ public class EditorActivity extends AppCompatActivity {
                 String path = ResultPool.getInstance().getCurrentPath();
                 final EditText editText = editor.addSound(path);
                 final long requestStartTime = data.getLongExtra(SoundRecorderActivity.REQUEST_START_TIME, -1);
+                // wait for the last speech to finish
                 new Handler().postDelayed(() -> editText.setText(ResultPool.getInstance().resultFrom(requestStartTime))
-                        , 1000);
+                        , ResultPool.SLEEP_MILL);
             }
             break;
             case REQUEST_VIDEO_CAPTURE:
