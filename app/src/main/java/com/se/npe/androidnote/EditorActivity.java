@@ -16,7 +16,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -32,7 +31,6 @@ import com.se.npe.androidnote.editor.SortRichEditor;
 import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.NotePdfConverter;
-import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
 import com.se.npe.androidnote.sound.ResultPool;
 import com.se.npe.androidnote.util.Logger;
@@ -54,11 +52,9 @@ import java.util.Objects;
 
 import cn.sharesdk.framework.Platform;
 import cn.sharesdk.framework.PlatformActionListener;
-import cn.sharesdk.framework.ShareSDK;
 import cn.sharesdk.onekeyshare.OnekeyShare;
 import cn.sharesdk.onekeyshare.ShareContentCustomizeCallback;
 import cn.sharesdk.wechat.friends.Wechat;
-import cn.sharesdk.wechat.utils.WXFileObject;
 
 public class EditorActivity extends AppCompatActivity {
     private static final String LOG_TAG = EditorActivity.class.getSimpleName();
@@ -75,12 +71,17 @@ public class EditorActivity extends AppCompatActivity {
     private Date createTime;
     private String currentGroup = "";
     private Uri tempMediaUri;
+    private boolean isViewOnly;
     public static final String VIEW_ONLY = "VIEW_ONLY";
     public static final String CURRENT_GROUP = "CURRENT_GROUP";
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.activiry_editor, menu);
+        if (isViewOnly) {
+            getMenuInflater().inflate(R.menu.activity_editor_viewonly, menu);
+        } else {
+            getMenuInflater().inflate(R.menu.activity_editor, menu);
+        }
         return super.onCreateOptionsMenu(menu);
     }
 
@@ -116,7 +117,7 @@ public class EditorActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
 
-            case android.R.id.home: {
+            case R.id.home: {
                 editor.destroy();
                 save();
                 finish();
@@ -136,6 +137,8 @@ public class EditorActivity extends AppCompatActivity {
                     item.setTitle("Markdown");
                 }
                 break;
+
+            case R.id.viewonly_share:
             case R.id.share: {
                 OnekeyShare oks = new OnekeyShare();
                 oks.disableSSOWhenAuthorize();
@@ -149,10 +152,10 @@ public class EditorActivity extends AppCompatActivity {
                 oks.show(this);
 
 
-
                 break;
             }
 
+            case R.id.viewonly_export:
             case R.id.export: {
                 Note note = editor.buildNote();
                 note.setStartTime(createTime);
@@ -170,8 +173,10 @@ public class EditorActivity extends AppCompatActivity {
     }
 
 
-
     private void save() {
+        if (isViewOnly) {
+            return;
+        }
         Note note = editor.buildNote();
         if (oldNote != null)
             note.setIndex(oldNote.getIndex());
@@ -237,9 +242,10 @@ public class EditorActivity extends AppCompatActivity {
         // set view only mode before load note
         // so that the component can be set as view only
         if (getIntent().getBooleanExtra(VIEW_ONLY, false)) {
+            isViewOnly = true;
             editor.setViewOnly();
             insertMedia.setVisibility(View.GONE);
-            findViewById(R.id.sound_player_text).setVisibility(View.GONE);
+            findViewById(R.id.scroll_edit).setVisibility(View.GONE);
         } else {
             editor.setMarkdownController(findViewById(R.id.scroll_edit));
         }
@@ -250,8 +256,9 @@ public class EditorActivity extends AppCompatActivity {
         if (oldNote != null) {
             editor.loadNote(oldNote);
             this.createTime = oldNote.getStartTime();
-        } else
+        } else {
             this.createTime = new Date();
+        }
 
         // start recording right now
         try {
@@ -404,18 +411,6 @@ public class EditorActivity extends AppCompatActivity {
         editor.destroy();
         super.onBackPressed();
     }
-
-//    @Override
-//    protected void onPause() {
-//        super.onPause();
-//        Note note = editor.buildNote();
-//        if (oldNote != null) {
-//            note.setIndex(oldNote.getIndex());
-//        }
-//        note.setStartTime(this.createTime);
-//        note.setModifyTime(new Date());
-//        EventBus.getDefault().post(new NoteModifyEvent(note));
-//    }
 
     @Override
     protected void onDestroy() {

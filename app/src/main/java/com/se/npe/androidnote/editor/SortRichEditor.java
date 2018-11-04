@@ -885,13 +885,14 @@ public class SortRichEditor extends ScrollView {
     private EditText insertEditTextAtIndex(final int index, String editStr) {
         DeletableEditText editText = createEditText();
         editText.setText(editStr);
-        if (isViewOnly) {
-            editText.setFocusable(false);
-        }
         containerLayout.setLayoutTransition(null);
         containerLayout.addView(editText, index);
         containerLayout.addView(editText.getMd(), index + 1);
         containerLayout.setLayoutTransition(mTransition);
+        if (isViewOnly) {
+            editText.setFocusable(false);
+            editText.render(isMarkdown /* true */);
+        }
         return editText;
     }
 
@@ -1085,6 +1086,7 @@ public class SortRichEditor extends ScrollView {
 
     public void setViewOnly() {
         isViewOnly = true;
+        isMarkdown = true;
         title.setFocusable(false);
     }
 
