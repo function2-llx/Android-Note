@@ -352,6 +352,7 @@ public class ListActivity extends AppCompatActivity {
             @Override
             public boolean onQueryTextSubmit(String query) {
                 noteAdapter.updateSearchList(query);
+
                 return true;
             }
 
