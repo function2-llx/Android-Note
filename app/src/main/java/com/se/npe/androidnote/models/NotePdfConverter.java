@@ -14,15 +14,23 @@ import com.itextpdf.text.Image;
 import com.itextpdf.text.PageSize;
 import com.itextpdf.text.Paragraph;
 import com.itextpdf.text.pdf.BaseFont;
+import com.itextpdf.text.pdf.PdfReader;
 import com.itextpdf.text.pdf.PdfWriter;
 import com.itextpdf.text.pdf.draw.LineSeparator;
+import com.itextpdf.text.pdf.parser.PdfReaderContentParser;
+import com.itextpdf.text.pdf.parser.SimpleTextExtractionStrategy;
+import com.itextpdf.text.pdf.parser.TextExtractionStrategy;
 import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.interfaces.INoteFileConverter;
+import com.se.npe.androidnote.util.AsyncTaskWithResponse;
 import com.se.npe.androidnote.util.Logger;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,13 +43,45 @@ public class NotePdfConverter implements INoteFileConverter {
     private static final String EXCEPTION_TAG = "ITextPdf";
 
     @Override
-    public void importNoteFromFile(Note note, String filePathName) {
-        throw new UnsupportedOperationException("Import note from pdf is not supported.");
+    public void importNoteFromFile(AsyncTaskWithResponse.AsyncResponse<Note> delegate, String filePathName) {
+        new ImportNoteFromPdfTask(delegate, filePathName).execute();
     }
 
     @Override
     public void exportNoteToFile(Note note, String fileName) {
         new ExportNoteToPdfTask(note, fileName).execute();
+    }
+
+    private static class ImportNoteFromPdfTask extends AsyncTaskWithResponse<Void, Void, Note> {
+        private String filePathName;
+
+        ImportNoteFromPdfTask(AsyncResponse<Note> delegate, String filePathName) {
+            super(delegate);
+            this.filePathName = filePathName;
+        }
+
+        @Override
+        protected Note doInBackground(Void... voids) {
+            List<IData> content = new ArrayList<>();
+            try {
+                PdfReader reader = new PdfReader(filePathName);
+                PdfReaderContentParser parser = new PdfReaderContentParser(reader);
+                for (int i = 1; i <= reader.getNumberOfPages(); i++) {
+                    TextExtractionStrategy strategy = parser.processContent(i, new SimpleTextExtractionStrategy());
+                    content.add(new TextData(strategy.getResultantText()));
+                }
+                reader.close();
+            } catch (IOException e) {
+                Logger.log(EXCEPTION_TAG, e);
+            }
+            String title = filePathName.substring(filePathName.lastIndexOf(File.separatorChar) + 1, filePathName.lastIndexOf(".pdf"));
+            List<String> tags = new ArrayList<>();
+            tags.add("imported");
+            Note note = new Note(title, content, tags);
+            note.setStartTime(new Date());
+            note.setModifyTime(new Date());
+            return note;
+        }
     }
 
     private static class ExportNoteToPdfTask extends AsyncTask<Void, Void, Void> {

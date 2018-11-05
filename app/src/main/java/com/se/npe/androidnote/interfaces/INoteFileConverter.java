@@ -1,10 +1,10 @@
 package com.se.npe.androidnote.interfaces;
 
-import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.TableConfig;
+import com.se.npe.androidnote.util.AsyncTaskWithResponse;
 import com.se.npe.androidnote.util.Logger;
 
 import java.io.File;
@@ -19,10 +19,10 @@ public interface INoteFileConverter {
     /**
      * Convert note to file
      *
-     * @param note         note in RAM
+     * @param delegate     Override processFinish() to response when process finish
      * @param filePathName The path of the file (not directory)
      */
-    void importNoteFromFile(Note note, String filePathName);
+    void importNoteFromFile(AsyncTaskWithResponse.AsyncResponse<Note> delegate, String filePathName);
 
     /**
      * Convert file to note

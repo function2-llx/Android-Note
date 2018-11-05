@@ -30,8 +30,10 @@ import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.se.npe.androidnote.adapters.NoteAdapter;
 import com.se.npe.androidnote.models.Note;
+import com.se.npe.androidnote.models.NotePdfConverter;
 import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
+import com.se.npe.androidnote.util.AsyncTaskWithResponse;
 
 import java.io.File;
 import java.util.Date;
@@ -112,6 +114,15 @@ public class ListActivity extends AppCompatActivity {
                     note.setStartTime(date);
                     note.setModifyTime(date);
                     TableOperate.getInstance().modify(note);
+//                    final Uri uri = data.getData();
+//                    String path = FileUtils.getPath(this, uri);
+//                    NotePdfConverter notePdfConverter = new NotePdfConverter();
+//                    notePdfConverter.importNoteFromFile(new AsyncTaskWithResponse.AsyncResponse<Note>() {
+//                        @Override
+//                        public void processFinish(Note note) {
+//                            TableOperate.getInstance().addNote(note);
+//                        }
+//                    }, path);
                 }
                 break;
             }
