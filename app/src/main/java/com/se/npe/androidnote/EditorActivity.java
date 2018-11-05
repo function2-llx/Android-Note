@@ -29,6 +29,7 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.mob.MobSDK;
 import com.se.npe.androidnote.editor.SortRichEditor;
 import com.se.npe.androidnote.events.NoteSelectEvent;
+import com.se.npe.androidnote.interfaces.INoteFileConverter;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.NotePdfConverter;
 import com.se.npe.androidnote.models.TableOperate;
@@ -157,9 +158,9 @@ public class EditorActivity extends AppCompatActivity {
                 Note note = editor.buildNote();
                 note.setStartTime(createTime);
                 note.setModifyTime(new Date());
-                NotePdfConverter notePdfConverter = new NotePdfConverter(getApplicationContext());
+                NotePdfConverter notePdfConverter = new NotePdfConverter();
                 notePdfConverter.exportNoteToFile(note, note.getTitle());
-                Toast.makeText(this, "Exported", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Exported to " + INoteFileConverter.getExportFilePath(note.getTitle() + ".pdf"), Toast.LENGTH_SHORT).show();
                 break;
             }
 

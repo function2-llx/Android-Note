@@ -4,6 +4,7 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 
 import com.se.npe.androidnote.models.Note;
+import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.util.Logger;
 
 import java.io.File;
@@ -36,17 +37,16 @@ public interface INoteFileConverter {
      * File not existed -> create an empty file and its parent directory
      * File existed -> delete original file and create an empty file
      *
-     * @param context  activity.getApplicationContext()
      * @param fileName The name (not path) of the file
      * @return File to export
      */
-    static File createFileToExport(@NonNull Context context, String fileName) {
-        String exportDirPath = getExportDirPath(context);
+    static File createFileToExport(String fileName) {
+        String exportDirPath = getExportDirPath();
         File exportDir = new File(exportDirPath);
         // create dir
         exportDir.mkdirs();
 
-        String exportFilePath = getExportFilePath(context, fileName);
+        String exportFilePath = getExportFilePath(fileName);
         File exportFile = new File(exportFilePath);
         try {
             // delete original file
@@ -65,13 +65,12 @@ public interface INoteFileConverter {
     }
 
     @NonNull
-    static String getExportDirPath(@NonNull Context context) {
-        return context.getExternalFilesDir(null).getAbsolutePath() + "/Export/";
+    static String getExportDirPath() {
+        return TableConfig.SAVE_PATH + "/Export";
     }
 
     @NonNull
-    static String getExportFilePath(@NonNull Context context, String fileName) {
-        // ".pdf" will be automatically appended by ITextPdf
-        return getExportDirPath(context) + fileName;
+    static String getExportFilePath(String fileName) {
+        return getExportDirPath() + '/' + fileName;
     }
 }
