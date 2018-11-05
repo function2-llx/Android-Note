@@ -23,15 +23,16 @@
         android:title="@string/manage_groups" >
         <menu>
             <group
-                android:id="@+id/group_manage" >
+                android:id="@+id/group_operations">
                 <item
                     android:id="@+id/new_group"
                     android:title="@string/new_group"
                     android:icon="@mipmap/icon_add_group"
                     />
                 <item
-                    android:id="@+id/remove_group"
-                    android:title="@string/remove_group" />
+                    android:id="@+id/manage_group"
+                    android:icon="@mipmap/icon_remove"
+                    android:title="@string/manage_groups" />
             </group>
         </menu>
     </item>

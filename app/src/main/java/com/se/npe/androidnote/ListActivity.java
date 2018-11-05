@@ -90,10 +90,6 @@ public class ListActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    private Uri getContentUri(File file) {
-        System.err.println(file);
-        return FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileprovider", file);
-    }
     //Can only use lower 16 bits for requestCode
     private static final int REQUEST_FILE_CHOOSE = 23333;
 
@@ -243,128 +239,132 @@ public class ListActivity extends AppCompatActivity {
 
         refreshGroups();
 
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-//                drawerLayout.closeDrawers();
-                switch (menuItem.getGroupId()) {
-                    case R.id.group_all_notes: {
-                        noteAdapter.updateAllNotesList();
-                        currentGroup = "";
-                        setTitle(getString(R.string.list_title));
-                        break;
-                    }
-
-                    case R.id.group_groups: {
-                        String groupName = menuItem.getTitle().toString();
-                        noteAdapter.updateGroupNotesList(groupName);
-                        currentGroup = groupName;
-                        setTitle(groupName);
-                        break;
-                    }
-
-                    case R.id.group_manage: {
-                        List<String> allGroups = TableOperate.getInstance().getAllGroup();
-                        String[] allGroupsArray = allGroups.toArray(new String[0]);
-                        switch (menuItem.getItemId()) {
-                            case R.id.new_group: {
-                                EditText editText = new EditText(ListActivity.this);
-                                AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
-                                builder.setTitle("New group");
-                                builder.setPositiveButton("add", null);
-                                builder.setNegativeButton("cancel", null);
-                                builder.setView(editText);
-                                AlertDialog dialog = builder.create();
-                                dialog.show();
-                                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        String groupName = editText.getText().toString();
-                                        if (groupName.isEmpty())
-                                            Toast.makeText(ListActivity.this, "input something?", Toast.LENGTH_SHORT).show();
-                                        else if (allGroups.contains(groupName))
-                                            Toast.makeText(ListActivity.this, groupName + " already exist", Toast.LENGTH_SHORT).show();
-                                        else {
-                                            TableOperate.getInstance().addGroup(groupName);
-                                            refreshGroups();
-                                            dialog.cancel();
-                                        }
-                                    }
-                                });
-                                break;
-                            }
-
-                            case R.id.remove_group: {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
-                                builder.setTitle("remove group");
-                                boolean selected[] = new boolean[allGroupsArray.length];
-                                builder.setMultiChoiceItems(allGroupsArray, new boolean[allGroupsArray.length], new DialogInterface.OnMultiChoiceClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                                        selected[which] = isChecked;
-                                    }
-                                });
-                                builder.setNegativeButton("cancel", null);
-                                builder.setPositiveButton("confirm", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        for (int i = 0; i < allGroupsArray.length; i++)
-                                            if (selected[i])
-                                                TableOperate.getInstance().removeGroup(allGroupsArray[i]);
-                                        refreshGroups();
-                                    }
-                                });
-                                builder.show();
-                                break;
-                            }
-
-                            default:
-                                break;
-                        }
-                        break;
-                    }
-                    default:
-                        break;
+        navigationView.setNavigationItemSelectedListener(menuItem -> {
+            switch (menuItem.getGroupId()) {
+                case R.id.group_all_notes: {
+                    noteAdapter.updateAllNotesList();
+                    currentGroup = "";
+                    setTitle(getString(R.string.list_title));
+                    drawerLayout.closeDrawers();
+                    break;
                 }
 
-                return true;
+                case R.id.group_groups: {
+                    String groupName = menuItem.getTitle().toString();
+                    noteAdapter.updateGroupNotesList(groupName);
+                    currentGroup = groupName;
+                    setTitle(groupName);
+                    drawerLayout.closeDrawers();
+                    break;
+                }
+
+                case R.id.group_operations: {
+                    List<String> allGroups = TableOperate.getInstance().getAllGroup();
+                    String[] allGroupsArray = allGroups.toArray(new String[0]);
+                    switch (menuItem.getItemId()) {
+                        case R.id.new_group: {
+                            EditText editText = new EditText(ListActivity.this);
+                            AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
+                            builder.setTitle("New group");
+                            builder.setPositiveButton("add", null);
+                            builder.setNegativeButton("cancel", null);
+                            builder.setView(editText);
+                            AlertDialog dialog = builder.create();
+                            dialog.show();
+                            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
+                                @Override
+                                public void onClick(View v) {
+                                    String groupName = editText.getText().toString();
+                                    if (groupName.isEmpty())
+                                        Toast.makeText(ListActivity.this, "input something?", Toast.LENGTH_SHORT).show();
+                                    else if (allGroups.contains(groupName))
+                                        Toast.makeText(ListActivity.this, groupName + " already exist", Toast.LENGTH_SHORT).show();
+                                    else {
+                                        TableOperate.getInstance().addGroup(groupName);
+                                        refreshGroups();
+                                        dialog.cancel();
+                                    }
+                                }
+                            });
+                            break;
+                        }
+
+                        case R.id.manage_group: {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
+                            builder.setTitle(getString(R.string.manage_groups));
+                            boolean selected[] = new boolean[allGroupsArray.length];
+                            builder.setMultiChoiceItems(allGroupsArray, new boolean[allGroupsArray.length], new DialogInterface.OnMultiChoiceClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which, boolean isChecked) {
+                                    selected[which] = isChecked;
+                                }
+                            });
+                            builder.setNegativeButton("cancel", null);
+                            builder.setPositiveButton("confirm", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    for (int i = 0; i < allGroupsArray.length; i++)
+                                        if (selected[i])
+                                            TableOperate.getInstance().removeGroup(allGroupsArray[i]);
+                                    refreshGroups();
+                                }
+                            });
+                            builder.show();
+                            break;
+                        }
+
+                        default:
+                            break;
+                    }
+                    break;
+                }
+                default:
+                    break;
             }
+
+            return true;
         });
     }
+
 
     /**
      * Configure search view to set hint & listener
      */
 
-//    void setSlidingMenu() {
-//        slidingMenu = new SlidingMenu(this);
-//        slidingMenu.setMode(SlidingMenu.LEFT);
-//        slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
-//        slidingMenu.setBehindOffsetRes(R.dimen.sliding_menu_behind_witdh);
-//        slidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
-//        slidingMenu.setMenu(R.layout.sliding_menu_list);
-//        slidingMenu.setTouchModeBehind(SlidingMenu.TOUCHMODE_FULLSCREEN);
-//    }
-
     private void configureSearchView(@NonNull SearchView searchView) {
-        searchView.setQueryHint("search by title...");
+        searchView.setQueryHint("search for your note");
+
+        // open event
+        searchView.setOnSearchClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(ListActivity.this, "open search view", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                noteAdapter.updateSearchList(query);
-
+                if (currentGroup.isEmpty())
+                    noteAdapter.updateSearchList(query);
+                else
+                    noteAdapter.updateSearchListWithGroup(query, currentGroup);
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                noteAdapter.updateSearchList(newText);
+                if (currentGroup.isEmpty())
+                    noteAdapter.updateSearchList(newText);
+                else
+                    noteAdapter.updateSearchListWithGroup(newText, currentGroup);
                 return true;
             }
         });
 
+        // close event
         searchView.setOnCloseListener(() -> {
-            ultimateRecyclerView.setAdapter(noteAdapter);
+            updateList();
             return false;
         });
     }
