@@ -158,7 +158,7 @@ public class EditorActivity extends AppCompatActivity {
                 note.setStartTime(createTime);
                 note.setModifyTime(new Date());
                 NotePdfConverter notePdfConverter = new NotePdfConverter(getApplicationContext());
-                notePdfConverter.exportNoteToFile(note, "test");
+                notePdfConverter.exportNoteToFile(note, note.getTitle());
                 Toast.makeText(this, "Exported", Toast.LENGTH_SHORT).show();
                 break;
             }

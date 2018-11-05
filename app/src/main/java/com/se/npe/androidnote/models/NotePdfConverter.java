@@ -38,7 +38,7 @@ import java.util.List;
 public class NotePdfConverter implements INoteFileConverter {
 
     private Context context;
-    static final String EXCEPTION_TAG = "ITextPdf";
+    private static final String EXCEPTION_TAG = "ITextPdf";
 
     public NotePdfConverter(@NonNull Context context) {
         this.context = context;
@@ -94,7 +94,7 @@ public class NotePdfConverter implements INoteFileConverter {
             titleParagraph.setAlignment(Element.ALIGN_CENTER);
             document.add(titleParagraph);
         } catch (DocumentException e) {
-            Logger.log("ITextPdf", e);
+            Logger.log(EXCEPTION_TAG, e);
         }
         // group
         String noteGroup = note.getGroupName();
@@ -135,7 +135,7 @@ public class NotePdfConverter implements INoteFileConverter {
                     // retrieve the first bitmap of the video
                     MediaMetadataRetriever retriever = new MediaMetadataRetriever();
                     retriever.setDataSource(data.getPath());
-                    Bitmap bitmap = retriever.getFrameAtTime(0, MediaMetadataRetriever.OPTION_CLOSEST_SYNC);
+                    Bitmap bitmap = retriever.getFrameAtTime(1000 * 1000, MediaMetadataRetriever.OPTION_CLOSEST_SYNC); // retrieve at about 1s
                     // convert bitmap to byte array
                     ByteArrayOutputStream stream = new ByteArrayOutputStream();
                     bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
