@@ -14,6 +14,7 @@ import com.se.npe.androidnote.R;
 import com.se.npe.androidnote.models.DataExample;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.SingletonResetter;
+import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
 
 import org.junit.After;
@@ -62,30 +63,6 @@ public class NoteAdapterTest {
     @After
     public void tearDown() {
         SingletonResetter.resetTableOperateSingleton();
-    }
-
-    @Test
-    public void setComparator() {
-        for (int i = 0; i < 3; ++i) {
-            Comparator<Note> comparator;
-            switch (i) {
-                case 0: {
-                    comparator = Comparator.comparing(Note::getTitle);
-                    break;
-                }
-                case 1: {
-                    comparator = Comparator.comparing(Note::getStartTime);
-                    break;
-                }
-                default: {
-                    comparator = Comparator.comparing(Note::getModifyTime);
-                    break;
-                }
-            }
-            noteAdapter.setComparator(comparator);
-            noteList.sort(comparator);
-            assertEquals(noteList, noteAdapter.getItems());
-        }
     }
 
     @Test
@@ -138,6 +115,15 @@ public class NoteAdapterTest {
     @Test
     public void updateList() {
         assertEquals(NOTE_LIST_SIZE, noteAdapter.getAdapterItemCount());
+    }
+
+    @Test
+    public void setSortField() {
+        for (String sortField : TableConfig.Sorter.SORTER_FIELDS) {
+            noteAdapter.setSortField(sortField);
+            noteList.sort(TableConfig.Sorter.SORTER_FIELD_TO_COMPARATOR.get(sortField));
+            assertEquals(noteList, noteAdapter.getItems());
+        }
     }
 
     @Test

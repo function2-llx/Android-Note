@@ -18,14 +18,14 @@ import static org.junit.Assert.*;
 @RunWith(RobolectricTestRunner.class)
 public class NotePdfConverterTest {
 
-    Context context;
     private NotePdfConverter notePdfConverter;
 
     @Before
     public void setUp() {
+        notePdfConverter = new NotePdfConverter();
         AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
-        context = activity.getApplicationContext();
-        notePdfConverter = new NotePdfConverter(context);
+        Context context = activity.getApplicationContext();
+        TableConfig.SAVE_PATH = context.getExternalFilesDir(null).getAbsolutePath(); // initialize SAVE_PATH
     }
 
     @Test
@@ -37,9 +37,12 @@ public class NotePdfConverterTest {
         Note note = DataExample.getExampleNote(DataExample.EXAMPLE_MIX_IN);
         notePdfConverter.exportNoteToFile(note, DataExample.EXAMPLE_MIX_IN);
 
-        File exportDir = new File(INoteFileConverter.getExportDirPath(context));
-        File exportFile = new File(INoteFileConverter.getExportFilePath(context, DataExample.EXAMPLE_MIX_IN + ".pdf"));
+        File exportDir = new File(INoteFileConverter.getExportDirPath());
+        File exportFile = new File(INoteFileConverter.getExportFilePath(DataExample.EXAMPLE_MIX_IN + ".pdf"));
         assertTrue(exportFile.exists());
         assertNotEquals(0, exportDir.listFiles().length);
+        for (File file : exportDir.listFiles()) {
+            System.out.println(file.getAbsolutePath());
+        }
     }
 }

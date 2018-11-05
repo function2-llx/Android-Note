@@ -44,7 +44,6 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 
     public NoteAdapter(ListActivity activity) {
         this.activity = activity;
-        String wtf = TableOperate.getSearchConfig();
         this.comparator = TableConfig.Sorter.SORTER_FIELD_TO_COMPARATOR.get(TableOperate.getSearchConfig());
     }
 
