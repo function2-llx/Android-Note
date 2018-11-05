@@ -120,7 +120,7 @@ public class TableOperate implements INoteCollection {
 
     List<String> stringToListString(String src) {
         if (src.length() == 0) return new ArrayList<>();
-        String[] strings = src.split(TableConfig.FileSave.LINE_SEPARATOR);
+        String[] strings = src.split(TableConfig.FileSave.LIST_SEPARATOR);
         return Arrays.asList(strings);
     }
 
