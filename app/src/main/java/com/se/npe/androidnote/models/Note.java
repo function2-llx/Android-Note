@@ -166,25 +166,22 @@ public class Note {
 
         //文件夹生成
 
-        File savepath = new File(TableConfig.SAVE_PATH);
-        if (!savepath.exists()) {
-            savepath.mkdir();
+        File savePath = new File(TableConfig.SAVE_PATH);
+        if (!savePath.exists()) {
+            savePath.mkdir();
         }
-        File notesave = new File(TableConfig.SAVE_PATH + "/NoteSave");
-        if (!notesave.exists()) {
-            notesave.mkdirs();
+        File noteSave = new File(TableConfig.SAVE_PATH + "/NoteSave");
+        if (!noteSave.exists()) {
+            noteSave.mkdirs();
         }
-        File tempfloder = new File(TableConfig.SAVE_PATH + "/NoteSave/TempFloder");
-        //if (!tempfloder.exists()) {
-        //    tempfloder.mkdirs();
-        //}
+        File tempFloder = new File(TableConfig.SAVE_PATH + "/NoteSave/TempFloder");
 
         //文件解压缩
         FileOperate.unzip(fileName, TableConfig.SAVE_PATH + "/NoteSave");
 
         //文件解压测试
         Log.d("debug0001", "TestFileUnzip");
-        File fa[] = tempfloder.listFiles();
+        File fa[] = tempFloder.listFiles();
         for (File fs : fa) {
             if (fs.isDirectory()) {
                 Log.d("debug0001", fs.getPath() + "目录");
@@ -212,14 +209,14 @@ public class Note {
             Logger.log(LOG_TAG, e);
         }
 
-        String tempcontent = new String(b);
-        String[] StrArray = tempcontent.split(TableConfig.FileSave.LIST_SEPARATOR);
+        String tempContent = new String(b);
+        String[] StrArray = tempContent.split(TableConfig.FileSave.LIST_SEPARATOR);
 
         title = StrArray[0];
 
         //Note资源文件转移
 
-        tempfloder.renameTo(new File(TableConfig.SAVE_PATH + "/NoteSave/" + title + "_unzip"));
+        tempFloder.renameTo(new File(TableConfig.SAVE_PATH + "/NoteSave/" + title + "_unzip"));
 
         //转移测试
 
@@ -244,7 +241,7 @@ public class Note {
             Log.d("debug0001", StrArray[i]);
             if (StrArray[i].charAt(0) == 'S') {
                 String[] tempArray = StrArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
-                SoundData tempSoundData = new SoundData(tempArray[1], tempArray[2]);
+                SoundData tempSoundData = new SoundData(tempArray[1], TableConfig.SAVE_PATH + tempArray[2]);
                 content.add(tempSoundData);
             } else if (StrArray[i].charAt(0) == 'T') {
                 String[] tempArray = StrArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
@@ -252,11 +249,11 @@ public class Note {
                 content.add(tempTextData);
             } else if (StrArray[i].charAt(0) == 'V') {
                 String[] tempArray = StrArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
-                VideoData tempVideoData = new VideoData(tempArray[1]);
+                VideoData tempVideoData = new VideoData(TableConfig.SAVE_PATH + tempArray[1]);
                 content.add(tempVideoData);
             } else if (StrArray[i].charAt(0) == 'P') {
                 String[] tempArray = StrArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
-                PictureData tempPictureData = new PictureData(tempArray[1]);
+                PictureData tempPictureData = new PictureData(TableConfig.SAVE_PATH + tempArray[1]);
                 content.add(tempPictureData);
             }
         }
@@ -278,17 +275,17 @@ public class Note {
 
         //文件夹生成
 
-        File savepath = new File(TableConfig.SAVE_PATH);
-        if (!savepath.exists()) {
-            savepath.mkdir();
+        File savePath = new File(TableConfig.SAVE_PATH);
+        if (!savePath.exists()) {
+            savePath.mkdir();
         }
-        File notesave = new File(TableConfig.SAVE_PATH + "/NoteSave");
-        if (!notesave.exists()) {
-            notesave.mkdirs();
+        File noteSave = new File(TableConfig.SAVE_PATH + "/NoteSave");
+        if (!noteSave.exists()) {
+            noteSave.mkdirs();
         }
-        File tempfloder = new File(TableConfig.SAVE_PATH + "/NoteSave/TempFloder");
-        if (!tempfloder.exists()) {
-            tempfloder.mkdirs();
+        File tempFloder = new File(TableConfig.SAVE_PATH + "/NoteSave/TempFloder");
+        if (!tempFloder.exists()) {
+            tempFloder.mkdirs();
         }
 
         //Note资源文件拷贝
@@ -340,17 +337,17 @@ public class Note {
         for (int i = 0; i < ContentList.size(); i++) {
             switch (ContentList.get(i).getType()) {
                 case "Pic": {
-                    String newdir = TableConfig.SAVE_PATH + "/NoteSave/" + getTitle() + "_unzip/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
+                    String newdir = "/NoteSave/" + getTitle() + "_unzip/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
                     string.append("Picture").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LIST_SEPARATOR);
                     break;
                 }
                 case "Sound": {
-                    String newdir = TableConfig.SAVE_PATH + "/NoteSave/" + getTitle() + "_unzip/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
+                    String newdir = "/NoteSave/" + getTitle() + "_unzip/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
                     string.append("Sound").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LINE_SEPARATOR).append(ContentList.get(i).getText()).append(TableConfig.FileSave.LIST_SEPARATOR);
                     break;
                 }
                 case "Video": {
-                    String newdir = TableConfig.SAVE_PATH + "/NoteSave/" + getTitle() + "_unzip/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
+                    String newdir = "/NoteSave/" + getTitle() + "_unzip/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
                     string.append("Video").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LIST_SEPARATOR);
                     break;
                 }
@@ -374,8 +371,8 @@ public class Note {
         }
 
         //文件压缩
-        String zipFileName = TableConfig.SAVE_PATH + "/NoteSave/" + fileName + ".zip";
-        FileOperate.zip(TableConfig.SAVE_PATH + "/NoteSave/TempFloder", TableConfig.SAVE_PATH + "/NoteSave/" + fileName + ".zip");
+        String zipFileName = TableConfig.SAVE_PATH + "/NoteSave/" + fileName + ".note";
+        FileOperate.zip(TableConfig.SAVE_PATH + "/NoteSave/TempFloder", TableConfig.SAVE_PATH + "/NoteSave/" + fileName + ".note");
 
 
         //文件夹删除
@@ -383,7 +380,7 @@ public class Note {
 
         //文件存储测试
         Log.d("debug0001", "TestFileSave");
-        File fa[] = notesave.listFiles();
+        File fa[] = noteSave.listFiles();
         for (File fs : fa) {
             if (fs.isDirectory()) {
                 Log.d("debug0001", fs.getPath() + "目录");
