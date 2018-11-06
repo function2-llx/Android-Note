@@ -34,6 +34,7 @@ import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.NotePdfConverter;
 import com.se.npe.androidnote.models.TableOperate;
 import com.se.npe.androidnote.sound.ResultPool;
+import com.se.npe.androidnote.util.AsyncTaskWithResponse;
 import com.se.npe.androidnote.util.Logger;
 
 import org.greenrobot.eventbus.EventBus;
@@ -159,8 +160,12 @@ public class EditorActivity extends AppCompatActivity {
                 note.setStartTime(createTime);
                 note.setModifyTime(new Date());
                 NotePdfConverter notePdfConverter = new NotePdfConverter();
-                notePdfConverter.exportNoteToFile(note, note.getTitle());
-                Toast.makeText(this, "Exported to " + INoteFileConverter.getExportFilePath(note.getTitle() + ".pdf"), Toast.LENGTH_SHORT).show();
+                notePdfConverter.exportNoteToFile(new AsyncTaskWithResponse.AsyncResponse<String>() {
+                    @Override
+                    public void processFinish(String s) {
+                        Toast.makeText(getApplicationContext(), "Exported to " + s, Toast.LENGTH_SHORT).show();
+                    }
+                }, note, note.getTitle());
                 break;
             }
 

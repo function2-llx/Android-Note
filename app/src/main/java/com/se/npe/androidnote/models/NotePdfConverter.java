@@ -48,8 +48,8 @@ public class NotePdfConverter implements INoteFileConverter {
     }
 
     @Override
-    public void exportNoteToFile(Note note, String fileName) {
-        new ExportNoteToPdfTask(note, fileName).execute();
+    public void exportNoteToFile(AsyncTaskWithResponse.AsyncResponse<String> delegate, Note note, String fileName) {
+        new ExportNoteToPdfTask(delegate, note, fileName).execute();
     }
 
     private static class ImportNoteFromPdfTask extends AsyncTaskWithResponse<Void, Void, Note> {
@@ -84,17 +84,18 @@ public class NotePdfConverter implements INoteFileConverter {
         }
     }
 
-    private static class ExportNoteToPdfTask extends AsyncTask<Void, Void, Void> {
+    private static class ExportNoteToPdfTask extends AsyncTaskWithResponse<Void, Void, String> {
         private Note note;
         private String fileName;
 
-        ExportNoteToPdfTask(Note note, String fileName) {
+        ExportNoteToPdfTask(AsyncResponse<String> delegate, Note note, String fileName) {
+            super(delegate);
             this.note = note;
             this.fileName = fileName;
         }
 
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected String doInBackground(Void... voids) {
             // create pdf document
             Document document = new Document();
             try {
@@ -206,7 +207,7 @@ public class NotePdfConverter implements INoteFileConverter {
             }
 
             document.close();
-            return null;
+            return INoteFileConverter.getExportFilePath(fileName + ".pdf");
         }
     }
 }

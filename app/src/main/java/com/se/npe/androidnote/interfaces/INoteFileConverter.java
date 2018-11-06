@@ -27,10 +27,11 @@ public interface INoteFileConverter {
     /**
      * Convert file to note
      *
+     * @param delegate Override processFinish() to response when process finish
      * @param note     note in RAM
      * @param fileName The name (not path) of the file
      */
-    void exportNoteToFile(Note note, String fileName);
+    void exportNoteToFile(AsyncTaskWithResponse.AsyncResponse<String> delegate, Note note, String fileName);
 
     /**
      * Create file to export
