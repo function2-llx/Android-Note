@@ -263,12 +263,10 @@ public class EditorActivity extends AppCompatActivity {
             Logger.log(LOG_TAG, e);
         }
 
-        /*
         try {
             MobSDK.init(this);
-        } catch (Exception e) {
+        } catch (Throwable e) {
         }
-        */
     }
 
     private void openCamera(int code) {
