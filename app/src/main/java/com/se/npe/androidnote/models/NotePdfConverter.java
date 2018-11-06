@@ -2,7 +2,6 @@ package com.se.npe.androidnote.models;
 
 import android.graphics.Bitmap;
 import android.media.MediaMetadataRetriever;
-import android.os.AsyncTask;
 
 import com.itextpdf.text.BaseColor;
 import com.itextpdf.text.Chunk;
@@ -52,7 +51,7 @@ public class NotePdfConverter implements INoteFileConverter {
         new ExportNoteToPdfTask(delegate, note, fileName).execute();
     }
 
-    private static class ImportNoteFromPdfTask extends AsyncTaskWithResponse<Void, Void, Note> {
+    static class ImportNoteFromPdfTask extends AsyncTaskWithResponse<Void, Void, Note> {
         private String filePathName;
 
         ImportNoteFromPdfTask(AsyncResponse<Note> delegate, String filePathName) {
@@ -84,7 +83,7 @@ public class NotePdfConverter implements INoteFileConverter {
         }
     }
 
-    private static class ExportNoteToPdfTask extends AsyncTaskWithResponse<Void, Void, String> {
+    static class ExportNoteToPdfTask extends AsyncTaskWithResponse<Void, Void, String> {
         private Note note;
         private String fileName;
 
