@@ -43,7 +43,7 @@ public class NoteZipConverter implements INoteFileConverter {
         protected Note doInBackground(Void... voids) {
 
             // unzip
-            FileOperate.unzip(filePathName, getTempDirPath());
+            FileOperate.unzip(filePathName, INoteFileConverter.getExportDirPath());
 
             //文件解压测试
 //            Log.d("debug0001", "TestFileUnzip");
@@ -59,36 +59,38 @@ public class NoteZipConverter implements INoteFileConverter {
 
             //Note标题解析
 
-            File file = new File(TableConfig.SAVE_PATH + "/NoteSave/TempFloder/data.txt");
+            File file = new File(INoteFileConverter.getExportDirPath() + "/TempFloder/data.txt");
             InputStream inputStream = null;
             try {
                 inputStream = new FileInputStream(file);
             } catch (FileNotFoundException e) {
                 Logger.log(EXCEPTION_TAG, e);
-                return;
+                return new Note();
             }
 
             byte b[] = new byte[(int) file.length()];
             try {
                 int len = inputStream.read(b);
-                if (len == -1) return;
+                if (len == -1) return new Note();
             } catch (Exception e) {
                 Logger.log(EXCEPTION_TAG, e);
             }
 
+            Note note = new Note();
+
             String tempcontent = new String(b);
             String[] StrArray = tempcontent.split(TableConfig.FileSave.LIST_SEPARATOR);
-
-            title = StrArray[0];
+            note.setTitle(StrArray[0]);
 
             //Note资源文件转移
 
-            tempfloder.renameTo(new File(TableConfig.SAVE_PATH + "/NoteSave/" + title + "_unzip"));
+            File tempFloder = new File(INoteFileConverter.getExportDirPath() + "/tempFloder")
+            tempFloder.renameTo(new File(INoteFileConverter.getExportDirPath() + note.getTitle() + "_unzip"));
 
             //转移测试
 
             Log.d("debug0001", "TestFileMove");
-            File unzip = new File(TableConfig.SAVE_PATH + "/NoteSave/" + title + "_unzip");
+            File unzip = new File(INoteFileConverter.getExportDirPath() + note.getTitle() + "_unzip");
             File fax[] = unzip.listFiles();
             for (File fs : fax) {
                 if (fs.isDirectory()) {
