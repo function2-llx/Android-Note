@@ -85,7 +85,7 @@ public class NoteZipConverter implements INoteFileConverter {
 
             //Note资源文件转移
 
-            File tempFloder = new File(INoteFileConverter.getExportDirPath() + "/tempFloder")
+            File tempFloder = new File(INoteFileConverter.getExportDirPath() + "/tempFloder");
             tempFloder.renameTo(new File(INoteFileConverter.getExportDirPath() + note.getTitle() + "_unzip"));
 
             //转移测试
@@ -132,29 +132,6 @@ public class NoteZipConverter implements INoteFileConverter {
             }
             return note;
         }
-
-
-        String foo() {
-            File file = new File(TableConfig.SAVE_PATH + "/NoteSave/TempFloder/data.txt");
-            InputStream inputStream = null;
-            try {
-                inputStream = new FileInputStream(file);
-            } catch (FileNotFoundException e) {
-                Logger.log(EXCEPTION_TAG, e);
-                return;
-            }
-
-            byte b[] = new byte[(int) file.length()];
-            try {
-                int len = inputStream.read(b);
-                if (len == -1) return;
-            } catch (Exception e) {
-                Logger.log(EXCEPTION_TAG, e);
-            }
-
-            String tempcontent = new String(b);
-            String[] StrArray = tempcontent.split(TableConfig.FileSave.LIST_SEPARATOR);
-        }
     }
 
     static class ExportNoteToZipTask extends AsyncTaskWithResponse<Void, Void, String> {
@@ -169,76 +146,51 @@ public class NoteZipConverter implements INoteFileConverter {
 
         @Override
         protected String doInBackground(Void... voids) {
-            // temp dir for zip
-            File tempDir = new File(getTempDirPath());
-            if (tempDir.exists() && !tempDir.delete()) {
-                Logger.logError(EXCEPTION_TAG, "delete fails");
-            }
-            tempDir.mkdirs();
 
-            // the structure of note
-            //
-            List<IData> content = note.getContent();
-            StringBuilder string = new StringBuilder(note.getTitle() + TableConfig.FileSave.LIST_SEPARATOR);
+            //文件夹生成
 
-            for (int i = 0; i < content.size(); i++) {
-                switch (content.get(i).getType()) {
-                    case "Pic": {
-                        String newdir = note.getTitle() + "_unzip/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(content.get(i).getPath());
-                        string.append("Picture").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LIST_SEPARATOR);
-                        break;
-                    }
-                    case "Sound": {
-                        String newdir = note.getTitle() + "_unzip/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(content.get(i).getPath());
-                        string.append("Sound").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LINE_SEPARATOR).append(content.get(i).getText()).append(TableConfig.FileSave.LIST_SEPARATOR);
-                        break;
-                    }
-                    case "Video": {
-                        String newdir = note.getTitle() + "_unzip/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(content.get(i).getPath());
-                        string.append("Video").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LIST_SEPARATOR);
-                        break;
-                    }
-                    default:
-                        string.append(content.get(i).toString()).append(TableConfig.FileSave.LIST_SEPARATOR);
-                        break;
-                }
+            File tempFloder = new File(getTempDirPath());
+            if (!tempFloder.exists()) {
+                tempFloder.mkdirs();
             }
 
+            //Note资源文件拷贝
 
-            // copy resources (picture, sound, video)
-            for (int i = 0; i < content.size(); ++i) {
-                switch (content.get(i).getType()) {
+            File srcFile;
+            File desFile;
+            List<IData> ContentList = note.getContent();
+
+            for (int i = 0; i < ContentList.size(); i++) {
+                switch (ContentList.get(i).getType()) {
                     case "Pic":
-                    case "Sound":
-                    case "Video":
-                        File srcFile = new File(content.get(i).getPath());
-                        File desFile = new File(getTempDirPath() + "data" + i + "." + FileOperate.getSuffix(content.get(i).getPath()));
+                        srcFile = new File(ContentList.get(i).getPath());
+                        FileOperate.getSuffix(ContentList.get(i).getPath());
+                        desFile = new File(getTempDirPath() + "/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath()));
                         FileOperate.copy(srcFile, desFile);
                         break;
-                    default:
+                    case "Sound":
+                        srcFile = new File(ContentList.get(i).getPath());
+                        desFile = new File(getTempDirPath() + "/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath()));
+                        FileOperate.copy(srcFile, desFile);
+                        break;
+                    case "Video":
+                        srcFile = new File(ContentList.get(i).getPath());
+                        desFile = new File(getTempDirPath() + "/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath()));
+                        FileOperate.copy(srcFile, desFile);
                         break;
                 }
             }
 
-            File dataFile = new File(getTempDirPath() + "/data.txt");
-            try {
-                // delete original file
-                if (dataFile.exists() && !dataFile.delete()) {
-                    throw new IOException("delete fails");
+            //Note结构文件
+
+            File file = new File(getTempDirPath() + "/data.txt");
+            if (!file.exists()) {
+                try {
+                    file.createNewFile();
+                } catch (IOException e) {
+                    Logger.log(EXCEPTION_TAG, e);
                 }
-                // create file
-                if (!dataFile.createNewFile()) {
-                    throw new IOException("createNewFile fails");
-                }
-            } catch (IOException e) {
-                Logger.log("CreateFile", e);
             }
-
-            try (OutputStream outputStream = new FileOutputStream(dataFile)) {
-
-            }
-
-
             OutputStream outputStream = null;
             try {
                 outputStream = new FileOutputStream(file);
@@ -246,22 +198,22 @@ public class NoteZipConverter implements INoteFileConverter {
                 Logger.log(EXCEPTION_TAG, e);
                 return "fuck";
             }
-            StringBuilder string = new StringBuilder(getTitle() + TableConfig.FileSave.LIST_SEPARATOR);
+            StringBuilder string = new StringBuilder(note.getTitle() + TableConfig.FileSave.LIST_SEPARATOR);
 
             for (int i = 0; i < ContentList.size(); i++) {
                 switch (ContentList.get(i).getType()) {
                     case "Pic": {
-                        String newdir = TableConfig.SAVE_PATH + "/NoteSave/" + getTitle() + "_unzip/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
+                        String newdir = "/TempFloder/" + note.getTitle() + "_unzip/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
                         string.append("Picture").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LIST_SEPARATOR);
                         break;
                     }
                     case "Sound": {
-                        String newdir = TableConfig.SAVE_PATH + "/NoteSave/" + getTitle() + "_unzip/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
+                        String newdir = "/TempFloder/" + note.getTitle() + "_unzip/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
                         string.append("Sound").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LINE_SEPARATOR).append(ContentList.get(i).getText()).append(TableConfig.FileSave.LIST_SEPARATOR);
                         break;
                     }
                     case "Video": {
-                        String newdir = TableConfig.SAVE_PATH + "/NoteSave/" + getTitle() + "_unzip/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
+                        String newdir = "/TempFloder/" + note.getTitle() + "_unzip/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
                         string.append("Video").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LIST_SEPARATOR);
                         break;
                     }
@@ -284,14 +236,27 @@ public class NoteZipConverter implements INoteFileConverter {
                 Logger.log(EXCEPTION_TAG, e);
             }
 
-            // zip
-            String zipFilePathName = INoteFileConverter.getExportFilePath(fileName + ".note");
-            FileOperate.zip(getTempDirPath(), zipFilePathName);
+            //文件压缩
+            String zipFileName = INoteFileConverter.getExportDirPath() + "/" + fileName + ".note";
+            FileOperate.zip(getTempDirPath(), zipFileName);
 
-            // delete temp dir
+
+            //文件夹删除
             FileOperate.delete(getTempDirPath());
 
-            return zipFilePathName;
+            //文件存储测试
+            Log.d("debug0001", "TestFileSave");
+            File noteSave = new File(INoteFileConverter.getExportDirPath());
+            File fa[] = noteSave.listFiles();
+            for (File fs : fa) {
+                if (fs.isDirectory()) {
+                    Log.d("debug0001", fs.getPath() + "目录");
+                } else {
+                    Log.d("debug0001", fs.getPath() + "文件");
+                }
+            }
+
+            return zipFileName;
         }
     }
 
