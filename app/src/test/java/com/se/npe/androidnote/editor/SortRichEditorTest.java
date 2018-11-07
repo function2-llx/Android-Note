@@ -26,6 +26,11 @@ public class SortRichEditorTest {
     }
 
     @Test
+    public void testEmptyViewClick() {
+        editor.getEmptyView().performClick();
+    }
+
+    @Test
     public void sort() {
         assertNotNull(editor);
         editor.sort();
