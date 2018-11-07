@@ -11,6 +11,7 @@ import com.se.npe.androidnote.editor.SortRichEditor;
 
 import static org.junit.Assert.*;
 
+import org.bouncycastle.util.Integers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,6 +19,7 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import com.se.npe.androidnote.sound.ResultPool;
 
+import java.lang.reflect.Method;
 import java.util.Date;
 
 @RunWith(RobolectricTestRunner.class)
@@ -49,5 +51,31 @@ public class EditorActivityTest {
     @Test
     public void testDestroy() {
         activity.onDestroy();
+    }
+
+    @Test
+    public void testOpenCamera() {
+        Class<?> clazz = EditorActivity.class;
+        Method method;
+        try {
+            method = clazz.getDeclaredMethod("openCamera", int.class);
+            assertNotNull(method);
+            method.setAccessible(true);
+            method.invoke(activity, 1);
+        } catch (Exception e) {
+        }
+    }
+
+    @Test
+    public void testPickMedia() {
+        Class<?> clazz = EditorActivity.class;
+        Method method;
+        try {
+            method = clazz.getDeclaredMethod("pickMedia", int.class);
+            assertNotNull(method);
+            method.setAccessible(true);
+            method.invoke(activity, 1);
+        } catch (Exception e) {
+        }
     }
 }

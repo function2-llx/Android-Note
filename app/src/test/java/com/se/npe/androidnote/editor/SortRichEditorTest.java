@@ -3,6 +3,7 @@ package com.se.npe.androidnote.editor;
 import android.view.MotionEvent;
 import android.widget.RelativeLayout;
 
+import com.googlecode.mp4parser.authoring.Edit;
 import com.se.npe.androidnote.EditorActivity;
 import com.se.npe.androidnote.R;
 
@@ -23,7 +24,7 @@ public class SortRichEditorTest {
     EditorActivity activity;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         activity = Robolectric.setupActivity(EditorActivity.class);
         assertNotNull(activity);
         editor = activity.findViewById(R.id.rich_editor);
@@ -31,14 +32,34 @@ public class SortRichEditorTest {
     }
 
     @Test
-    public void testEmptyViewClick() throws Exception {
+    public void testEmptyViewClick() {
         Class<?> clazz = SortRichEditor.class;
-        Field field = clazz.getDeclaredField("emptyView");
+        Field field = null;
+        RelativeLayout emptyView = null;
+
+        EditorActivity activity2 = Robolectric.setupActivity(EditorActivity.class);
+        SortRichEditor editor2 = activity2.findViewById(R.id.rich_editor);
+
+        try {
+            field = clazz.getDeclaredField("emptyView");
+        } catch (Exception e) {
+        }
         assertNotNull(field);
         field.setAccessible(true);
-        RelativeLayout emptyView = (RelativeLayout)field.get(editor);
+        try {
+            emptyView = (RelativeLayout) field.get(editor2);
+        } catch (Exception e) {
+        }
+        assertNotNull(emptyView);
+
+        editor2.sort();
         emptyView.performClick();
-        editor.sort();
+
+        try {
+            emptyView = (RelativeLayout) field.get(editor);
+        } catch (Exception e) {
+        }
+        assertNotNull(emptyView);
         emptyView.performClick();
     }
 
