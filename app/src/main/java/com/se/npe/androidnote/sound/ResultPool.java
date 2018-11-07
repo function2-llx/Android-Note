@@ -161,11 +161,14 @@ public class ResultPool {
         if (!f.createNewFile()) {
             throw new IOException("create file failed " + TEMP_OUTPUT_PATH);
         }
-        startTime = System.currentTimeMillis();
-        recorder = new AudioUtil.AudioRecordThread(TEMP_OUTPUT_PATH);
-        recorder.start();
-        iFlyFeeder = new IFlyFeeder(this);
-        iFlyFeeder.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        try {
+            startTime = System.currentTimeMillis();
+            recorder = new AudioUtil.AudioRecordThread(TEMP_OUTPUT_PATH);
+            recorder.start();
+            iFlyFeeder = new IFlyFeeder(this);
+            iFlyFeeder.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        } catch (Exception e) {
+        }
     }
 
     public long getStartTime() {

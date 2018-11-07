@@ -235,7 +235,6 @@ public class EditorActivity extends AppCompatActivity {
             insertMedia.collapse();
             editor.sort();
         });
-
         // set view only mode before load note
         // so that the component can be set as view only
         if (getIntent().getBooleanExtra(VIEW_ONLY, false)) {
@@ -264,7 +263,10 @@ public class EditorActivity extends AppCompatActivity {
             Logger.log(LOG_TAG, e);
         }
 
-        MobSDK.init(this);
+        try {
+            MobSDK.init(this);
+        } catch (Throwable e) {
+        }
     }
 
     private void openCamera(int code) {

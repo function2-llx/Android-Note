@@ -82,7 +82,7 @@ public class NoteAdapterTest {
                     break;
                 }
             }
-            noteAdapter.setComparator(comparator);
+            //noteAdapter.setComparator(comparator);
             noteList.sort(comparator);
             assertEquals(noteList, noteAdapter.getItems());
         }

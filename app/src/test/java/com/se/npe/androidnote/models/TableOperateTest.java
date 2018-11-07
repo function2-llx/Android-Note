@@ -89,7 +89,7 @@ public class TableOperateTest {
     @Test
     public void setSearchConfigAndGetSearchConfig() {
         final int SEARCH_CONFIG = 0;
-        TableOperate.setSearchConfig(SEARCH_CONFIG);
+        TableOperate.setSearchConfig(String.valueOf(SEARCH_CONFIG));
         assertEquals(SEARCH_CONFIG, TableOperate.getSearchConfig());
     }
 

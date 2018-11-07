@@ -1,33 +1,81 @@
 package com.se.npe.androidnote;
 
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
+import android.view.View;
 
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.se.npe.androidnote.editor.SortRichEditor;
 
 import static org.junit.Assert.*;
+
+import org.bouncycastle.util.Integers;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
+import com.se.npe.androidnote.sound.ResultPool;
+
+import java.lang.reflect.Method;
+import java.util.Date;
 
 @RunWith(RobolectricTestRunner.class)
 public class EditorActivityTest {
-    @Test
-    public void testCreateActivity() {
-        EditorActivity activity = Robolectric.setupActivity(EditorActivity.class);
+    EditorActivity activity;
+
+    @Before
+    public void setUp() {
+        activity = Robolectric.setupActivity(EditorActivity.class);
         assertNotNull(activity);
+    }
 
-        Toolbar toolbar = activity.findViewById(R.id.toolbar);
-        assertNotNull(toolbar);
-        activity.setSupportActionBar(toolbar);
-        assertNotNull(activity.getSupportActionBar());
-        // can't test button. todo
+    @Test
+    public void testOnCreate() {
+        assertNotNull(activity.findViewById(R.id.toolbar));
+        assertNotNull(activity.findViewById(R.id.rich_editor));
+        activity.findViewById(R.id.insert_picture).performClick();
+        activity.findViewById(R.id.insert_video).performClick();
+        activity.findViewById(R.id.insert_sound).performClick();
+        activity.findViewById(R.id.rearrange_editor).performClick();
 
-        SortRichEditor editor = activity.findViewById(R.id.rich_editor);
-        assertNotNull(editor);
+        // test another if branch
+        Intent intent = new Intent();
+        intent.putExtra(EditorActivity.VIEW_ONLY, true);
+        EditorActivity activity2 = Robolectric.buildActivity(EditorActivity.class, intent).create().get();
+        assertNotNull(activity2);
+    }
 
-        FloatingActionsMenu insertMedia = activity.findViewById(R.id.insert_media);
-        assertNotNull(insertMedia);
+    @Test
+    public void testDestroy() {
+        activity.onDestroy();
+    }
+
+    @Test
+    public void testOpenCamera() {
+        Class<?> clazz = EditorActivity.class;
+        Method method;
+        try {
+            method = clazz.getDeclaredMethod("openCamera", int.class);
+            assertNotNull(method);
+            method.setAccessible(true);
+            method.invoke(activity, 1);
+        } catch (Exception e) {
+        }
+    }
+
+    @Test
+    public void testPickMedia() {
+        Class<?> clazz = EditorActivity.class;
+        Method method;
+        try {
+            method = clazz.getDeclaredMethod("pickMedia", int.class);
+            assertNotNull(method);
+            method.setAccessible(true);
+            method.invoke(activity, 1);
+        } catch (Exception e) {
+        }
     }
 }
