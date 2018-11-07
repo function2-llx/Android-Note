@@ -35,8 +35,9 @@ public class NotePdfConverterTest {
     @Test
     public void exportNoteToFile() {
         Note note = DataExample.getExampleNote(DataExample.EXAMPLE_MIX_IN);
-        notePdfConverter.exportNoteToFile(note, DataExample.EXAMPLE_MIX_IN);
-
+        notePdfConverter.exportNoteToFile((String filePathName) ->
+                        assertEquals(INoteFileConverter.getExportFilePath(DataExample.EXAMPLE_MIX_IN + ".pdf"), filePathName),
+                note, DataExample.EXAMPLE_MIX_IN);
         File exportDir = new File(INoteFileConverter.getExportDirPath());
         File exportFile = new File(INoteFileConverter.getExportFilePath(DataExample.EXAMPLE_MIX_IN + ".pdf"));
         assertTrue(exportFile.exists());
