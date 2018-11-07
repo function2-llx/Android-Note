@@ -29,9 +29,14 @@ import android.widget.Toast;
 import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.se.npe.androidnote.adapters.NoteAdapter;
+import com.se.npe.androidnote.interfaces.INoteFileConverter;
+import com.se.npe.androidnote.models.FileOperate;
 import com.se.npe.androidnote.models.Note;
+import com.se.npe.androidnote.models.NotePdfConverter;
+import com.se.npe.androidnote.models.NoteZipConverter;
 import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
+import com.se.npe.androidnote.util.AsyncTaskWithResponse;
 
 import java.io.File;
 import java.util.Date;
@@ -94,6 +99,7 @@ public class ListActivity extends AppCompatActivity {
         System.err.println(file);
         return FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileprovider", file);
     }
+
     //Can only use lower 16 bits for requestCode
     private static final int REQUEST_FILE_CHOOSE = 23333;
 
@@ -104,14 +110,21 @@ public class ListActivity extends AppCompatActivity {
                 if (resultCode == RESULT_OK) {
                     final Uri uri = data.getData();
                     String path = FileUtils.getPath(this, uri);
-
-                    Toast.makeText(this, path, Toast.LENGTH_SHORT).show();
-                    Note note = new Note();
-                    note.loadFromFile(path);
-                    Date date = new Date();
-                    note.setStartTime(date);
-                    note.setModifyTime(date);
-                    TableOperate.getInstance().modify(note);
+                    INoteFileConverter noteFileConverter;
+                    switch (FileOperate.getSuffix(path)) {
+                        case "note":
+                            noteFileConverter = new NoteZipConverter();
+                            break;
+                        case "pdf":
+                            noteFileConverter = new NotePdfConverter();
+                            break;
+                        default:
+                            noteFileConverter = new NoteZipConverter();
+                            break;
+                    }
+                    noteFileConverter.importNoteFromFile((Note note) ->
+                                    TableOperate.getInstance().addNote(note)
+                            , path);
                 }
                 break;
             }
@@ -231,7 +244,7 @@ public class ListActivity extends AppCompatActivity {
         groupMenu.removeGroup(R.id.group_groups);
         List<String> allGroups = TableOperate.getInstance().getAllGroup();
 
-        for (String groupName: allGroups)
+        for (String groupName : allGroups)
             groupMenu.add(R.id.group_groups, Menu.NONE, Menu.NONE, groupName);
     }
 
@@ -345,7 +358,6 @@ public class ListActivity extends AppCompatActivity {
 //        slidingMenu.setMenu(R.layout.sliding_menu_list);
 //        slidingMenu.setTouchModeBehind(SlidingMenu.TOUCHMODE_FULLSCREEN);
 //    }
-
     private void configureSearchView(@NonNull SearchView searchView) {
         searchView.setQueryHint("search by title...");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {

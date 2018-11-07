@@ -27,12 +27,12 @@ public class INoteFileConverterTest {
 
     @Test
     public void createFileToExport() {
-        INoteFileConverter.createFileToExport(context, FILE_NAME);
+        INoteFileConverter.createFileToExport(FILE_NAME);
         // successfully create dir
-        File exportDir = new File(INoteFileConverter.getExportDirPath(context));
+        File exportDir = new File(INoteFileConverter.getExportDirPath());
         assertNotNull(exportDir);
         // successfully create file
-        File exportFile = new File(INoteFileConverter.getExportFilePath(context, FILE_NAME));
+        File exportFile = new File(INoteFileConverter.getExportFilePath(FILE_NAME));
         assertNotNull(exportFile);
         assertNotNull(exportDir.listFiles());
     }
