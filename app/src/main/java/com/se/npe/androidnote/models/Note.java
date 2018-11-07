@@ -241,7 +241,7 @@ public class Note {
             Log.d("debug0001", StrArray[i]);
             if (StrArray[i].charAt(0) == 'S') {
                 String[] tempArray = StrArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
-                SoundData tempSoundData = new SoundData(tempArray[1], TableConfig.SAVE_PATH + tempArray[2]);
+                SoundData tempSoundData = new SoundData(TableConfig.SAVE_PATH + tempArray[1], tempArray[2]);
                 content.add(tempSoundData);
             } else if (StrArray[i].charAt(0) == 'T') {
                 String[] tempArray = StrArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
