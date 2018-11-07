@@ -1,5 +1,7 @@
 package com.se.npe.androidnote.editor;
 
+import android.view.MotionEvent;
+
 import com.se.npe.androidnote.EditorActivity;
 import com.se.npe.androidnote.R;
 
@@ -44,40 +46,27 @@ public class SortRichEditorTest {
     }
 
     @Test
-    public void showOrHideKeyboard() {
+    public void testComputeScroll() {
+        editor.computeScroll();
     }
 
     @Test
-    public void addPicture() {
+    public void testOnTouchEvent() {
     }
 
     @Test
-    public void addVideo() {
+    public void testPerformClick() {
+        editor.performClick();
     }
 
     @Test
-    public void addSound() {
-    }
-
-    @Test
-    public void destroy() {
-    }
-
-    @Test
-    public void loadNote() {
-    }
-
-    @Test
-    public void buildNote() {
+    public void testDestroy() {
+        editor.destroy();
     }
 
     @Test
     public void setViewOnly() {
         editor.setViewOnly();
         assertTrue(editor.testIsViewOnly());
-    }
-
-    @Test
-    public void setMarkdownController() {
     }
 }
