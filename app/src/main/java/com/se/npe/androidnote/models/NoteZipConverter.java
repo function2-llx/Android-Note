@@ -1,7 +1,6 @@
 package com.se.npe.androidnote.models;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.interfaces.INoteFileConverter;
@@ -10,12 +9,11 @@ import com.se.npe.androidnote.util.Logger;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class NoteZipConverter implements INoteFileConverter {
@@ -46,90 +44,51 @@ public class NoteZipConverter implements INoteFileConverter {
             // unzip
             FileOperate.unzip(filePathName, INoteFileConverter.getExportDirPath());
 
-            //文件解压测试
-//            Log.d("debug0001", "TestFileUnzip");
-//            File fa[] = tempfloder.listFiles();
-//            for (File fs : fa) {
-//                if (fs.isDirectory()) {
-//                    Log.d("debug0001", fs.getPath() + "目录");
-//                } else {
-//                    Log.d("debug0001", fs.getPath() + "文件");
-//                }
-//            }
-
-
-            //Note标题解析
-
+            // read the file "data.txt"
             File file = new File(getTempDirPath() + "/data.txt");
-            InputStream inputStream = null;
-            try {
-                inputStream = new FileInputStream(file);
-            } catch (FileNotFoundException e) {
-                Logger.log(EXCEPTION_TAG, e);
-                return new Note();
-            }
-
             byte b[] = new byte[(int) file.length()];
-            try {
+            try (InputStream inputStream = new FileInputStream(file)) {
                 int len = inputStream.read(b);
                 if (len == -1) return new Note();
-            } catch (Exception e) {
+            } catch (IOException e) {
                 Logger.log(EXCEPTION_TAG, e);
             }
+            String[] strArray = new String(b).split(TableConfig.FileSave.LIST_SEPARATOR);
 
             Note note = new Note();
 
-            String tempcontent = new String(b);
-            String[] StrArray = tempcontent.split(TableConfig.FileSave.LIST_SEPARATOR);
-            note.setTitle(StrArray[0]);
+            // title
+            note.setTitle(strArray[0]);
 
-            //Note资源文件转移
+            // resource files (picture, sound, video)
+            File tempFolder = new File(INoteFileConverter.getExportDirPath() + "/temp");
+            tempFolder.renameTo(new File(INoteFileConverter.getExportDirPath() + note.getTitle() + "_unzip"));
 
-            File tempFloder = new File(INoteFileConverter.getExportDirPath() + "/tempFloder");
-            tempFloder.renameTo(new File(INoteFileConverter.getExportDirPath() + note.getTitle() + "_unzip"));
-
-            //转移测试
-
-            Log.d("debug0001", "TestFileMove");
-            File unzip = new File(INoteFileConverter.getExportDirPath() + note.getTitle() + "_unzip");
-            File fax[] = unzip.listFiles();
-            for (File fs : fax) {
-                if (fs.isDirectory()) {
-                    Log.d("debug0001", fs.getPath() + "目录");
-                } else {
-                    Log.d("debug0001", fs.getPath() + "文件");
-                }
-            }
-
-            //Note结构解析
-            Log.d("debug0001", "TestNoteStruct");
-
-            for (int i = 1; i < StrArray.length; i++) {
-                Log.d("debug0001", StrArray[i]);
-                if (StrArray[i].charAt(0) == 'S') {
-                    String[] tempArray = StrArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
-                    SoundData tempSoundData = new SoundData(INoteFileConverter.getExportDirPath() + tempArray[1],tempArray[2]);
+            // structure of the note
+            for (int i = 1; i < strArray.length; i++) {
+                if (strArray[i].charAt(0) == 'S') {
+                    String[] tempArray = strArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
+                    SoundData tempSoundData = new SoundData(INoteFileConverter.getExportDirPath() + tempArray[1], tempArray[2]);
                     note.getContent().add(tempSoundData);
-                } else if (StrArray[i].charAt(0) == 'T') {
-                    String[] tempArray = StrArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
+                } else if (strArray[i].charAt(0) == 'T') {
+                    String[] tempArray = strArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
                     TextData tempTextData = new TextData(tempArray[1]);
                     note.getContent().add(tempTextData);
-                } else if (StrArray[i].charAt(0) == 'V') {
-                    String[] tempArray = StrArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
+                } else if (strArray[i].charAt(0) == 'V') {
+                    String[] tempArray = strArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
                     VideoData tempVideoData = new VideoData(INoteFileConverter.getExportDirPath() + tempArray[1]);
                     note.getContent().add(tempVideoData);
-                } else if (StrArray[i].charAt(0) == 'P') {
-                    String[] tempArray = StrArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
+                } else if (strArray[i].charAt(0) == 'P') {
+                    String[] tempArray = strArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
                     PictureData tempPictureData = new PictureData(INoteFileConverter.getExportDirPath() + tempArray[1]);
                     note.getContent().add(tempPictureData);
                 }
             }
 
-            try {
-                inputStream.close();
-            } catch (IOException e) {
-                Logger.log(EXCEPTION_TAG, e);
-            }
+            // time
+            note.setStartTime(new Date());
+            note.setModifyTime(new Date());
+
             return note;
         }
     }
@@ -147,114 +106,89 @@ public class NoteZipConverter implements INoteFileConverter {
         @Override
         protected String doInBackground(Void... voids) {
 
-            //文件夹生成
-
-            File tempFloder = new File(getTempDirPath());
-            if (!tempFloder.exists()) {
-                tempFloder.mkdirs();
+            // temp folder to place resource files (picture, sound, video)
+            File tempFolder = new File(getTempDirPath());
+            if (!tempFolder.exists()) {
+                tempFolder.mkdirs();
             }
 
-            //Note资源文件拷贝
-
+            // copy resource files
             File srcFile;
             File desFile;
-            List<IData> ContentList = note.getContent();
-
-            for (int i = 0; i < ContentList.size(); i++) {
-                switch (ContentList.get(i).getType()) {
+            List<IData> contentList = note.getContent();
+            for (int i = 0; i < contentList.size(); i++) {
+                switch (contentList.get(i).getType()) {
                     case "Pic":
-                        srcFile = new File(ContentList.get(i).getPath());
-                        FileOperate.getSuffix(ContentList.get(i).getPath());
-                        desFile = new File(getTempDirPath() + "/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath()));
+                        srcFile = new File(contentList.get(i).getPath());
+                        FileOperate.getSuffix(contentList.get(i).getPath());
+                        desFile = new File(getTempDirPath() + "/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath()));
                         FileOperate.copy(srcFile, desFile);
                         break;
                     case "Sound":
-                        srcFile = new File(ContentList.get(i).getPath());
-                        desFile = new File(getTempDirPath() + "/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath()));
+                        srcFile = new File(contentList.get(i).getPath());
+                        desFile = new File(getTempDirPath() + "/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath()));
                         FileOperate.copy(srcFile, desFile);
                         break;
                     case "Video":
-                        srcFile = new File(ContentList.get(i).getPath());
-                        desFile = new File(getTempDirPath() + "/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath()));
+                        srcFile = new File(contentList.get(i).getPath());
+                        desFile = new File(getTempDirPath() + "/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath()));
                         FileOperate.copy(srcFile, desFile);
                         break;
                 }
             }
 
-            //Note结构文件
-
-            File file = new File(getTempDirPath() + "/data.txt");
-            if (!file.exists()) {
-                try {
-                    file.createNewFile();
-                } catch (IOException e) {
-                    Logger.log(EXCEPTION_TAG, e);
-                }
-            }
-            OutputStream outputStream = null;
-            try {
-                outputStream = new FileOutputStream(file);
-            } catch (FileNotFoundException e) {
-                Logger.log(EXCEPTION_TAG, e);
-                return "fuck";
-            }
+            // structure of the note
             StringBuilder string = new StringBuilder(note.getTitle() + TableConfig.FileSave.LIST_SEPARATOR);
-
-            for (int i = 0; i < ContentList.size(); i++) {
-                switch (ContentList.get(i).getType()) {
+            for (int i = 0; i < contentList.size(); i++) {
+                switch (contentList.get(i).getType()) {
                     case "Pic": {
-                        String newdir = "/TempFloder/" + note.getTitle() + "_unzip/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
+                        String newdir = "/temp/" + note.getTitle() + "_unzip/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
                         string.append("Picture").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LIST_SEPARATOR);
                         break;
                     }
                     case "Sound": {
-                        String newdir = "/TempFloder/" + note.getTitle() + "_unzip/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
-                        string.append("Sound").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LINE_SEPARATOR).append(ContentList.get(i).getText()).append(TableConfig.FileSave.LIST_SEPARATOR);
+                        String newdir = "/temp/" + note.getTitle() + "_unzip/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
+                        string.append("Sound").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LINE_SEPARATOR).append(contentList.get(i).getText()).append(TableConfig.FileSave.LIST_SEPARATOR);
                         break;
                     }
                     case "Video": {
-                        String newdir = "/TempFloder/" + note.getTitle() + "_unzip/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(ContentList.get(i).getPath());
+                        String newdir = "/temp/" + note.getTitle() + "_unzip/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
                         string.append("Video").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LIST_SEPARATOR);
                         break;
                     }
                     default:
-                        string.append(ContentList.get(i).toString()).append(TableConfig.FileSave.LIST_SEPARATOR);
+                        string.append(contentList.get(i).toString()).append(TableConfig.FileSave.LIST_SEPARATOR);
                         break;
                 }
             }
-
             byte[] bs = string.toString().getBytes();
+
+            // write structure of the note into "data.txt"
+            File file = new File(getTempDirPath() + "/data.txt");
             try {
+                // delete original file
+                if (file.exists() && !file.delete()) {
+                    throw new IOException("delete fails");
+                }
+                // create file
+                if (!file.createNewFile()) {
+                    throw new IOException("createNewFile fails");
+                }
+            } catch (IOException e) {
+                Logger.log(EXCEPTION_TAG, e);
+            }
+            try (OutputStream outputStream = new FileOutputStream(file)) {
                 outputStream.write(bs);
             } catch (IOException e) {
                 Logger.log(EXCEPTION_TAG, e);
             }
 
-            try {
-                outputStream.close();
-            } catch (IOException e) {
-                Logger.log(EXCEPTION_TAG, e);
-            }
-
-            //文件压缩
+            // zip
             String zipFileName = INoteFileConverter.getExportDirPath() + "/" + fileName + ".note";
             FileOperate.zip(getTempDirPath(), zipFileName);
 
-
-            //文件夹删除
+            // delete temp folder
             FileOperate.delete(getTempDirPath());
-
-            //文件存储测试
-            Log.d("debug0001", "TestFileSave");
-            File noteSave = new File(INoteFileConverter.getExportDirPath());
-            File fa[] = noteSave.listFiles();
-            for (File fs : fa) {
-                if (fs.isDirectory()) {
-                    Log.d("debug0001", fs.getPath() + "目录");
-                } else {
-                    Log.d("debug0001", fs.getPath() + "文件");
-                }
-            }
 
             return zipFileName;
         }
@@ -262,6 +196,6 @@ public class NoteZipConverter implements INoteFileConverter {
 
     @NonNull
     static String getTempDirPath() {
-        return INoteFileConverter.getExportDirPath() + "/TempFloder";
+        return INoteFileConverter.getExportDirPath() + "/temp";
     }
 }

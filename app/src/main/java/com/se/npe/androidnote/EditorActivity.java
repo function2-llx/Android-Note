@@ -32,6 +32,7 @@ import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.interfaces.INoteFileConverter;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.NotePdfConverter;
+import com.se.npe.androidnote.models.NoteZipConverter;
 import com.se.npe.androidnote.models.TableOperate;
 import com.se.npe.androidnote.sound.ResultPool;
 import com.se.npe.androidnote.util.AsyncTaskWithResponse;
@@ -107,11 +108,13 @@ public class EditorActivity extends AppCompatActivity {
     private void shareWechat(Platform weChat, Platform.ShareParams sp) {
         Note note = editor.buildNote();
         sp.setTitle(note.getTitle() + ".note");
-        String filename = editor.buildNote().saveToFile("temp");
         sp.setImageUrl("https://hmls.hfbank.com.cn/hfapp-api/9.png");
         sp.setShareType(Platform.SHARE_FILE);
-        sp.setFilePath(filename);
-        weChat.share(sp);
+        INoteFileConverter noteFileConverter = new NoteZipConverter();
+        noteFileConverter.exportNoteToFile((String fileName) -> {
+            sp.setFilePath(fileName);
+            weChat.share(sp);
+        }, note, "temp");
     }
 
     @Override
@@ -159,13 +162,21 @@ public class EditorActivity extends AppCompatActivity {
                 Note note = editor.buildNote();
                 note.setStartTime(createTime);
                 note.setModifyTime(new Date());
-                NotePdfConverter notePdfConverter = new NotePdfConverter();
-                notePdfConverter.exportNoteToFile(new AsyncTaskWithResponse.AsyncResponse<String>() {
-                    @Override
-                    public void processFinish(String s) {
-                        Toast.makeText(getApplicationContext(), "Exported to " + s, Toast.LENGTH_SHORT).show();
-                    }
-                }, note, note.getTitle());
+                new AlertDialog.Builder(this)
+                        .setTitle("Format")
+                        .setSingleChoiceItems(new String[]{"Note", "PDF"}, -1, (dialog, which) -> {
+                            INoteFileConverter noteFileConverter;
+                            if (which == 0) {
+                                noteFileConverter = new NoteZipConverter();
+                            } else {
+                                noteFileConverter = new NotePdfConverter();
+                            }
+                            noteFileConverter.exportNoteToFile((String filePathName) ->
+                                            Toast.makeText(getApplicationContext(), "Exported to " + filePathName, Toast.LENGTH_SHORT).show()
+                                    , note, note.getTitle());
+                            dialog.cancel();
+                        })
+                        .show();
                 break;
             }
 
