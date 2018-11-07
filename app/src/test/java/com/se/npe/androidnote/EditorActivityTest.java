@@ -1,5 +1,7 @@
 package com.se.npe.androidnote;
 
+import android.content.Intent;
+import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -22,29 +24,16 @@ public class EditorActivityTest {
     public void testCreateActivity() {
         EditorActivity activity = Robolectric.setupActivity(EditorActivity.class);
         assertNotNull(activity);
+        assertNotNull(activity.findViewById(R.id.toolbar));
+        assertNotNull(activity.findViewById(R.id.rich_editor));
+        activity.findViewById(R.id.insert_picture).performClick();
+        activity.findViewById(R.id.insert_video).performClick();
+        activity.findViewById(R.id.insert_sound).performClick();
+        activity.findViewById(R.id.rearrange_editor).performClick();
 
-        Toolbar toolbar = activity.findViewById(R.id.toolbar);
-        assertNotNull(toolbar);
-        activity.setSupportActionBar(toolbar);
-        assertNotNull(activity.getSupportActionBar());
-        // can't test button.
-
-        SortRichEditor editor = activity.findViewById(R.id.rich_editor);
-        assertNotNull(editor);
-
-        FloatingActionsMenu insertMedia = activity.findViewById(R.id.insert_media);
-        assertNotNull(insertMedia);
-
-        assertNotNull(activity.getIntent());
-        if (activity.getIntent().getBooleanExtra(activity.VIEW_ONLY, false)) {
-            editor.setViewOnly();
-            assertTrue(editor.testIsViewOnly());
-            insertMedia.setVisibility(View.GONE);
-            assertTrue(insertMedia.getVisibility() == View.GONE);
-            activity.findViewById(R.id.scroll_edit).setVisibility(View.GONE);
-            assertTrue(activity.findViewById(R.id.scroll_edit).getVisibility() == View.GONE);
-        } else {
-            editor.setMarkdownController(activity.findViewById(R.id.scroll_edit));
-        }
+        Intent intent = new Intent();
+        intent.putExtra(EditorActivity.VIEW_ONLY, true);
+        EditorActivity activity2 = Robolectric.buildActivity(EditorActivity.class, intent).create().get();
+        assertNotNull(activity2);
     }
 }
