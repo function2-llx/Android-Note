@@ -1,6 +1,7 @@
 package com.se.npe.androidnote.editor;
 
 import android.view.MotionEvent;
+import android.widget.RelativeLayout;
 
 import com.se.npe.androidnote.EditorActivity;
 import com.se.npe.androidnote.R;
@@ -11,6 +12,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
+
+import java.lang.reflect.Field;
 
 import static org.junit.Assert.*;
 
@@ -28,8 +31,15 @@ public class SortRichEditorTest {
     }
 
     @Test
-    public void testEmptyViewClick() {
-        editor.getEmptyView().performClick();
+    public void testEmptyViewClick() throws Exception {
+        Class<?> clazz = SortRichEditor.class;
+        Field field = clazz.getDeclaredField("emptyView");
+        assertNotNull(field);
+        field.setAccessible(true);
+        RelativeLayout emptyView = (RelativeLayout)field.get(editor);
+        emptyView.performClick();
+        editor.sort();
+        emptyView.performClick();
     }
 
     @Test

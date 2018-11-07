@@ -318,10 +318,6 @@ public class SortRichEditor extends ScrollView {
         parentLayout.addView(tags);
     }
 
-    public RelativeLayout getEmptyView() {
-        return emptyView;
-    }
-
     private void initEmptyView() {
         emptyView = new RelativeLayout(getContext());
         RelativeLayout.LayoutParams lp = new RelativeLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
