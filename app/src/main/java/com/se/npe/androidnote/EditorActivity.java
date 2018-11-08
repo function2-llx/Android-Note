@@ -28,18 +28,13 @@ import com.dmcbig.mediapicker.entity.Media;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.mob.MobSDK;
 import com.se.npe.androidnote.editor.SortRichEditor;
-import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.interfaces.INoteFileConverter;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.NotePdfConverter;
 import com.se.npe.androidnote.models.NoteZipConverter;
 import com.se.npe.androidnote.models.TableOperate;
 import com.se.npe.androidnote.sound.ResultPool;
-import com.se.npe.androidnote.util.AsyncTaskWithResponse;
 import com.se.npe.androidnote.util.Logger;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -211,7 +206,6 @@ public class EditorActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        EventBus.getDefault().register(this);
         editor = findViewById(R.id.rich_editor);
         final FloatingActionsMenu insertMedia = findViewById(R.id.insert_media);
         findViewById(R.id.insert_picture).setOnClickListener(v -> {
@@ -435,18 +429,6 @@ public class EditorActivity extends AppCompatActivity {
         super.onDestroy();
         editor.destroy();
 
-        EventBus.getDefault().removeAllStickyEvents();
-        EventBus.getDefault().unregister(this);
         ResultPool.getInstance().stopRecording();
-    }
-
-    @Subscribe(sticky = true)
-    public void getNoteFromOld(Note note) {
-        oldNote = note;
-    }
-
-    @Subscribe(sticky = true)
-    public void getNoteFromSelect(NoteSelectEvent event) {
-        this.oldNote = event.getNote();
     }
 }

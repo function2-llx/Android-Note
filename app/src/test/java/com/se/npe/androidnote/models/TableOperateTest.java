@@ -2,12 +2,8 @@ package com.se.npe.androidnote.models;
 
 import android.support.v7.app.AppCompatActivity;
 
-import com.se.npe.androidnote.events.NoteClearEvent;
-import com.se.npe.androidnote.events.NoteDeleteEvent;
-import com.se.npe.androidnote.events.NoteModifyEvent;
 import com.se.npe.androidnote.interfaces.IData;
 
-import org.greenrobot.eventbus.EventBus;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;
@@ -223,56 +219,5 @@ public class TableOperateTest {
     public void getNoteAtAfterEnd() {
         expectedException.expect(IndexOutOfBoundsException.class);
         tableOperate.getNoteAt(noteList.get(NOTE_LIST_SIZE - 1).getIndex() + 1); // noteList.get(NOTE_LIST_SIZE - 1).getIndex() == NOTE_LIST_SIZE
-    }
-
-    @Test
-    public void onReceiveNote() {
-        // add note
-        for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
-            Note note = DataExample.getExampleNote(String.valueOf(i + NOTE_LIST_SIZE));
-            EventBus.getDefault().post(new NoteModifyEvent(note));
-            noteList.add(note);
-            assertEquals(noteList, tableOperate.getAllNotes());
-        }
-        // set note
-        for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
-            // index does not change
-            int index = noteList.get(i).getIndex();
-            Note note = DataExample.getExampleNote(String.valueOf(i + NOTE_LIST_SIZE + NOTE_LIST_SIZE));
-            note.setIndex(index);
-            // Old note get index -> New note set
-            EventBus.getDefault().post(new NoteModifyEvent(note));
-            noteList.set(i, note);
-            assertEquals(noteList, tableOperate.getAllNotes());
-        }
-    }
-
-    @Test
-    public void onDeleteNote() {
-        final int NOTE_LIST_SIZE_REMOVE = 4;
-        // Remove note at start, middle
-        for (int i = 0; i < NOTE_LIST_SIZE_REMOVE; ++i) {
-            // Old note get index -> New note remove
-            EventBus.getDefault().post(new NoteDeleteEvent(noteList.get(i)));
-            noteList.remove(i);
-            assertEquals(noteList, tableOperate.getAllNotes());
-        }
-        // Remove note at end
-        EventBus.getDefault().post(new NoteDeleteEvent(noteList.get(noteList.size() - 1)));
-        noteList.remove(noteList.size() - 1);
-        assertEquals(noteList, tableOperate.getAllNotes());
-        // Remove all notes one by one
-        for (int i = 0; i < noteList.size(); ++i) {
-            EventBus.getDefault().post(new NoteDeleteEvent(noteList.get(i)));
-        }
-        noteList.clear();
-        assertEquals(noteList, tableOperate.getAllNotes());
-    }
-
-    @Test
-    public void onClearNote() {
-        EventBus.getDefault().post(new NoteClearEvent());
-        noteList.clear();
-        assertEquals(noteList, tableOperate.getAllNotes());
     }
 }
