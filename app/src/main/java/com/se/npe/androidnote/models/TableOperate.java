@@ -120,7 +120,7 @@ public class TableOperate implements INoteCollection {
 
     List<String> stringToListString(String src) {
         if (src.length() == 0) return new ArrayList<>();
-        String[] strings = src.split(TableConfig.FileSave.LINE_SEPARATOR);
+        String[] strings = src.split(TableConfig.FileSave.LIST_SEPARATOR);
         return Arrays.asList(strings);
     }
 
@@ -234,6 +234,22 @@ public class TableOperate implements INoteCollection {
         }
         c.close();
         return noteList;
+    }
+
+    public List<String> getAllTags() {
+        ArrayList<String> tagNameList = new ArrayList<>();
+        Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME, null);
+        while (c.moveToNext()) {
+            String tag = c.getString(5);
+            List<String> taglist = stringToListString(tag);
+            for (int i = 0; i < taglist.size(); i++) {
+                if(!tagNameList.contains(taglist.get(i))) {
+                    tagNameList.add(taglist.get(i));
+                }
+            }
+        }
+        c.close();
+        return tagNameList;
     }
 
     public List<Note> getSearchResultFuzzyWithTag(String parameter, String tag) {
