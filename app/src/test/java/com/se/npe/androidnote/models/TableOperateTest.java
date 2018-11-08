@@ -36,7 +36,8 @@ public class TableOperateTest {
     @Before
     public void setUp() {
         init();
-        addNote();
+        noteList = new ArrayList<>();
+        addExampleNote(noteList);
     }
 
     @After
@@ -88,9 +89,10 @@ public class TableOperateTest {
 
     @Test
     public void setSearchConfigAndGetSearchConfig() {
-        final int SEARCH_CONFIG = 0;
-        TableOperate.setSearchConfig(SEARCH_CONFIG);
-        assertEquals(SEARCH_CONFIG, TableOperate.getSearchConfig());
+        for (String searchConfig : TableConfig.Sorter.SORTER_FIELDS) {
+            TableOperate.setSearchConfig(searchConfig);
+            assertEquals(searchConfig, TableOperate.getSearchConfig());
+        }
     }
 
     @Test
@@ -141,16 +143,11 @@ public class TableOperateTest {
         noteListSearched.clear();
     }
 
-    @Test
-    public void addNote() {
-        noteList = new ArrayList<>();
+    public static void addExampleNote(List<Note> noteList) {
         for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
             Note note = DataExample.getExampleNote(String.valueOf(i));
-            tableOperate.addNote(note);
+            TableOperate.getInstance().addNote(note);
             noteList.add(note);
-            // SQL index starts at 1
-            // noteList.get(i).getIndex() == i + 1
-            // if addNote() is invoked the first time
         }
     }
 
@@ -205,7 +202,7 @@ public class TableOperateTest {
     public void removeAllNotesAndAddNote() {
         // Remove all notes & Add note
         removeAllNotes();
-        addNote();
+        addExampleNote(noteList);
     }
 
     @Test

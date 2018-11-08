@@ -27,6 +27,7 @@ import java.util.Collections;
  */
 
 public class ResultPool {
+    public static final int SLEEP_MILL = 2500; // 2500ms
     private static final String LOG_TAG = ResultPool.class.getSimpleName();
     private static final String OUTPUT_DIR =
             Environment.getExternalStorageDirectory().getAbsolutePath() + "/AndroidNote/";
@@ -41,14 +42,12 @@ public class ResultPool {
     private long startTime;
 
     static class IFlyFeeder extends AsyncTask<Void, Void, Void> {
-        private static final int SLEEP_MILL = 1000; // 1000ms
         private WeakReference<ResultPool> ref;
         private int currentPcmByte;
         private FileInputStream fis;
         private SpeechRecognizer iat;
 
         IFlyFeeder(ResultPool ref) {
-            super();
             this.ref = new WeakReference<>(ref);
             try {
                 fis = new FileInputStream(new File(TEMP_OUTPUT_PATH));
@@ -111,11 +110,11 @@ public class ResultPool {
 
                         @Override
                         public void onResult(RecognizerResult recognizerResult, boolean isLast) {
-                            // skip 。
-                            if (isLast) {
+                            // skip '。' & space
+                            String result = recognizerResult.getResultString();
+                            if ("".equals(result) || "。".equals(result)) {
                                 return;
                             }
-                            String result = recognizerResult.getResultString();
                             target.putResult(now, result);
                         }
 
@@ -161,11 +160,14 @@ public class ResultPool {
         if (!f.createNewFile()) {
             throw new IOException("create file failed " + TEMP_OUTPUT_PATH);
         }
-        startTime = System.currentTimeMillis();
-        recorder = new AudioUtil.AudioRecordThread(TEMP_OUTPUT_PATH);
-        recorder.start();
-        iFlyFeeder = new IFlyFeeder(this);
-        iFlyFeeder.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        try {
+            startTime = System.currentTimeMillis();
+            recorder = new AudioUtil.AudioRecordThread(TEMP_OUTPUT_PATH);
+            recorder.start();
+            iFlyFeeder = new IFlyFeeder(this);
+            iFlyFeeder.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
+        } catch (Exception e) {
+        }
     }
 
     public long getStartTime() {

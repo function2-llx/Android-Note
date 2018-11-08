@@ -223,6 +223,29 @@ public class TableOperate implements INoteCollection {
         return noteList;
     }
 
+    public List<Note> getSearchResultFuzzyWithGroupAndTag(String parameter, String groupName,String tagName) {
+        ArrayList<Note> noteList = new ArrayList<>();
+        String sql2 = "select * from " + TableConfig.TABLE_NAME
+                + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%'";
+        Cursor c = db.rawQuery(sql2, null);
+        while (c.moveToNext()) {
+            Note temp = new Note(c.getString(1), decodeNote(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToListString(c.getString(5)), c.getString(6));
+            if (groupName.equals(temp.getGroupName())) {
+                List<String> taglist = temp.getTag();
+                boolean flag = false;
+                for (int i = 0; i < taglist.size(); i++) {
+                    if (taglist.get(i).equals(tagName)) {
+                        flag = true;
+                        break;
+                    }
+                }
+                if (flag) noteList.add(temp);
+            }
+        }
+        c.close();
+        return noteList;
+    }
+
     public List<Note> getAllNotesWithGroup(String groupName) {
         ArrayList<Note> noteList = new ArrayList<>();
         Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME, null);

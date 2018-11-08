@@ -1095,6 +1095,10 @@ public class SortRichEditor extends ScrollView {
         title.setFocusable(false);
     }
 
+    public boolean testIsViewOnly() {
+        return isViewOnly && isMarkdown && tags.getVisibility() == GONE && !title.isFocusable();
+    }
+
     public void setMarkdownController(HorizontalEditScrollView markdownController) {
         this.markdownController = markdownController;
         if (lastFocusEdit instanceof DeletableEditText) {

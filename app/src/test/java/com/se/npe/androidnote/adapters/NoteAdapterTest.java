@@ -1,6 +1,5 @@
 package com.se.npe.androidnote.adapters;
 
-import android.Manifest;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.MenuItem;
@@ -9,20 +8,19 @@ import android.widget.PopupMenu;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.se.npe.androidnote.ListActivity;
 import com.se.npe.androidnote.ListActivityTest;
-import com.se.npe.androidnote.PermissionTest;
 import com.se.npe.androidnote.R;
 import com.se.npe.androidnote.models.DataExample;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.SingletonResetter;
+import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
+import com.se.npe.androidnote.models.TableOperateTest;
 
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
-import org.robolectric.RuntimeEnvironment;
 import org.robolectric.shadows.ShadowPopupMenu;
 
 import java.util.ArrayList;
@@ -43,18 +41,12 @@ public class NoteAdapterTest {
 
     @Before
     public void setUp() {
-        TableOperate.init(RuntimeEnvironment.application.getApplicationContext()); // workaround for TableOperate.init()
-        PermissionTest.grantPermission(RuntimeEnvironment.application, Manifest.permission.RECORD_AUDIO); // workaround for permission RECORD_AUDIO
-        activity = Robolectric.setupActivity(ListActivity.class);
+        activity = ListActivityTest.initListActivity();
         ultimateRecyclerView = activity.findViewById(R.id.ultimate_recycler_view);
         noteAdapter = new NoteAdapter(activity);
 
         noteList = new ArrayList<>();
-        for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
-            Note note = DataExample.getExampleNote(String.valueOf(i));
-            noteList.add(note);
-            TableOperate.getInstance().addNote(note);
-        }
+        TableOperateTest.addExampleNote(noteList);
         noteAdapter.updateAllNotesList();
         noteList.sort(Comparator.comparing(Note::getTitle)); // sort note list
     }
@@ -62,30 +54,6 @@ public class NoteAdapterTest {
     @After
     public void tearDown() {
         SingletonResetter.resetTableOperateSingleton();
-    }
-
-    @Test
-    public void setComparator() {
-        for (int i = 0; i < 3; ++i) {
-            Comparator<Note> comparator;
-            switch (i) {
-                case 0: {
-                    comparator = Comparator.comparing(Note::getTitle);
-                    break;
-                }
-                case 1: {
-                    comparator = Comparator.comparing(Note::getStartTime);
-                    break;
-                }
-                default: {
-                    comparator = Comparator.comparing(Note::getModifyTime);
-                    break;
-                }
-            }
-            noteAdapter.setComparator(comparator);
-            noteList.sort(comparator);
-            assertEquals(noteList, noteAdapter.getItems());
-        }
     }
 
     @Test
@@ -138,6 +106,15 @@ public class NoteAdapterTest {
     @Test
     public void updateList() {
         assertEquals(NOTE_LIST_SIZE, noteAdapter.getAdapterItemCount());
+    }
+
+    @Test
+    public void setSortField() {
+        for (String sortField : TableConfig.Sorter.SORTER_FIELDS) {
+            noteAdapter.setSortField(sortField);
+            noteList.sort(TableConfig.Sorter.SORTER_FIELD_TO_COMPARATOR.get(sortField));
+            assertEquals(noteList, noteAdapter.getItems());
+        }
     }
 
     @Test

@@ -29,10 +29,13 @@ import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.mob.MobSDK;
 import com.se.npe.androidnote.editor.SortRichEditor;
 import com.se.npe.androidnote.events.NoteSelectEvent;
+import com.se.npe.androidnote.interfaces.INoteFileConverter;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.NotePdfConverter;
+import com.se.npe.androidnote.models.NoteZipConverter;
 import com.se.npe.androidnote.models.TableOperate;
 import com.se.npe.androidnote.sound.ResultPool;
+import com.se.npe.androidnote.util.AsyncTaskWithResponse;
 import com.se.npe.androidnote.util.Logger;
 
 import org.greenrobot.eventbus.EventBus;
@@ -105,11 +108,13 @@ public class EditorActivity extends AppCompatActivity {
     private void shareWechat(Platform weChat, Platform.ShareParams sp) {
         Note note = editor.buildNote();
         sp.setTitle(note.getTitle() + ".note");
-        String filename = editor.buildNote().saveToFile("temp");
         sp.setImageUrl("https://hmls.hfbank.com.cn/hfapp-api/9.png");
         sp.setShareType(Platform.SHARE_FILE);
-        sp.setFilePath(filename);
-        weChat.share(sp);
+        INoteFileConverter noteFileConverter = new NoteZipConverter();
+        noteFileConverter.exportNoteToFile((String fileName) -> {
+            sp.setFilePath(fileName);
+            weChat.share(sp);
+        }, note, "temp");
     }
 
     @Override
@@ -157,9 +162,21 @@ public class EditorActivity extends AppCompatActivity {
                 Note note = editor.buildNote();
                 note.setStartTime(createTime);
                 note.setModifyTime(new Date());
-                NotePdfConverter notePdfConverter = new NotePdfConverter(getApplicationContext());
-                notePdfConverter.exportNoteToFile(note, "test");
-                Toast.makeText(this, "Exported", Toast.LENGTH_SHORT).show();
+                new AlertDialog.Builder(this)
+                        .setTitle("Format")
+                        .setSingleChoiceItems(new String[]{"Note", "PDF"}, -1, (dialog, which) -> {
+                            INoteFileConverter noteFileConverter;
+                            if (which == 0) {
+                                noteFileConverter = new NoteZipConverter();
+                            } else {
+                                noteFileConverter = new NotePdfConverter();
+                            }
+                            noteFileConverter.exportNoteToFile((String filePathName) ->
+                                            Toast.makeText(getApplicationContext(), "Exported to " + filePathName, Toast.LENGTH_SHORT).show()
+                                    , note, note.getTitle());
+                            dialog.cancel();
+                        })
+                        .show();
                 break;
             }
 
@@ -235,7 +252,6 @@ public class EditorActivity extends AppCompatActivity {
             insertMedia.collapse();
             editor.sort();
         });
-
         // set view only mode before load note
         // so that the component can be set as view only
         if (getIntent().getBooleanExtra(VIEW_ONLY, false)) {
@@ -264,7 +280,10 @@ public class EditorActivity extends AppCompatActivity {
             Logger.log(LOG_TAG, e);
         }
 
-        MobSDK.init(this);
+        try {
+            MobSDK.init(this);
+        } catch (Throwable e) {
+        }
     }
 
     private void openCamera(int code) {
@@ -365,8 +384,9 @@ public class EditorActivity extends AppCompatActivity {
                 String path = ResultPool.getInstance().getCurrentPath();
                 final EditText editText = editor.addSound(path);
                 final long requestStartTime = data.getLongExtra(SoundRecorderActivity.REQUEST_START_TIME, -1);
+                // wait for the last speech to finish
                 new Handler().postDelayed(() -> editText.setText(ResultPool.getInstance().resultFrom(requestStartTime))
-                        , 1000);
+                        , ResultPool.SLEEP_MILL);
             }
             break;
             case REQUEST_VIDEO_CAPTURE:
