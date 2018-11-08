@@ -17,13 +17,13 @@ import java.io.File;
 import static org.junit.Assert.*;
 
 @RunWith(RobolectricTestRunner.class)
-public class NotePdfConverterTest {
+public class NoteZipConverterTest {
 
-    private NotePdfConverter notePdfConverter;
+    private NoteZipConverter noteZipConverter;
 
     @Before
-    public void setUp() {
-        notePdfConverter = new NotePdfConverter();
+    public void setUp(){
+        noteZipConverter = new NoteZipConverter();
         AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
         Context context = activity.getApplicationContext();
         TableConfig.SAVE_PATH = context.getExternalFilesDir(null).getAbsolutePath(); // initialize SAVE_PATH
@@ -32,7 +32,7 @@ public class NotePdfConverterTest {
     @Test
     public void importNoteFromFile() {
         exportNoteToFile();
-        notePdfConverter.importNoteFromFile((Note note) ->
+        noteZipConverter.importNoteFromFile((Note note) ->
                         assertEquals(DataExample.getExampleNote(DataExample.EXAMPLE_MIX_IN), note)
                 , getExportFilePath());
     }
@@ -40,7 +40,7 @@ public class NotePdfConverterTest {
     @Test
     public void exportNoteToFile() {
         Note note = DataExample.getExampleNote(DataExample.EXAMPLE_MIX_IN);
-        notePdfConverter.exportNoteToFile((String filePathName) ->
+        noteZipConverter.exportNoteToFile((String filePathName) ->
                         assertEquals(getExportFilePath(), filePathName),
                 note, DataExample.EXAMPLE_MIX_IN);
         File exportDir = new File(INoteFileConverter.getExportDirPath());
@@ -51,6 +51,6 @@ public class NotePdfConverterTest {
 
     @NonNull
     private String getExportFilePath() {
-        return INoteFileConverter.getExportFilePath(DataExample.EXAMPLE_MIX_IN + ".pdf");
+        return INoteFileConverter.getExportFilePath(DataExample.EXAMPLE_MIX_IN + ".note");
     }
 }

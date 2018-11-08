@@ -170,6 +170,10 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         return this.noteList;
     }
 
+    public Comparator<Note> getComparator() {
+        return this.comparator;
+    }
+
     /**
      * Adapt Note to item-like View
      *
