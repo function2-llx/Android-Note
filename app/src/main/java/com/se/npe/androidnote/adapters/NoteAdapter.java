@@ -128,11 +128,16 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
     public void updateSearchList(String searchParameter) {
         updateList(TableOperate.getInstance().getSearchResultFuzzy(searchParameter));
     }
+    public void updateSearchList(String searchParameter, List<String> tags) {
+//        updateList(TableOperate.getInstance().get(searchParameter));
+    }
 
     public void updateSearchListWithGroup(String searchParameter, String groupName) {
         updateList(TableOperate.getInstance().getSearchResultFuzzyWithGroup(searchParameter, groupName));
 
     }
+
+
 
     // Group notes
     public void updateGroupNotesList(String groupName) {

@@ -31,6 +31,7 @@ import com.se.npe.androidnote.adapters.NoteAdapter;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
+import com.se.npe.androidnote.models.TagGroupManager;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -56,7 +57,7 @@ public class ListActivity extends AppCompatActivity {
     private NavigationView navigationView;
     private SubMenu groupMenu;
     private String currentGroup = "";
-    private TagContainerLayout tagContainerLayout;
+    private TagGroupManager tagGroupManager;
 
     public String getCurrentGroup() {
         return currentGroup;
@@ -329,41 +330,13 @@ public class ListActivity extends AppCompatActivity {
     private void hideList() {
         ultimateRecyclerView.setVisibility(View.INVISIBLE);
     }
+
+
 //
-    private void showTagGroup() {
-        tagContainerLayout.setVisibility(View.VISIBLE);
-        List<String> stringList = new ArrayList<>();
-        for (int i = 0; i < 10; i++)
-            stringList.add("tag" + i);
-        tagContainerLayout.setTags(stringList);
-    }
-
-    private void hideTagGroup() {
-        tagContainerLayout.setVisibility(View.INVISIBLE);
-        tagContainerLayout.removeAllTags();
-    }
-
 
     private void configureSearchView(@NonNull SearchView searchView) {
-        tagContainerLayout = findViewById(R.id.tag_container_layout);
-        tagContainerLayout.setOnTagClickListener(new TagView.OnTagClickListener() {
-            @Override
-            public void onTagClick(int position, String text) {
-                Toast.makeText(ListActivity.this, text, Toast.LENGTH_SHORT).show();
-                TagView tagView = tagContainerLayout.getTagView(position);
-                tagView.setTagBackgroundColor(R.color.grey);
-            }
+        tagGroupManager = findViewById(R.id.tag_group_manager);
 
-            @Override
-            public void onTagLongClick(int position, String text) {
-
-            }
-
-            @Override
-            public void onTagCrossClick(int position) {
-
-            }
-        });
         searchView.setQueryHint("search for your note");
 
         // open event
@@ -371,14 +344,14 @@ public class ListActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(ListActivity.this, "open search view", Toast.LENGTH_SHORT).show();
-                showTagGroup();
+                tagGroupManager.show();
                 hideList();
             }
         });
 
         // close event
         searchView.setOnCloseListener(() -> {
-            hideTagGroup();
+            tagGroupManager.hide();
             showList();
             return false;
         });
@@ -386,7 +359,7 @@ public class ListActivity extends AppCompatActivity {
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                hideTagGroup();
+                tagGroupManager.hide();
                 ultimateRecyclerView.setVisibility(View.VISIBLE);
                 if (currentGroup.isEmpty())
                     noteAdapter.updateSearchList(query);
@@ -397,7 +370,7 @@ public class ListActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                hideTagGroup();
+                tagGroupManager.hide();
                 ultimateRecyclerView.setVisibility(View.VISIBLE);
                 if (currentGroup.isEmpty())
                     noteAdapter.updateSearchList(newText);

@@ -21,10 +21,10 @@
             app:title="@string/list_title" >
 
         </android.support.v7.widget.Toolbar>
-        <co.lujun.androidtagview.TagContainerLayout
+        <com.se.npe.androidnote.models.TagGroupManager
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/tag_container_layout"
+            android:id="@+id/tag_group_manager"
             android:layout_margin="0dp"
             android:padding="10dp"
             android:visibility="invisible"
