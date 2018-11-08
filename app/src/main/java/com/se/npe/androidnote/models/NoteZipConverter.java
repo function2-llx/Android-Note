@@ -1,6 +1,7 @@
 package com.se.npe.androidnote.models;
 
 import android.support.annotation.NonNull;
+import android.util.Log;
 
 import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.interfaces.INoteFileConverter;
@@ -62,7 +63,7 @@ public class NoteZipConverter implements INoteFileConverter {
 
             // resource files (picture, sound, video)
             File tempFolder = new File(INoteFileConverter.getExportDirPath() + "/temp");
-            tempFolder.renameTo(new File(INoteFileConverter.getExportDirPath() + note.getTitle() + "_unzip"));
+            tempFolder.renameTo(new File(INoteFileConverter.getExportDirPath() + '/' + note.getTitle() + "_unzip"));
 
             // structure of the note
             for (int i = 1; i < strArray.length; i++) {
@@ -88,6 +89,12 @@ public class NoteZipConverter implements INoteFileConverter {
             // time
             note.setStartTime(new Date());
             note.setModifyTime(new Date());
+
+            Log.d("debug0001","testload");
+            Log.d("debug0001",note.getTitle());
+            for(int i = 0;i < note.getContent().size();i ++) {
+                Log.d("debug0001",note.getContent().get(i).getType()+note.getContent().get(i).getPath());
+            }
 
             return note;
         }
@@ -142,17 +149,17 @@ public class NoteZipConverter implements INoteFileConverter {
             for (int i = 0; i < contentList.size(); i++) {
                 switch (contentList.get(i).getType()) {
                     case "Pic": {
-                        String newdir = "/temp/" + note.getTitle() + "_unzip/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
+                        String newdir = "/" + note.getTitle() + "_unzip/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
                         string.append("Picture").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LIST_SEPARATOR);
                         break;
                     }
                     case "Sound": {
-                        String newdir = "/temp/" + note.getTitle() + "_unzip/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
+                        String newdir = "/" + note.getTitle() + "_unzip/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
                         string.append("Sound").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LINE_SEPARATOR).append(contentList.get(i).getText()).append(TableConfig.FileSave.LIST_SEPARATOR);
                         break;
                     }
                     case "Video": {
-                        String newdir = "/temp/" + note.getTitle() + "_unzip/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
+                        String newdir = "/" + note.getTitle() + "_unzip/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
                         string.append("Video").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LIST_SEPARATOR);
                         break;
                     }
