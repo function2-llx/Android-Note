@@ -246,9 +246,10 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         @Override
         public void onClick(@NonNull View v) {
             Note selectedNote = getItem(getAdapterPosition());
-            EventBus.getDefault().postSticky(new NoteSelectEvent(selectedNote));
+//            EventBus.getDefault().postSticky(new NoteSelectEvent(selectedNote));
             Intent intent = new Intent(activity, EditorActivity.class);
             intent.putExtra(EditorActivity.CURRENT_GROUP, activity.getCurrentGroup());
+            intent.putExtra(EditorActivity.INITIAL_NOTE, selectedNote);
             activity.startActivity(intent);
         }
 
@@ -265,10 +266,11 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
                     }
 
                     case R.id.preview: {
-                        EventBus.getDefault().postSticky(new NoteSelectEvent(selectedNote));
+//                        EventBus.getDefault().postSticky(new NoteSelectEvent(selectedNote));
                         Intent intent = new Intent(activity, EditorActivity.class);
                         intent.putExtra(EditorActivity.VIEW_ONLY, true);
                         intent.putExtra(EditorActivity.CURRENT_GROUP, activity.getCurrentGroup());
+                        intent.putExtra(EditorActivity.INITIAL_NOTE, selectedNote);
                         activity.startActivity(intent);
                         break;
                     }

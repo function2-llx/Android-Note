@@ -4,6 +4,7 @@ import android.support.annotation.NonNull;
 
 import com.se.npe.androidnote.interfaces.IData;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
@@ -17,9 +18,7 @@ import java.util.Objects;
  * @author MashPlant
  */
 
-public class Note {
-    private static final String LOG_TAG = Note.class.getSimpleName();
-
+public class Note implements Serializable {
     public static class PreviewData {
         // using public field just for convenience
         public @NonNull

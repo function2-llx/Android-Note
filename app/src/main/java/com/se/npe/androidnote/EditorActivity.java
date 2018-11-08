@@ -77,6 +77,7 @@ public class EditorActivity extends AppCompatActivity {
     private boolean isViewOnly;
     public static final String VIEW_ONLY = "VIEW_ONLY";
     public static final String CURRENT_GROUP = "CURRENT_GROUP";
+    public static final String INITIAL_NOTE = "INITIAL_NOTE";
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -262,8 +263,10 @@ public class EditorActivity extends AppCompatActivity {
         } else {
             editor.setMarkdownController(findViewById(R.id.scroll_edit));
         }
-
+        // set current group
         this.currentGroup = getIntent().getStringExtra(CURRENT_GROUP);
+        // set old note
+        this.oldNote = (Note) getIntent().getSerializableExtra(INITIAL_NOTE);
 
         // deferred built, or we will get NPE
         if (oldNote != null) {
