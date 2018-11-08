@@ -28,24 +28,28 @@ public class TagGroupManager extends TagContainerLayout{
 
     private boolean[] checked;
 
-    public void show() {
-        this.setVisibility(View.VISIBLE);
-        List<String> tagList = new ArrayList<>();
-//        for (int i = 0; i < 10; i++)
-//            tagList.add("tag" + i);
+    private void setChecked(int position, boolean checkedState) {
+        checked[position] = checkedState;
+        TagView tagView = getTagView(position);
+        if (checkedState)
+            tagView.setTagBorderColor(getResources().getColor(R.color.checked_color, null));
+        else
+            tagView.setTagBorderColor(getResources().getColor(R.color.unchecked_color, null));
+    }
 
-        tagList = TableOperate.getInstance().getAllTags();
+    void switchCheckedState(int position) {
+        this.setChecked(position, !checked[position]);
+    }
+
+    public void show() {
+        this.setBackgroundColor(getResources().getColor(R.color.white, null));
+        this.setRippleAlpha(0);
+        this.setVisibility(View.VISIBLE);
 
         this.setOnTagClickListener(new TagView.OnTagClickListener() {
             @Override
             public void onTagClick(int position, String text) {
-                checked[position] = !checked[position];
-                TagView tagView = getTagView(position);
-
-                if (checked[position])
-                    tagView.setBackgroundColor(getResources().getColor(R.color.checked_color, null));
-                else
-                    tagView.setBackgroundColor(getResources().getColor(R.color.unchecked_color, null));
+                switchCheckedState(position);
             }
 
             @Override
@@ -58,12 +62,12 @@ public class TagGroupManager extends TagContainerLayout{
 
             }
         });
+        List<String> tagList;
+        tagList = TableOperate.getInstance().getAllTags();
         this.setTags(tagList);
         checked = new boolean[tagList.size()];
-        for (int i = 0; i < checked.length; i++) {
-            getTagView(i).setBackgroundColor(getResources().getColor(R.color.unchecked_color, null));
-            checked[i] = false;
-        }
+        for (int i = 0; i < checked.length; i++)
+            setChecked(i, false);
     }
 
     public void hide() {

@@ -129,7 +129,14 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
     }
     public void updateSearchList(String searchParameter, List<String> tags) {
 //        updateList(TableOperate.getInstance().get(searchParameter));
+        if (tags.isEmpty())
+            this.updateSearchList(searchParameter);
+        else {
+
+        }
     }
+
+
 
     public void updateSearchListWithGroup(String searchParameter, String groupName) {
         updateList(TableOperate.getInstance().getSearchResultFuzzyWithGroup(searchParameter, groupName));
