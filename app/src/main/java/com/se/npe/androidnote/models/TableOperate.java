@@ -236,6 +236,19 @@ public class TableOperate implements INoteCollection {
         return noteList;
     }
 
+    public List<String> getAllTags() {
+        ArrayList<String> tagNameList = new ArrayList<>();
+        Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME, null);
+        while (c.moveToNext()) {
+            String tag = c.getString(5);
+            if(!tagNameList.contains(tag)) {
+                tagNameList.add(tag);
+            }
+        }
+        c.close();
+        return tagNameList;
+    }
+
     public List<Note> getSearchResultFuzzyWithTag(String parameter, String tag) {
         ArrayList<Note> noteList = new ArrayList<>();
         String sql2 = "select * from " + TableConfig.TABLE_NAME
