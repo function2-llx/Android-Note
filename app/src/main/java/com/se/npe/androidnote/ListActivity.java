@@ -11,7 +11,6 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -33,13 +32,13 @@ import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
 
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
-import me.gujun.android.taggroup.TagGroup;
+import co.lujun.androidtagview.TagContainerLayout;
+import co.lujun.androidtagview.TagView;
 
 /**
  * show a list of the preview of note(data stored in noteCollection)
@@ -54,10 +53,10 @@ public class ListActivity extends AppCompatActivity {
     private ActionBarDrawerToggle drawerToggle;
     private DrawerLayout drawerLayout;
     private Toolbar toolbar;
-    NavigationView navigationView;
-    SubMenu groupMenu;
-    String currentGroup = "";
-    TagGroup tagGroup;
+    private NavigationView navigationView;
+    private SubMenu groupMenu;
+    private String currentGroup = "";
+    private TagContainerLayout tagContainerLayout;
 
     public String getCurrentGroup() {
         return currentGroup;
@@ -322,8 +321,49 @@ public class ListActivity extends AppCompatActivity {
      * Configure search view to set hint & listener
      */
 
+    private void showList() {
+        ultimateRecyclerView.setVisibility(View.VISIBLE);
+        updateList();
+    }
+
+    private void hideList() {
+        ultimateRecyclerView.setVisibility(View.INVISIBLE);
+    }
+//
+    private void showTagGroup() {
+        tagContainerLayout.setVisibility(View.VISIBLE);
+        List<String> stringList = new ArrayList<>();
+        for (int i = 0; i < 10; i++)
+            stringList.add("tag" + i);
+        tagContainerLayout.setTags(stringList);
+    }
+
+    private void hideTagGroup() {
+        tagContainerLayout.setVisibility(View.INVISIBLE);
+        tagContainerLayout.removeAllTags();
+    }
+
+
     private void configureSearchView(@NonNull SearchView searchView) {
-        tagGroup = findViewById(R.id.tag_group);
+        tagContainerLayout = findViewById(R.id.tag_container_layout);
+        tagContainerLayout.setOnTagClickListener(new TagView.OnTagClickListener() {
+            @Override
+            public void onTagClick(int position, String text) {
+                Toast.makeText(ListActivity.this, text, Toast.LENGTH_SHORT).show();
+                TagView tagView = tagContainerLayout.getTagView(position);
+                tagView.setTagBackgroundColor(R.color.grey);
+            }
+
+            @Override
+            public void onTagLongClick(int position, String text) {
+
+            }
+
+            @Override
+            public void onTagCrossClick(int position) {
+
+            }
+        });
         searchView.setQueryHint("search for your note");
 
         // open event
@@ -331,29 +371,22 @@ public class ListActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(ListActivity.this, "open search view", Toast.LENGTH_SHORT).show();
-                ultimateRecyclerView.setVisibility(View.INVISIBLE);
-                tagGroup.setVisibility(View.VISIBLE);
-                List<String> stringList = new ArrayList<>();
-                for (int i = 0; i < 10; i++)
-                    stringList.add("tag" + i);
-                tagGroup.setTags(stringList);
+                showTagGroup();
+                hideList();
             }
         });
 
         // close event
         searchView.setOnCloseListener(() -> {
-            updateList();
-            ultimateRecyclerView.setVisibility(View.VISIBLE);
-            tagGroup.setVisibility(View.INVISIBLE);
-            tagGroup.removeAllViews();
+            hideTagGroup();
+            showList();
             return false;
         });
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                tagGroup.setVisibility(View.INVISIBLE);
-                tagGroup.removeAllViews();
+                hideTagGroup();
                 ultimateRecyclerView.setVisibility(View.VISIBLE);
                 if (currentGroup.isEmpty())
                     noteAdapter.updateSearchList(query);
@@ -364,8 +397,7 @@ public class ListActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                tagGroup.setVisibility(View.INVISIBLE);
-                tagGroup.removeAllViews();
+                hideTagGroup();
                 ultimateRecyclerView.setVisibility(View.VISIBLE);
                 if (currentGroup.isEmpty())
                     noteAdapter.updateSearchList(newText);

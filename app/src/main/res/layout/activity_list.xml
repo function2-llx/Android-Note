@@ -21,11 +21,18 @@
             app:title="@string/list_title" >
 
         </android.support.v7.widget.Toolbar>
-
-        <me.gujun.android.taggroup.TagGroup
-            android:id="@+id/tag_group"
+        <co.lujun.androidtagview.TagContainerLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/tag_container_layout"
+            android:layout_margin="0dp"
+            android:padding="10dp"
             android:visibility="invisible"
-            style="@style/TagGroup" />
+            app:container_enable_drag="false"
+            app:horizontal_interval="10dp"
+            app:vertical_interval="10dp"
+            app:tag_clickable="true"
+            app:tag_theme="pure_teal" />
 
         <com.marshalchen.ultimaterecyclerview.UltimateRecyclerView
             android:id="@+id/ultimate_recycler_view"
