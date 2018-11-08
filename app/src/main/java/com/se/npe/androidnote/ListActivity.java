@@ -34,9 +34,12 @@ import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Objects;
+
+import me.gujun.android.taggroup.TagGroup;
 
 /**
  * show a list of the preview of note(data stored in noteCollection)
@@ -54,6 +57,7 @@ public class ListActivity extends AppCompatActivity {
     NavigationView navigationView;
     SubMenu groupMenu;
     String currentGroup = "";
+    TagGroup tagGroup;
 
     public String getCurrentGroup() {
         return currentGroup;
@@ -190,19 +194,6 @@ public class ListActivity extends AppCompatActivity {
 
         setNavigationView();
         initDrawerToggle();
-//        MobSDK.init(this);
-        //        this.ultimateRecyclerView.reenableLoadmore();
-//        this.noteAdapter.setCustomLoadMoreView(LayoutInflater.from(this).inflate(R.layout.custom_bottom_progressbar, null));
-//        ultimateRecyclerView.setOnLoadMoreListener((itemsCount, maxLastVisiblePosition) -> {
-//            Handler handler = new Handler();
-//            handler.postDelayed(() -> {
-//                noteList.add(new Note());
-//                noteAdapter.notifyDataSetChanged();
-//            }, 1000);
-//        });
-
-//        this.enableDrag();
-
     }
 
     @Override
@@ -332,6 +323,7 @@ public class ListActivity extends AppCompatActivity {
      */
 
     private void configureSearchView(@NonNull SearchView searchView) {
+        tagGroup = findViewById(R.id.tag_group);
         searchView.setQueryHint("search for your note");
 
         // open event
@@ -339,12 +331,30 @@ public class ListActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(ListActivity.this, "open search view", Toast.LENGTH_SHORT).show();
+                ultimateRecyclerView.setVisibility(View.INVISIBLE);
+                tagGroup.setVisibility(View.VISIBLE);
+                List<String> stringList = new ArrayList<>();
+                for (int i = 0; i < 10; i++)
+                    stringList.add("tag" + i);
+                tagGroup.setTags(stringList);
             }
+        });
+
+        // close event
+        searchView.setOnCloseListener(() -> {
+            updateList();
+            ultimateRecyclerView.setVisibility(View.VISIBLE);
+            tagGroup.setVisibility(View.INVISIBLE);
+            tagGroup.removeAllViews();
+            return false;
         });
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
+                tagGroup.setVisibility(View.INVISIBLE);
+                tagGroup.removeAllViews();
+                ultimateRecyclerView.setVisibility(View.VISIBLE);
                 if (currentGroup.isEmpty())
                     noteAdapter.updateSearchList(query);
                 else
@@ -354,6 +364,9 @@ public class ListActivity extends AppCompatActivity {
 
             @Override
             public boolean onQueryTextChange(String newText) {
+                tagGroup.setVisibility(View.INVISIBLE);
+                tagGroup.removeAllViews();
+                ultimateRecyclerView.setVisibility(View.VISIBLE);
                 if (currentGroup.isEmpty())
                     noteAdapter.updateSearchList(newText);
                 else
@@ -362,11 +375,7 @@ public class ListActivity extends AppCompatActivity {
             }
         });
 
-        // close event
-        searchView.setOnCloseListener(() -> {
-            updateList();
-            return false;
-        });
+
     }
 
     public void updateList() {
