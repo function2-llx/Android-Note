@@ -36,10 +36,8 @@ import com.se.npe.androidnote.models.NotePdfConverter;
 import com.se.npe.androidnote.models.NoteZipConverter;
 import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
-import com.se.npe.androidnote.util.AsyncTaskWithResponse;
 
 import java.io.File;
-import java.util.Date;
 import java.util.List;
 import java.util.Objects;
 
