@@ -118,7 +118,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 
     // All notes
     public void updateAllNotesList() {
-        updateList(TableOperate.getInstance().getAllNotes());
+        updateList(TableOperate.getInstance().getAllNotes("",null));
     }
 
     // Search for notes
