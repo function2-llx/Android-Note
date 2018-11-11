@@ -112,6 +112,13 @@ public class TableOperateTest {
         noteListSearched.add(DataExample.getExampleNote(String.valueOf(3)));
         assertNotEquals(noteListSearched, tableOperate.fuzzySearch(this.noteList.get(3).getTitle(),"",null));
         noteListSearched.clear();
+
+        List<String> TagList = new ArrayList<String>();
+        TagList.add("TagZ");
+        assertEquals(20,tableOperate.fuzzySearch("This","",null).size());
+        assertEquals(2,tableOperate.fuzzySearch("This","Group1",null).size());
+        assertEquals(1,tableOperate.fuzzySearch("This","Group1",TagList).size());
+        assertEquals(2,tableOperate.fuzzySearch("This","",TagList).size());
     }
 
     public static void addExampleNote(List<Note> noteList) {

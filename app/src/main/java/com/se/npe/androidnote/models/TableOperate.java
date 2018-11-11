@@ -187,7 +187,7 @@ public class TableOperate implements INoteCollection {
         }
         else {
             sql = "select * from " + TableConfig.TABLE_NAME
-                    + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%' AND " + TableConfig.Note.NOTE_GROUP + " = " + groupName;
+                    + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%' AND " + TableConfig.Note.NOTE_GROUP + " = " + "'" + groupName + "'";
         }
         Cursor c = db.rawQuery(sql, null);
         while (c.moveToNext()) {
