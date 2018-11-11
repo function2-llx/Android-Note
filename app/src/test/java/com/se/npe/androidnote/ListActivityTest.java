@@ -61,7 +61,7 @@ public class ListActivityTest {
         clickOptionsMenuItem(R.id.sort_modified_time);
         assertEquals(TableConfig.Sorter.SORTER_FIELD_TO_COMPARATOR.get(TableConfig.Sorter.SORTER_OPTION_TO_FIELD.get(R.id.sort_modified_time)), noteAdapter.getComparator());
         clickOptionsMenuItem(R.id.clear);
-        assertEquals(new ArrayList<Note>(), TableOperate.getInstance().getAllNotes());
+        assertEquals(new ArrayList<Note>(), TableOperate.getInstance().getAllNotes("",null));
     }
 
     @Test

@@ -30,6 +30,11 @@ public class TextDataTest {
     }
 
     @Test
+    public void getPath() {
+        assertEquals("",textData.getPath());
+    }
+
+    @Test
     public void getType() {
         assertEquals("Text", textData.getType());
     }
