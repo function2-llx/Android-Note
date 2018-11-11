@@ -336,6 +336,7 @@ public class SortRichEditor extends ScrollView {
                 lastEdit.requestFocus();
                 lastEdit.setController(markdownController);
                 lastFocusEdit = lastEdit;
+                showOrHideKeyboard(true);
             }
         });
         parentLayout.addView(emptyView);
@@ -884,7 +885,7 @@ public class SortRichEditor extends ScrollView {
         containerLayout.addView(createPlaceholder(), index);
     }
 
-    private EditText insertEditTextAtIndex(final int index, String editStr) {
+    private EditText insertEditTextAtIndex(int index, String editStr) {
         DeletableEditText editText = createEditText();
         editText.setText(editStr);
         containerLayout.setLayoutTransition(null);
@@ -893,7 +894,7 @@ public class SortRichEditor extends ScrollView {
         containerLayout.setLayoutTransition(mTransition);
         if (isViewOnly) {
             editText.setFocusable(false);
-            editText.render(isMarkdown /* true */);
+            editText.render(isMarkdown /* must be true here */);
         }
         return editText;
     }
@@ -1029,7 +1030,7 @@ public class SortRichEditor extends ScrollView {
                 for (IData data : content) {
                     int currentChild = ref.containerLayout.getChildCount();
                     if (data instanceof TextData) {
-                        ref.insertEditTextAtIndex(currentChild, data.getText());
+                        ref.lastFocusEdit = ref.insertEditTextAtIndex(currentChild, data.getText());
                     } else if (data instanceof PictureData) {
                         ref.insertPictureAtIndex(currentChild, data.getPath());
                     } else if (data instanceof VideoData) {
@@ -1040,6 +1041,14 @@ public class SortRichEditor extends ScrollView {
                     }
                 }
             }
+
+            // no edit text is created
+            if (ref.lastFocusEdit == null) {
+                // then created an empty one
+                ref.lastFocusEdit =
+                        ref.insertEditTextAtIndex(ref.containerLayout.getChildCount(), "");
+            }
+
             ArrayList<String> tagList = new ArrayList<>(note.getTag());
             tagList.addAll(ref.tags.getLabels());
             ref.tags.setLabels(tagList);

@@ -16,6 +16,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,14 +36,13 @@ import com.se.npe.androidnote.models.NotePdfConverter;
 import com.se.npe.androidnote.models.NoteZipConverter;
 import com.se.npe.androidnote.models.TableOperate;
 import com.se.npe.androidnote.sound.ResultPool;
-import com.se.npe.androidnote.util.AsyncTaskWithResponse;
 import com.se.npe.androidnote.util.Logger;
+import com.se.npe.androidnote.util.ReturnValueEater;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,7 +56,6 @@ import java.util.Objects;
 import cn.sharesdk.framework.Platform;
 import cn.sharesdk.framework.PlatformActionListener;
 import cn.sharesdk.onekeyshare.OnekeyShare;
-import cn.sharesdk.onekeyshare.ShareContentCustomizeCallback;
 import cn.sharesdk.wechat.friends.Wechat;
 
 public class EditorActivity extends AppCompatActivity {
@@ -389,25 +388,29 @@ public class EditorActivity extends AppCompatActivity {
             break;
             case REQUEST_VIDEO_CAPTURE:
             case REQUEST_IMAGE_CAPTURE: {
-                try {
-                    File f = new File(OUTPUT_DIR + tempMediaUri.getPath());
+                File f = new File(OUTPUT_DIR + tempMediaUri.getPath());
+                try (FileOutputStream fos = new FileOutputStream(f); InputStream fis = getContentResolver().openInputStream(tempMediaUri)) {
+                    if (fis == null) {
+                        Log.e(LOG_TAG, "getContentResolver().openInputStream(tempMediaUri) returned null");
+                        return;
+                    }
                     if (!f.getParentFile().exists()) {
-                        f.getParentFile().mkdirs();
+                        boolean ok = f.getParentFile().mkdirs();
+                        ReturnValueEater.eat(ok);
                     }
                     if (!f.exists()) {
-                        f.createNewFile();
+                        boolean ok = f.createNewFile();
+                        ReturnValueEater.eat(ok);
                     }
-                    InputStream fis = getContentResolver().openInputStream(tempMediaUri);
-                    FileOutputStream fos = new FileOutputStream(f);
                     byte[] bytes = new byte[fis.available()];
-                    fis.read(bytes, 0, bytes.length);
+                    int count = fis.read(bytes, 0, bytes.length);
                     fos.write(bytes, 0, bytes.length);
+                    ReturnValueEater.eat(count);
                     if (requestCode == REQUEST_IMAGE_CAPTURE) {
                         editor.addPicture(OUTPUT_DIR + tempMediaUri.getPath());
                     } else {
                         editor.addVideo(OUTPUT_DIR + tempMediaUri.getPath());
                     }
-                    fos.close();
                 } catch (IOException e) {
                     Logger.log(LOG_TAG, e);
                 }

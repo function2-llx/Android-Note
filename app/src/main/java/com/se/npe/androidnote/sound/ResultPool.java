@@ -85,9 +85,12 @@ public class ResultPool {
                 byte[] voiceBuffer = null;
                 try {
                     voiceBuffer = new byte[fis.available() - currentPcmByte];
-                    fis.skip(currentPcmByte);
-                    fis.read(voiceBuffer);
+                    boolean ok = fis.skip(currentPcmByte) == currentPcmByte;
+                    ok = ok && fis.read(voiceBuffer) == voiceBuffer.length;
                     currentPcmByte = fis.available();
+                    if (!ok) {
+                        Log.e(LOG_TAG, "skip or read not complete, but continued anyway");
+                    }
                 } catch (IOException e) {
                     Logger.log(LOG_TAG, e);
                 }

@@ -18,8 +18,8 @@ import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
 public class SortRichEditorTest {
-    SortRichEditor editor;
-    EditorActivity activity;
+    private SortRichEditor editor;
+    private EditorActivity activity;
 
     @Before
     public void setUp() {

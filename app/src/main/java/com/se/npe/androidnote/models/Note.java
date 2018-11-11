@@ -4,9 +4,9 @@ import android.support.annotation.NonNull;
 
 import com.se.npe.androidnote.interfaces.IData;
 
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
