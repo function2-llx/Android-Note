@@ -1,23 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item
-        android:id="@+id/groups"
-        android:icon="@mipmap/icon_group"
-        android:title="@string/groups" >
-        <menu>
-            <group
-                android:id="@+id/group_all_notes">
-                <item
-                    android:title="@string/group_all_notes"
-                    android:id="@+id/all_notes"
-                    android:icon="@mipmap/icon_notes" />
-            </group>
-            <group
-                android:id="@+id/group_groups" />
 
-        </menu>
-    </item>
 
     <item
         android:title="@string/manage_groups" >
@@ -34,6 +18,24 @@
                     android:icon="@mipmap/icon_remove"
                     android:title="@string/manage_groups" />
             </group>
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/groups"
+        android:icon="@mipmap/icon_group"
+        android:title="@string/groups" >
+        <menu>
+            <group
+                android:id="@+id/group_all_notes">
+                <item
+                    android:title="@string/group_all_notes"
+                    android:id="@+id/all_notes"
+                    android:icon="@mipmap/icon_notes" />
+            </group>
+            <group
+                android:id="@+id/group_groups" />
+
         </menu>
     </item>
 
