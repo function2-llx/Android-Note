@@ -10,7 +10,17 @@ public class TableConfig {
     public static String SAVE_PATH = ""; // initialized in TableOperate.init()
     public static final String TABLE_NAME = "AndroidNote";
 
+    // no constructor
+    private TableConfig() {
+
+    }
+
     public static class Note {
+        // no constructor
+        private Note() {
+
+        }
+
         public static final String NOTE_ID = "id";
         public static final String NOTE_TITLE = "note_title";
         public static final String NOTE_CONTENT = "note_content";
@@ -23,17 +33,31 @@ public class TableConfig {
     public static final String GROUP_TABLE = "GroupTable";
 
     public static class Group {
+        // no constructor
+        private Group() {
+
+        }
+
         public static final String GROUP_NAME = "group_name";
     }
 
     public static class FileSave {
+        // no constructor
+        private FileSave() {
+
+        }
+
         public static final String LIST_SEPARATOR = "qwert";
         public static final String LINE_SEPARATOR = "asdfg";
     }
 
     public static class Sorter {
+        // no constructor
+        private Sorter() {
 
-        public static final String SORTER_FIELDS[] = {"sort_title", "sort_create_time", "sort_modify_time"};
+        }
+
+        public static final String []SORTER_FIELDS = {"sort_title", "sort_create_time", "sort_modify_time"};
         public static final Map<Integer, String> SORTER_OPTION_TO_FIELD = new HashMap<>();
 
         public static final Map<String, Comparator<com.se.npe.androidnote.models.Note>>

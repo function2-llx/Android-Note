@@ -170,6 +170,7 @@ public class ResultPool {
             iFlyFeeder = new IFlyFeeder(this);
             iFlyFeeder.executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR);
         } catch (Exception e) {
+            Logger.log(LOG_TAG, e);
         }
     }
 

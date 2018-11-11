@@ -23,6 +23,8 @@ import com.yydcdut.markdown.MarkdownEditText;
 
 public class TodoController {
     private MarkdownEditText mRxMDEditText;
+    private static final String UNDONE_TAG = "- [ ] ";
+    private static final String DONE_TAG = "- [x] ";
 
     public TodoController(MarkdownEditText rxMDEditText) {
         mRxMDEditText = rxMDEditText;
@@ -38,13 +40,13 @@ public class TodoController {
             return;
         }
         Editable editable = mRxMDEditText.getText();
-        if ("- [ ] ".equals(editable.subSequence(Utils.safePosition(position0, editable), Utils.safePosition(position0 + "- [ ] ".length(), editable)).toString())) {
-            editable.delete(position0, position0 + "- [ ] ".length());
-        } else if ("- [x] ".equalsIgnoreCase(editable.subSequence(Utils.safePosition(position0, editable), Utils.safePosition(position0 + "- [ ] ".length(), editable)).toString())) {
-            editable.delete(position0, position0 + "- [x] ".length());
-            editable.insert(position0, "- [ ] ");
+        if (UNDONE_TAG.equals(editable.subSequence(Utils.safePosition(position0, editable), Utils.safePosition(position0 + UNDONE_TAG.length(), editable)).toString())) {
+            editable.delete(position0, position0 + UNDONE_TAG.length());
+        } else if (DONE_TAG.equalsIgnoreCase(editable.subSequence(Utils.safePosition(position0, editable), Utils.safePosition(position0 + UNDONE_TAG.length(), editable)).toString())) {
+            editable.delete(position0, position0 + DONE_TAG.length());
+            editable.insert(position0, UNDONE_TAG);
         } else {
-            editable.insert(position0, "- [ ] ");
+            editable.insert(position0, UNDONE_TAG);
         }
     }
 
@@ -58,13 +60,13 @@ public class TodoController {
             return;
         }
         Editable editable = mRxMDEditText.getText();
-        if ("- [x] ".equals(editable.subSequence(Utils.safePosition(position0, editable), Utils.safePosition(position0 + "- [x] ".length(), editable)).toString())) {
-            mRxMDEditText.getText().delete(position0, position0 + "- [x] ".length());
-        } else if ("- [ ] ".equalsIgnoreCase(editable.subSequence(Utils.safePosition(position0, editable), Utils.safePosition(position0 + "- [ ] ".length(), editable)).toString())) {
-            editable.delete(position0, position0 + "- [ ] ".length());
-            editable.insert(position0, "- [x] ");
+        if (DONE_TAG.equals(editable.subSequence(Utils.safePosition(position0, editable), Utils.safePosition(position0 + DONE_TAG.length(), editable)).toString())) {
+            mRxMDEditText.getText().delete(position0, position0 + DONE_TAG.length());
+        } else if (UNDONE_TAG.equalsIgnoreCase(editable.subSequence(Utils.safePosition(position0, editable), Utils.safePosition(position0 + UNDONE_TAG.length(), editable)).toString())) {
+            editable.delete(position0, position0 + UNDONE_TAG.length());
+            editable.insert(position0, DONE_TAG);
         } else {
-            editable.insert(position0, "- [x] ");
+            editable.insert(position0, DONE_TAG);
         }
     }
 }

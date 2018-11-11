@@ -158,10 +158,7 @@ public class Note {
     @Override
     public boolean equals(Object o) {
         // Identify note by its DBindex
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Note note = (Note) o;
-        return indexDB == note.indexDB;
+        return o instanceof Note && ((Note) o).indexDB == indexDB;
     }
 
     @Override

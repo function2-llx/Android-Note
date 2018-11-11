@@ -180,8 +180,13 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
      * @author llx
      */
     public class ViewHolder extends UltimateRecyclerviewViewHolder implements View.OnClickListener, View.OnLongClickListener {
-        private TextView title, text, group;
-        private TextView createTimeDisplayer, modifyTimeDisplayer;
+        private TextView title;
+        private TextView text;
+        private TextView group;
+
+        private TextView createTimeDisplayer;
+        private TextView modifyTimeDisplayer;
+
         private ImageView imageView;
         int screenWidth = -1;
 
@@ -270,7 +275,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
                                 .putExtra(EditorActivity.CURRENT_GROUP, activity.getCurrentGroup()));
                         break;
 
-                    case R.id.set_group: {
+                    case R.id.set_group:
                         List<String> groupName = TableOperate.getInstance().getAllGroup();
 
                         View dialogView = View.inflate(activity, R.layout.set_group_dialog, null);
@@ -290,7 +295,6 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
                         builder.show();
 
                         break;
-                    }
 
                     case R.id.remove_from_current_group:
                         selectedNote.setGroupName("");

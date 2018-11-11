@@ -52,7 +52,9 @@ public class SortRichEditorTest {
         }
 
         try {
-            emptyView = (RelativeLayout) field.get(editor2);
+            if (field != null) {
+                emptyView = (RelativeLayout) field.get(editor2);
+            }
         } catch (IllegalAccessException e) {
             e.printStackTrace();
         }

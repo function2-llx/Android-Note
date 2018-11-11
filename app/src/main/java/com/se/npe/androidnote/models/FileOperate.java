@@ -88,6 +88,8 @@ public class FileOperate {
         }
     }
 
+    private static final String DELETE_DIR = "DeleteDir";
+
     /**
      * 删除目录及目录下的文件
      *
@@ -101,7 +103,7 @@ public class FileOperate {
         File dirFile = new File(dir);
         // 如果dir对应的文件不存在，或者不是一个目录，则退出
         if ((!dirFile.exists()) || (!dirFile.isDirectory())) {
-            Logger.logError("DeleteDir", "删除目录失败：" + dir + "不存在！");
+            Logger.logError(DELETE_DIR, "删除目录失败：" + dir + "不存在！");
             return false;
         }
 
@@ -119,13 +121,13 @@ public class FileOperate {
             }
         }
         if (!flag) {
-            Logger.logError("DeleteDir", "删除目录失败！");
+            Logger.logError(DELETE_DIR, "删除目录失败！");
             return false;
         }
 
         // 删除当前目录
         if (dirFile.delete()) {
-            Logger.logInfo("DeleteDir", "删除目录" + dir + "成功！");
+            Logger.logInfo(DELETE_DIR, "删除目录" + dir + "成功！");
             return true;
         } else {
             return false;
@@ -185,12 +187,12 @@ public class FileOperate {
                     File f = new File(outputDirectory + File.separator + zipEntry.getName());
                     f.mkdirs();
                 } else {
-                    int index = entryName.lastIndexOf("\\");
+                    int index = entryName.lastIndexOf('\\');
                     if (index != -1) {
                         File df = new File(outputDirectory + File.separator + entryName.substring(0, index));
                         df.mkdirs();
                     }
-                    index = entryName.lastIndexOf("/");
+                    index = entryName.lastIndexOf('/');
                     if (index != -1) {
                         File df = new File(outputDirectory + File.separator + entryName.substring(0, index));
                         df.mkdirs();

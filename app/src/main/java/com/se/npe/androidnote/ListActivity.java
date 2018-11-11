@@ -100,30 +100,24 @@ public class ListActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        switch (requestCode) {
-            case REQUEST_FILE_CHOOSE:
-                if (resultCode == RESULT_OK) {
-                    final Uri uri = data.getData();
-                    String path = FileUtils.getPath(this, uri);
-                    INoteFileConverter noteFileConverter;
-                    switch (FileOperate.getSuffix(path)) {
-                        case "note":
-                            noteFileConverter = new NoteZipConverter();
-                            break;
-                        case "pdf":
-                            noteFileConverter = new NotePdfConverter();
-                            break;
-                        default:
-                            noteFileConverter = new NoteZipConverter();
-                            break;
-                    }
-                    noteFileConverter.importNoteFromFile((Note note) ->
-                                    TableOperate.getInstance().addNote(note)
-                            , path);
-                }
-                break;
-            default:
-                break;
+        if (requestCode == REQUEST_FILE_CHOOSE && resultCode == RESULT_OK) {
+            final Uri uri = data.getData();
+            String path = FileUtils.getPath(this, uri);
+            INoteFileConverter noteFileConverter;
+            switch (FileOperate.getSuffix(path)) {
+                case "note":
+                    noteFileConverter = new NoteZipConverter();
+                    break;
+                case "pdf":
+                    noteFileConverter = new NotePdfConverter();
+                    break;
+                default:
+                    noteFileConverter = new NoteZipConverter();
+                    break;
+            }
+            noteFileConverter.importNoteFromFile((Note note) ->
+                            TableOperate.getInstance().addNote(note)
+                    , path);
         }
     }
 

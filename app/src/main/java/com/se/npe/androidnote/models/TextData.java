@@ -35,10 +35,7 @@ public class TextData implements IData {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        TextData textData = (TextData) o;
-        return Objects.equals(text, textData.text);
+        return o instanceof TextData && ((TextData) o).text.equals(text);
     }
 
     @Override
