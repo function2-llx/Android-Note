@@ -57,6 +57,8 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         final ViewHolder holder = new ViewHolder(v);
         v.setOnClickListener(holder);
         v.setOnLongClickListener(holder);
+
+        //把文字部分设置为屏幕宽度的2/3
         LinearLayout textLayout = v.findViewById(R.id.text_layout);
         LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) textLayout.getLayoutParams();
         params.width = getScreenWidth() / 3 * 2;
@@ -132,13 +134,11 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
     public void updateSearchList(String searchParameter) {
         updateList(TableOperate.getInstance().getSearchResultFuzzy(searchParameter));
     }
-    public void updateSearchList(String searchParameter, List<String> tags) {
-//        updateList(TableOperate.getInstance().get(searchParameter));
-        if (tags.isEmpty())
-            this.updateSearchList(searchParameter);
-        else {
 
-        }
+
+    //ultimate version
+    public void updateSearchList(String param, String group, List<String> tags) {
+
     }
 
 
@@ -147,7 +147,6 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         updateList(TableOperate.getInstance().getSearchResultFuzzyWithGroup(searchParameter, groupName));
 
     }
-
 
 
     // Group notes

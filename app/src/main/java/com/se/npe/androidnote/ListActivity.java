@@ -5,6 +5,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
+import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -23,6 +24,7 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.ipaulpro.afilechooser.utils.FileUtils;
@@ -341,22 +343,41 @@ public class ListActivity extends AppCompatActivity {
     private void hideList() {
         ultimateRecyclerView.setVisibility(View.INVISIBLE);
     }
-
-
 //
+    List<String> getParticiple(String rawText) {
+        List<String> ret = new ArrayList<>();
+        ret.add(rawText);
+        return ret;
+    }
 
     private void configureSearchView(@NonNull SearchView searchView) {
         tagGroupManager = findViewById(R.id.tag_group_manager);
 
         searchView.setQueryHint("search for your note");
 
+        searchView.setSubmitButtonEnabled(true);
+        ImageView goButton = searchView.findViewById(R.id.search_go_btn);
+        goButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                tagGroupManager.hide();
+                showList();
+                String query = searchView.getQuery().toString();
+                List<String> tags = tagGroupManager.getCheckedTags();
+                Toast.makeText(ListActivity.this, tags.toString(), Toast.LENGTH_SHORT).show();
+                noteAdapter.updateSearchList(query, currentGroup, tags);
+//                Toast.makeText(ListActivity.this, "click search submit button", Toast.LENGTH_SHORT).show();
+            }
+        });
+
         // open event
         searchView.setOnSearchClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(ListActivity.this, "open search view", Toast.LENGTH_SHORT).show();
+//                Toast.makeText(ListActivity.this, "open search view", Toast.LENGTH_SHORT).show();
                 tagGroupManager.show();
                 hideList();
+                disableRefresh();
             }
         });
 
@@ -364,29 +385,24 @@ public class ListActivity extends AppCompatActivity {
         searchView.setOnCloseListener(() -> {
             tagGroupManager.hide();
             showList();
+            enableRefresh();
             return false;
         });
 
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                tagGroupManager.hide();
-                ultimateRecyclerView.setVisibility(View.VISIBLE);
-                if (currentGroup.isEmpty())
-                    noteAdapter.updateSearchList(query);
-                else
-                    noteAdapter.updateSearchListWithGroup(query, currentGroup);
+                goButton.callOnClick();
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                tagGroupManager.hide();
-                ultimateRecyclerView.setVisibility(View.VISIBLE);
-                if (currentGroup.isEmpty())
-                    noteAdapter.updateSearchList(newText);
-                else
-                    noteAdapter.updateSearchListWithGroup(newText, currentGroup);
+                if (newText.isEmpty()) {
+                    hideList();
+                    tagGroupManager.show();
+                } else
+                    goButton.callOnClick();
                 return true;
             }
         });
@@ -408,5 +424,9 @@ public class ListActivity extends AppCompatActivity {
             ListActivity.this.ultimateRecyclerView.setRefreshing(false);
             layoutManager.scrollToPosition(0);
         }, 500));
+    }
+
+    private void disableRefresh() {
+        ultimateRecyclerView.mSwipeRefreshLayout.setEnabled(false);
     }
 }
