@@ -191,12 +191,28 @@ public class TableOperate implements INoteCollection {
     @Override
     public List<Note> fuzzySearch(String parameter,String groupName,List<String> tagList) {
         ArrayList<Note> noteList = new ArrayList<>();
-        String sql2 = "select * from " + TableConfig.TABLE_NAME
-                + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%'";
-        Cursor c = db.rawQuery(sql2, null);
+        String sql;
+        if(groupName == "") {
+            sql = "select * from " + TableConfig.TABLE_NAME
+                    + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%'";
+        }
+        else {
+            sql = "select * from " + TableConfig.TABLE_NAME
+                    + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%' AND " + TableConfig.Note.NOTE_GROUP + " = " + groupName;
+        }
+        Cursor c = db.rawQuery(sql, null);
         while (c.moveToNext()) {
             Note temp = new Note(c.getString(1), stringToContent(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToTagList(c.getString(5)), c.getString(6));
-            noteList.add(temp);
+            if(tagList == null)noteList.add(temp);
+            else {
+                List<String> tempTag = temp.getTag();
+                for(int i = 0;i < tagList.size();i ++) {
+                    if(tempTag.contains(tagList.get(i))) {
+                        noteList.add(temp);
+                        break;
+                    }
+                }
+            }
         }
         c.close();
         return noteList;
