@@ -993,6 +993,8 @@ public class SortRichEditor extends ScrollView {
             return;
         }
         destroyed = true;
+        // hide the keyboard when destroyed
+        showOrHideKeyboard(false);
         int count = containerLayout.getChildCount();
         for (int i = 0; i < count; ++i) {
             View v = containerLayout.getChildAt(i);
@@ -1024,30 +1026,28 @@ public class SortRichEditor extends ScrollView {
             ref.title.setText(note.getTitle());
             ref.containerLayout.removeAllViews();
             List<IData> content = note.getContent();
-            if (content.isEmpty()) {
-                ref.insertEditTextAtIndex(ref.containerLayout.getChildCount(), "");
-            } else {
-                for (IData data : content) {
-                    int currentChild = ref.containerLayout.getChildCount();
-                    if (data instanceof TextData) {
-                        ref.lastFocusEdit = ref.insertEditTextAtIndex(currentChild, data.getText());
-                    } else if (data instanceof PictureData) {
-                        ref.insertPictureAtIndex(currentChild, data.getPath());
-                    } else if (data instanceof VideoData) {
-                        ref.insertVideoAtIndex(currentChild, data.getPath());
-                    } else if (data instanceof SoundData) {
-                        ref.insertSoundAtIndex(currentChild, data.getPath());
-                        ref.lastAddedSoundPlayer.getEditText().setText(data.getText());
-                    }
+
+            for (IData data : content) {
+                int currentChild = ref.containerLayout.getChildCount();
+                if (data instanceof TextData) {
+                    ref.lastFocusEdit = ref.insertEditTextAtIndex(currentChild, data.getText());
+                } else if (data instanceof PictureData) {
+                    ref.insertPictureAtIndex(currentChild, data.getPath());
+                } else if (data instanceof VideoData) {
+                    ref.insertVideoAtIndex(currentChild, data.getPath());
+                } else if (data instanceof SoundData) {
+                    ref.insertSoundAtIndex(currentChild, data.getPath());
+                    ref.lastAddedSoundPlayer.getEditText().setText(data.getText());
                 }
             }
 
-            // no edit text is created
-            if (ref.lastFocusEdit == null) {
+            // the last item is not a edit text
+            if (ref.containerLayout.getChildCount() == 0
+                    || !(ref.containerLayout.getChildAt(ref.containerLayout.getChildCount() - 1) instanceof TextView)) {
                 // then created an empty one
-                ref.lastFocusEdit =
-                        ref.insertEditTextAtIndex(ref.containerLayout.getChildCount(), "");
+                ref.insertEditTextAtIndex(ref.containerLayout.getChildCount(), "");
             }
+            ref.lastFocusEdit = (EditText) ref.containerLayout.getChildAt(ref.containerLayout.getChildCount() - 2);
 
             ArrayList<String> tagList = new ArrayList<>(note.getTag());
             tagList.addAll(ref.tags.getLabels());
@@ -1118,7 +1118,7 @@ public class SortRichEditor extends ScrollView {
     private class ViewDragHelperCallBack extends ViewDragHelper.Callback {
         @Override
         public boolean tryCaptureView(@NonNull View child, int pointerId) {
-            return (child instanceof RelativeLayout) && isSort;
+            return isSort;
         }
 
         @Override

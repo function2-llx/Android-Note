@@ -159,6 +159,9 @@ public class ListActivity extends AppCompatActivity {
                 item.setChecked(true);
                 noteAdapter.setSortField(TableConfig.Sorter.SORTER_OPTION_TO_FIELD.get(R.id.sort_modified_time));
                 break;
+
+            default:
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -202,11 +205,6 @@ public class ListActivity extends AppCompatActivity {
         super.onResume();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
     private void initDrawerToggle() {
         DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close);
@@ -221,6 +219,47 @@ public class ListActivity extends AppCompatActivity {
             groupMenu.add(R.id.group_groups, Menu.NONE, Menu.NONE, groupName);
     }
 
+    private void handleGroupManage(@NonNull MenuItem menuItem) {
+        List<String> allGroups = TableOperate.getInstance().getAllGroup();
+        String[] allGroupsArray = allGroups.toArray(new String[0]);
+        if (menuItem.getItemId() == R.id.new_group) {
+            EditText editText = new EditText(ListActivity.this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
+            builder.setTitle("New group");
+            builder.setPositiveButton("add", null);
+            builder.setNegativeButton("cancel", null);
+            builder.setView(editText);
+            AlertDialog dialog = builder.create();
+            dialog.show();
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                String groupName = editText.getText().toString();
+                if (groupName.isEmpty())
+                    Toast.makeText(ListActivity.this, "input something?", Toast.LENGTH_SHORT).show();
+                else if (allGroups.contains(groupName))
+                    Toast.makeText(ListActivity.this, groupName + " already exist", Toast.LENGTH_SHORT).show();
+                else {
+                    TableOperate.getInstance().addGroup(groupName);
+                    refreshGroups();
+                    dialog.cancel();
+                }
+            });
+        } else if (menuItem.getItemId() == R.id.remove_group) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
+            builder.setTitle("remove group");
+            boolean[] selected = new boolean[allGroupsArray.length];
+            builder.setMultiChoiceItems(allGroupsArray, new boolean[allGroupsArray.length],
+                    (dialog, which, isChecked) -> selected[which] = isChecked);
+            builder.setNegativeButton("cancel", null);
+            builder.setPositiveButton("confirm", (dialog, which) -> {
+                for (int i = 0; i < allGroupsArray.length; i++)
+                    if (selected[i])
+                        TableOperate.getInstance().removeGroup(allGroupsArray[i]);
+                refreshGroups();
+            });
+            builder.show();
+        }
+    }
+
     public void setNavigationView() {
         this.navigationView = findViewById(R.id.nav_view);
         Menu menu = navigationView.getMenu();
@@ -229,81 +268,29 @@ public class ListActivity extends AppCompatActivity {
 
         refreshGroups();
 
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-                switch (menuItem.getGroupId()) {
-                    case R.id.group_all_notes: {
-                        noteAdapter.updateAllNotesList();
-                        currentGroup = "";
-                        setTitle(getString(R.string.list_title));
-                        break;
-                    }
+        navigationView.setNavigationItemSelectedListener((@NonNull MenuItem menuItem) -> {
+            switch (menuItem.getGroupId()) {
+                case R.id.group_all_notes:
+                    noteAdapter.updateAllNotesList();
+                    currentGroup = "";
+                    setTitle(getString(R.string.list_title));
+                    break;
 
-                    case R.id.group_groups: {
-                        String groupName = menuItem.getTitle().toString();
-                        noteAdapter.updateGroupNotesList(groupName);
-                        currentGroup = groupName;
-                        setTitle(groupName);
-                        break;
-                    }
+                case R.id.group_groups:
+                    String groupName = menuItem.getTitle().toString();
+                    noteAdapter.updateGroupNotesList(groupName);
+                    currentGroup = groupName;
+                    setTitle(groupName);
+                    break;
 
-                    case R.id.group_manage: {
-                        List<String> allGroups = TableOperate.getInstance().getAllGroup();
-                        String[] allGroupsArray = allGroups.toArray(new String[0]);
-                        switch (menuItem.getItemId()) {
-                            case R.id.new_group: {
-                                EditText editText = new EditText(ListActivity.this);
-                                AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
-                                builder.setTitle("New group");
-                                builder.setPositiveButton("add", null);
-                                builder.setNegativeButton("cancel", null);
-                                builder.setView(editText);
-                                AlertDialog dialog = builder.create();
-                                dialog.show();
-                                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener((v) -> {
-                                    String groupName = editText.getText().toString();
-                                    if (groupName.isEmpty())
-                                        Toast.makeText(ListActivity.this, "input something?", Toast.LENGTH_SHORT).show();
-                                    else if (allGroups.contains(groupName))
-                                        Toast.makeText(ListActivity.this, groupName + " already exist", Toast.LENGTH_SHORT).show();
-                                    else {
-                                        TableOperate.getInstance().addGroup(groupName);
-                                        refreshGroups();
-                                        dialog.cancel();
-                                    }
-                                });
-                                break;
-                            }
+                case R.id.group_manage:
+                    handleGroupManage(menuItem);
+                    break;
 
-                            case R.id.remove_group: {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
-                                builder.setTitle("remove group");
-                                boolean selected[] = new boolean[allGroupsArray.length];
-                                builder.setMultiChoiceItems(allGroupsArray, new boolean[allGroupsArray.length],
-                                        (dialog, which, isChecked) -> selected[which] = isChecked);
-                                builder.setNegativeButton("cancel", null);
-                                builder.setPositiveButton("confirm", (dialog, which) -> {
-                                    for (int i = 0; i < allGroupsArray.length; i++)
-                                        if (selected[i])
-                                            TableOperate.getInstance().removeGroup(allGroupsArray[i]);
-                                    refreshGroups();
-                                });
-                                builder.show();
-                                break;
-                            }
-
-                            default:
-                                break;
-                        }
-                        break;
-                    }
-                    default:
-                        break;
-                }
-
-                return true;
+                default:
+                    break;
             }
+            return true;
         });
     }
 

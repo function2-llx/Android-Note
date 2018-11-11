@@ -103,18 +103,17 @@ public class EditorActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
 
-            case android.R.id.home: {
+            case android.R.id.home:
                 editor.destroy();
                 save();
                 finish();
                 break;
-            }
 
-            case R.id.menu_save: {
+            case R.id.menu_save:
                 save();
                 Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
                 break;
-            }
+
 
             case R.id.menu_markdown:
                 if (editor.changeIsMarkdown()) {
@@ -125,7 +124,7 @@ public class EditorActivity extends AppCompatActivity {
                 break;
 
             case R.id.viewonly_share:
-            case R.id.share: {
+            case R.id.share:
                 OnekeyShare oks = new OnekeyShare();
                 oks.disableSSOWhenAuthorize();
                 oks.setShareContentCustomizeCallback(
@@ -137,10 +136,9 @@ public class EditorActivity extends AppCompatActivity {
                 oks.show(this);
 
                 break;
-            }
 
             case R.id.viewonly_export:
-            case R.id.export: {
+            case R.id.export:
                 Note note = editor.buildNote();
                 note.setStartTime(createTime);
                 note.setModifyTime(new Date());
@@ -160,7 +158,6 @@ public class EditorActivity extends AppCompatActivity {
                         })
                         .show();
                 break;
-            }
 
             default:
                 break;
@@ -309,7 +306,8 @@ public class EditorActivity extends AppCompatActivity {
             try {
                 File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "rxMarkdown");
                 if (!dir.exists()) {
-                    dir.mkdirs();
+                    boolean ok = dir.mkdirs();
+                    ReturnValueEater.eat(ok);
                 }
                 outputStream = new FileOutputStream(dir.getAbsolutePath() + File.separator + "b.jpg");
                 AssetManager assetManager = getAssets();
@@ -321,13 +319,13 @@ public class EditorActivity extends AppCompatActivity {
                 }
                 outputStream.flush();
             } catch (IOException e) {
-                e.printStackTrace();
+                Logger.log(LOG_TAG, e);
             } finally {
                 if (outputStream != null) {
                     try {
                         outputStream.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        Logger.log(LOG_TAG, e);
                     }
                 }
                 try {
@@ -335,10 +333,39 @@ public class EditorActivity extends AppCompatActivity {
                         inputStream.close();
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Logger.log(LOG_TAG, e);
                 }
             }
             return null;
+        }
+    }
+
+    void handleMediaResult(int requestCode) {
+        File f = new File(OUTPUT_DIR + tempMediaUri.getPath());
+        try (FileOutputStream fos = new FileOutputStream(f); InputStream fis = getContentResolver().openInputStream(tempMediaUri)) {
+            if (fis == null) {
+                Log.e(LOG_TAG, "getContentResolver().openInputStream(tempMediaUri) returned null");
+                return;
+            }
+            if (!f.getParentFile().exists()) {
+                boolean ok = f.getParentFile().mkdirs();
+                ReturnValueEater.eat(ok);
+            }
+            if (!f.exists()) {
+                boolean ok = f.createNewFile();
+                ReturnValueEater.eat(ok);
+            }
+            byte[] bytes = new byte[fis.available()];
+            int count = fis.read(bytes, 0, bytes.length);
+            fos.write(bytes, 0, bytes.length);
+            ReturnValueEater.eat(count);
+            if (requestCode == REQUEST_IMAGE_CAPTURE) {
+                editor.addPicture(OUTPUT_DIR + tempMediaUri.getPath());
+            } else {
+                editor.addVideo(OUTPUT_DIR + tempMediaUri.getPath());
+            }
+        } catch (IOException e) {
+            Logger.log(LOG_TAG, e);
         }
     }
 
@@ -346,59 +373,32 @@ public class EditorActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case PickerConfig.PICKER_IMAGE: {
-                ArrayList<Media> select = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
-                for (Media media : select) {
+            case PickerConfig.PICKER_IMAGE:
+                for (Media media : data.<Media>getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT)) {
                     editor.addPicture(media.path);
                 }
-            }
-            break;
-            case PickerConfig.PICKER_VIDEO: {
-                ArrayList<Media> select = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
-                for (Media media : select) {
+                break;
+
+            case PickerConfig.PICKER_VIDEO:
+                for (Media media : data.<Media>getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT)) {
                     editor.addVideo(media.path);
                 }
-            }
-            break;
-            case PICKER_SOUND: {
+                break;
+
+            case PICKER_SOUND:
                 String path = ResultPool.getInstance().getCurrentPath();
                 final EditText editText = editor.addSound(path);
                 final long requestStartTime = data.getLongExtra(SoundRecorderActivity.REQUEST_START_TIME, -1);
                 // wait for the last speech to finish
                 new Handler().postDelayed(() -> editText.setText(ResultPool.getInstance().resultFrom(requestStartTime))
                         , ResultPool.SLEEP_MILL);
-            }
-            break;
+                break;
+
             case REQUEST_VIDEO_CAPTURE:
-            case REQUEST_IMAGE_CAPTURE: {
-                File f = new File(OUTPUT_DIR + tempMediaUri.getPath());
-                try (FileOutputStream fos = new FileOutputStream(f); InputStream fis = getContentResolver().openInputStream(tempMediaUri)) {
-                    if (fis == null) {
-                        Log.e(LOG_TAG, "getContentResolver().openInputStream(tempMediaUri) returned null");
-                        return;
-                    }
-                    if (!f.getParentFile().exists()) {
-                        boolean ok = f.getParentFile().mkdirs();
-                        ReturnValueEater.eat(ok);
-                    }
-                    if (!f.exists()) {
-                        boolean ok = f.createNewFile();
-                        ReturnValueEater.eat(ok);
-                    }
-                    byte[] bytes = new byte[fis.available()];
-                    int count = fis.read(bytes, 0, bytes.length);
-                    fos.write(bytes, 0, bytes.length);
-                    ReturnValueEater.eat(count);
-                    if (requestCode == REQUEST_IMAGE_CAPTURE) {
-                        editor.addPicture(OUTPUT_DIR + tempMediaUri.getPath());
-                    } else {
-                        editor.addVideo(OUTPUT_DIR + tempMediaUri.getPath());
-                    }
-                } catch (IOException e) {
-                    Logger.log(LOG_TAG, e);
-                }
-            }
-            break;
+            case REQUEST_IMAGE_CAPTURE:
+                handleMediaResult(requestCode);
+                break;
+
             default:
                 break;
         }
