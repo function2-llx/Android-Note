@@ -87,7 +87,12 @@ public class TableOperateTest {
 
     @Test
     public void getAllNotes() {
+        List<String> TagList = new ArrayList<String>();
+        TagList.add("TagZ");
         assertEquals(noteList, tableOperate.getAllNotes("",null));
+        assertEquals(2,tableOperate.getAllNotes("Group1",null).size());
+        assertEquals(2,tableOperate.getAllNotes("",TagList).size());
+        assertEquals(1,tableOperate.getAllNotes("Group1",TagList).size());
     }
 
     @Test
@@ -110,11 +115,32 @@ public class TableOperateTest {
     }
 
     public static void addExampleNote(List<Note> noteList) {
-        for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
+        for (int i = 0; i < NOTE_LIST_SIZE - 3; ++i) {
             Note note = DataExample.getExampleNote(String.valueOf(i));
             TableOperate.getInstance().addNote(note);
             noteList.add(note);
         }
+        Note note;
+
+        //Note with Group1
+        note = DataExample.getExampleNote(String.valueOf(NOTE_LIST_SIZE - 1));
+        note.setGroupName("Group1");
+        TableOperate.getInstance().addNote(note);
+        noteList.add(note);
+
+        //Note with Group1 and TagZ
+        note = DataExample.getExampleNote(String.valueOf(NOTE_LIST_SIZE - 1));
+        note.setGroupName("Group1");
+        note.getTag().add("TagZ");
+        TableOperate.getInstance().addNote(note);
+        noteList.add(note);
+
+        //Note with Group2 and TagZ
+        note = DataExample.getExampleNote(String.valueOf(NOTE_LIST_SIZE - 1));
+        note.setGroupName("Group2");
+        note.getTag().add("TagZ");
+        TableOperate.getInstance().addNote(note);
+        noteList.add(note);
     }
 
     @Test
