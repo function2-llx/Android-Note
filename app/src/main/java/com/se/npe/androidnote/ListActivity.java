@@ -51,8 +51,6 @@ public class ListActivity extends AppCompatActivity {
     private LinearLayoutManager layoutManager;
     private NoteAdapter noteAdapter;
     private UltimateRecyclerView ultimateRecyclerView;
-    private ActionBarDrawerToggle drawerToggle;
-    private DrawerLayout drawerLayout;
     private Toolbar toolbar;
     NavigationView navigationView;
     SubMenu groupMenu;
@@ -94,7 +92,6 @@ public class ListActivity extends AppCompatActivity {
     }
 
     private Uri getContentUri(File file) {
-        System.err.println(file);
         return FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileprovider", file);
     }
 
@@ -104,7 +101,7 @@ public class ListActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         switch (requestCode) {
-            case REQUEST_FILE_CHOOSE: {
+            case REQUEST_FILE_CHOOSE:
                 if (resultCode == RESULT_OK) {
                     final Uri uri = data.getData();
                     String path = FileUtils.getPath(this, uri);
@@ -125,49 +122,43 @@ public class ListActivity extends AppCompatActivity {
                             , path);
                 }
                 break;
-            }
+            default:
+                break;
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_new_note: {
-                Intent intent = new Intent(ListActivity.this, EditorActivity.class);
-                intent.putExtra(EditorActivity.CURRENT_GROUP, currentGroup);
-                this.startActivity(intent);
+            case R.id.menu_new_note:
+                startActivity(new Intent(ListActivity.this, EditorActivity.class)
+                        .putExtra(EditorActivity.CURRENT_GROUP, currentGroup));
                 break;
-            }
 
-            case R.id.menu_open: {
-                Intent getContentIntent = FileUtils.createGetContentIntent();
-                Intent intent = Intent.createChooser(getContentIntent, "Select a file");
-                startActivityForResult(intent, REQUEST_FILE_CHOOSE);
+            case R.id.menu_open:
+                startActivityForResult(
+                        Intent.createChooser(FileUtils.createGetContentIntent(), "Select a file")
+                        , REQUEST_FILE_CHOOSE);
                 break;
-            }
 
-            case R.id.clear: {
+            case R.id.clear:
                 noteAdapter.clear();
                 break;
-            }
 
-            case R.id.sort_title: {
+            case R.id.sort_title:
                 item.setChecked(true);
                 noteAdapter.setSortField(TableConfig.Sorter.SORTER_OPTION_TO_FIELD.get(R.id.sort_title));
                 break;
-            }
 
-            case R.id.sort_created_time: {
+            case R.id.sort_created_time:
                 item.setChecked(true);
                 noteAdapter.setSortField(TableConfig.Sorter.SORTER_OPTION_TO_FIELD.get(R.id.sort_created_time));
                 break;
-            }
 
-            case R.id.sort_modified_time: {
+            case R.id.sort_modified_time:
                 item.setChecked(true);
                 noteAdapter.setSortField(TableConfig.Sorter.SORTER_OPTION_TO_FIELD.get(R.id.sort_modified_time));
                 break;
-            }
         }
         return super.onOptionsItemSelected(item);
     }
@@ -179,9 +170,7 @@ public class ListActivity extends AppCompatActivity {
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_list);
-//        this.setTitle(this.getResources().getString(R.string.list_title));
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -205,19 +194,6 @@ public class ListActivity extends AppCompatActivity {
 
         setNavigationView();
         initDrawerToggle();
-//        MobSDK.init(this);
-        //        this.ultimateRecyclerView.reenableLoadmore();
-//        this.noteAdapter.setCustomLoadMoreView(LayoutInflater.from(this).inflate(R.layout.custom_bottom_progressbar, null));
-//        ultimateRecyclerView.setOnLoadMoreListener((itemsCount, maxLastVisiblePosition) -> {
-//            Handler handler = new Handler();
-//            handler.postDelayed(() -> {
-//                noteList.add(new Note());
-//                noteAdapter.notifyDataSetChanged();
-//            }, 1000);
-//        });
-
-//        this.enableDrag();
-
     }
 
     @Override
@@ -232,9 +208,8 @@ public class ListActivity extends AppCompatActivity {
     }
 
     private void initDrawerToggle() {
-
-        this.drawerLayout = findViewById(R.id.drawer_layout);
-        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close);
+        DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close);
         drawerToggle.syncState();
     }
 
@@ -257,7 +232,6 @@ public class ListActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-//                drawerLayout.closeDrawers();
                 switch (menuItem.getGroupId()) {
                     case R.id.group_all_notes: {
                         noteAdapter.updateAllNotesList();
@@ -287,19 +261,16 @@ public class ListActivity extends AppCompatActivity {
                                 builder.setView(editText);
                                 AlertDialog dialog = builder.create();
                                 dialog.show();
-                                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        String groupName = editText.getText().toString();
-                                        if (groupName.isEmpty())
-                                            Toast.makeText(ListActivity.this, "input something?", Toast.LENGTH_SHORT).show();
-                                        else if (allGroups.contains(groupName))
-                                            Toast.makeText(ListActivity.this, groupName + " already exist", Toast.LENGTH_SHORT).show();
-                                        else {
-                                            TableOperate.getInstance().addGroup(groupName);
-                                            refreshGroups();
-                                            dialog.cancel();
-                                        }
+                                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener((v) -> {
+                                    String groupName = editText.getText().toString();
+                                    if (groupName.isEmpty())
+                                        Toast.makeText(ListActivity.this, "input something?", Toast.LENGTH_SHORT).show();
+                                    else if (allGroups.contains(groupName))
+                                        Toast.makeText(ListActivity.this, groupName + " already exist", Toast.LENGTH_SHORT).show();
+                                    else {
+                                        TableOperate.getInstance().addGroup(groupName);
+                                        refreshGroups();
+                                        dialog.cancel();
                                     }
                                 });
                                 break;
@@ -309,21 +280,14 @@ public class ListActivity extends AppCompatActivity {
                                 AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
                                 builder.setTitle("remove group");
                                 boolean selected[] = new boolean[allGroupsArray.length];
-                                builder.setMultiChoiceItems(allGroupsArray, new boolean[allGroupsArray.length], new DialogInterface.OnMultiChoiceClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                                        selected[which] = isChecked;
-                                    }
-                                });
+                                builder.setMultiChoiceItems(allGroupsArray, new boolean[allGroupsArray.length],
+                                        (dialog, which, isChecked) -> selected[which] = isChecked);
                                 builder.setNegativeButton("cancel", null);
-                                builder.setPositiveButton("confirm", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        for (int i = 0; i < allGroupsArray.length; i++)
-                                            if (selected[i])
-                                                TableOperate.getInstance().removeGroup(allGroupsArray[i]);
-                                        refreshGroups();
-                                    }
+                                builder.setPositiveButton("confirm", (dialog, which) -> {
+                                    for (int i = 0; i < allGroupsArray.length; i++)
+                                        if (selected[i])
+                                            TableOperate.getInstance().removeGroup(allGroupsArray[i]);
+                                    refreshGroups();
                                 });
                                 builder.show();
                                 break;
@@ -343,19 +307,6 @@ public class ListActivity extends AppCompatActivity {
         });
     }
 
-    /**
-     * Configure search view to set hint & listener
-     */
-
-//    void setSlidingMenu() {
-//        slidingMenu = new SlidingMenu(this);
-//        slidingMenu.setMode(SlidingMenu.LEFT);
-//        slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
-//        slidingMenu.setBehindOffsetRes(R.dimen.sliding_menu_behind_witdh);
-//        slidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
-//        slidingMenu.setMenu(R.layout.sliding_menu_list);
-//        slidingMenu.setTouchModeBehind(SlidingMenu.TOUCHMODE_FULLSCREEN);
-//    }
     private void configureSearchView(@NonNull SearchView searchView) {
         searchView.setQueryHint("search by title...");
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {

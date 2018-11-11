@@ -87,23 +87,6 @@ public class EditorActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    private PlatformActionListener platformActionListener = new PlatformActionListener() {
-        @Override
-        public void onComplete(Platform platform, int i, HashMap<String, Object> hashMap) {
-            Logger.logInfo("kid", "分享成功");
-        }
-
-        @Override
-        public void onError(Platform platform, int i, Throwable throwable) {
-            Logger.logError("kid", "分享失败");
-        }
-
-        @Override
-        public void onCancel(Platform platform, int i) {
-            Logger.logInfo("kid", "分享取消");
-        }
-    };
-
     private void shareWechat(Platform weChat, Platform.ShareParams sp) {
         Note note = editor.buildNote();
         sp.setTitle(note.getTitle() + ".note");

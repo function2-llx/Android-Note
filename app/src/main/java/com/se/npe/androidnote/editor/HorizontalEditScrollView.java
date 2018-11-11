@@ -102,7 +102,6 @@ public class HorizontalEditScrollView extends FrameLayout implements View.OnClic
         findViewById(R.id.img_unorder_list).setOnClickListener(this);
         findViewById(R.id.img_order_list).setOnClickListener(this);
         findViewById(R.id.img_link).setOnClickListener(this);
-        findViewById(R.id.img_photo).setOnClickListener(this);
     }
 
     @Override

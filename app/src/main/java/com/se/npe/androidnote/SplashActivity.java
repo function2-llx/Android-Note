@@ -22,11 +22,6 @@ public class SplashActivity extends Activity {
         }
 
         @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-        }
-
-        @Override
         protected Void doInBackground(Void... voids) {
             publishProgress("loading database...");
             TableOperate.init(ref.get());
@@ -44,12 +39,12 @@ public class SplashActivity extends Activity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            SplashActivity ref = this.ref.get();
-            Intent srcIntent = ref.getIntent();
-            Intent dstIntent = new Intent(ref, ListActivity.class);
+            SplashActivity activity = ref.get();
+            Intent srcIntent = activity.getIntent();
+            Intent dstIntent = new Intent(activity, ListActivity.class);
             dstIntent.putExtras(srcIntent);
-            ref.startActivity(dstIntent);
-            ref.finish();
+            activity.startActivity(dstIntent);
+            activity.finish();
         }
     }
 
