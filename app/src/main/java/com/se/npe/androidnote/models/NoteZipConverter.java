@@ -7,6 +7,7 @@ import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.interfaces.INoteFileConverter;
 import com.se.npe.androidnote.util.AsyncTaskWithResponse;
 import com.se.npe.androidnote.util.Logger;
+import com.se.npe.androidnote.util.ReturnValueEater;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -47,7 +48,7 @@ public class NoteZipConverter implements INoteFileConverter {
 
             // read the file "data.txt"
             File file = new File(getTempDirPath() + "/data.txt");
-            byte b[] = new byte[(int) file.length()];
+            byte []b = new byte[(int) file.length()];
             try (InputStream inputStream = new FileInputStream(file)) {
                 int len = inputStream.read(b);
                 if (len == -1) return new Note();
@@ -63,7 +64,8 @@ public class NoteZipConverter implements INoteFileConverter {
 
             // resource files (picture, sound, video)
             File tempFolder = new File(INoteFileConverter.getExportDirPath() + "/temp");
-            tempFolder.renameTo(new File(INoteFileConverter.getExportDirPath() + '/' + note.getTitle() + "_unzip"));
+            boolean ok = tempFolder.renameTo(new File(INoteFileConverter.getExportDirPath() + '/' + note.getTitle() + "_unzip"));
+            ReturnValueEater.eat(ok);
 
             // structure of the note
             for (int i = 1; i < strArray.length; i++) {
@@ -90,10 +92,10 @@ public class NoteZipConverter implements INoteFileConverter {
             note.setStartTime(new Date());
             note.setModifyTime(new Date());
 
-            Log.d("debug0001","testload");
-            Log.d("debug0001",note.getTitle());
-            for(int i = 0;i < note.getContent().size();i ++) {
-                Log.d("debug0001",note.getContent().get(i).getType()+note.getContent().get(i).getPath());
+            Log.d("debug0001", "testload");
+            Log.d("debug0001", note.getTitle());
+            for (int i = 0; i < note.getContent().size(); i++) {
+                Log.d("debug0001", note.getContent().get(i).getType() + note.getContent().get(i).getPath());
             }
 
             return note;
@@ -116,7 +118,8 @@ public class NoteZipConverter implements INoteFileConverter {
             // temp folder to place resource files (picture, sound, video)
             File tempFolder = new File(getTempDirPath());
             if (!tempFolder.exists()) {
-                tempFolder.mkdirs();
+                boolean ok = tempFolder.mkdirs();
+                ReturnValueEater.eat(ok);
             }
 
             // copy resource files
@@ -131,15 +134,20 @@ public class NoteZipConverter implements INoteFileConverter {
                         desFile = new File(getTempDirPath() + "/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath()));
                         FileOperate.copy(srcFile, desFile);
                         break;
+
                     case "Sound":
                         srcFile = new File(contentList.get(i).getPath());
                         desFile = new File(getTempDirPath() + "/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath()));
                         FileOperate.copy(srcFile, desFile);
                         break;
+
                     case "Video":
                         srcFile = new File(contentList.get(i).getPath());
                         desFile = new File(getTempDirPath() + "/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath()));
                         FileOperate.copy(srcFile, desFile);
+                        break;
+
+                    default:
                         break;
                 }
             }
@@ -147,22 +155,23 @@ public class NoteZipConverter implements INoteFileConverter {
             // structure of the note
             StringBuilder string = new StringBuilder(note.getTitle() + TableConfig.FileSave.LIST_SEPARATOR);
             for (int i = 0; i < contentList.size(); i++) {
+                String newdir;
                 switch (contentList.get(i).getType()) {
-                    case "Pic": {
-                        String newdir = "/" + note.getTitle() + "_unzip/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
+                    case "Pic":
+                        newdir = "/" + note.getTitle() + "_unzip/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
                         string.append("Picture").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LIST_SEPARATOR);
                         break;
-                    }
-                    case "Sound": {
-                        String newdir = "/" + note.getTitle() + "_unzip/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
+
+                    case "Sound":
+                        newdir = "/" + note.getTitle() + "_unzip/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
                         string.append("Sound").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LINE_SEPARATOR).append(contentList.get(i).getText()).append(TableConfig.FileSave.LIST_SEPARATOR);
                         break;
-                    }
-                    case "Video": {
-                        String newdir = "/" + note.getTitle() + "_unzip/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
+
+                    case "Video":
+                        newdir = "/" + note.getTitle() + "_unzip/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
                         string.append("Video").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LIST_SEPARATOR);
                         break;
-                    }
+
                     default:
                         string.append(contentList.get(i).toString()).append(TableConfig.FileSave.LIST_SEPARATOR);
                         break;

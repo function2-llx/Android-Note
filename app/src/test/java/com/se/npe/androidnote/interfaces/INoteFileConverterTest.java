@@ -11,7 +11,7 @@ import org.robolectric.RobolectricTestRunner;
 
 import java.io.File;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(RobolectricTestRunner.class)
 public class INoteFileConverterTest {

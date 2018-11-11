@@ -180,8 +180,13 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
      * @author llx
      */
     public class ViewHolder extends UltimateRecyclerviewViewHolder implements View.OnClickListener, View.OnLongClickListener {
-        private TextView title, text, group;
-        private TextView createTimeDisplayer, modifyTimeDisplayer;
+        private TextView title;
+        private TextView text;
+        private TextView group;
+
+        private TextView createTimeDisplayer;
+        private TextView modifyTimeDisplayer;
+
         private ImageView imageView;
         int screenWidth = -1;
 
@@ -259,21 +264,18 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
             menu.setOnMenuItemClickListener(item -> {
                 Note selectedNote = getItem(getAdapterPosition());
                 switch (item.getItemId()) {
-                    case R.id.delete: {
+                    case R.id.delete:
                         remove(getAdapterPosition());
                         break;
-                    }
 
-                    case R.id.preview: {
+                    case R.id.preview:
                         EventBus.getDefault().postSticky(new NoteSelectEvent(selectedNote));
-                        Intent intent = new Intent(activity, EditorActivity.class);
-                        intent.putExtra(EditorActivity.VIEW_ONLY, true);
-                        intent.putExtra(EditorActivity.CURRENT_GROUP, activity.getCurrentGroup());
-                        activity.startActivity(intent);
+                        activity.startActivity(new Intent(activity, EditorActivity.class)
+                                .putExtra(EditorActivity.VIEW_ONLY, true)
+                                .putExtra(EditorActivity.CURRENT_GROUP, activity.getCurrentGroup()));
                         break;
-                    }
 
-                    case R.id.set_group: {
+                    case R.id.set_group:
                         List<String> groupName = TableOperate.getInstance().getAllGroup();
 
                         View dialogView = View.inflate(activity, R.layout.set_group_dialog, null);
@@ -282,45 +284,26 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
                         builder.setTitle("set group");
                         builder.setView(dialogView);
                         final int[] selected = {0};
-                        builder.setPositiveButton("confirm", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                selectedNote.setGroupName(groupName.get(selected[0]));
-                                TableOperate.getInstance().modify(selectedNote);
-                                activity.updateList();
-                            }
+                        builder.setPositiveButton("confirm", (dialog, which) -> {
+                            selectedNote.setGroupName(groupName.get(selected[0]));
+                            TableOperate.getInstance().modify(selectedNote);
+                            activity.updateList();
                         });
                         builder.setNegativeButton("cancel", null);
-                        builder.setSingleChoiceItems(groupName.toArray(new String[0]), selected[0], new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                selected[0] = which;
-                            }
-                        });
+                        builder.setSingleChoiceItems(groupName.toArray(new String[0]), selected[0],
+                                (dialog, which) -> selected[0] = which);
                         builder.show();
 
-//                        AlertDialog dialog = builder.create();
-//                        dialog.setCancelable(false);
-//                        dialog.show();
-//                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-//                            @Override
-//                            public void onClick(View v) {
-////                                String groupName = editText.getText().toString();
-////                                if (!groupName.isEmpty()) {
-////                                    selectedNote.setGroupName(groupName);
-////                                    TableOperate.getInstance().modify(selectedNote);
-////                                    dialog.cancel();
-////                                }
-//                                dialog.cancel();
-//                            }
-//                        });
-                    }
+                        break;
 
-                    case R.id.remove_from_current_group: {
+                    case R.id.remove_from_current_group:
                         selectedNote.setGroupName("");
                         TableOperate.getInstance().modify(selectedNote);
                         activity.updateList();
-                    }
+                        break;
+
+                    default:
+                        break;
                 }
                 return true;
             });
