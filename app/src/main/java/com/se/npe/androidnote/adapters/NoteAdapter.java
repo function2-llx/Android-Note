@@ -118,17 +118,17 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 
     // All notes
     public void updateAllNotesList() {
-        updateList(TableOperate.getInstance().getAllNotes());
+        updateList(TableOperate.getInstance().getAllNotes("",null));
     }
 
     // Search for notes
     public void updateSearchList(String searchParameter) {
-        updateList(TableOperate.getInstance().getSearchResultFuzzy(searchParameter));
+        updateList(TableOperate.getInstance().fuzzySearch(searchParameter,"",null));
     }
 
     // Group notes
     public void updateGroupNotesList(String groupName) {
-        this.updateList(TableOperate.getInstance().getAllNotesWithGroup(groupName));
+        this.updateList(TableOperate.getInstance().getAllNotes(groupName,null));
     }
 
     private void updateList(@NonNull List<Note> list) {
