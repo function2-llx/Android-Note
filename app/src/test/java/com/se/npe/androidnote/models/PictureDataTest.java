@@ -30,6 +30,11 @@ public class PictureDataTest {
     }
 
     @Test
+    public void getText() {
+        assertEquals("",pictureData.getText());
+    }
+
+    @Test
     public void getType() {
         assertEquals("Pic", pictureData.getType());
     }

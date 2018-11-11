@@ -35,6 +35,11 @@ public class VideoDataTest {
     }
 
     @Test
+    public void getText() {
+        assertEquals("",videoData.getText());
+    }
+
+    @Test
     public void equalsTest() {
         // Equals VideoData are same
         assertTrue(videoDataEquals.equals(videoData));
