@@ -1,5 +1,6 @@
 package com.se.npe.androidnote;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
@@ -7,6 +8,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 
+import com.dmcbig.mediapicker.PickerConfig;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.se.npe.androidnote.editor.SortRichEditor;
 
@@ -102,5 +104,10 @@ public class EditorActivityTest {
             activity.onOptionsItemSelected(menuItem);
         } catch (Exception e) {
         }
+    }
+
+    @Test
+    public void onActivityResult() {
+
     }
 }
