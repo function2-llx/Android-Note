@@ -333,13 +333,11 @@ public class EditorActivity extends AppCompatActivity {
                 AssetManager assetManager = getAssets();
                 inputStream = assetManager.open("b.jpg");
                 byte[] buffer = new byte[1024];
-                int read = 0;
+                int read;
                 while ((read = inputStream.read(buffer)) != -1) {
                     outputStream.write(buffer, 0, read);
                 }
                 outputStream.flush();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {

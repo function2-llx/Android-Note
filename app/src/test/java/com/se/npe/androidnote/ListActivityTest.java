@@ -25,7 +25,7 @@ import java.util.ArrayList;
 
 import static com.se.npe.androidnote.EditorActivity.CURRENT_GROUP;
 import static com.se.npe.androidnote.EditorActivity.VIEW_ONLY;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.robolectric.Shadows.shadowOf;
 
 @RunWith(RobolectricTestRunner.class)

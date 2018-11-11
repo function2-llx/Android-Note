@@ -1,13 +1,10 @@
 package com.se.npe.androidnote.editor;
 
-import android.view.MotionEvent;
 import android.widget.RelativeLayout;
 
-import com.googlecode.mp4parser.authoring.Edit;
 import com.se.npe.androidnote.EditorActivity;
 import com.se.npe.androidnote.R;
 
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -16,7 +13,8 @@ import org.robolectric.RobolectricTestRunner;
 
 import java.lang.reflect.Field;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
 public class SortRichEditorTest {
@@ -42,23 +40,38 @@ public class SortRichEditorTest {
 
         try {
             field = clazz.getDeclaredField("emptyView");
-        } catch (Exception e) {
+        } catch (NoSuchFieldException e) {
+            e.printStackTrace();
         }
         assertNotNull(field);
-        field.setAccessible(true);
+
+        // sonar cube complains about it, and thinks we need a null check
+        // actually we don't
+        if (field != null) {
+            field.setAccessible(true);
+        }
+
         try {
             emptyView = (RelativeLayout) field.get(editor2);
-        } catch (Exception e) {
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
+
         assertNotNull(emptyView);
 
         editor2.sort();
-        emptyView.performClick();
+
+        // same as above
+        if (emptyView != null) {
+            emptyView.performClick();
+        }
 
         try {
             emptyView = (RelativeLayout) field.get(editor);
-        } catch (Exception e) {
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
         }
+
         assertNotNull(emptyView);
         emptyView.performClick();
     }
