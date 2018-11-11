@@ -11,6 +11,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
@@ -56,6 +57,10 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         final ViewHolder holder = new ViewHolder(v);
         v.setOnClickListener(holder);
         v.setOnLongClickListener(holder);
+        LinearLayout textLayout = v.findViewById(R.id.text_layout);
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) textLayout.getLayoutParams();
+        params.width = getScreenWidth() / 3 * 2;
+        textLayout.setLayoutParams(params);
         return holder;
     }
 
@@ -191,6 +196,12 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 
     public Comparator<Note> getComparator() {
         return this.comparator;
+    }
+
+    private int getScreenWidth() {
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
+        return outMetrics.widthPixels;
     }
 
     /**
