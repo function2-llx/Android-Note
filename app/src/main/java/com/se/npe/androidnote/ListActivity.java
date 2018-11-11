@@ -375,6 +375,7 @@ public class ListActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 //                Toast.makeText(ListActivity.this, "open search view", Toast.LENGTH_SHORT).show();
+                tagGroupManager.updateTags();
                 tagGroupManager.show();
                 hideList();
                 disableRefresh();

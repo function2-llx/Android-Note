@@ -15,37 +15,15 @@ import co.lujun.androidtagview.TagView;
 public class TagGroupManager extends TagContainerLayout{
 
     public TagGroupManager(Context context) {
-        super(context);
+        this(context, null);
     }
 
     public TagGroupManager(Context context, AttributeSet attrs) {
-        super(context, attrs);
+        this(context, attrs, 0);
     }
 
     public TagGroupManager(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-    }
-
-    private boolean[] checked;
-
-    private void setChecked(int position, boolean checkedState) {
-        checked[position] = checkedState;
-        TagView tagView = getTagView(position);
-        if (checkedState)
-            tagView.setTagBorderColor(getResources().getColor(R.color.checked_color, null));
-        else
-            tagView.setTagBorderColor(getResources().getColor(R.color.unchecked_color, null));
-    }
-
-    void switchCheckedState(int position) {
-        this.setChecked(position, !checked[position]);
-    }
-
-    public void show() {
-        this.setBackgroundColor(getResources().getColor(R.color.white, null));
-        this.setRippleAlpha(0);
-        this.setVisibility(View.VISIBLE);
-
         this.setOnTagClickListener(new TagView.OnTagClickListener() {
             @Override
             public void onTagClick(int position, String text) {
@@ -62,12 +40,32 @@ public class TagGroupManager extends TagContainerLayout{
 
             }
         });
-        List<String> tagList;
-        tagList = TableOperate.getInstance().getAllTags();
+        this.setBackgroundColor(getResources().getColor(R.color.white, null));
+        this.setRippleAlpha(0);
+        this.setVisibility(View.INVISIBLE);
+    }
+
+    private boolean[] checked;
+    List<String> tagList;
+
+    private void setChecked(int position, boolean checkedState) {
+        checked[position] = checkedState;
+        TagView tagView = getTagView(position);
+        if (checkedState)
+            tagView.setTagBorderColor(getResources().getColor(R.color.checked_color, null));
+        else
+            tagView.setTagBorderColor(getResources().getColor(R.color.unchecked_color, null));
+    }
+
+    void switchCheckedState(int position) {
+        this.setChecked(position, !checked[position]);
+    }
+
+    public void show() {
         this.setTags(tagList);
-        checked = new boolean[tagList.size()];
         for (int i = 0; i < checked.length; i++)
-            setChecked(i, false);
+            setChecked(i, checked[i]);
+        this.setVisibility(View.VISIBLE);
     }
 
     public void hide() {
@@ -75,11 +73,16 @@ public class TagGroupManager extends TagContainerLayout{
         this.removeAllViews();
     }
 
+    public void updateTags() {
+        tagList = TableOperate.getInstance().getAllTags();
+        checked = new boolean[tagList.size()];
+    }
+
     public List<String> getCheckedTags() {
         List<String> ret = new ArrayList<>();
         for (int i = 0; i < checked.length; i++)
             if (checked[i])
-                ret.add(this.getTagText(i));
+                ret.add(tagList.get(i));
 
         return ret;
     }
