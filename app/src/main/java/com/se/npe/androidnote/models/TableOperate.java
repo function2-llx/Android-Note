@@ -177,17 +177,6 @@ public class TableOperate implements INoteCollection {
         return noteList;
     }
 
-    public List<Note> getSearchResult(String parameter) {
-        ArrayList<Note> noteList = new ArrayList<>();
-        Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME + " where " + TableConfig.Note.NOTE_TITLE + "= ?", new String[]{parameter});
-        while (c.moveToNext()) {
-            Note temp = new Note(c.getString(1), stringToContent(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToTagList(c.getString(5)), c.getString(6));
-            noteList.add(temp);
-        }
-        c.close();
-        return noteList;
-    }
-
     @Override
     public List<Note> fuzzySearch(String parameter,String groupName,List<String> tagList) {
         ArrayList<Note> noteList = new ArrayList<>();
@@ -218,19 +207,6 @@ public class TableOperate implements INoteCollection {
         return noteList;
     }
 
-    public List<Note> getSearchResultFuzzy(String parameter) {
-        ArrayList<Note> noteList = new ArrayList<>();
-        String sql2 = "select * from " + TableConfig.TABLE_NAME
-                + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%'";
-        Cursor c = db.rawQuery(sql2, null);
-        while (c.moveToNext()) {
-            Note temp = new Note(c.getString(1), stringToContent(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToTagList(c.getString(5)), c.getString(6));
-            noteList.add(temp);
-        }
-        c.close();
-        return noteList;
-    }
-
     public void addGroup(String groupName) {
         ContentValues cValue = new ContentValues();
         cValue.put(TableConfig.Group.GROUP_NAME, groupName);
@@ -239,12 +215,13 @@ public class TableOperate implements INoteCollection {
 
     public void removeGroup(String groupName) {
         db.execSQL("delete from " + TableConfig.GROUP_TABLE + " where " + TableConfig.Group.GROUP_NAME + "=?", new String[]{groupName});
-        List<Note> noteList = getAllNotesWithGroup(groupName);
+        List<Note> noteList = getAllNotes(groupName,null);
         for (int i = 0; i < noteList.size(); i++) {
             removeNote(noteList.get(i));
         }
     }
 
+    @Override
     public List<String> getAllGroup() {
         ArrayList<String> groupnameList = new ArrayList<>();
         Cursor c = db.rawQuery("select * from " + TableConfig.GROUP_TABLE, null);
@@ -253,78 +230,6 @@ public class TableOperate implements INoteCollection {
         }
         c.close();
         return groupnameList;
-    }
-
-    public List<Note> getSearchResultFuzzyWithGroup(String parameter, String groupName) {
-        ArrayList<Note> noteList = new ArrayList<>();
-        String sql2 = "select * from " + TableConfig.TABLE_NAME
-                + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%'";
-        Cursor c = db.rawQuery(sql2, null);
-        while (c.moveToNext()) {
-            Note temp = new Note(c.getString(1), stringToContent(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToTagList(c.getString(5)), c.getString(6));
-            if (groupName.equals(temp.getGroupName())) {
-                noteList.add(temp);
-            }
-        }
-        c.close();
-        return noteList;
-    }
-
-    public List<Note> getSearchResultFuzzyWithGroupAndTag(String parameter, String groupName,String tagName) {
-        ArrayList<Note> noteList = new ArrayList<>();
-        String sql2 = "select * from " + TableConfig.TABLE_NAME
-                + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%'";
-        Cursor c = db.rawQuery(sql2, null);
-        while (c.moveToNext()) {
-            Note temp = new Note(c.getString(1), stringToContent(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToTagList(c.getString(5)), c.getString(6));
-            if (groupName.equals(temp.getGroupName())) {
-                List<String> taglist = temp.getTag();
-                boolean flag = false;
-                for (int i = 0; i < taglist.size(); i++) {
-                    if (taglist.get(i).equals(tagName)) {
-                        flag = true;
-                        break;
-                    }
-                }
-                if (flag) noteList.add(temp);
-            }
-        }
-        c.close();
-        return noteList;
-    }
-
-    public List<Note> getAllNotesWithGroup(String groupName) {
-        ArrayList<Note> noteList = new ArrayList<>();
-        Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME, null);
-        while (c.moveToNext()) {
-            Note temp = new Note(c.getString(1), stringToContent(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToTagList(c.getString(5)), c.getString(6));
-            if (groupName.equals(temp.getGroupName())) {
-                noteList.add(temp);
-            }
-        }
-        c.close();
-        return noteList;
-    }
-
-    public List<Note> getSearchResultFuzzyWithTag(String parameter, String tag) {
-        ArrayList<Note> noteList = new ArrayList<>();
-        String sql2 = "select * from " + TableConfig.TABLE_NAME
-                + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%'";
-        Cursor c = db.rawQuery(sql2, null);
-        while (c.moveToNext()) {
-            Note temp = new Note(c.getString(1), stringToContent(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToTagList(c.getString(5)), c.getString(6));
-            List<String> taglist = temp.getTag();
-            boolean flag = false;
-            for (int i = 0; i < taglist.size(); i++) {
-                if (taglist.get(i).equals(tag)) {
-                    flag = true;
-                    break;
-                }
-            }
-            if (flag) noteList.add(temp);
-        }
-        c.close();
-        return noteList;
     }
 
     @Override
