@@ -11,6 +11,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -41,6 +42,18 @@ public class NoteTest {
     @After
     public void tearDown() {
         SingletonResetter.resetTableOperateSingleton();
+    }
+
+    @Test
+    public void buildTest() {
+        List<IData> content = new ArrayList<IData>();
+        content.add(new TextData("text"));
+        List<String> tags = new ArrayList<String>();
+        tags.add("TagZ");
+        Note note1 = new Note("title",content);
+        Note note2 = new Note("title",content,tags);
+        note1.getTag().add("TagZ");
+        assertEquals(note1,note2);
     }
 
     @Test
