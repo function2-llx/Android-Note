@@ -1,11 +1,9 @@
 package com.se.npe.androidnote;
 
 import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
-import android.nfc.Tag;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
@@ -39,14 +37,8 @@ import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
 import com.se.npe.androidnote.models.TagGroupManager;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.io.File;
 import java.util.List;
 import java.util.Objects;
-
-import co.lujun.androidtagview.TagContainerLayout;
-import co.lujun.androidtagview.TagView;
 
 /**
  * show a list of the preview of note(data stored in noteCollection)
@@ -59,7 +51,6 @@ public class ListActivity extends AppCompatActivity {
     private NoteAdapter noteAdapter;
     private UltimateRecyclerView ultimateRecyclerView;
     private Toolbar toolbar;
-    private NavigationView navigationView;
     private SubMenu groupMenu;
     private String currentGroup = "";
     private TagGroupManager tagGroupManager;
@@ -105,9 +96,11 @@ public class ListActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         if (requestCode == REQUEST_FILE_CHOOSE && resultCode == RESULT_OK) {
+            assert data != null;
             final Uri uri = data.getData();
             String path = FileUtils.getPath(this, uri);
             INoteFileConverter noteFileConverter;
+            assert path != null;
             switch (FileOperate.getSuffix(path)) {
                 case "note":
                     noteFileConverter = new NoteZipConverter();
@@ -203,8 +196,10 @@ public class ListActivity extends AppCompatActivity {
         super.onResume();
     }
 
+    private DrawerLayout drawerLayout;
+
     private void initDrawerToggle() {
-        DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
+        drawerLayout = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close);
         drawerToggle.syncState();
     }
@@ -220,46 +215,54 @@ public class ListActivity extends AppCompatActivity {
     private void handleGroupManage(@NonNull MenuItem menuItem) {
         List<String> allGroups = TableOperate.getInstance().getAllGroup();
         String[] allGroupsArray = allGroups.toArray(new String[0]);
-        if (menuItem.getItemId() == R.id.new_group) {
-            EditText editText = new EditText(ListActivity.this);
-            AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
-            builder.setTitle("New group");
-            builder.setPositiveButton("add", null);
-            builder.setNegativeButton("cancel", null);
-            builder.setView(editText);
-            AlertDialog dialog = builder.create();
-            dialog.show();
-            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-                String groupName = editText.getText().toString();
-                if (groupName.isEmpty())
-                    Toast.makeText(ListActivity.this, "input something?", Toast.LENGTH_SHORT).show();
-                else if (allGroups.contains(groupName))
-                    Toast.makeText(ListActivity.this, groupName + " already exist", Toast.LENGTH_SHORT).show();
-                else {
-                    TableOperate.getInstance().addGroup(groupName);
+        switch (menuItem.getItemId()) {
+            case R.id.new_group: {
+                EditText editText = new EditText(ListActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
+                builder.setTitle("New group");
+                builder.setPositiveButton("add", null);
+                builder.setNegativeButton("cancel", null);
+                builder.setView(editText);
+                AlertDialog dialog = builder.create();
+                dialog.show();
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                    String groupName = editText.getText().toString();
+                    if (groupName.isEmpty())
+                        Toast.makeText(ListActivity.this, "input something?", Toast.LENGTH_SHORT).show();
+                    else if (allGroups.contains(groupName))
+                        Toast.makeText(ListActivity.this, groupName + " already exist", Toast.LENGTH_SHORT).show();
+                    else {
+                        TableOperate.getInstance().addGroup(groupName);
+                        refreshGroups();
+                        dialog.cancel();
+                    }
+                });
+                break;
+            }
+
+            case R.id.manage_group: {
+                AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
+                builder.setTitle(getString(R.string.manage_groups));
+                boolean selected[] = new boolean[allGroupsArray.length];
+                builder.setMultiChoiceItems(allGroupsArray, new boolean[allGroupsArray.length], (dialog, which, isChecked) -> selected[which] = isChecked);
+                builder.setNegativeButton("cancel", null);
+                builder.setPositiveButton("confirm", (dialog, which) -> {
+                    for (int i = 0; i < allGroupsArray.length; i++)
+                        if (selected[i])
+                            TableOperate.getInstance().removeGroup(allGroupsArray[i]);
                     refreshGroups();
-                    dialog.cancel();
-                }
-            });
-        } else if (menuItem.getItemId() == R.id.remove_group) {
-            AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
-            builder.setTitle("remove group");
-            boolean[] selected = new boolean[allGroupsArray.length];
-            builder.setMultiChoiceItems(allGroupsArray, new boolean[allGroupsArray.length],
-                    (dialog, which, isChecked) -> selected[which] = isChecked);
-            builder.setNegativeButton("cancel", null);
-            builder.setPositiveButton("confirm", (dialog, which) -> {
-                for (int i = 0; i < allGroupsArray.length; i++)
-                    if (selected[i])
-                        TableOperate.getInstance().removeGroup(allGroupsArray[i]);
-                refreshGroups();
-            });
-            builder.show();
+                });
+                builder.show();
+                break;
+            }
+
+            default:
+                break;
         }
     }
 
     public void setNavigationView() {
-        this.navigationView = findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         Menu menu = navigationView.getMenu();
         this.groupMenu = menu.findItem(R.id.groups).getSubMenu();
         navigationView.setItemIconTintList(null);
@@ -286,63 +289,8 @@ public class ListActivity extends AppCompatActivity {
                 }
 
                 case R.id.group_operations: {
-                    List<String> allGroups = TableOperate.getInstance().getAllGroup();
-                    String[] allGroupsArray = allGroups.toArray(new String[0]);
-                    switch (menuItem.getItemId()) {
-                        case R.id.new_group: {
-                            EditText editText = new EditText(ListActivity.this);
-                            AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
-                            builder.setTitle("New group");
-                            builder.setPositiveButton("add", null);
-                            builder.setNegativeButton("cancel", null);
-                            builder.setView(editText);
-                            AlertDialog dialog = builder.create();
-                            dialog.show();
-                            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-                                @Override
-                                public void onClick(View v) {
-                                    String groupName = editText.getText().toString();
-                                    if (groupName.isEmpty())
-                                        Toast.makeText(ListActivity.this, "input something?", Toast.LENGTH_SHORT).show();
-                                    else if (allGroups.contains(groupName))
-                                        Toast.makeText(ListActivity.this, groupName + " already exist", Toast.LENGTH_SHORT).show();
-                                    else {
-                                        TableOperate.getInstance().addGroup(groupName);
-                                        refreshGroups();
-                                        dialog.cancel();
-                                    }
-                                }
-                            });
-                            break;
-                        }
+                    handleGroupManage(menuItem);
 
-                        case R.id.manage_group: {
-                            AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
-                            builder.setTitle(getString(R.string.manage_groups));
-                            boolean selected[] = new boolean[allGroupsArray.length];
-                            builder.setMultiChoiceItems(allGroupsArray, new boolean[allGroupsArray.length], new DialogInterface.OnMultiChoiceClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                                    selected[which] = isChecked;
-                                }
-                            });
-                            builder.setNegativeButton("cancel", null);
-                            builder.setPositiveButton("confirm", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialog, int which) {
-                                    for (int i = 0; i < allGroupsArray.length; i++)
-                                        if (selected[i])
-                                            TableOperate.getInstance().removeGroup(allGroupsArray[i]);
-                                    refreshGroups();
-                                }
-                            });
-                            builder.show();
-                            break;
-                        }
-
-                        default:
-                            break;
-                    }
                     break;
                 }
                 default:
@@ -366,12 +314,6 @@ public class ListActivity extends AppCompatActivity {
     private void hideList() {
         ultimateRecyclerView.setVisibility(View.INVISIBLE);
     }
-//
-    List<String> getParticiple(String rawText) {
-        List<String> ret = new ArrayList<>();
-        ret.add(rawText);
-        return ret;
-    }
 
     private void configureSearchView(@NonNull SearchView searchView) {
         tagGroupManager = findViewById(R.id.tag_group_manager);
@@ -380,29 +322,20 @@ public class ListActivity extends AppCompatActivity {
 
         searchView.setSubmitButtonEnabled(true);
         ImageView goButton = searchView.findViewById(R.id.search_go_btn);
-        goButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                tagGroupManager.hide();
-                showList();
-                String query = searchView.getQuery().toString();
-                List<String> tags = tagGroupManager.getCheckedTags();
-                Toast.makeText(ListActivity.this, tags.toString(), Toast.LENGTH_SHORT).show();
-                noteAdapter.updateSearchList(query, currentGroup, tags);
-//                Toast.makeText(ListActivity.this, "click search submit button", Toast.LENGTH_SHORT).show();
-            }
+        goButton.setOnClickListener(v -> {
+            tagGroupManager.hide();
+            showList();
+            String query = searchView.getQuery().toString();
+            List<String> tags = tagGroupManager.getCheckedTags();
+            noteAdapter.updateSearchList(query, currentGroup, tags);
         });
 
         // open event
-        searchView.setOnSearchClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-//                Toast.makeText(ListActivity.this, "open search view", Toast.LENGTH_SHORT).show();
-                tagGroupManager.updateTags();
-                tagGroupManager.show();
-                hideList();
-                disableRefresh();
-            }
+        searchView.setOnSearchClickListener(v -> {
+            tagGroupManager.updateTags();
+            tagGroupManager.show();
+            hideList();
+            disableRefresh();
         });
 
         // close event

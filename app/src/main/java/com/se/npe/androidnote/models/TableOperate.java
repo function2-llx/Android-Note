@@ -154,7 +154,7 @@ public class TableOperate implements INoteCollection {
     public List<Note> getAllNotes(String groupName,List<String> tagList) {
         ArrayList<Note> noteList = new ArrayList<>();
         Cursor c;
-        if(groupName == "") {
+        if(groupName.equals("")) {
             c = db.rawQuery("select * from " + TableConfig.TABLE_NAME ,null);
         }
         else {
@@ -232,12 +232,13 @@ public class TableOperate implements INoteCollection {
         return groupnameList;
     }
 
+
     public List<String> getAllTags() {
         ArrayList<String> tagNameList = new ArrayList<>();
         Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME, null);
         while (c.moveToNext()) {
             String tag = c.getString(5);
-            List<String> taglist = stringToListString(tag);
+            List<String> taglist = stringToTagList(tag);
             for (int i = 0; i < taglist.size(); i++) {
                 if(!tagNameList.contains(taglist.get(i))) {
                     tagNameList.add(taglist.get(i));
