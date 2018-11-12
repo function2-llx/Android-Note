@@ -45,6 +45,6 @@ public class TextData implements IData {
 
     @Override
     public String toString() {
-        return "Text" + "asdfg" + text;
+        return "Text" + TableConfig.FileSave.LINE_SEPARATOR + text;
     }
 }

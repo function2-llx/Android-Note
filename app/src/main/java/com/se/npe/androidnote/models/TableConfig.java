@@ -47,8 +47,8 @@ public class TableConfig {
 
         }
 
-        public static final String LIST_SEPARATOR = "qwert";
-        public static final String LINE_SEPARATOR = "asdfg";
+        public static final String LIST_SEPARATOR = "Sep"+(char)29;
+        public static final String LINE_SEPARATOR = "Sep"+(char)31;
     }
 
     public static class Sorter {
