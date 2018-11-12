@@ -1,17 +1,6 @@
 package com.se.npe.androidnote;
 
 import android.content.Intent;
-import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
-import android.view.View;
-
-import com.getbase.floatingactionbutton.FloatingActionsMenu;
-import com.se.npe.androidnote.editor.SortRichEditor;
-
-import static org.junit.Assert.*;
-
-import org.bouncycastle.util.Integers;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,6 +10,10 @@ import com.se.npe.androidnote.sound.ResultPool;
 
 import java.lang.reflect.Method;
 import java.util.Date;
+
+import java.lang.reflect.Method;
+
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(RobolectricTestRunner.class)
 public class EditorActivityTest {

@@ -11,10 +11,13 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotEquals;
 
 @RunWith(RobolectricTestRunner.class)
 public class NoteTest {
@@ -39,6 +42,18 @@ public class NoteTest {
     @After
     public void tearDown() {
         SingletonResetter.resetTableOperateSingleton();
+    }
+
+    @Test
+    public void buildTest() {
+        List<IData> content = new ArrayList<IData>();
+        content.add(new TextData("text"));
+        List<String> tags = new ArrayList<String>();
+        tags.add("TagZ");
+        Note note1 = new Note("title",content);
+        Note note2 = new Note("title",content,tags);
+        note1.getTag().add("TagZ");
+        assertEquals(note1,note2);
     }
 
     @Test
@@ -100,6 +115,13 @@ public class NoteTest {
     }
 
     @Test
+    public void groupFunc() {
+        assertEquals("",note.getGroupName());
+        note.setGroupName("Group1");
+        assertEquals("Group1",note.getGroupName());
+    }
+
+    @Test
     public void setIndex() {
         final int NOTE_INDEX = 100;
         note.setIndex(NOTE_INDEX);
@@ -108,6 +130,21 @@ public class NoteTest {
 
     @Test
     public void getPreview() {
+        Note tempNote = new Note();
+        TextData tData = new TextData("text");
+        PictureData pData = new PictureData("Pic");
+        tempNote.getContent().add(tData);
+        tempNote.getContent().add(pData);
+        tempNote.setGroupName("Group");
+        tempNote.setStartTime(new Date());
+        tempNote.setModifyTime(new Date());
+
+        assertEquals("text",tempNote.getPreview().text);
+        assertEquals("Pic",tempNote.getPreview().picturePath);
+        assertEquals("Group",tempNote.getPreview().groupName);
+        assertEquals(tempNote.getStartTime(),tempNote.getPreview().startTime);
+        assertEquals(tempNote.getModifyTime(),tempNote.getPreview().modifyTime);
+        assertEquals("this is tile for -1",tempNote.getPreview().title);
     }
 
     @Test

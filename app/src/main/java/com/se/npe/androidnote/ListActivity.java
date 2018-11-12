@@ -41,6 +41,7 @@ import com.se.npe.androidnote.models.TagGroupManager;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.io.File;
 import java.util.List;
 import java.util.Objects;
 
@@ -57,8 +58,6 @@ public class ListActivity extends AppCompatActivity {
     private LinearLayoutManager layoutManager;
     private NoteAdapter noteAdapter;
     private UltimateRecyclerView ultimateRecyclerView;
-    private ActionBarDrawerToggle drawerToggle;
-    private DrawerLayout drawerLayout;
     private Toolbar toolbar;
     private NavigationView navigationView;
     private SubMenu groupMenu;
@@ -105,71 +104,62 @@ public class ListActivity extends AppCompatActivity {
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        switch (requestCode) {
-            case REQUEST_FILE_CHOOSE: {
-                if (resultCode == RESULT_OK) {
-                    final Uri uri = data.getData();
-                    String path = FileUtils.getPath(this, uri);
-                    INoteFileConverter noteFileConverter;
-                    switch (FileOperate.getSuffix(path)) {
-                        case "note":
-                            noteFileConverter = new NoteZipConverter();
-                            break;
-                        case "pdf":
-                            noteFileConverter = new NotePdfConverter();
-                            break;
-                        default:
-                            noteFileConverter = new NoteZipConverter();
-                            break;
-                    }
-                    noteFileConverter.importNoteFromFile((Note note) ->
-                                    TableOperate.getInstance().addNote(note)
-                            , path);
-                }
-                break;
+        if (requestCode == REQUEST_FILE_CHOOSE && resultCode == RESULT_OK) {
+            final Uri uri = data.getData();
+            String path = FileUtils.getPath(this, uri);
+            INoteFileConverter noteFileConverter;
+            switch (FileOperate.getSuffix(path)) {
+                case "note":
+                    noteFileConverter = new NoteZipConverter();
+                    break;
+                case "pdf":
+                    noteFileConverter = new NotePdfConverter();
+                    break;
+                default:
+                    noteFileConverter = new NoteZipConverter();
+                    break;
             }
+            noteFileConverter.importNoteFromFile((Note note) ->
+                            TableOperate.getInstance().addNote(note)
+                    , path);
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_new_note: {
-                Intent intent = new Intent(ListActivity.this, EditorActivity.class);
-                intent.putExtra(EditorActivity.CURRENT_GROUP, currentGroup);
-                this.startActivity(intent);
+            case R.id.menu_new_note:
+                startActivity(new Intent(ListActivity.this, EditorActivity.class)
+                        .putExtra(EditorActivity.CURRENT_GROUP, currentGroup));
                 break;
-            }
 
-            case R.id.menu_open: {
-                Intent getContentIntent = FileUtils.createGetContentIntent();
-                Intent intent = Intent.createChooser(getContentIntent, "Select a file");
-                startActivityForResult(intent, REQUEST_FILE_CHOOSE);
+            case R.id.menu_open:
+                startActivityForResult(
+                        Intent.createChooser(FileUtils.createGetContentIntent(), "Select a file")
+                        , REQUEST_FILE_CHOOSE);
                 break;
-            }
 
-            case R.id.clear: {
+            case R.id.clear:
                 noteAdapter.clear();
                 break;
-            }
 
-            case R.id.sort_title: {
+            case R.id.sort_title:
                 item.setChecked(true);
                 noteAdapter.setSortField(TableConfig.Sorter.SORTER_OPTION_TO_FIELD.get(R.id.sort_title));
                 break;
-            }
 
-            case R.id.sort_created_time: {
+            case R.id.sort_created_time:
                 item.setChecked(true);
                 noteAdapter.setSortField(TableConfig.Sorter.SORTER_OPTION_TO_FIELD.get(R.id.sort_created_time));
                 break;
-            }
 
-            case R.id.sort_modified_time: {
+            case R.id.sort_modified_time:
                 item.setChecked(true);
                 noteAdapter.setSortField(TableConfig.Sorter.SORTER_OPTION_TO_FIELD.get(R.id.sort_modified_time));
                 break;
-            }
+
+            default:
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -181,9 +171,7 @@ public class ListActivity extends AppCompatActivity {
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_list);
-//        this.setTitle(this.getResources().getString(R.string.list_title));
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -215,15 +203,9 @@ public class ListActivity extends AppCompatActivity {
         super.onResume();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
     private void initDrawerToggle() {
-
-        this.drawerLayout = findViewById(R.id.drawer_layout);
-        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close);
+        DrawerLayout drawerLayout = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close);
         drawerToggle.syncState();
     }
 
@@ -233,6 +215,47 @@ public class ListActivity extends AppCompatActivity {
 
         for (String groupName : allGroups)
             groupMenu.add(R.id.group_groups, Menu.NONE, Menu.NONE, groupName);
+    }
+
+    private void handleGroupManage(@NonNull MenuItem menuItem) {
+        List<String> allGroups = TableOperate.getInstance().getAllGroup();
+        String[] allGroupsArray = allGroups.toArray(new String[0]);
+        if (menuItem.getItemId() == R.id.new_group) {
+            EditText editText = new EditText(ListActivity.this);
+            AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
+            builder.setTitle("New group");
+            builder.setPositiveButton("add", null);
+            builder.setNegativeButton("cancel", null);
+            builder.setView(editText);
+            AlertDialog dialog = builder.create();
+            dialog.show();
+            dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                String groupName = editText.getText().toString();
+                if (groupName.isEmpty())
+                    Toast.makeText(ListActivity.this, "input something?", Toast.LENGTH_SHORT).show();
+                else if (allGroups.contains(groupName))
+                    Toast.makeText(ListActivity.this, groupName + " already exist", Toast.LENGTH_SHORT).show();
+                else {
+                    TableOperate.getInstance().addGroup(groupName);
+                    refreshGroups();
+                    dialog.cancel();
+                }
+            });
+        } else if (menuItem.getItemId() == R.id.remove_group) {
+            AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
+            builder.setTitle("remove group");
+            boolean[] selected = new boolean[allGroupsArray.length];
+            builder.setMultiChoiceItems(allGroupsArray, new boolean[allGroupsArray.length],
+                    (dialog, which, isChecked) -> selected[which] = isChecked);
+            builder.setNegativeButton("cancel", null);
+            builder.setPositiveButton("confirm", (dialog, which) -> {
+                for (int i = 0; i < allGroupsArray.length; i++)
+                    if (selected[i])
+                        TableOperate.getInstance().removeGroup(allGroupsArray[i]);
+                refreshGroups();
+            });
+            builder.show();
+        }
     }
 
     public void setNavigationView() {

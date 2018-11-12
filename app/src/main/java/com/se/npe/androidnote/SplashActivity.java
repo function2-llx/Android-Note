@@ -5,22 +5,13 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.util.Log;
 import android.widget.TextView;
 
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
-import com.se.npe.androidnote.interfaces.IData;
-import com.se.npe.androidnote.models.FileOperate;
-import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
-import com.se.npe.androidnote.models.Note;
-import com.se.npe.androidnote.models.TextData;
-
-import org.w3c.dom.Text;
 
 import java.lang.ref.WeakReference;
-import java.util.ArrayList;
 
 public class SplashActivity extends Activity {
     static class ResourceInit extends AsyncTask<Void, String, Void> {
@@ -28,11 +19,6 @@ public class SplashActivity extends Activity {
 
         ResourceInit(SplashActivity ref) {
             this.ref = new WeakReference<>(ref);
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
         }
 
         @Override
@@ -53,12 +39,12 @@ public class SplashActivity extends Activity {
         @Override
         protected void onPostExecute(Void aVoid) {
             super.onPostExecute(aVoid);
-            SplashActivity ref = this.ref.get();
-            Intent srcIntent = ref.getIntent();
-            Intent dstIntent = new Intent(ref, ListActivity.class);
+            SplashActivity activity = ref.get();
+            Intent srcIntent = activity.getIntent();
+            Intent dstIntent = new Intent(activity, ListActivity.class);
             dstIntent.putExtras(srcIntent);
-            ref.startActivity(dstIntent);
-            ref.finish();
+            activity.startActivity(dstIntent);
+            activity.finish();
         }
     }
 

@@ -336,6 +336,7 @@ public class SortRichEditor extends ScrollView {
                 lastEdit.requestFocus();
                 lastEdit.setController(markdownController);
                 lastFocusEdit = lastEdit;
+                showOrHideKeyboard(true);
             }
         });
         parentLayout.addView(emptyView);
@@ -884,7 +885,7 @@ public class SortRichEditor extends ScrollView {
         containerLayout.addView(createPlaceholder(), index);
     }
 
-    private EditText insertEditTextAtIndex(final int index, String editStr) {
+    private EditText insertEditTextAtIndex(int index, String editStr) {
         DeletableEditText editText = createEditText();
         editText.setText(editStr);
         containerLayout.setLayoutTransition(null);
@@ -893,7 +894,7 @@ public class SortRichEditor extends ScrollView {
         containerLayout.setLayoutTransition(mTransition);
         if (isViewOnly) {
             editText.setFocusable(false);
-            editText.render(isMarkdown /* true */);
+            editText.render(isMarkdown /* must be true here */);
         }
         return editText;
     }
@@ -992,6 +993,8 @@ public class SortRichEditor extends ScrollView {
             return;
         }
         destroyed = true;
+        // hide the keyboard when destroyed
+        showOrHideKeyboard(false);
         int count = containerLayout.getChildCount();
         for (int i = 0; i < count; ++i) {
             View v = containerLayout.getChildAt(i);
@@ -1023,23 +1026,29 @@ public class SortRichEditor extends ScrollView {
             ref.title.setText(note.getTitle());
             ref.containerLayout.removeAllViews();
             List<IData> content = note.getContent();
-            if (content.isEmpty()) {
-                ref.insertEditTextAtIndex(ref.containerLayout.getChildCount(), "");
-            } else {
-                for (IData data : content) {
-                    int currentChild = ref.containerLayout.getChildCount();
-                    if (data instanceof TextData) {
-                        ref.insertEditTextAtIndex(currentChild, data.getText());
-                    } else if (data instanceof PictureData) {
-                        ref.insertPictureAtIndex(currentChild, data.getPath());
-                    } else if (data instanceof VideoData) {
-                        ref.insertVideoAtIndex(currentChild, data.getPath());
-                    } else if (data instanceof SoundData) {
-                        ref.insertSoundAtIndex(currentChild, data.getPath());
-                        ref.lastAddedSoundPlayer.getEditText().setText(data.getText());
-                    }
+
+            for (IData data : content) {
+                int currentChild = ref.containerLayout.getChildCount();
+                if (data instanceof TextData) {
+                    ref.lastFocusEdit = ref.insertEditTextAtIndex(currentChild, data.getText());
+                } else if (data instanceof PictureData) {
+                    ref.insertPictureAtIndex(currentChild, data.getPath());
+                } else if (data instanceof VideoData) {
+                    ref.insertVideoAtIndex(currentChild, data.getPath());
+                } else if (data instanceof SoundData) {
+                    ref.insertSoundAtIndex(currentChild, data.getPath());
+                    ref.lastAddedSoundPlayer.getEditText().setText(data.getText());
                 }
             }
+
+            // the last item is not a edit text
+            if (ref.containerLayout.getChildCount() == 0
+                    || !(ref.containerLayout.getChildAt(ref.containerLayout.getChildCount() - 1) instanceof TextView)) {
+                // then created an empty one
+                ref.insertEditTextAtIndex(ref.containerLayout.getChildCount(), "");
+            }
+            ref.lastFocusEdit = (EditText) ref.containerLayout.getChildAt(ref.containerLayout.getChildCount() - 2);
+
             ArrayList<String> tagList = new ArrayList<>(note.getTag());
             tagList.addAll(ref.tags.getLabels());
             ref.tags.setLabels(tagList);
@@ -1109,7 +1118,7 @@ public class SortRichEditor extends ScrollView {
     private class ViewDragHelperCallBack extends ViewDragHelper.Callback {
         @Override
         public boolean tryCaptureView(@NonNull View child, int pointerId) {
-            return (child instanceof RelativeLayout) && isSort;
+            return isSort;
         }
 
         @Override
