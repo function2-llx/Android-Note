@@ -76,6 +76,18 @@ public class TableOperateTest {
     }
 
     @Test
+    public void groupFunctionTest() {
+        List<String> groupList = new ArrayList<>();
+        groupList.add(DataExample.getExampleGroupName("1"));
+
+        TableOperate.getInstance().addGroup(DataExample.getExampleGroupName("1"));
+        assertEquals(groupList,TableOperate.getInstance().getAllGroup());
+
+        TableOperate.getInstance().removeGroup(DataExample.getExampleGroupName("1"));
+        assertEquals(new ArrayList<>(),TableOperate.getInstance().getAllGroup());
+    }
+
+    @Test
     public void setSearchConfigAndGetSearchConfig() {
         for (String searchConfig : TableConfig.Sorter.SORTER_FIELDS) {
             TableOperate.setSearchConfig(searchConfig);
