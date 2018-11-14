@@ -5,7 +5,6 @@ import android.support.v7.app.AppCompatActivity;
 import com.se.npe.androidnote.events.NoteClearEvent;
 import com.se.npe.androidnote.events.NoteDeleteEvent;
 import com.se.npe.androidnote.events.NoteModifyEvent;
-import com.se.npe.androidnote.interfaces.IData;
 
 import org.greenrobot.eventbus.EventBus;
 import org.junit.After;
@@ -24,7 +23,6 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertSame;
 
 @RunWith(RobolectricTestRunner.class)
@@ -87,12 +85,12 @@ public class TableOperateTest {
 
     @Test
     public void getAllNotes() {
-        List<String> TagList = new ArrayList<String>();
-        TagList.add("TagZ");
+        List<String> tagList = new ArrayList<>();
+        tagList.add("TagZ");
         assertEquals(noteList, tableOperate.getAllNotes("",null));
-        assertEquals(2,tableOperate.getAllNotes("Group1",null).size());
-        assertEquals(2,tableOperate.getAllNotes("",TagList).size());
-        assertEquals(1,tableOperate.getAllNotes("Group1",TagList).size());
+        assertEquals(2,tableOperate.getAllNotes(DataExample.getExampleGroupName("1"),null).size());
+        assertEquals(2,tableOperate.getAllNotes("",tagList).size());
+        assertEquals(1,tableOperate.getAllNotes(DataExample.getExampleGroupName("1"),tagList).size());
     }
 
     @Test
@@ -113,12 +111,12 @@ public class TableOperateTest {
         assertNotEquals(noteListSearched, tableOperate.fuzzySearch(this.noteList.get(3).getTitle(),"",null));
         noteListSearched.clear();
 
-        List<String> TagList = new ArrayList<String>();
-        TagList.add("TagZ");
+        List<String> tagList = new ArrayList<>();
+        tagList.add("TagZ");
         assertEquals(20,tableOperate.fuzzySearch("This","",null).size());
-        assertEquals(2,tableOperate.fuzzySearch("This","Group1",null).size());
-        assertEquals(1,tableOperate.fuzzySearch("This","Group1",TagList).size());
-        assertEquals(2,tableOperate.fuzzySearch("This","",TagList).size());
+        assertEquals(2,tableOperate.fuzzySearch("This",DataExample.getExampleGroupName("1"),null).size());
+        assertEquals(1,tableOperate.fuzzySearch("This",DataExample.getExampleGroupName("1"),tagList).size());
+        assertEquals(2,tableOperate.fuzzySearch("This","",tagList).size());
     }
 
     public static void addExampleNote(List<Note> noteList) {
@@ -131,20 +129,20 @@ public class TableOperateTest {
 
         //Note with Group1
         note = DataExample.getExampleNote(String.valueOf(NOTE_LIST_SIZE - 1));
-        note.setGroupName("Group1");
+        note.setGroupName(DataExample.getExampleGroupName("1"));
         TableOperate.getInstance().addNote(note);
         noteList.add(note);
 
         //Note with Group1 and TagZ
         note = DataExample.getExampleNote(String.valueOf(NOTE_LIST_SIZE - 1));
-        note.setGroupName("Group1");
+        note.setGroupName(DataExample.getExampleGroupName("1"));
         note.getTag().add("TagZ");
         TableOperate.getInstance().addNote(note);
         noteList.add(note);
 
         //Note with Group2 and TagZ
         note = DataExample.getExampleNote(String.valueOf(NOTE_LIST_SIZE - 1));
-        note.setGroupName("Group2");
+        note.setGroupName(DataExample.getExampleGroupName("2"));
         note.getTag().add("TagZ");
         TableOperate.getInstance().addNote(note);
         noteList.add(note);
