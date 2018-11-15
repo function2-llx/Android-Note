@@ -24,7 +24,6 @@ public class NoteTest {
 
     private Note note;
     private Note noteNotEquals;
-    private TableOperate tableOperate;
 
     @Before
     public void setUp() {
@@ -33,10 +32,9 @@ public class NoteTest {
         // set up tableOperate
         AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
         TableOperate.init(activity.getApplicationContext());
-        tableOperate = TableOperate.getInstance();
         // add note to initialize DBindex
-        tableOperate.addNote(note);
-        tableOperate.addNote(noteNotEquals);
+        TableOperate.getInstance().addNote(note);
+        TableOperate.getInstance().addNote(noteNotEquals);
     }
 
     @After

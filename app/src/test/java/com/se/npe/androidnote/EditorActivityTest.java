@@ -9,10 +9,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
+<<<<<<< app/src/test/java/com/se/npe/androidnote/EditorActivityTest.java
+=======
 import org.robolectric.RuntimeEnvironment;
 
 import com.se.npe.androidnote.editor.SoundPlayer;
 import com.se.npe.androidnote.models.TableOperate;
+>>>>>>> app/src/test/java/com/se/npe/androidnote/EditorActivityTest.java
 
 import java.lang.reflect.Method;
 
@@ -95,6 +98,7 @@ public class EditorActivityTest {
             activity.onOptionsItemSelected(menuItem);
         } catch (Exception e) {
             /* no operation */
+>>>>>>> app/src/test/java/com/se/npe/androidnote/EditorActivityTest.java
         }
     }
 

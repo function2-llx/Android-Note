@@ -14,6 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DataExample {
+    // no constructor
+    private DataExample() {
+
+    }
+
     public static final String EXAMPLE_MIX_IN = "test";
 
     // Path

@@ -2,8 +2,6 @@ package com.se.npe.androidnote.models;
 
 import android.support.v7.app.AppCompatActivity;
 
-import com.se.npe.androidnote.interfaces.IData;
-
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Rule;

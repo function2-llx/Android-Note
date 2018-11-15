@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -142,12 +141,12 @@ public class Note implements Serializable {
     public PreviewData getPreview() {
         String text = null;
         String picPath = null;
-        List<IData> content = getContent();
-        for (int i = 0; i < content.size(); i++) {
-            if (picPath == null && content.get(i).toString().charAt(0) == 'P') {
-                picPath = content.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
-            } else if (text == null && content.get(i).toString().charAt(0) == 'T') {
-                text = content.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
+        List<IData> contentList = getContent();
+        for (int i = 0; i < contentList.size(); i++) {
+            if (picPath == null && contentList.get(i).toString().charAt(0) == 'P') {
+                picPath = contentList.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
+            } else if (text == null && contentList.get(i).toString().charAt(0) == 'T') {
+                text = contentList.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
             }
         }
         if (text == null) text = "无预览文字";
