@@ -287,7 +287,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
                         activity.startActivity(new Intent(activity, EditorActivity.class)
                                 .putExtra(EditorActivity.VIEW_ONLY, true)
                                 .putExtra(EditorActivity.CURRENT_GROUP, activity.getCurrentGroup())
-                                .putExtra(EditorActivity.INITIAL_NOTE, selectedNote);
+                                .putExtra(EditorActivity.INITIAL_NOTE, selectedNote));
                         break;
 
                     case R.id.set_group:
