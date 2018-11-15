@@ -25,7 +25,8 @@ import java.util.Objects;
 
 public class TableOperate implements INoteCollection {
     private static final String LOG_TAG = Note.class.getSimpleName();
-
+    private static final String constantStringWhere = " where ";
+    //Magic avoid Code Smell
     private DBManager manager;
     private SQLiteDatabase db;
     private static File configFile;
@@ -60,7 +61,7 @@ public class TableOperate implements INoteCollection {
         stringBuilder.append("Select * from ");
         stringBuilder.append(tableName);
         if(!condition1.equals("")) {
-            stringBuilder.append(" where ");
+            stringBuilder.append(constantStringWhere);
             stringBuilder.append(condition1);
         }
         if(!condition2.equals("")) {
@@ -210,7 +211,7 @@ public class TableOperate implements INoteCollection {
             sql = getSql(TableConfig.TABLE_NAME,getCondition(TableConfig.Note.NOTE_TITLE,parameter,true),"");
         }
         else {
-            sql = getSql(TableConfig.TABLE_NAME,getCondition(TableConfig.Note.NOTE_TITLE,parameter,true),getCondition(TableConfig.Note.NOTE_GROUP,groupName,false));;
+            sql = getSql(TableConfig.TABLE_NAME,getCondition(TableConfig.Note.NOTE_TITLE,parameter,true),getCondition(TableConfig.Note.NOTE_GROUP,groupName,false));
         }
         Cursor c = db.rawQuery(sql, null);
         while (c.moveToNext()) {
@@ -237,7 +238,7 @@ public class TableOperate implements INoteCollection {
     }
 
     public void removeGroup(String groupName) {
-        db.execSQL("delete from " + TableConfig.GROUP_TABLE + " where " + TableConfig.Group.GROUP_NAME + "=?", new String[]{groupName});
+        db.execSQL("delete from " + TableConfig.GROUP_TABLE + constantStringWhere + TableConfig.Group.GROUP_NAME + "=?", new String[]{groupName});
         List<Note> noteList = getAllNotes(groupName,null);
         for (int i = 0; i < noteList.size(); i++) {
             removeNote(noteList.get(i));
@@ -293,13 +294,13 @@ public class TableOperate implements INoteCollection {
 
     @Override
     public void setNote(Note note) {
-        db.execSQL("update " + TableConfig.TABLE_NAME + " set " + TableConfig.Note.NOTE_TITLE + "=?," + TableConfig.Note.NOTE_TAG + "=?," + TableConfig.Note.NOTE_START_TIME + "=?," + TableConfig.Note.NOTE_MODIFY_TIME + "=?," + TableConfig.Note.NOTE_GROUP + "=?," + TableConfig.Note.NOTE_CONTENT + "=? where " + TableConfig.Note.NOTE_ID + "=?",
+        db.execSQL("update " + TableConfig.TABLE_NAME + " set " + TableConfig.Note.NOTE_TITLE + "=?," + TableConfig.Note.NOTE_TAG + "=?," + TableConfig.Note.NOTE_START_TIME + "=?," + TableConfig.Note.NOTE_MODIFY_TIME + "=?," + TableConfig.Note.NOTE_GROUP + "=?," + TableConfig.Note.NOTE_CONTENT + "=?" + constantStringWhere + TableConfig.Note.NOTE_ID + "=?",
                 new Object[]{note.getTitle(), tagListToString(note.getTag()), Long.toString(note.getStartTime().getTime()), Long.toString(note.getModifyTime().getTime()), note.getGroupName(), contentToString(note.getContent()), Integer.toString(note.getIndex())});
     }
 
     @Override
     public void removeNote(Note note) {
-        db.execSQL("delete from " + TableConfig.TABLE_NAME + " where " + TableConfig.Note.NOTE_ID + "=?", new String[]{Integer.toString(note.getIndex())});
+        db.execSQL("delete from " + TableConfig.TABLE_NAME + constantStringWhere + TableConfig.Note.NOTE_ID + "=?", new String[]{Integer.toString(note.getIndex())});
     }
 
     @Override
