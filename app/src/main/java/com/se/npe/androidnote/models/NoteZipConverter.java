@@ -134,13 +134,11 @@ public class NoteZipConverter implements INoteFileConverter {
                         desFile = new File(getTempDirPath() + "/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath()));
                         FileOperate.copy(srcFile, desFile);
                         break;
-
                     case "Sound":
                         srcFile = new File(contentList.get(i).getPath());
                         desFile = new File(getTempDirPath() + "/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath()));
                         FileOperate.copy(srcFile, desFile);
                         break;
-
                     case "Video":
                         srcFile = new File(contentList.get(i).getPath());
                         desFile = new File(getTempDirPath() + "/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath()));
