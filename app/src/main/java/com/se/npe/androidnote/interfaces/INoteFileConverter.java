@@ -63,7 +63,7 @@ public interface INoteFileConverter {
 
     @NonNull
     static String getExportDirPath() {
-        return TableConfig.SAVE_PATH + File.separator + "Export";
+        return TableConfig.FileSave.getSavePath() + File.separator + "Export";
     }
 
     @NonNull

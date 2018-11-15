@@ -84,7 +84,7 @@ public class ListActivity extends AppCompatActivity {
         String sortField = TableOperate.getSearchConfig();
         for (int i = 0; i < sortMenu.size(); i++) {
             MenuItem item = sortMenu.getItem(i);
-            if (TableConfig.Sorter.SORTER_OPTION_TO_FIELD.get(item.getItemId()).equals(sortField))
+            if (TableConfig.Sorter.getSorterOptionToField(item.getItemId()).equals(sortField))
                 item.setChecked(true);
         }
 
@@ -139,17 +139,17 @@ public class ListActivity extends AppCompatActivity {
 
             case R.id.sort_title:
                 item.setChecked(true);
-                noteAdapter.setSortField(TableConfig.Sorter.SORTER_OPTION_TO_FIELD.get(R.id.sort_title));
+                noteAdapter.setSortField(TableConfig.Sorter.getSorterOptionToField(R.id.sort_title));
                 break;
 
             case R.id.sort_created_time:
                 item.setChecked(true);
-                noteAdapter.setSortField(TableConfig.Sorter.SORTER_OPTION_TO_FIELD.get(R.id.sort_created_time));
+                noteAdapter.setSortField(TableConfig.Sorter.getSorterOptionToField(R.id.sort_created_time));
                 break;
 
             case R.id.sort_modified_time:
                 item.setChecked(true);
-                noteAdapter.setSortField(TableConfig.Sorter.SORTER_OPTION_TO_FIELD.get(R.id.sort_modified_time));
+                noteAdapter.setSortField(TableConfig.Sorter.getSorterOptionToField(R.id.sort_modified_time));
                 break;
 
             default:
