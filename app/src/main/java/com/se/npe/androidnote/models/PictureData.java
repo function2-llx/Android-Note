@@ -2,6 +2,8 @@ package com.se.npe.androidnote.models;
 
 import com.se.npe.androidnote.interfaces.IData;
 
+import java.util.Objects;
+
 /**
  * Picture data <-> an ImageView in the editor
  *
@@ -31,17 +33,20 @@ public class PictureData implements IData {
     }
 
     @Override
+    public String toString() {
+        return "Picture" + TableConfig.FileSave.LINE_SEPARATOR + picturePath;
+    }
+
+    @Override
     public boolean equals(Object o) {
-        return o instanceof PictureData && ((PictureData) o).picturePath.equals(picturePath);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        PictureData that = (PictureData) o;
+        return Objects.equals(picturePath, that.picturePath);
     }
 
     @Override
     public int hashCode() {
-        return picturePath.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return "Picture" + TableConfig.FileSave.LINE_SEPARATOR + picturePath;
+        return Objects.hash(picturePath);
     }
 }

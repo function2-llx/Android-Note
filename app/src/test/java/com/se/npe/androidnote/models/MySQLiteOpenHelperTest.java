@@ -21,7 +21,7 @@ import static org.junit.Assert.assertSame;
 @RunWith(RobolectricTestRunner.class)
 public class MySQLiteOpenHelperTest {
 
-    Context context;
+    private Context context;
 
     @Before
     public void setUp() {

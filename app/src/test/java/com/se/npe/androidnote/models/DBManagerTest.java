@@ -18,7 +18,7 @@ import static org.junit.Assert.assertTrue;
 @RunWith(RobolectricTestRunner.class)
 public class DBManagerTest {
 
-    Context context;
+    private Context context;
 
     @Before
     public void setUp() {
