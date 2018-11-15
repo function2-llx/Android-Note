@@ -55,11 +55,10 @@ public class TableOperate implements INoteCollection {
         return stringBuilder.toString();
     }
 
-    private static String getSql(String command,String tablename,String condition1,String condition2) {
+    private static String getSql(String tableName,String condition1,String condition2) {
         StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(command);
-        stringBuilder.append(" * from ");
-        stringBuilder.append(tablename);
+        stringBuilder.append("Select * from ");
+        stringBuilder.append(tableName);
         if(!condition1.equals("")) {
             stringBuilder.append(" where ");
             stringBuilder.append(condition1);
@@ -181,10 +180,10 @@ public class TableOperate implements INoteCollection {
         ArrayList<Note> noteList = new ArrayList<>();
         Cursor c;
         if(groupName.equals("")) {
-            c = db.rawQuery(getSql("Select",TableConfig.TABLE_NAME,"","") ,null);
+            c = db.rawQuery(getSql(TableConfig.TABLE_NAME,"","") ,null);
         }
         else {
-            c = db.rawQuery("select * from " + TableConfig.TABLE_NAME + " where " + TableConfig.Note.NOTE_GROUP + "= ?", new String[]{groupName});
+            c = db.rawQuery(getSql(TableConfig.TABLE_NAME,getCondition(TableConfig.Note.NOTE_GROUP,groupName,false),""),null);
         }
         while (c.moveToNext()) {
             Note temp = new Note(c.getString(1), stringToContent(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToTagList(c.getString(5)), c.getString(6));
@@ -208,12 +207,10 @@ public class TableOperate implements INoteCollection {
         ArrayList<Note> noteList = new ArrayList<>();
         String sql;
         if(groupName.equals("")) {
-            sql = "select * from " + TableConfig.TABLE_NAME
-                    + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%'";
+            sql = getSql(TableConfig.TABLE_NAME,getCondition(TableConfig.Note.NOTE_TITLE,parameter,true),"");
         }
         else {
-            sql = "select * from " + TableConfig.TABLE_NAME
-                    + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%' AND " + TableConfig.Note.NOTE_GROUP + " = " + "'" + groupName + "'";
+            sql = getSql(TableConfig.TABLE_NAME,getCondition(TableConfig.Note.NOTE_TITLE,parameter,true),getCondition(TableConfig.Note.NOTE_GROUP,groupName,false));;
         }
         Cursor c = db.rawQuery(sql, null);
         while (c.moveToNext()) {
@@ -250,7 +247,7 @@ public class TableOperate implements INoteCollection {
     @Override
     public List<String> getAllGroup() {
         ArrayList<String> groupnameList = new ArrayList<>();
-        Cursor c = db.rawQuery("select * from " + TableConfig.GROUP_TABLE, null);
+        Cursor c = db.rawQuery(getSql(TableConfig.GROUP_TABLE,"",""), null);
         while (c.moveToNext()) {
             groupnameList.add(c.getString(0));
         }
@@ -261,13 +258,13 @@ public class TableOperate implements INoteCollection {
 
     public List<String> getAllTags() {
         ArrayList<String> tagNameList = new ArrayList<>();
-        Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME, null);
+        Cursor c = db.rawQuery(getSql(TableConfig.TABLE_NAME,"",""), null);
         while (c.moveToNext()) {
             String tag = c.getString(5);
-            List<String> taglist = stringToTagList(tag);
-            for (int i = 0; i < taglist.size(); i++) {
-                if(!tagNameList.contains(taglist.get(i))) {
-                    tagNameList.add(taglist.get(i));
+            List<String> tagList = stringToTagList(tag);
+            for (int i = 0; i < tagList.size(); i++) {
+                if(!tagNameList.contains(tagList.get(i))) {
+                    tagNameList.add(tagList.get(i));
                 }
             }
         }
@@ -286,7 +283,7 @@ public class TableOperate implements INoteCollection {
         cValue.put(TableConfig.Note.NOTE_TAG, tagListToString(note.getTag()));
         cValue.put(TableConfig.Note.NOTE_GROUP, note.getGroupName());
         db.insert(TableConfig.TABLE_NAME, null, cValue);
-        String sql = "select * from " + TableConfig.TABLE_NAME;
+        String sql = getSql(TableConfig.TABLE_NAME,"","");
         Cursor cursor = db.rawQuery(sql, null);
         cursor.moveToLast();
         int count = cursor.getInt(0);
@@ -312,7 +309,7 @@ public class TableOperate implements INoteCollection {
 
     Note getNoteAt(int index) {
         ArrayList<Note> noteList = new ArrayList<>();
-        Cursor c = db.rawQuery("select * from " + TableConfig.TABLE_NAME + " where " + TableConfig.Note.NOTE_ID + "= ?", new String[]{Integer.toString(index)});
+        Cursor c = db.rawQuery(getSql(TableConfig.TABLE_NAME,getCondition(TableConfig.Note.NOTE_ID,Integer.toString(index),false),""),null);
         while (c.moveToNext()) {
             Note temp = new Note(c.getString(1), stringToContent(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToTagList(c.getString(5)), c.getString(6));
             noteList.add(temp);

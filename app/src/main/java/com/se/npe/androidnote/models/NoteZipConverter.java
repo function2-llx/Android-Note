@@ -92,12 +92,6 @@ public class NoteZipConverter implements INoteFileConverter {
             note.setStartTime(new Date());
             note.setModifyTime(new Date());
 
-            Log.d("debug0001", "testload");
-            Log.d("debug0001", note.getTitle());
-            for (int i = 0; i < note.getContent().size(); i++) {
-                Log.d("debug0001", note.getContent().get(i).getType() + note.getContent().get(i).getPath());
-            }
-
             return note;
         }
     }
