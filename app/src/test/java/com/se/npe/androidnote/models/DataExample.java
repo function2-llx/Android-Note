@@ -22,6 +22,12 @@ public class DataExample {
         return Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + mixIn;
     }
 
+    // GroupName
+    @NonNull
+    static String getExampleGroupName(String mixIn) {
+        return "Group" + mixIn;
+    }
+
     // TextData
     @NonNull
     static TextData getExampleTextData(String mixIn) {

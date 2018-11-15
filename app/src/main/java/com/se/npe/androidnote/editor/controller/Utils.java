@@ -26,6 +26,11 @@ import com.yydcdut.markdown.utils.TextHelper;
 import com.yydcdut.rxmarkdown.RxMDEditText;
 
 public class Utils {
+    // no constructor
+    private Utils() {
+
+    }
+
     /**
      * find '\n' from "start" position
      *

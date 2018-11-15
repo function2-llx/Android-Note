@@ -27,7 +27,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.robolectric.Shadows.shadowOf;
 
 @RunWith(RobolectricTestRunner.class)
@@ -80,10 +81,10 @@ public class NoteAdapterTest {
     @Test
     public void updateSearchList() {
         // Whole note list
-        noteAdapter.updateSearchList("title");
+        noteAdapter.updateSearchList("title","",new ArrayList<>());
         assertEquals(noteList, noteAdapter.getItems());
         // Empty note list
-        noteAdapter.updateSearchList("wtf???");
+        noteAdapter.updateSearchList("wtf???","",new ArrayList<>());
         assertEquals(new ArrayList<Note>(), noteAdapter.getItems());
 
         // Depends on addNote()
@@ -95,7 +96,7 @@ public class NoteAdapterTest {
             }
         }
         noteListSearched.sort(Comparator.comparing(Note::getTitle));
-        noteAdapter.updateSearchList("3");
+        noteAdapter.updateSearchList("3","",new ArrayList<>());
         assertEquals(noteListSearched, noteAdapter.getItems());
     }
 

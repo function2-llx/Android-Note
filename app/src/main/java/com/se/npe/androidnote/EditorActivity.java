@@ -16,6 +16,7 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -28,21 +29,16 @@ import com.dmcbig.mediapicker.entity.Media;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
 import com.mob.MobSDK;
 import com.se.npe.androidnote.editor.SortRichEditor;
-import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.interfaces.INoteFileConverter;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.NotePdfConverter;
 import com.se.npe.androidnote.models.NoteZipConverter;
 import com.se.npe.androidnote.models.TableOperate;
 import com.se.npe.androidnote.sound.ResultPool;
-import com.se.npe.androidnote.util.AsyncTaskWithResponse;
 import com.se.npe.androidnote.util.Logger;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
+import com.se.npe.androidnote.util.ReturnValueEater;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -56,7 +52,6 @@ import java.util.Objects;
 import cn.sharesdk.framework.Platform;
 import cn.sharesdk.framework.PlatformActionListener;
 import cn.sharesdk.onekeyshare.OnekeyShare;
-import cn.sharesdk.onekeyshare.ShareContentCustomizeCallback;
 import cn.sharesdk.wechat.friends.Wechat;
 
 public class EditorActivity extends AppCompatActivity {
@@ -77,6 +72,7 @@ public class EditorActivity extends AppCompatActivity {
     private boolean isViewOnly;
     public static final String VIEW_ONLY = "VIEW_ONLY";
     public static final String CURRENT_GROUP = "CURRENT_GROUP";
+    public static final String INITIAL_NOTE = "INITIAL_NOTE";
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -87,23 +83,6 @@ public class EditorActivity extends AppCompatActivity {
         }
         return super.onCreateOptionsMenu(menu);
     }
-
-    private PlatformActionListener platformActionListener = new PlatformActionListener() {
-        @Override
-        public void onComplete(Platform platform, int i, HashMap<String, Object> hashMap) {
-            Logger.logInfo("kid", "分享成功");
-        }
-
-        @Override
-        public void onError(Platform platform, int i, Throwable throwable) {
-            Logger.logError("kid", "分享失败");
-        }
-
-        @Override
-        public void onCancel(Platform platform, int i) {
-            Logger.logInfo("kid", "分享取消");
-        }
-    };
 
     private void shareWechat(Platform weChat, Platform.ShareParams sp) {
         Note note = editor.buildNote();
@@ -121,18 +100,17 @@ public class EditorActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
 
-            case android.R.id.home: {
+            case android.R.id.home:
                 editor.destroy();
                 save();
                 finish();
                 break;
-            }
 
-            case R.id.menu_save: {
+            case R.id.menu_save:
                 save();
                 Toast.makeText(this, "Saved", Toast.LENGTH_SHORT).show();
                 break;
-            }
+
 
             case R.id.menu_markdown:
                 if (editor.changeIsMarkdown()) {
@@ -143,7 +121,7 @@ public class EditorActivity extends AppCompatActivity {
                 break;
 
             case R.id.viewonly_share:
-            case R.id.share: {
+            case R.id.share:
                 OnekeyShare oks = new OnekeyShare();
                 oks.disableSSOWhenAuthorize();
                 oks.setShareContentCustomizeCallback(
@@ -155,10 +133,9 @@ public class EditorActivity extends AppCompatActivity {
                 oks.show(this);
 
                 break;
-            }
 
             case R.id.viewonly_export:
-            case R.id.export: {
+            case R.id.export:
                 Note note = editor.buildNote();
                 note.setStartTime(createTime);
                 note.setModifyTime(new Date());
@@ -178,7 +155,6 @@ public class EditorActivity extends AppCompatActivity {
                         })
                         .show();
                 break;
-            }
 
             default:
                 break;
@@ -210,7 +186,6 @@ public class EditorActivity extends AppCompatActivity {
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
-        EventBus.getDefault().register(this);
         editor = findViewById(R.id.rich_editor);
         final FloatingActionsMenu insertMedia = findViewById(R.id.insert_media);
         findViewById(R.id.insert_picture).setOnClickListener(v -> {
@@ -262,8 +237,10 @@ public class EditorActivity extends AppCompatActivity {
         } else {
             editor.setMarkdownController(findViewById(R.id.scroll_edit));
         }
-
+        // set current group
         this.currentGroup = getIntent().getStringExtra(CURRENT_GROUP);
+        // set old note
+        this.oldNote = (Note) getIntent().getSerializableExtra(INITIAL_NOTE);
 
         // deferred built, or we will get NPE
         if (oldNote != null) {
@@ -327,27 +304,26 @@ public class EditorActivity extends AppCompatActivity {
             try {
                 File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "rxMarkdown");
                 if (!dir.exists()) {
-                    dir.mkdirs();
+                    boolean ok = dir.mkdirs();
+                    ReturnValueEater.eat(ok);
                 }
                 outputStream = new FileOutputStream(dir.getAbsolutePath() + File.separator + "b.jpg");
                 AssetManager assetManager = getAssets();
                 inputStream = assetManager.open("b.jpg");
                 byte[] buffer = new byte[1024];
-                int read = 0;
+                int read;
                 while ((read = inputStream.read(buffer)) != -1) {
                     outputStream.write(buffer, 0, read);
                 }
                 outputStream.flush();
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
             } catch (IOException e) {
-                e.printStackTrace();
+                Logger.log(LOG_TAG, e);
             } finally {
                 if (outputStream != null) {
                     try {
                         outputStream.close();
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        Logger.log(LOG_TAG, e);
                     }
                 }
                 try {
@@ -355,10 +331,39 @@ public class EditorActivity extends AppCompatActivity {
                         inputStream.close();
                     }
                 } catch (IOException e) {
-                    e.printStackTrace();
+                    Logger.log(LOG_TAG, e);
                 }
             }
             return null;
+        }
+    }
+
+    void handleMediaResult(int requestCode) {
+        File f = new File(OUTPUT_DIR + tempMediaUri.getPath());
+        try (FileOutputStream fos = new FileOutputStream(f); InputStream fis = getContentResolver().openInputStream(tempMediaUri)) {
+            if (fis == null) {
+                Log.e(LOG_TAG, "getContentResolver().openInputStream(tempMediaUri) returned null");
+                return;
+            }
+            if (!f.getParentFile().exists()) {
+                boolean ok = f.getParentFile().mkdirs();
+                ReturnValueEater.eat(ok);
+            }
+            if (!f.exists()) {
+                boolean ok = f.createNewFile();
+                ReturnValueEater.eat(ok);
+            }
+            byte[] bytes = new byte[fis.available()];
+            int count = fis.read(bytes, 0, bytes.length);
+            fos.write(bytes, 0, bytes.length);
+            ReturnValueEater.eat(count);
+            if (requestCode == REQUEST_IMAGE_CAPTURE) {
+                editor.addPicture(OUTPUT_DIR + tempMediaUri.getPath());
+            } else {
+                editor.addVideo(OUTPUT_DIR + tempMediaUri.getPath());
+            }
+        } catch (IOException e) {
+            Logger.log(LOG_TAG, e);
         }
     }
 
@@ -366,55 +371,32 @@ public class EditorActivity extends AppCompatActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         switch (requestCode) {
-            case PickerConfig.PICKER_IMAGE: {
-                ArrayList<Media> select = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
-                for (Media media : select) {
+            case PickerConfig.PICKER_IMAGE:
+                for (Media media : data.<Media>getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT)) {
                     editor.addPicture(media.path);
                 }
-            }
-            break;
-            case PickerConfig.PICKER_VIDEO: {
-                ArrayList<Media> select = data.getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT);
-                for (Media media : select) {
+                break;
+
+            case PickerConfig.PICKER_VIDEO:
+                for (Media media : data.<Media>getParcelableArrayListExtra(PickerConfig.EXTRA_RESULT)) {
                     editor.addVideo(media.path);
                 }
-            }
-            break;
-            case PICKER_SOUND: {
+                break;
+
+            case PICKER_SOUND:
                 String path = ResultPool.getInstance().getCurrentPath();
                 final EditText editText = editor.addSound(path);
                 final long requestStartTime = data.getLongExtra(SoundRecorderActivity.REQUEST_START_TIME, -1);
                 // wait for the last speech to finish
                 new Handler().postDelayed(() -> editText.setText(ResultPool.getInstance().resultFrom(requestStartTime))
                         , ResultPool.SLEEP_MILL);
-            }
-            break;
+                break;
+
             case REQUEST_VIDEO_CAPTURE:
-            case REQUEST_IMAGE_CAPTURE: {
-                try {
-                    File f = new File(OUTPUT_DIR + tempMediaUri.getPath());
-                    if (!f.getParentFile().exists()) {
-                        f.getParentFile().mkdirs();
-                    }
-                    if (!f.exists()) {
-                        f.createNewFile();
-                    }
-                    InputStream fis = getContentResolver().openInputStream(tempMediaUri);
-                    FileOutputStream fos = new FileOutputStream(f);
-                    byte[] bytes = new byte[fis.available()];
-                    fis.read(bytes, 0, bytes.length);
-                    fos.write(bytes, 0, bytes.length);
-                    if (requestCode == REQUEST_IMAGE_CAPTURE) {
-                        editor.addPicture(OUTPUT_DIR + tempMediaUri.getPath());
-                    } else {
-                        editor.addVideo(OUTPUT_DIR + tempMediaUri.getPath());
-                    }
-                    fos.close();
-                } catch (IOException e) {
-                    Logger.log(LOG_TAG, e);
-                }
-            }
-            break;
+            case REQUEST_IMAGE_CAPTURE:
+                handleMediaResult(requestCode);
+                break;
+
             default:
                 break;
         }
@@ -432,18 +414,6 @@ public class EditorActivity extends AppCompatActivity {
         super.onDestroy();
         editor.destroy();
 
-        EventBus.getDefault().removeAllStickyEvents();
-        EventBus.getDefault().unregister(this);
         ResultPool.getInstance().stopRecording();
-    }
-
-    @Subscribe(sticky = true)
-    public void getNoteFromOld(Note note) {
-        oldNote = note;
-    }
-
-    @Subscribe(sticky = true)
-    public void getNoteFromSelect(NoteSelectEvent event) {
-        this.oldNote = event.getNote();
     }
 }

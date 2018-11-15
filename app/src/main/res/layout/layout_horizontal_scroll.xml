@@ -236,18 +236,6 @@
             android:background="@drawable/press"
             android:scaleType="centerCrop"
             android:src="@drawable/ic_insert_link_black_24dp" />
-
-        <ImageView
-            android:id="@+id/img_photo"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
-            android:layout_marginBottom="6dp"
-            android:layout_marginLeft="12dp"
-            android:layout_marginRight="12dp"
-            android:layout_marginTop="6dp"
-            android:background="@drawable/press"
-            android:scaleType="centerCrop"
-            android:src="@drawable/ic_insert_photo_black_24dp" />
     </LinearLayout>
 
 </HorizontalScrollView>

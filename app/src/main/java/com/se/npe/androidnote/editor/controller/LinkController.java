@@ -18,7 +18,6 @@ package com.se.npe.androidnote.editor.controller;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Build;
 import android.support.v7.app.AlertDialog;
 import android.text.TextUtils;

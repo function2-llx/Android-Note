@@ -4,9 +4,11 @@ import android.support.annotation.NonNull;
 
 import com.se.npe.androidnote.interfaces.IData;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -17,9 +19,7 @@ import java.util.Objects;
  * @author MashPlant
  */
 
-public class Note {
-    private static final String LOG_TAG = Note.class.getSimpleName();
-
+public class Note implements Serializable {
     public static class PreviewData {
         // using public field just for convenience
         public @NonNull
@@ -158,10 +158,7 @@ public class Note {
     @Override
     public boolean equals(Object o) {
         // Identify note by its DBindex
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Note note = (Note) o;
-        return indexDB == note.indexDB;
+        return o instanceof Note && ((Note) o).indexDB == indexDB;
     }
 
     @Override
