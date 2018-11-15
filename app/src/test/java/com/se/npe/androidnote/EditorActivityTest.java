@@ -1,11 +1,21 @@
 package com.se.npe.androidnote;
 
 import android.content.Intent;
+import android.view.MenuItem;
+import static org.robolectric.Shadows.shadowOf;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
+<<<<<<< app/src/test/java/com/se/npe/androidnote/EditorActivityTest.java
+=======
+import org.robolectric.RuntimeEnvironment;
+
+import com.se.npe.androidnote.editor.SoundPlayer;
+import com.se.npe.androidnote.models.TableOperate;
+>>>>>>> app/src/test/java/com/se/npe/androidnote/EditorActivityTest.java
 
 import java.lang.reflect.Method;
 
@@ -52,7 +62,7 @@ public class EditorActivityTest {
             method.setAccessible(true);
             method.invoke(activity, 1);
         } catch (Exception e) {
-            //Do Nothing
+            /* no operation */
         }
     }
 
@@ -66,7 +76,42 @@ public class EditorActivityTest {
             method.setAccessible(true);
             method.invoke(activity, 1);
         } catch (Exception e) {
-            //Do Nothing
+            /* no operation */
         }
+    }
+
+    @Test
+    public void onOptionsItemSelected() {
+        TableOperate.init(RuntimeEnvironment.application.getApplicationContext());
+        clickOptionsMenuItem(android.R.id.home);
+        clickOptionsMenuItem(R.id.menu_save);
+        clickOptionsMenuItem(R.id.menu_markdown);
+        clickOptionsMenuItem(R.id.viewonly_share);
+        clickOptionsMenuItem(R.id.share);
+        clickOptionsMenuItem(R.id.viewonly_export);
+        clickOptionsMenuItem(R.id.export);
+    }
+
+    private void clickOptionsMenuItem(int optionsMenuItemId) {
+        MenuItem menuItem = shadowOf(activity).getOptionsMenu().findItem(optionsMenuItemId);
+        try {
+            activity.onOptionsItemSelected(menuItem);
+        } catch (Exception e) {
+            /* no operation */
+>>>>>>> app/src/test/java/com/se/npe/androidnote/EditorActivityTest.java
+        }
+    }
+
+    @Test
+    public void testClick() {
+        activity.findViewById(R.id.insert_picture).performClick();
+        activity.findViewById(R.id.insert_video).performClick();
+        activity.findViewById(R.id.insert_sound).performClick();
+    }
+
+    @Test
+    public void onActivityResult() {
+        Intent intent = new Intent(activity, SoundPlayer.class);
+        activity.startActivityForResult(intent, 0);
     }
 }
