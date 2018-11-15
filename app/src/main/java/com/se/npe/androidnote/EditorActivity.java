@@ -97,10 +97,8 @@ public class EditorActivity extends AppCompatActivity {
         sp.setImageUrl("https://hmls.hfbank.com.cn/hfapp-api/9.png");
         sp.setShareType(Platform.SHARE_FILE);
         INoteFileConverter noteFileConverter = new NoteZipConverter();
-        noteFileConverter.exportNoteToFile((String fileName) -> {
-            sp.setFilePath(fileName);
-            weChat.share(sp);
-        }, note, "temp");
+        noteFileConverter.exportNoteToFile(sp::setFilePath, note, "temp");
+        weChat.share(sp);
     }
 
     @Override

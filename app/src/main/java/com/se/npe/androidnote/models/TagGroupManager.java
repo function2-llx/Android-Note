@@ -12,7 +12,7 @@ import java.util.List;
 import co.lujun.androidtagview.TagContainerLayout;
 import co.lujun.androidtagview.TagView;
 
-public class TagGroupManager extends TagContainerLayout{
+public class TagGroupManager extends TagContainerLayout {
 
     public TagGroupManager(Context context) {
         this(context, null);
