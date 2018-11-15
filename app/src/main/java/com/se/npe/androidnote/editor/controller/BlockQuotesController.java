@@ -28,6 +28,33 @@ public class BlockQuotesController {
         mRxMDEditText = rxMDEditText;
     }
 
+    private void doBlockQuotesHandleWhenPositionEq() {
+        Editable editable = mRxMDEditText.getText();
+        int selectedStart = mRxMDEditText.getSelectionStart();
+        int selectedEnd = mRxMDEditText.getSelectionEnd();
+        if (selectedStart >= "> ".length() && ("> ".equals(editable.subSequence(Utils.safePosition(selectedStart - "> ".length(), editable), Utils.safePosition(selectedStart, editable)).toString())) &&
+                ((selectedStart > "\n> ".length() && editable.charAt(selectedStart - 3) == '\n') || selectedStart < "\n> ".length()) || (
+                selectedStart > "> > ".length() && "> > ".equals(editable.subSequence(Utils.safePosition(selectedStart - "> > ".length(), editable), Utils.safePosition(selectedStart, editable)).toString()))) {
+            mRxMDEditText.getText().delete(selectedStart - "> ".length(), selectedStart);
+            mRxMDEditText.setSelection(selectedStart - "> ".length(), selectedEnd - "> ".length());
+            return;
+        }
+
+        if ((selectedStart > 0 && editable.charAt(selectedStart - 1) == '\n') || selectedStart == 0) {
+            if (selectedEnd < editable.length() && editable.charAt(selectedEnd) != '\n') {
+                mRxMDEditText.getText().insert(selectedEnd, "\n");
+            }
+            mRxMDEditText.getText().insert(selectedStart, "> ");
+            mRxMDEditText.setSelection(selectedStart + "> ".length(), selectedEnd + "> ".length());
+        } else {
+            if (selectedEnd + 1 < editable.length() && editable.charAt(selectedEnd + 1) != '\n') {
+                mRxMDEditText.getText().insert(selectedEnd, "\n");
+            }
+            mRxMDEditText.getText().insert(selectedStart, "\n> ");
+            mRxMDEditText.setSelection(selectedStart + "\n> ".length(), selectedEnd + "\n> ".length());
+        }
+    }
+
     public void doBlockQuotes() {
         int start = mRxMDEditText.getSelectionStart();
         int end = mRxMDEditText.getSelectionEnd();
@@ -44,35 +71,39 @@ public class BlockQuotesController {
             int position0 = Utils.findBeforeNewLineChar(mRxMDEditText.getText(), start) + 1;
             int position1 = Utils.findBeforeNewLineChar(mRxMDEditText.getText(), end) + 1;
             if (position0 == position1) {
-                Editable editable = mRxMDEditText.getText();
-                int selectedStart = mRxMDEditText.getSelectionStart();
-                int selectedEnd = mRxMDEditText.getSelectionEnd();
-                if (selectedStart >= "> ".length() && ("> ".equals(editable.subSequence(Utils.safePosition(selectedStart - "> ".length(), editable), Utils.safePosition(selectedStart, editable)).toString())) &&
-                        ((selectedStart > "\n> ".length() && editable.charAt(selectedStart - 3) == '\n') || selectedStart < "\n> ".length()) || (
-                        selectedStart > "> > ".length() && "> > ".equals(editable.subSequence(Utils.safePosition(selectedStart - "> > ".length(), editable), Utils.safePosition(selectedStart, editable)).toString()))) {
-                    mRxMDEditText.getText().delete(selectedStart - "> ".length(), selectedStart);
-                    mRxMDEditText.setSelection(selectedStart - "> ".length(), selectedEnd - "> ".length());
-                    return;
-                }
-
-                if ((selectedStart > 0 && editable.charAt(selectedStart - 1) == '\n') || selectedStart == 0) {
-                    if (selectedEnd < editable.length() && editable.charAt(selectedEnd) != '\n') {
-                        mRxMDEditText.getText().insert(selectedEnd, "\n");
-                    }
-                    mRxMDEditText.getText().insert(selectedStart, "> ");
-                    mRxMDEditText.setSelection(selectedStart + "> ".length(), selectedEnd + "> ".length());
-                } else {
-                    if (selectedEnd + 1 < editable.length() && editable.charAt(selectedEnd + 1) != '\n') {
-                        mRxMDEditText.getText().insert(selectedEnd, "\n");
-                    }
-                    mRxMDEditText.getText().insert(selectedStart, "\n> ");
-                    mRxMDEditText.setSelection(selectedStart + "\n> ".length(), selectedEnd + "\n> ".length());
-                }
+                doBlockQuotesHandleWhenPositionEq();
             } else {
                 Toast.makeText(mRxMDEditText.getContext(), "无法操作多行", Toast.LENGTH_SHORT).show();
             }
         }
+    }
 
+    private void addNestedBlockQuotesHandlePositionEq() {
+        int selectedStart = mRxMDEditText.getSelectionStart();
+        int selectedEnd = mRxMDEditText.getSelectionEnd();
+        Editable editable = mRxMDEditText.getText();
+        if (selectedStart >= "> ".length()
+                && ("> ".equals(editable.subSequence(Utils.safePosition(selectedStart - "> ".length(), editable), Utils.safePosition(selectedStart, editable)).toString())) &&
+                ((selectedStart > "\n> ".length() && editable.charAt(selectedStart - 3) == '\n') || selectedStart < "\n> ".length()) || (
+                selectedStart > "> > ".length() && "> > ".equals(editable.subSequence(Utils.safePosition(selectedStart - "> > ".length(), editable), Utils.safePosition(selectedStart, editable)).toString()))) {
+            mRxMDEditText.getText().insert(selectedStart, "> ");
+            mRxMDEditText.setSelection(selectedStart + "> ".length(), selectedEnd + "> ".length());
+            return;
+        }
+
+        if ((selectedStart > 0 && editable.charAt(selectedStart - 1) == '\n') || selectedStart == 0) {
+            if (selectedEnd < editable.length() && editable.charAt(selectedEnd) != '\n') {
+                mRxMDEditText.getText().insert(selectedEnd, "\n");
+            }
+            mRxMDEditText.getText().insert(selectedStart, "> ");
+            mRxMDEditText.setSelection(selectedStart + "> ".length(), selectedEnd + "> ".length());
+        } else {
+            if (selectedEnd + 1 < editable.length() && editable.charAt(selectedEnd + 1) != '\n') {
+                mRxMDEditText.getText().insert(selectedEnd, "\n");
+            }
+            mRxMDEditText.getText().insert(selectedStart, "\n> ");
+            mRxMDEditText.setSelection(selectedStart + "\n> ".length(), selectedEnd + "\n> ".length());
+        }
     }
 
     public void addNestedBlockQuotes() {
@@ -85,31 +116,7 @@ public class BlockQuotesController {
             int position0 = Utils.findBeforeNewLineChar(mRxMDEditText.getText(), start) + 1;
             int position1 = Utils.findBeforeNewLineChar(mRxMDEditText.getText(), end) + 1;
             if (position0 == position1) {
-                int selectedStart = mRxMDEditText.getSelectionStart();
-                int selectedEnd = mRxMDEditText.getSelectionEnd();
-                Editable editable = mRxMDEditText.getText();
-                if (selectedStart >= "> ".length()
-                        && ("> ".equals(editable.subSequence(Utils.safePosition(selectedStart - "> ".length(), editable), Utils.safePosition(selectedStart, editable)).toString())) &&
-                        ((selectedStart > "\n> ".length() && editable.charAt(selectedStart - 3) == '\n') || selectedStart < "\n> ".length()) || (
-                        selectedStart > "> > ".length() && "> > ".equals(editable.subSequence(Utils.safePosition(selectedStart - "> > ".length(), editable), Utils.safePosition(selectedStart, editable)).toString()))) {
-                    mRxMDEditText.getText().insert(selectedStart, "> ");
-                    mRxMDEditText.setSelection(selectedStart + "> ".length(), selectedEnd + "> ".length());
-                    return;
-                }
-
-                if ((selectedStart > 0 && editable.charAt(selectedStart - 1) == '\n') || selectedStart == 0) {
-                    if (selectedEnd < editable.length() && editable.charAt(selectedEnd) != '\n') {
-                        mRxMDEditText.getText().insert(selectedEnd, "\n");
-                    }
-                    mRxMDEditText.getText().insert(selectedStart, "> ");
-                    mRxMDEditText.setSelection(selectedStart + "> ".length(), selectedEnd + "> ".length());
-                } else {
-                    if (selectedEnd + 1 < editable.length() && editable.charAt(selectedEnd + 1) != '\n') {
-                        mRxMDEditText.getText().insert(selectedEnd, "\n");
-                    }
-                    mRxMDEditText.getText().insert(selectedStart, "\n> ");
-                    mRxMDEditText.setSelection(selectedStart + "\n> ".length(), selectedEnd + "\n> ".length());
-                }
+                addNestedBlockQuotesHandlePositionEq();
             } else {
                 Toast.makeText(mRxMDEditText.getContext(), "无法操作多行", Toast.LENGTH_SHORT).show();
             }
