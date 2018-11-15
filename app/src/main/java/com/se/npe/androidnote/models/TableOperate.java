@@ -37,6 +37,40 @@ public class TableOperate implements INoteCollection {
         initConfigFile();
     }
 
+    private static String getCondition(String label,String parameter,boolean op) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(label);
+        if(op) {
+            stringBuilder.append(" like ");
+            stringBuilder.append("'%");
+            stringBuilder.append(parameter);
+            stringBuilder.append("%'");
+        }
+        else {
+            stringBuilder.append(" = ");
+            stringBuilder.append("'");
+            stringBuilder.append(parameter);
+            stringBuilder.append("'");
+        }
+        return stringBuilder.toString();
+    }
+
+    private static String getSql(String command,String tablename,String condition1,String condition2) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(command);
+        stringBuilder.append(" * from ");
+        stringBuilder.append(tablename);
+        if(!condition1.equals("")) {
+            stringBuilder.append(" where ");
+            stringBuilder.append(condition1);
+        }
+        if(!condition2.equals("")) {
+            stringBuilder.append(" AND ");
+            stringBuilder.append(condition2);
+        }
+        return stringBuilder.toString();
+    }
+
     private static void initConfigFile() {
         File file = new File(TableConfig.SAVE_PATH + "/config");
         if (!file.exists()) {
@@ -147,7 +181,7 @@ public class TableOperate implements INoteCollection {
         ArrayList<Note> noteList = new ArrayList<>();
         Cursor c;
         if(groupName.equals("")) {
-            c = db.rawQuery("select * from " + TableConfig.TABLE_NAME ,null);
+            c = db.rawQuery(getSql("Select",TableConfig.TABLE_NAME,"","") ,null);
         }
         else {
             c = db.rawQuery("select * from " + TableConfig.TABLE_NAME + " where " + TableConfig.Note.NOTE_GROUP + "= ?", new String[]{groupName});

@@ -6,10 +6,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
-import com.se.npe.androidnote.sound.ResultPool;
-
-import java.lang.reflect.Method;
-import java.util.Date;
 
 import java.lang.reflect.Method;
 
@@ -56,6 +52,7 @@ public class EditorActivityTest {
             method.setAccessible(true);
             method.invoke(activity, 1);
         } catch (Exception e) {
+            //Do Nothing
         }
     }
 
@@ -69,6 +66,7 @@ public class EditorActivityTest {
             method.setAccessible(true);
             method.invoke(activity, 1);
         } catch (Exception e) {
+            //Do Nothing
         }
     }
 }
