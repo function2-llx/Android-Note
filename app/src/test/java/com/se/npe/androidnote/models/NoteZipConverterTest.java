@@ -24,11 +24,11 @@ public class NoteZipConverterTest {
     private NoteZipConverter noteZipConverter;
 
     @Before
-    public void setUp(){
+    public void setUp() {
         noteZipConverter = new NoteZipConverter();
         AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
         Context context = activity.getApplicationContext();
-        TableConfig.SAVE_PATH = context.getExternalFilesDir(null).getAbsolutePath(); // initialize SAVE_PATH
+        TableOperate.init(context); // initialize SAVE_PATH
     }
 
     @Test

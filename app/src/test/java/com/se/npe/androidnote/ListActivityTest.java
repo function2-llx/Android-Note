@@ -55,11 +55,11 @@ public class ListActivityTest {
         clickOptionsMenuItem(R.id.menu_open);
         // TODO: do something with open
         clickOptionsMenuItem(R.id.sort_title);
-        assertEquals(TableConfig.Sorter.SORTER_FIELD_TO_COMPARATOR.get(TableConfig.Sorter.SORTER_OPTION_TO_FIELD.get(R.id.sort_title)), noteAdapter.getComparator());
+        assertEquals(TableConfig.Sorter.getSorterFieldToComparator(TableConfig.Sorter.getSorterOptionToField(R.id.sort_title)), noteAdapter.getComparator());
         clickOptionsMenuItem(R.id.sort_created_time);
-        assertEquals(TableConfig.Sorter.SORTER_FIELD_TO_COMPARATOR.get(TableConfig.Sorter.SORTER_OPTION_TO_FIELD.get(R.id.sort_created_time)), noteAdapter.getComparator());
+        assertEquals(TableConfig.Sorter.getSorterFieldToComparator(TableConfig.Sorter.getSorterOptionToField(R.id.sort_created_time)), noteAdapter.getComparator());
         clickOptionsMenuItem(R.id.sort_modified_time);
-        assertEquals(TableConfig.Sorter.SORTER_FIELD_TO_COMPARATOR.get(TableConfig.Sorter.SORTER_OPTION_TO_FIELD.get(R.id.sort_modified_time)), noteAdapter.getComparator());
+        assertEquals(TableConfig.Sorter.getSorterFieldToComparator(TableConfig.Sorter.getSorterOptionToField(R.id.sort_modified_time)), noteAdapter.getComparator());
         clickOptionsMenuItem(R.id.clear);
         assertEquals(new ArrayList<Note>(), TableOperate.getInstance().getAllNotes("",null));
     }

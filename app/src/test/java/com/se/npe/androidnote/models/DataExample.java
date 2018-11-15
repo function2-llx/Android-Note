@@ -17,6 +17,10 @@ import java.util.List;
 public class DataExample {
     public static final String EXAMPLE_MIX_IN = "test";
 
+    // no constructor
+    private DataExample() {
+    }
+
     // Path
     @NonNull
     static String getExamplePath(String mixIn) {

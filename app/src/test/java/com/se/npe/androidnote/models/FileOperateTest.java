@@ -20,9 +20,9 @@ public class FileOperateTest {
     private File file;
     private String fileMixIn = "file";
     private File directory;
-    private String directoryMixIn = "directory/";
+    private String directoryMixIn = "directory" + File.separator;
     private File fileInDirectory;
-    private String fileInDirectoryMixIn = directoryMixIn + "file";
+    private String fileInDirectoryMixIn = directoryMixIn + fileMixIn;
     private File zipFile;
     private String zipFileMixIn = "file.zip";
     private File zipDirectory;

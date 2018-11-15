@@ -55,10 +55,10 @@ public class TableOperateTest {
     @Test
     public void initConfigFile() {
         // successfully create dir
-        File configDir = new File(TableConfig.SAVE_PATH + "/config");
+        File configDir = new File(TableConfig.FileSave.getSavePath() + "/config");
         assertNotNull(configDir);
         // successfully create file
-        File configFile = new File(TableConfig.SAVE_PATH + "/config/searchconfig.txt");
+        File configFile = new File(TableConfig.FileSave.getSavePath() + "/config/searchconfig.txt");
         assertNotNull(configFile);
         assertNotNull(configDir.listFiles());
     }
@@ -86,7 +86,7 @@ public class TableOperateTest {
 
     @Test
     public void setSearchConfigAndGetSearchConfig() {
-        for (String searchConfig : TableConfig.Sorter.SORTER_FIELDS) {
+        for (String searchConfig : TableConfig.Sorter.getSorterFields()) {
             TableOperate.setSearchConfig(searchConfig);
             assertEquals(searchConfig, TableOperate.getSearchConfig());
         }

@@ -111,9 +111,9 @@ public class NoteAdapterTest {
 
     @Test
     public void setSortField() {
-        for (String sortField : TableConfig.Sorter.SORTER_FIELDS) {
+        for (String sortField : TableConfig.Sorter.getSorterFields()) {
             noteAdapter.setSortField(sortField);
-            noteList.sort(TableConfig.Sorter.SORTER_FIELD_TO_COMPARATOR.get(sortField));
+            noteList.sort(TableConfig.Sorter.getSorterFieldToComparator(sortField));
             assertEquals(noteList, noteAdapter.getItems());
         }
     }

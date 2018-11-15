@@ -45,9 +45,11 @@ public class TableConfig {
         public static final String LINE_SEPARATOR = "Sep" + (char) 31;
 
         private static String savePath; // initialized in TableOperate.init()
+
         public static String getSavePath() {
             return FileSave.savePath;
         }
+
         public static void setSavePath(String savePath) {
             FileSave.savePath = savePath;
         }
@@ -74,6 +76,10 @@ public class TableConfig {
 
         public static String getDefaultSorterField() {
             return SORTER_FIELDS[0];
+        }
+
+        public static String[] getSorterFields() {
+            return SORTER_FIELDS;
         }
 
         public static String getSorterOptionToField(Integer sorterOption) {

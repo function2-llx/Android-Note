@@ -202,7 +202,7 @@ public class NoteZipConverter implements INoteFileConverter {
             FileOperate.zip(getTempDirPath(), zipFileName);
 
             // delete temp folder
-            FileOperate.delete(getTempDirPath());
+            tempFolder.delete();
 
             return zipFileName;
         }
