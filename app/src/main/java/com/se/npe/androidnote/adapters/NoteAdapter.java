@@ -245,8 +245,8 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         }
 
         public void setGroup(String group) {
-            if (group.isEmpty())
-                this.group.setText("");
+            if (group == null || group.isEmpty())
+                this.group.setText("this note does not belong to any group");
             else
                 this.group.setText("group: " + group);
         }

@@ -27,10 +27,12 @@ import com.dmcbig.mediapicker.PickerActivity;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.mob.MobSDK;
 import com.se.npe.androidnote.editor.SortRichEditor;
 import com.se.npe.androidnote.events.NoteSelectEvent;
 import com.se.npe.androidnote.interfaces.INoteFileConverter;
+import com.se.npe.androidnote.models.FileOperate;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.NotePdfConverter;
 import com.se.npe.androidnote.models.NoteZipConverter;
@@ -42,6 +44,7 @@ import com.se.npe.androidnote.util.ReturnValueEater;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
+import org.mp4parser.aspectj.lang.reflect.InterTypeConstructorDeclaration;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -166,6 +169,10 @@ public class EditorActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void startActivity(Intent intent) {
+        super.startActivity(intent);
+    }
 
     private void save() {
         if (isViewOnly) {
@@ -185,6 +192,30 @@ public class EditorActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
+
+        if (Objects.equals(getIntent().getAction(), Intent.ACTION_VIEW)) {
+            final Uri uri = getIntent().getData();
+            String path = FileUtils.getPath(this, uri);
+            INoteFileConverter noteFileConverter;
+            assert path != null;
+            switch (FileOperate.getSuffix(path)) {
+                case "note":
+                    noteFileConverter = new NoteZipConverter();
+                    break;
+                case "pdf":
+                    noteFileConverter = new NotePdfConverter();
+                    break;
+                default:
+                    noteFileConverter = new NoteZipConverter();
+                    break;
+            }
+            noteFileConverter.importNoteFromFile((Note note) -> {
+                TableOperate.getInstance().addNote(note);
+                oldNote = note;
+//                getIntent().putExtra(EditorActivity.VIEW_ONLY, true);
+                }, path);
+
+        }
 
         setSupportActionBar(findViewById(R.id.toolbar));
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
