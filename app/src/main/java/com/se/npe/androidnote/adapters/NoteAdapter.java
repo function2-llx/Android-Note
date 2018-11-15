@@ -14,6 +14,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.marshalchen.ultimaterecyclerview.UltimateViewAdapter;
@@ -132,6 +133,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
     // Search for notes
     //ultimate version
     public void updateSearchList(String param, String group, List<String> tags) {
+        Toast.makeText(activity, param + group + tags.toString(), Toast.LENGTH_SHORT).show();
         updateList(TableOperate.getInstance().fuzzySearch(param, group, tags));
     }
 
