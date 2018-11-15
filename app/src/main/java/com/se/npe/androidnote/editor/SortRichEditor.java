@@ -251,6 +251,7 @@ public class SortRichEditor extends ScrollView {
 
             @Override
             public void afterTextChanged(Editable s) {
+                // no-op
             }
         });
 
@@ -392,16 +393,13 @@ public class SortRichEditor extends ScrollView {
 
     private LinearLayout createContainer() {
         LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        final LinearLayout containerLayout = new LinearLayout(getContext()) {
+        final LinearLayout buildingContainerLayout = new LinearLayout(getContext()) {
             @Override
             public boolean dispatchTouchEvent(MotionEvent event) {
                 // lock the page, so that when there are many medias, touch event won't
                 // won't be interpreted as page turning
-                if (isSort) {
-                    getParent().requestDisallowInterceptTouchEvent(true);
-                } else {
-                    getParent().requestDisallowInterceptTouchEvent(false);
-                }
+                getParent().requestDisallowInterceptTouchEvent(isSort);
+
                 viewDragHelper.processTouchEvent(event);
                 int action = event.getAction();
                 switch (action) {
@@ -435,12 +433,12 @@ public class SortRichEditor extends ScrollView {
 
 
         };
-        containerLayout.setPadding(0, DEFAULT_MARGIN, 0, DEFAULT_MARGIN);
-        containerLayout.setOrientation(LinearLayout.VERTICAL);
-        containerLayout.setBackgroundColor(Color.WHITE);
-        containerLayout.setLayoutParams(layoutParams);
-        setupLayoutTransitions(containerLayout);
-        return containerLayout;
+        buildingContainerLayout.setPadding(0, DEFAULT_MARGIN, 0, DEFAULT_MARGIN);
+        buildingContainerLayout.setOrientation(LinearLayout.VERTICAL);
+        buildingContainerLayout.setBackgroundColor(Color.WHITE);
+        buildingContainerLayout.setLayoutParams(layoutParams);
+        setupLayoutTransitions(buildingContainerLayout);
+        return buildingContainerLayout;
     }
 
     // restore the size of child view
@@ -951,11 +949,6 @@ public class SortRichEditor extends ScrollView {
         return super.onTouchEvent(ev);
     }
 
-    @Override
-    public boolean performClick() {
-        return super.performClick();
-    }
-
     // update the indexArray according to current child position
     private void resetChildPosition() {
         indexArray.clear();
@@ -1002,10 +995,9 @@ public class SortRichEditor extends ScrollView {
                 View media = ((RelativeLayout) v).getChildAt(0);
                 if (media instanceof SoundPlayer) {
                     ((SoundPlayer) media).destroy();
-                } else if (media instanceof VideoPlayer) {
-                    if (((VideoPlayer) media).getJzvdStd().isCurrentPlay()) {
-                        ((VideoPlayer) media).getJzvdStd().onAutoCompletion();
-                    }
+                } else if (media instanceof VideoPlayer
+                        && ((VideoPlayer) media).getJzvdStd().isCurrentPlay()) {
+                    ((VideoPlayer) media).getJzvdStd().onAutoCompletion();
                 }
             }
         }
