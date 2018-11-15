@@ -8,7 +8,6 @@ import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -164,24 +163,32 @@ public class Note implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        // Identify note by its DBindex
-        return o instanceof Note && ((Note) o).indexDB == indexDB;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Note note = (Note) o;
+        return indexDB == note.indexDB &&
+                Objects.equals(title, note.title) &&
+                Objects.equals(content, note.content) &&
+                Objects.equals(startTime, note.startTime) &&
+                Objects.equals(modifyTime, note.modifyTime) &&
+                Objects.equals(tag, note.tag) &&
+                Objects.equals(groupName, note.groupName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(indexDB);
+        return Objects.hash(title, content, startTime, modifyTime, tag, indexDB, groupName);
     }
 
     @Override
     public String toString() {
         String string = "Title:" + getTitle() + "\nContents:";
-        List<IData> templist = getContent();
+        List<IData> tempList = getContent();
         StringBuilder sb = new StringBuilder();
         sb.append(string);
-        for (int i = 0; i < templist.size(); i++) {
+        for (int i = 0; i < tempList.size(); i++) {
             sb.append('\n');
-            sb.append(templist.get(i).toString());
+            sb.append(tempList.get(i).toString());
         }
         return sb.toString();
     }

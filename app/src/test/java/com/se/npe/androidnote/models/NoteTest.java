@@ -24,7 +24,6 @@ public class NoteTest {
 
     private Note note;
     private Note noteNotEquals;
-    private TableOperate tableOperate;
 
     @Before
     public void setUp() {
@@ -33,7 +32,7 @@ public class NoteTest {
         // set up tableOperate
         AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
         TableOperate.init(activity.getApplicationContext());
-        tableOperate = TableOperate.getInstance();
+        TableOperate tableOperate = TableOperate.getInstance();
         // add note to initialize DBindex
         tableOperate.addNote(note);
         tableOperate.addNote(noteNotEquals);
@@ -50,10 +49,10 @@ public class NoteTest {
         content.add(new TextData("text"));
         List<String> tags = new ArrayList<>();
         tags.add("TagZ");
-        Note note1 = new Note("title",content);
-        Note note2 = new Note("title",content,tags);
+        Note note1 = new Note("title", content);
+        Note note2 = new Note("title", content, tags);
         note1.getTag().add("TagZ");
-        assertEquals(note1,note2);
+        assertEquals(note1, note2);
     }
 
     @Test
@@ -69,15 +68,28 @@ public class NoteTest {
     }
 
     @Test
+    public void getGroup() {
+        assertEquals(DataExample.getExampleGroupName(DataExample.EXAMPLE_MIX_IN), note.getGroupName());
+    }
+
+    @Test
+    public void setGroup() {
+        final String groupName = DataExample.getExampleGroupName("setGroup test");
+        note.setGroupName(groupName);
+        assertEquals(groupName, note.getGroupName());
+    }
+
+
+    @Test
     public void getContent() {
         assertEquals(DataExample.getExampleDataList(DataExample.EXAMPLE_MIX_IN), note.getContent());
     }
 
     @Test
     public void setContent() {
-        final List<IData> NOTE_CONTENT = DataExample.getExampleDataList("setContent test");
-        note.setContent(NOTE_CONTENT);
-        assertEquals(NOTE_CONTENT, note.getContent());
+        final List<IData> noteContent = DataExample.getExampleDataList("setContent test");
+        note.setContent(noteContent);
+        assertEquals(noteContent, note.getContent());
     }
 
     @Test
@@ -115,13 +127,6 @@ public class NoteTest {
     }
 
     @Test
-    public void groupFunc() {
-        assertEquals("",note.getGroupName());
-        note.setGroupName(DataExample.getExampleGroupName("1"));
-        assertEquals(DataExample.getExampleGroupName("1"),note.getGroupName());
-    }
-
-    @Test
     public void setIndex() {
         final int NOTE_INDEX = 100;
         note.setIndex(NOTE_INDEX);
@@ -139,12 +144,12 @@ public class NoteTest {
         tempNote.setStartTime(new Date());
         tempNote.setModifyTime(new Date());
 
-        assertEquals("text",tempNote.getPreview().text);
-        assertEquals("Pic",tempNote.getPreview().picturePath);
-        assertEquals("Group",tempNote.getPreview().groupName);
-        assertEquals(tempNote.getStartTime(),tempNote.getPreview().startTime);
-        assertEquals(tempNote.getModifyTime(),tempNote.getPreview().modifyTime);
-        assertEquals("this is tile for -1",tempNote.getPreview().title);
+        assertEquals("text", tempNote.getPreview().text);
+        assertEquals("Pic", tempNote.getPreview().picturePath);
+        assertEquals("Group", tempNote.getPreview().groupName);
+        assertEquals(tempNote.getStartTime(), tempNote.getPreview().startTime);
+        assertEquals(tempNote.getModifyTime(), tempNote.getPreview().modifyTime);
+        assertEquals("this is tile for -1", tempNote.getPreview().title);
     }
 
     @Test
