@@ -216,38 +216,41 @@ public class ListActivity extends AppCompatActivity {
             groupMenu.add(R.id.group_groups, Menu.NONE, Menu.NONE, groupName);
     }
 
+    private void handleNewGroup(List<String> allGroups) {
+        EditText editText = new EditText(ListActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
+        builder.setTitle("New group");
+        builder.setPositiveButton("add", null);
+        builder.setNegativeButton("cancel", null);
+        builder.setView(editText);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String groupName = editText.getText().toString();
+            if (groupName.isEmpty())
+                Toast.makeText(ListActivity.this, "input something?", Toast.LENGTH_SHORT).show();
+            else if (allGroups.contains(groupName))
+                Toast.makeText(ListActivity.this, groupName + " already exist", Toast.LENGTH_SHORT).show();
+            else {
+                TableOperate.getInstance().addGroup(groupName);
+                refreshGroups();
+                dialog.cancel();
+            }
+        });
+    }
+
     private void handleGroupManage(@NonNull MenuItem menuItem) {
         List<String> allGroups = TableOperate.getInstance().getAllGroup();
         String[] allGroupsArray = allGroups.toArray(new String[0]);
         switch (menuItem.getItemId()) {
-            case R.id.new_group: {
-                EditText editText = new EditText(ListActivity.this);
-                AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
-                builder.setTitle("New group");
-                builder.setPositiveButton("add", null);
-                builder.setNegativeButton("cancel", null);
-                builder.setView(editText);
-                AlertDialog dialog = builder.create();
-                dialog.show();
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-                    String groupName = editText.getText().toString();
-                    if (groupName.isEmpty())
-                        Toast.makeText(ListActivity.this, "input something?", Toast.LENGTH_SHORT).show();
-                    else if (allGroups.contains(groupName))
-                        Toast.makeText(ListActivity.this, groupName + " already exist", Toast.LENGTH_SHORT).show();
-                    else {
-                        TableOperate.getInstance().addGroup(groupName);
-                        refreshGroups();
-                        dialog.cancel();
-                    }
-                });
+            case R.id.new_group:
+                handleNewGroup(allGroups);
                 break;
-            }
 
-            case R.id.manage_group: {
+            case R.id.manage_group:
                 AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
                 builder.setTitle(getString(R.string.manage_groups));
-                boolean selected[] = new boolean[allGroupsArray.length];
+                boolean[] selected = new boolean[allGroupsArray.length];
                 builder.setMultiChoiceItems(allGroupsArray, new boolean[allGroupsArray.length], (dialog, which, isChecked) -> selected[which] = isChecked);
                 builder.setNegativeButton("cancel", null);
                 builder.setPositiveButton("confirm", (dialog, which) -> {
@@ -258,7 +261,6 @@ public class ListActivity extends AppCompatActivity {
                 });
                 builder.show();
                 break;
-            }
 
             default:
                 break;
@@ -275,28 +277,25 @@ public class ListActivity extends AppCompatActivity {
 
         navigationView.setNavigationItemSelectedListener(menuItem -> {
             switch (menuItem.getGroupId()) {
-                case R.id.group_all_notes: {
+                case R.id.group_all_notes:
                     noteAdapter.updateAllNotesList();
                     currentGroup = "";
                     setTitle(getString(R.string.list_title));
                     drawerLayout.closeDrawers();
                     break;
-                }
 
-                case R.id.group_groups: {
+                case R.id.group_groups:
                     String groupName = menuItem.getTitle().toString();
                     noteAdapter.updateGroupNotesList(groupName);
                     currentGroup = groupName;
                     setTitle(groupName);
                     drawerLayout.closeDrawers();
                     break;
-                }
 
-                case R.id.group_operations: {
+                case R.id.group_operations:
                     handleGroupManage(menuItem);
-
                     break;
-                }
+
                 default:
                     break;
             }
