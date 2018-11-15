@@ -3,6 +3,7 @@ package com.se.npe.androidnote;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
@@ -38,13 +39,11 @@ import com.se.npe.androidnote.models.NotePdfConverter;
 import com.se.npe.androidnote.models.NoteZipConverter;
 import com.se.npe.androidnote.models.TableOperate;
 import com.se.npe.androidnote.sound.ResultPool;
-import com.se.npe.androidnote.util.AsyncTaskWithResponse;
 import com.se.npe.androidnote.util.Logger;
 import com.se.npe.androidnote.util.ReturnValueEater;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
-import org.mp4parser.aspectj.lang.reflect.InterTypeConstructorDeclaration;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -52,13 +51,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Objects;
 
 import cn.sharesdk.framework.Platform;
-import cn.sharesdk.framework.PlatformActionListener;
 import cn.sharesdk.onekeyshare.OnekeyShare;
 import cn.sharesdk.wechat.friends.Wechat;
 
@@ -191,29 +187,6 @@ public class EditorActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
 
-        if (Objects.equals(getIntent().getAction(), Intent.ACTION_VIEW)) {
-            final Uri uri = getIntent().getData();
-            String path = FileUtils.getPath(this, uri);
-            INoteFileConverter noteFileConverter;
-            assert path != null;
-            switch (FileOperate.getSuffix(path)) {
-                case "note":
-                    noteFileConverter = new NoteZipConverter();
-                    break;
-                case "pdf":
-                    noteFileConverter = new NotePdfConverter();
-                    break;
-                default:
-                    noteFileConverter = new NoteZipConverter();
-                    break;
-            }
-            noteFileConverter.importNoteFromFile((Note note) -> {
-                TableOperate.getInstance().addNote(note);
-                oldNote = note;
-//                getIntent().putExtra(EditorActivity.VIEW_ONLY, true);
-                }, path);
-
-        }
 
         setSupportActionBar(findViewById(R.id.toolbar));
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
@@ -221,6 +194,7 @@ public class EditorActivity extends AppCompatActivity {
 
         EventBus.getDefault().register(this);
         editor = findViewById(R.id.rich_editor);
+
         final FloatingActionsMenu insertMedia = findViewById(R.id.insert_media);
         findViewById(R.id.insert_picture).setOnClickListener(v -> {
             insertMedia.collapse();
@@ -287,11 +261,6 @@ public class EditorActivity extends AppCompatActivity {
             ResultPool.getInstance().startRecording();
         } catch (IOException e) {
             Logger.log(LOG_TAG, e);
-        }
-
-        try {
-            MobSDK.init(this);
-        } catch (Throwable e) {
         }
     }
 
