@@ -233,7 +233,7 @@ public class NoteAdapterTest {
         AlertDialog alertDialog = ShadowAlertDialog.getLatestAlertDialog();
         ShadowAlertDialog shadowAlertDialog = shadowOf(alertDialog);
         shadowAlertDialog.clickOnItem(1); // click noteAdapter.getItem(1)
-        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick();
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick(); // click confirm
         assertEquals(noteList.get(1).getGroupName(), noteAdapter.getItem(0).getGroupName());
         // check remove group is properly done
         clickLatestPopupMenuItem(R.id.remove_from_current_group);

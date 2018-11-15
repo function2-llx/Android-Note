@@ -52,10 +52,11 @@ public class ListActivity extends AppCompatActivity {
     private UltimateRecyclerView ultimateRecyclerView;
     private Toolbar toolbar;
     private SubMenu groupMenu;
-    private TagGroupManager tagGroupManager;
+    private DrawerLayout drawerLayout;
+    // Can only use lower 16 bits for requestCode
+    private static final int REQUEST_OPEN_FILE = 23333;
 
-    /* Options menu */
-
+    // options menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // search
@@ -85,34 +86,6 @@ public class ListActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    //Can only use lower 16 bits for requestCode
-    private static final int REQUEST_FILE_CHOOSE = 23333;
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        if (requestCode == REQUEST_FILE_CHOOSE && resultCode == RESULT_OK) {
-            assert data != null;
-            final Uri uri = data.getData();
-            String path = FileUtils.getPath(this, uri);
-            INoteFileConverter noteFileConverter;
-            assert path != null;
-            switch (FileOperate.getSuffix(path)) {
-                case "note":
-                    noteFileConverter = new NoteZipConverter();
-                    break;
-                case "pdf":
-                    noteFileConverter = new NotePdfConverter();
-                    break;
-                default:
-                    noteFileConverter = new NoteZipConverter();
-                    break;
-            }
-            noteFileConverter.importNoteFromFile((Note note) ->
-                            TableOperate.getInstance().addNote(note)
-                    , path);
-        }
-    }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -124,7 +97,7 @@ public class ListActivity extends AppCompatActivity {
             case R.id.menu_open:
                 startActivityForResult(
                         Intent.createChooser(FileUtils.createGetContentIntent(), "Select a file")
-                        , REQUEST_FILE_CHOOSE);
+                        , REQUEST_OPEN_FILE);
                 break;
 
             case R.id.clear:
@@ -153,8 +126,28 @@ public class ListActivity extends AppCompatActivity {
     }
 
     @Override
-    public void setTitle(CharSequence title) {
-        Objects.requireNonNull(getSupportActionBar()).setTitle(title);
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == REQUEST_OPEN_FILE && resultCode == RESULT_OK) {
+            assert data != null;
+            final Uri uri = data.getData();
+            String path = FileUtils.getPath(this, uri);
+            INoteFileConverter noteFileConverter;
+            assert path != null;
+            switch (FileOperate.getSuffix(path)) {
+                case "note":
+                    noteFileConverter = new NoteZipConverter();
+                    break;
+                case "pdf":
+                    noteFileConverter = new NotePdfConverter();
+                    break;
+                default:
+                    noteFileConverter = new NoteZipConverter();
+                    break;
+            }
+            noteFileConverter.importNoteFromFile((Note note) ->
+                            TableOperate.getInstance().addNote(note)
+                    , path);
+        }
     }
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -169,7 +162,6 @@ public class ListActivity extends AppCompatActivity {
         this.layoutManager = new LinearLayoutManager(this);
         this.ultimateRecyclerView = this.findViewById(R.id.ultimate_recycler_view);
         this.ultimateRecyclerView.setLayoutManager(layoutManager);
-
         this.noteAdapter = new NoteAdapter(this);
         this.ultimateRecyclerView.setAdapter(noteAdapter);
         this.noteAdapter.updateGroupNotesList();
@@ -181,7 +173,7 @@ public class ListActivity extends AppCompatActivity {
                     10);
         }
 
-        //new note button
+        // new note button
         findViewById(R.id.new_note_button).setOnClickListener(v -> startActivity(new Intent(ListActivity.this, EditorActivity.class)
                 .putExtra(EditorActivity.CURRENT_GROUP, noteAdapter.getCurrentGroup())));
 
@@ -195,7 +187,11 @@ public class ListActivity extends AppCompatActivity {
         super.onResume();
     }
 
-    private DrawerLayout drawerLayout;
+    @Override
+    public void setTitle(CharSequence title) {
+        Objects.requireNonNull(getSupportActionBar()).setTitle(title);
+        super.setTitle(title);
+    }
 
     private void initDrawerToggle() {
         drawerLayout = findViewById(R.id.drawer_layout);
@@ -203,12 +199,43 @@ public class ListActivity extends AppCompatActivity {
         drawerToggle.syncState();
     }
 
-    private void refreshGroups() {
-        groupMenu.removeGroup(R.id.group_groups);
-        List<String> allGroups = TableOperate.getInstance().getAllGroups();
+    // navigation view
+    public void setNavigationView() {
+        NavigationView navigationView = findViewById(R.id.nav_view);
+        Menu menu = navigationView.getMenu();
+        this.groupMenu = menu.findItem(R.id.groups).getSubMenu();
+        navigationView.setItemIconTintList(null);
 
-        for (String groupName : allGroups)
-            groupMenu.add(R.id.group_groups, Menu.NONE, Menu.NONE, groupName);
+        refreshGroups();
+
+        navigationView.setNavigationItemSelectedListener(menuItem -> {
+            switch (menuItem.getGroupId()) {
+                case R.id.group_all_notes: {
+                    noteAdapter.setCurrentGroup("");
+                    setTitle(getString(R.string.list_title));
+                    drawerLayout.closeDrawers();
+                    break;
+                }
+
+                case R.id.group_groups: {
+                    String groupName = menuItem.getTitle().toString();
+                    noteAdapter.setCurrentGroup(groupName);
+                    setTitle(groupName);
+                    drawerLayout.closeDrawers();
+                    break;
+                }
+
+                case R.id.group_operations: {
+                    handleGroupManage(menuItem);
+
+                    break;
+                }
+                default:
+                    break;
+            }
+
+            return true;
+        });
     }
 
     private void handleGroupManage(@NonNull MenuItem menuItem) {
@@ -260,48 +287,13 @@ public class ListActivity extends AppCompatActivity {
         }
     }
 
-    public void setNavigationView() {
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        Menu menu = navigationView.getMenu();
-        this.groupMenu = menu.findItem(R.id.groups).getSubMenu();
-        navigationView.setItemIconTintList(null);
+    private void refreshGroups() {
+        groupMenu.removeGroup(R.id.group_groups);
+        List<String> allGroups = TableOperate.getInstance().getAllGroups();
 
-        refreshGroups();
-
-        navigationView.setNavigationItemSelectedListener(menuItem -> {
-            switch (menuItem.getGroupId()) {
-                case R.id.group_all_notes: {
-                    noteAdapter.setCurrentGroup("");
-                    setTitle(getString(R.string.list_title));
-                    drawerLayout.closeDrawers();
-                    break;
-                }
-
-                case R.id.group_groups: {
-                    String groupName = menuItem.getTitle().toString();
-                    noteAdapter.setCurrentGroup(groupName);
-                    setTitle(groupName);
-                    drawerLayout.closeDrawers();
-                    break;
-                }
-
-                case R.id.group_operations: {
-                    handleGroupManage(menuItem);
-
-                    break;
-                }
-                default:
-                    break;
-            }
-
-            return true;
-        });
+        for (String groupName : allGroups)
+            groupMenu.add(R.id.group_groups, Menu.NONE, Menu.NONE, groupName);
     }
-
-
-    /**
-     * Configure search view to set hint & listener
-     */
 
     private void showList() {
         ultimateRecyclerView.setVisibility(View.VISIBLE);
@@ -312,8 +304,9 @@ public class ListActivity extends AppCompatActivity {
         ultimateRecyclerView.setVisibility(View.INVISIBLE);
     }
 
+    // search
     private void configureSearchView(@NonNull SearchView searchView) {
-        tagGroupManager = findViewById(R.id.tag_group_manager);
+        TagGroupManager tagGroupManager = findViewById(R.id.tag_group_manager);
 
         searchView.setQueryHint("search for your note");
 
@@ -368,7 +361,7 @@ public class ListActivity extends AppCompatActivity {
     private void enableRefresh() {
         this.ultimateRecyclerView.setDefaultOnRefreshListener(() -> new Handler().postDelayed(() -> {
             noteAdapter.updateGroupNotesList();
-            ListActivity.this.ultimateRecyclerView.setRefreshing(false);
+            ultimateRecyclerView.setRefreshing(false);
             layoutManager.scrollToPosition(0);
         }, 500));
     }
