@@ -73,6 +73,13 @@ public class Note implements Serializable {
         this.tag = tag;
     }
 
+    public Note(String title, List<IData> content, List<String> tag, String groupName) {
+        this.title = title;
+        this.content = content;
+        this.tag = tag;
+        this.groupName = groupName;
+    }
+
     public Note(String title, List<IData> content, int index, String timeStart, String timeModify, List<String> tag, String groupName) {
         this.indexDB = index;
         this.title = title;

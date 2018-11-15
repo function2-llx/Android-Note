@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -211,14 +210,14 @@ public class ListActivity extends AppCompatActivity {
 
     private void refreshGroups() {
         groupMenu.removeGroup(R.id.group_groups);
-        List<String> allGroups = TableOperate.getInstance().getAllGroup();
+        List<String> allGroups = TableOperate.getInstance().getAllGroups();
 
         for (String groupName : allGroups)
             groupMenu.add(R.id.group_groups, Menu.NONE, Menu.NONE, groupName);
     }
 
     private void handleGroupManage(@NonNull MenuItem menuItem) {
-        List<String> allGroups = TableOperate.getInstance().getAllGroup();
+        List<String> allGroups = TableOperate.getInstance().getAllGroups();
         String[] allGroupsArray = allGroups.toArray(new String[0]);
         switch (menuItem.getItemId()) {
             case R.id.new_group: {

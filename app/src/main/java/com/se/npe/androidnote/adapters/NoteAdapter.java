@@ -1,10 +1,8 @@
 package com.se.npe.androidnote.adapters;
 
 import android.app.AlertDialog;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
@@ -223,7 +221,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
             //group the note belongs to
             this.group = itemView.findViewById(R.id.text_view_group);
 
-            // create & modify time
+            // create & modifyNote time
             int textWidth = getScreenWidth() / 3 * 2;
             this.createTimeDisplayer = itemView.findViewById(R.id.text_view_create_time);
             this.createTimeDisplayer.setWidth(textWidth);
@@ -291,7 +289,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
                         break;
 
                     case R.id.set_group:
-                        List<String> groupName = TableOperate.getInstance().getAllGroup();
+                        List<String> groupName = TableOperate.getInstance().getAllGroups();
 
                         View dialogView = View.inflate(activity, R.layout.set_group_dialog, null);
 
@@ -301,7 +299,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
                         final int[] selected = {0};
                         builder.setPositiveButton("confirm", (dialog, which) -> {
                             selectedNote.setGroupName(groupName.get(selected[0]));
-                            TableOperate.getInstance().modify(selectedNote);
+                            TableOperate.getInstance().modifyNote(selectedNote);
                             activity.updateList();
                         });
                         builder.setNegativeButton("cancel", null);
@@ -313,7 +311,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 
                     case R.id.remove_from_current_group:
                         selectedNote.setGroupName("");
-                        TableOperate.getInstance().modify(selectedNote);
+                        TableOperate.getInstance().modifyNote(selectedNote);
                         activity.updateList();
                         break;
 

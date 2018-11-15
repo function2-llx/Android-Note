@@ -89,11 +89,15 @@ public class DataExample {
     }
 
     @NonNull
-    static List<String> getExampleNoteTag(String mixIn) {
+    static List<String> getExampleNoteTags(String mixIn) {
         List<String> tags = new ArrayList<>();
-        tags.add("Tag");
-        tags.add("Tag" + mixIn);
+        tags.add(getExampleNoteTag(mixIn));
         return tags;
+    }
+
+    @NonNull
+    static String getExampleNoteTag(String mixIn) {
+        return "Tag" + mixIn;
     }
 
     @NonNull
@@ -109,7 +113,7 @@ public class DataExample {
 
     @NonNull
     public static Note getExampleNote(String mixIn) {
-        return new Note(getExampleNoteTitle(mixIn), getExampleDataList(mixIn), getExampleNoteTag(mixIn));
+        return new Note(getExampleNoteTitle(mixIn), getExampleDataList(mixIn), getExampleNoteTags(mixIn), getExampleGroupName(mixIn));
     }
 
     // File

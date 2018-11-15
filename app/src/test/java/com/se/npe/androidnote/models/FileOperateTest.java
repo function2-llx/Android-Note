@@ -53,35 +53,6 @@ public class FileOperateTest {
     }
 
     @Test
-    public void delete() {
-        assertTrue(file.exists());
-        FileOperate.delete(file.getAbsolutePath());
-        assertFalse(file.exists());
-        assertTrue(directory.exists());
-        assertTrue(fileInDirectory.exists());
-        FileOperate.delete(directory.getAbsolutePath());
-        assertFalse(directory.exists());
-        assertFalse(fileInDirectory.exists());
-    }
-
-    @Test
-    public void deleteFile() {
-        // exist -> delete -> not exist
-        assertTrue(file.exists());
-        FileOperate.deleteFile(file.getAbsolutePath());
-        assertFalse(file.exists());
-    }
-
-    @Test
-    public void deleteDirectory() {
-        // exist -> delete -> not exist
-        assertTrue(directory.exists());
-        FileOperate.deleteDirectory(directory.getAbsolutePath());
-        assertFalse(directory.exists());
-        assertFalse(fileInDirectory.exists());
-    }
-
-    @Test
     public void zip() {
         FileOperate.zip(file.getAbsolutePath(), zipFile.getAbsolutePath());
         assertTrue(zipFile.exists());

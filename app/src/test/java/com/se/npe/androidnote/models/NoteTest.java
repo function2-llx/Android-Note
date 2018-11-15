@@ -90,7 +90,7 @@ public class NoteTest {
 
     @Test
     public void setModifyTime() {
-        // set modify time & get modify time
+        // set modifyNote time & get modifyNote time
         Date modifyTime = new Date();
         note.setModifyTime(modifyTime);
         assertEquals(modifyTime, note.getModifyTime());
@@ -98,12 +98,12 @@ public class NoteTest {
 
     @Test
     public void getTag() {
-        assertEquals(DataExample.getExampleNoteTag(DataExample.EXAMPLE_MIX_IN), note.getTag());
+        assertEquals(DataExample.getExampleNoteTags(DataExample.EXAMPLE_MIX_IN), note.getTag());
     }
 
     @Test
     public void setTag() {
-        final List<String> tagList = DataExample.getExampleNoteTag("setTag test");
+        final List<String> tagList = DataExample.getExampleNoteTags("setTag test");
         note.setTag(tagList);
         assertEquals(tagList, note.getTag());
     }

@@ -20,7 +20,7 @@ public interface INoteCollection {
 
     void removeGroup(String groupName);
 
-    List<String> getAllGroup();
+    List<String> getAllGroups();
 
     void addNote(Note note);
 
