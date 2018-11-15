@@ -75,9 +75,9 @@ public class NoteTest {
 
     @Test
     public void setContent() {
-        final List<IData> NOTE_CONTENT = DataExample.getExampleDataList("setContent test");
-        note.setContent(NOTE_CONTENT);
-        assertEquals(NOTE_CONTENT, note.getContent());
+        final List<IData> contentList = DataExample.getExampleDataList("setContent test");
+        note.setContent(contentList);
+        assertEquals(contentList, note.getContent());
     }
 
     @Test

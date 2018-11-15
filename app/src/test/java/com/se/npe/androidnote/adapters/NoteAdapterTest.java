@@ -81,10 +81,10 @@ public class NoteAdapterTest {
     @Test
     public void updateSearchList() {
         // Whole note list
-        noteAdapter.updateSearchList("title");
+        noteAdapter.updateSearchList("title","",new ArrayList<>());
         assertEquals(noteList, noteAdapter.getItems());
         // Empty note list
-        noteAdapter.updateSearchList("wtf???");
+        noteAdapter.updateSearchList("wtf???","",new ArrayList<>());
         assertEquals(new ArrayList<Note>(), noteAdapter.getItems());
 
         // Depends on addNote()
@@ -96,7 +96,7 @@ public class NoteAdapterTest {
             }
         }
         noteListSearched.sort(Comparator.comparing(Note::getTitle));
-        noteAdapter.updateSearchList("3");
+        noteAdapter.updateSearchList("3","",new ArrayList<>());
         assertEquals(noteListSearched, noteAdapter.getItems());
     }
 
