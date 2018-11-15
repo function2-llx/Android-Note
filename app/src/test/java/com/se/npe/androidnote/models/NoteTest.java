@@ -46,9 +46,9 @@ public class NoteTest {
 
     @Test
     public void buildTest() {
-        List<IData> content = new ArrayList<IData>();
+        List<IData> content = new ArrayList<>();
         content.add(new TextData("text"));
-        List<String> tags = new ArrayList<String>();
+        List<String> tags = new ArrayList<>();
         tags.add("TagZ");
         Note note1 = new Note("title",content);
         Note note2 = new Note("title",content,tags);
@@ -63,9 +63,9 @@ public class NoteTest {
 
     @Test
     public void setTitle() {
-        final String NOTE_TITLE = DataExample.getExampleNoteTitle("setTitle test");
-        note.setTitle(NOTE_TITLE);
-        assertEquals(NOTE_TITLE, note.getTitle());
+        final String title = DataExample.getExampleNoteTitle("setTitle test");
+        note.setTitle(title);
+        assertEquals(title, note.getTitle());
     }
 
     @Test
@@ -103,9 +103,9 @@ public class NoteTest {
 
     @Test
     public void setTag() {
-        final List<String> NOTE_TAG = DataExample.getExampleNoteTag("setTag test");
-        note.setTag(NOTE_TAG);
-        assertEquals(NOTE_TAG, note.getTag());
+        final List<String> tagList = DataExample.getExampleNoteTag("setTag test");
+        note.setTag(tagList);
+        assertEquals(tagList, note.getTag());
     }
 
     @Test
@@ -117,8 +117,8 @@ public class NoteTest {
     @Test
     public void groupFunc() {
         assertEquals("",note.getGroupName());
-        note.setGroupName("Group1");
-        assertEquals("Group1",note.getGroupName());
+        note.setGroupName(DataExample.getExampleGroupName("1"));
+        assertEquals(DataExample.getExampleGroupName("1"),note.getGroupName());
     }
 
     @Test
