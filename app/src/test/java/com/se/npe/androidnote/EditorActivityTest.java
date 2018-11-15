@@ -23,6 +23,7 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 
+import com.se.npe.androidnote.editor.SoundPlayer;
 import com.se.npe.androidnote.models.TableOperate;
 import com.se.npe.androidnote.sound.ResultPool;
 
@@ -107,7 +108,15 @@ public class EditorActivityTest {
     }
 
     @Test
-    public void onActivityResult() {
+    public void testClick() {
+        activity.findViewById(R.id.insert_picture).performClick();
+        activity.findViewById(R.id.insert_video).performClick();
+        activity.findViewById(R.id.insert_sound).performClick();
+    }
 
+    @Test
+    public void onActivityResult() {
+        Intent intent = new Intent(activity, SoundPlayer.class);
+        activity.startActivityForResult(intent, 0);
     }
 }
