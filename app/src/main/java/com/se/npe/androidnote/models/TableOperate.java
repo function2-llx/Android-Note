@@ -154,7 +154,7 @@ public class TableOperate implements INoteCollection {
         }
         while (c.moveToNext()) {
             Note temp = new Note(c.getString(1), stringToContent(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToTagList(c.getString(5)), c.getString(6));
-            if(tagList == null||tagList.size()==0)noteList.add(temp);
+            if(tagList == null||tagList.isEmpty())noteList.add(temp);
             else {
                 List<String> tempTag = temp.getTag();
                 for(int i = 0;i < tagList.size();i ++) {
@@ -184,7 +184,7 @@ public class TableOperate implements INoteCollection {
         Cursor c = db.rawQuery(sql, null);
         while (c.moveToNext()) {
             Note temp = new Note(c.getString(1), stringToContent(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToTagList(c.getString(5)), c.getString(6));
-            if(tagList == null||tagList.size()==0)noteList.add(temp);
+            if(tagList == null||tagList.isEmpty())noteList.add(temp);
             else {
                 List<String> tempTag = temp.getTag();
                 for(int i = 0;i < tagList.size();i ++) {
@@ -257,7 +257,6 @@ public class TableOperate implements INoteCollection {
         cursor.moveToLast();
         int count = cursor.getInt(0);
         cursor.close();
-        Log.d("debug0001", Integer.toString(count));
         note.setIndex(count);
     }
 
