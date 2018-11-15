@@ -4,14 +4,17 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.marshalchen.ultimaterecyclerview.UltimateViewAdapter;
@@ -52,6 +55,12 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         final ViewHolder holder = new ViewHolder(v);
         v.setOnClickListener(holder);
         v.setOnLongClickListener(holder);
+
+        //把文字部分设置为屏幕宽度的2/3
+        LinearLayout textLayout = v.findViewById(R.id.text_layout);
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) textLayout.getLayoutParams();
+        params.width = getScreenWidth() / 3 * 2;
+        textLayout.setLayoutParams(params);
         return holder;
     }
 
@@ -115,17 +124,20 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 
     // All notes
     public void updateAllNotesList() {
-        updateList(TableOperate.getInstance().getAllNotes());
+        updateList(TableOperate.getInstance().getAllNotes("",null));
     }
 
     // Search for notes
-    public void updateSearchList(String searchParameter) {
-        updateList(TableOperate.getInstance().getSearchResultFuzzy(searchParameter));
+    //ultimate version
+    public void updateSearchList(String param, String group, List<String> tags) {
+        Toast.makeText(activity, param + group + tags.toString(), Toast.LENGTH_SHORT).show();
+        updateList(TableOperate.getInstance().fuzzySearch(param, group, tags));
     }
+
 
     // Group notes
     public void updateGroupNotesList(String groupName) {
-        this.updateList(TableOperate.getInstance().getAllNotesWithGroup(groupName));
+        this.updateList(TableOperate.getInstance().getAllNotes(groupName,null));
     }
 
     private void updateList(@NonNull List<Note> list) {
@@ -171,14 +183,25 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         return this.comparator;
     }
 
+    private int getScreenWidth() {
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        activity.getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
+        return outMetrics.widthPixels;
+    }
+
     /**
      * Adapt Note to item-like View
      *
      * @author llx
      */
     public class ViewHolder extends UltimateRecyclerviewViewHolder implements View.OnClickListener, View.OnLongClickListener {
-        private TextView title, text, group;
-        private TextView createTimeDisplayer, modifyTimeDisplayer;
+        private TextView title;
+        private TextView text;
+        private TextView group;
+
+        private TextView createTimeDisplayer;
+        private TextView modifyTimeDisplayer;
+
         private ImageView imageView;
         int screenWidth = -1;
 
@@ -256,21 +279,18 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
             menu.setOnMenuItemClickListener(item -> {
                 Note selectedNote = getItem(getAdapterPosition());
                 switch (item.getItemId()) {
-                    case R.id.delete: {
+                    case R.id.delete:
                         remove(getAdapterPosition());
                         break;
-                    }
 
-                    case R.id.preview: {
-                        Intent intent = new Intent(activity, EditorActivity.class);
-                        intent.putExtra(EditorActivity.VIEW_ONLY, true);
-                        intent.putExtra(EditorActivity.CURRENT_GROUP, activity.getCurrentGroup());
-                        intent.putExtra(EditorActivity.INITIAL_NOTE, selectedNote);
-                        activity.startActivity(intent);
+                    case R.id.preview:
+                        activity.startActivity(new Intent(activity, EditorActivity.class)
+                                .putExtra(EditorActivity.VIEW_ONLY, true)
+                                .putExtra(EditorActivity.CURRENT_GROUP, activity.getCurrentGroup())
+                                .putExtra(EditorActivity.INITIAL_NOTE, selectedNote);
                         break;
-                    }
 
-                    case R.id.set_group: {
+                    case R.id.set_group:
                         List<String> groupName = TableOperate.getInstance().getAllGroup();
 
                         View dialogView = View.inflate(activity, R.layout.set_group_dialog, null);
@@ -279,45 +299,26 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
                         builder.setTitle("set group");
                         builder.setView(dialogView);
                         final int[] selected = {0};
-                        builder.setPositiveButton("confirm", new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                selectedNote.setGroupName(groupName.get(selected[0]));
-                                TableOperate.getInstance().modify(selectedNote);
-                                activity.updateList();
-                            }
+                        builder.setPositiveButton("confirm", (dialog, which) -> {
+                            selectedNote.setGroupName(groupName.get(selected[0]));
+                            TableOperate.getInstance().modify(selectedNote);
+                            activity.updateList();
                         });
                         builder.setNegativeButton("cancel", null);
-                        builder.setSingleChoiceItems(groupName.toArray(new String[0]), selected[0], new DialogInterface.OnClickListener() {
-                            @Override
-                            public void onClick(DialogInterface dialog, int which) {
-                                selected[0] = which;
-                            }
-                        });
+                        builder.setSingleChoiceItems(groupName.toArray(new String[0]), selected[0],
+                                (dialog, which) -> selected[0] = which);
                         builder.show();
 
-//                        AlertDialog dialog = builder.create();
-//                        dialog.setCancelable(false);
-//                        dialog.show();
-//                        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-//                            @Override
-//                            public void onClick(View v) {
-////                                String groupName = editText.getText().toString();
-////                                if (!groupName.isEmpty()) {
-////                                    selectedNote.setGroupName(groupName);
-////                                    TableOperate.getInstance().modify(selectedNote);
-////                                    dialog.cancel();
-////                                }
-//                                dialog.cancel();
-//                            }
-//                        });
-                    }
+                        break;
 
-                    case R.id.remove_from_current_group: {
+                    case R.id.remove_from_current_group:
                         selectedNote.setGroupName("");
                         TableOperate.getInstance().modify(selectedNote);
                         activity.updateList();
-                    }
+                        break;
+
+                    default:
+                        break;
                 }
                 return true;
             });

@@ -25,7 +25,7 @@ import java.util.ArrayList;
 
 import static com.se.npe.androidnote.EditorActivity.CURRENT_GROUP;
 import static com.se.npe.androidnote.EditorActivity.VIEW_ONLY;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 import static org.robolectric.Shadows.shadowOf;
 
 @RunWith(RobolectricTestRunner.class)
@@ -61,7 +61,7 @@ public class ListActivityTest {
         clickOptionsMenuItem(R.id.sort_modified_time);
         assertEquals(TableConfig.Sorter.SORTER_FIELD_TO_COMPARATOR.get(TableConfig.Sorter.SORTER_OPTION_TO_FIELD.get(R.id.sort_modified_time)), noteAdapter.getComparator());
         clickOptionsMenuItem(R.id.clear);
-        assertEquals(new ArrayList<Note>(), TableOperate.getInstance().getAllNotes());
+        assertEquals(new ArrayList<Note>(), TableOperate.getInstance().getAllNotes("",null));
     }
 
     @Test

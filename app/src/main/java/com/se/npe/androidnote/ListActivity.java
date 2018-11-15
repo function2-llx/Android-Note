@@ -1,7 +1,6 @@
 package com.se.npe.androidnote;
 
 import android.Manifest;
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -9,9 +8,9 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.FileProvider;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AlertDialog;
@@ -24,6 +23,7 @@ import android.view.MenuItem;
 import android.view.SubMenu;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.ipaulpro.afilechooser.utils.FileUtils;
@@ -36,8 +36,8 @@ import com.se.npe.androidnote.models.NotePdfConverter;
 import com.se.npe.androidnote.models.NoteZipConverter;
 import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
+import com.se.npe.androidnote.models.TagGroupManager;
 
-import java.io.File;
 import java.util.List;
 import java.util.Objects;
 
@@ -51,12 +51,10 @@ public class ListActivity extends AppCompatActivity {
     private LinearLayoutManager layoutManager;
     private NoteAdapter noteAdapter;
     private UltimateRecyclerView ultimateRecyclerView;
-    private ActionBarDrawerToggle drawerToggle;
-    private DrawerLayout drawerLayout;
     private Toolbar toolbar;
-    NavigationView navigationView;
-    SubMenu groupMenu;
-    String currentGroup = "";
+    private SubMenu groupMenu;
+    private String currentGroup = "";
+    private TagGroupManager tagGroupManager;
 
     public String getCurrentGroup() {
         return currentGroup;
@@ -93,81 +91,69 @@ public class ListActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    private Uri getContentUri(File file) {
-        System.err.println(file);
-        return FileProvider.getUriForFile(this, BuildConfig.APPLICATION_ID + ".fileprovider", file);
-    }
-
     //Can only use lower 16 bits for requestCode
     private static final int REQUEST_FILE_CHOOSE = 23333;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        switch (requestCode) {
-            case REQUEST_FILE_CHOOSE: {
-                if (resultCode == RESULT_OK) {
-                    final Uri uri = data.getData();
-                    String path = FileUtils.getPath(this, uri);
-                    INoteFileConverter noteFileConverter;
-                    switch (FileOperate.getSuffix(path)) {
-                        case "note":
-                            noteFileConverter = new NoteZipConverter();
-                            break;
-                        case "pdf":
-                            noteFileConverter = new NotePdfConverter();
-                            break;
-                        default:
-                            noteFileConverter = new NoteZipConverter();
-                            break;
-                    }
-                    noteFileConverter.importNoteFromFile((Note note) ->
-                                    TableOperate.getInstance().addNote(note)
-                            , path);
-                }
-                break;
+        if (requestCode == REQUEST_FILE_CHOOSE && resultCode == RESULT_OK) {
+            assert data != null;
+            final Uri uri = data.getData();
+            String path = FileUtils.getPath(this, uri);
+            INoteFileConverter noteFileConverter;
+            assert path != null;
+            switch (FileOperate.getSuffix(path)) {
+                case "note":
+                    noteFileConverter = new NoteZipConverter();
+                    break;
+                case "pdf":
+                    noteFileConverter = new NotePdfConverter();
+                    break;
+                default:
+                    noteFileConverter = new NoteZipConverter();
+                    break;
             }
+            noteFileConverter.importNoteFromFile((Note note) ->
+                            TableOperate.getInstance().addNote(note)
+                    , path);
         }
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
-            case R.id.menu_new_note: {
-                Intent intent = new Intent(ListActivity.this, EditorActivity.class);
-                intent.putExtra(EditorActivity.CURRENT_GROUP, currentGroup);
-                this.startActivity(intent);
+            case R.id.menu_new_note:
+                startActivity(new Intent(ListActivity.this, EditorActivity.class)
+                        .putExtra(EditorActivity.CURRENT_GROUP, currentGroup));
                 break;
-            }
 
-            case R.id.menu_open: {
-                Intent getContentIntent = FileUtils.createGetContentIntent();
-                Intent intent = Intent.createChooser(getContentIntent, "Select a file");
-                startActivityForResult(intent, REQUEST_FILE_CHOOSE);
+            case R.id.menu_open:
+                startActivityForResult(
+                        Intent.createChooser(FileUtils.createGetContentIntent(), "Select a file")
+                        , REQUEST_FILE_CHOOSE);
                 break;
-            }
 
-            case R.id.clear: {
+            case R.id.clear:
                 noteAdapter.clear();
                 break;
-            }
 
-            case R.id.sort_title: {
+            case R.id.sort_title:
                 item.setChecked(true);
                 noteAdapter.setSortField(TableConfig.Sorter.SORTER_OPTION_TO_FIELD.get(R.id.sort_title));
                 break;
-            }
 
-            case R.id.sort_created_time: {
+            case R.id.sort_created_time:
                 item.setChecked(true);
                 noteAdapter.setSortField(TableConfig.Sorter.SORTER_OPTION_TO_FIELD.get(R.id.sort_created_time));
                 break;
-            }
 
-            case R.id.sort_modified_time: {
+            case R.id.sort_modified_time:
                 item.setChecked(true);
                 noteAdapter.setSortField(TableConfig.Sorter.SORTER_OPTION_TO_FIELD.get(R.id.sort_modified_time));
                 break;
-            }
+
+            default:
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -179,9 +165,7 @@ public class ListActivity extends AppCompatActivity {
 
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.activity_list);
-//        this.setTitle(this.getResources().getString(R.string.list_title));
 
         toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -203,21 +187,12 @@ public class ListActivity extends AppCompatActivity {
                     10);
         }
 
+        //new note button
+        findViewById(R.id.new_note_button).setOnClickListener(v -> startActivity(new Intent(ListActivity.this, EditorActivity.class)
+                .putExtra(EditorActivity.CURRENT_GROUP, currentGroup)));
+
         setNavigationView();
         initDrawerToggle();
-//        MobSDK.init(this);
-        //        this.ultimateRecyclerView.reenableLoadmore();
-//        this.noteAdapter.setCustomLoadMoreView(LayoutInflater.from(this).inflate(R.layout.custom_bottom_progressbar, null));
-//        ultimateRecyclerView.setOnLoadMoreListener((itemsCount, maxLastVisiblePosition) -> {
-//            Handler handler = new Handler();
-//            handler.postDelayed(() -> {
-//                noteList.add(new Note());
-//                noteAdapter.notifyDataSetChanged();
-//            }, 1000);
-//        });
-
-//        this.enableDrag();
-
     }
 
     @Override
@@ -226,15 +201,11 @@ public class ListActivity extends AppCompatActivity {
         super.onResume();
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
+    private DrawerLayout drawerLayout;
 
     private void initDrawerToggle() {
-
-        this.drawerLayout = findViewById(R.id.drawer_layout);
-        drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close);
+        drawerLayout = findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close);
         drawerToggle.syncState();
     }
 
@@ -246,136 +217,159 @@ public class ListActivity extends AppCompatActivity {
             groupMenu.add(R.id.group_groups, Menu.NONE, Menu.NONE, groupName);
     }
 
+    private void handleGroupManage(@NonNull MenuItem menuItem) {
+        List<String> allGroups = TableOperate.getInstance().getAllGroup();
+        String[] allGroupsArray = allGroups.toArray(new String[0]);
+        switch (menuItem.getItemId()) {
+            case R.id.new_group: {
+                EditText editText = new EditText(ListActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
+                builder.setTitle("New group");
+                builder.setPositiveButton("add", null);
+                builder.setNegativeButton("cancel", null);
+                builder.setView(editText);
+                AlertDialog dialog = builder.create();
+                dialog.show();
+                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                    String groupName = editText.getText().toString();
+                    if (groupName.isEmpty())
+                        Toast.makeText(ListActivity.this, "input something?", Toast.LENGTH_SHORT).show();
+                    else if (allGroups.contains(groupName))
+                        Toast.makeText(ListActivity.this, groupName + " already exist", Toast.LENGTH_SHORT).show();
+                    else {
+                        TableOperate.getInstance().addGroup(groupName);
+                        refreshGroups();
+                        dialog.cancel();
+                    }
+                });
+                break;
+            }
+
+            case R.id.manage_group: {
+                AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
+                builder.setTitle(getString(R.string.manage_groups));
+                boolean selected[] = new boolean[allGroupsArray.length];
+                builder.setMultiChoiceItems(allGroupsArray, new boolean[allGroupsArray.length], (dialog, which, isChecked) -> selected[which] = isChecked);
+                builder.setNegativeButton("cancel", null);
+                builder.setPositiveButton("confirm", (dialog, which) -> {
+                    for (int i = 0; i < allGroupsArray.length; i++)
+                        if (selected[i])
+                            TableOperate.getInstance().removeGroup(allGroupsArray[i]);
+                    refreshGroups();
+                });
+                builder.show();
+                break;
+            }
+
+            default:
+                break;
+        }
+    }
+
     public void setNavigationView() {
-        this.navigationView = findViewById(R.id.nav_view);
+        NavigationView navigationView = findViewById(R.id.nav_view);
         Menu menu = navigationView.getMenu();
         this.groupMenu = menu.findItem(R.id.groups).getSubMenu();
         navigationView.setItemIconTintList(null);
 
         refreshGroups();
 
-        navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-            @Override
-            public boolean onNavigationItemSelected(@NonNull MenuItem menuItem) {
-//                drawerLayout.closeDrawers();
-                switch (menuItem.getGroupId()) {
-                    case R.id.group_all_notes: {
-                        noteAdapter.updateAllNotesList();
-                        currentGroup = "";
-                        setTitle(getString(R.string.list_title));
-                        break;
-                    }
-
-                    case R.id.group_groups: {
-                        String groupName = menuItem.getTitle().toString();
-                        noteAdapter.updateGroupNotesList(groupName);
-                        currentGroup = groupName;
-                        setTitle(groupName);
-                        break;
-                    }
-
-                    case R.id.group_manage: {
-                        List<String> allGroups = TableOperate.getInstance().getAllGroup();
-                        String[] allGroupsArray = allGroups.toArray(new String[0]);
-                        switch (menuItem.getItemId()) {
-                            case R.id.new_group: {
-                                EditText editText = new EditText(ListActivity.this);
-                                AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
-                                builder.setTitle("New group");
-                                builder.setPositiveButton("add", null);
-                                builder.setNegativeButton("cancel", null);
-                                builder.setView(editText);
-                                AlertDialog dialog = builder.create();
-                                dialog.show();
-                                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(new View.OnClickListener() {
-                                    @Override
-                                    public void onClick(View v) {
-                                        String groupName = editText.getText().toString();
-                                        if (groupName.isEmpty())
-                                            Toast.makeText(ListActivity.this, "input something?", Toast.LENGTH_SHORT).show();
-                                        else if (allGroups.contains(groupName))
-                                            Toast.makeText(ListActivity.this, groupName + " already exist", Toast.LENGTH_SHORT).show();
-                                        else {
-                                            TableOperate.getInstance().addGroup(groupName);
-                                            refreshGroups();
-                                            dialog.cancel();
-                                        }
-                                    }
-                                });
-                                break;
-                            }
-
-                            case R.id.remove_group: {
-                                AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
-                                builder.setTitle("remove group");
-                                boolean selected[] = new boolean[allGroupsArray.length];
-                                builder.setMultiChoiceItems(allGroupsArray, new boolean[allGroupsArray.length], new DialogInterface.OnMultiChoiceClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-                                        selected[which] = isChecked;
-                                    }
-                                });
-                                builder.setNegativeButton("cancel", null);
-                                builder.setPositiveButton("confirm", new DialogInterface.OnClickListener() {
-                                    @Override
-                                    public void onClick(DialogInterface dialog, int which) {
-                                        for (int i = 0; i < allGroupsArray.length; i++)
-                                            if (selected[i])
-                                                TableOperate.getInstance().removeGroup(allGroupsArray[i]);
-                                        refreshGroups();
-                                    }
-                                });
-                                builder.show();
-                                break;
-                            }
-
-                            default:
-                                break;
-                        }
-                        break;
-                    }
-                    default:
-                        break;
+        navigationView.setNavigationItemSelectedListener(menuItem -> {
+            switch (menuItem.getGroupId()) {
+                case R.id.group_all_notes: {
+                    noteAdapter.updateAllNotesList();
+                    currentGroup = "";
+                    setTitle(getString(R.string.list_title));
+                    drawerLayout.closeDrawers();
+                    break;
                 }
 
-                return true;
+                case R.id.group_groups: {
+                    String groupName = menuItem.getTitle().toString();
+                    noteAdapter.updateGroupNotesList(groupName);
+                    currentGroup = groupName;
+                    setTitle(groupName);
+                    drawerLayout.closeDrawers();
+                    break;
+                }
+
+                case R.id.group_operations: {
+                    handleGroupManage(menuItem);
+
+                    break;
+                }
+                default:
+                    break;
             }
+
+            return true;
         });
     }
+
 
     /**
      * Configure search view to set hint & listener
      */
 
-//    void setSlidingMenu() {
-//        slidingMenu = new SlidingMenu(this);
-//        slidingMenu.setMode(SlidingMenu.LEFT);
-//        slidingMenu.setTouchModeAbove(SlidingMenu.TOUCHMODE_FULLSCREEN);
-//        slidingMenu.setBehindOffsetRes(R.dimen.sliding_menu_behind_witdh);
-//        slidingMenu.attachToActivity(this, SlidingMenu.SLIDING_CONTENT);
-//        slidingMenu.setMenu(R.layout.sliding_menu_list);
-//        slidingMenu.setTouchModeBehind(SlidingMenu.TOUCHMODE_FULLSCREEN);
-//    }
+    private void showList() {
+        ultimateRecyclerView.setVisibility(View.VISIBLE);
+        updateList();
+    }
+
+    private void hideList() {
+        ultimateRecyclerView.setVisibility(View.INVISIBLE);
+    }
+
     private void configureSearchView(@NonNull SearchView searchView) {
-        searchView.setQueryHint("search by title...");
+        tagGroupManager = findViewById(R.id.tag_group_manager);
+
+        searchView.setQueryHint("search for your note");
+
+        searchView.setSubmitButtonEnabled(true);
+        ImageView goButton = searchView.findViewById(R.id.search_go_btn);
+        goButton.setOnClickListener(v -> {
+            tagGroupManager.hide();
+            showList();
+            String query = searchView.getQuery().toString();
+            List<String> tags = tagGroupManager.getCheckedTags();
+            noteAdapter.updateSearchList(query, currentGroup, tags);
+        });
+
+        // open event
+        searchView.setOnSearchClickListener(v -> {
+            tagGroupManager.updateTags();
+            tagGroupManager.show();
+            hideList();
+            disableRefresh();
+        });
+
+        // close event
+        searchView.setOnCloseListener(() -> {
+            tagGroupManager.hide();
+            showList();
+            enableRefresh();
+            return false;
+        });
+
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                noteAdapter.updateSearchList(query);
+                goButton.callOnClick();
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                noteAdapter.updateSearchList(newText);
+                if (newText.isEmpty()) {
+                    hideList();
+                    tagGroupManager.show();
+                } else
+                    goButton.callOnClick();
                 return true;
             }
         });
 
-        searchView.setOnCloseListener(() -> {
-            ultimateRecyclerView.setAdapter(noteAdapter);
-            return false;
-        });
+
     }
 
     public void updateList() {
@@ -392,5 +386,9 @@ public class ListActivity extends AppCompatActivity {
             ListActivity.this.ultimateRecyclerView.setRefreshing(false);
             layoutManager.scrollToPosition(0);
         }, 500));
+    }
+
+    private void disableRefresh() {
+        ultimateRecyclerView.mSwipeRefreshLayout.setEnabled(false);
     }
 }
