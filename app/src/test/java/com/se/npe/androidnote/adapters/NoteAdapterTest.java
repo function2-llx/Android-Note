@@ -62,47 +62,47 @@ public class NoteAdapterTest {
         assertEquals(NOTE_LIST_SIZE, noteAdapter.getAdapterItemCount());
     }
 
-    @Test
-    public void updateAllNotesList() {
-        noteAdapter.updateAllNotesList();
-        assertEquals(NOTE_LIST_SIZE, noteAdapter.getAdapterItemCount());
-        // add notes
-        for (int i = NOTE_LIST_SIZE; i < NOTE_LIST_SIZE + NOTE_LIST_SIZE; ++i) {
-            Note note = DataExample.getExampleNote(String.valueOf(i));
-            TableOperate.getInstance().addNote(note);
-        }
-        // before updateAllNotesList
-        assertEquals(NOTE_LIST_SIZE, noteAdapter.getAdapterItemCount());
-        noteAdapter.updateAllNotesList();
-        // after updateAllNotesList
-        assertEquals(NOTE_LIST_SIZE + NOTE_LIST_SIZE, noteAdapter.getAdapterItemCount());
-    }
-
-    @Test
-    public void updateSearchList() {
-        // Whole note list
-        noteAdapter.updateSearchList("title");
-        assertEquals(noteList, noteAdapter.getItems());
-        // Empty note list
-        noteAdapter.updateSearchList("wtf???");
-        assertEquals(new ArrayList<Note>(), noteAdapter.getItems());
-
-        // Depends on addNote()
-        // Search for 3
-        List<Note> noteListSearched = new ArrayList<>();
-        for (Note note : noteList) {
-            if (note.getTitle().contains("3")) {
-                noteListSearched.add(note);
-            }
-        }
-        noteListSearched.sort(Comparator.comparing(Note::getTitle));
-        noteAdapter.updateSearchList("3");
-        assertEquals(noteListSearched, noteAdapter.getItems());
-    }
-
-    @Test
-    public void updateGroupNotesList() {
-    }
+//    @Test
+//    public void updateAllNotesList() {
+//        noteAdapter.updateAllNotesList();
+//        assertEquals(NOTE_LIST_SIZE, noteAdapter.getAdapterItemCount());
+//        // add notes
+//        for (int i = NOTE_LIST_SIZE; i < NOTE_LIST_SIZE + NOTE_LIST_SIZE; ++i) {
+//            Note note = DataExample.getExampleNote(String.valueOf(i));
+//            TableOperate.getInstance().addNote(note);
+//        }
+//        // before updateAllNotesList
+//        assertEquals(NOTE_LIST_SIZE, noteAdapter.getAdapterItemCount());
+//        noteAdapter.updateAllNotesList();
+//        // after updateAllNotesList
+//        assertEquals(NOTE_LIST_SIZE + NOTE_LIST_SIZE, noteAdapter.getAdapterItemCount());
+//    }
+//
+//    @Test
+//    public void updateSearchList() {
+//        // Whole note list
+//        noteAdapter.updateSearchList("title");
+//        assertEquals(noteList, noteAdapter.getItems());
+//        // Empty note list
+//        noteAdapter.updateSearchList("wtf???");
+//        assertEquals(new ArrayList<Note>(), noteAdapter.getItems());
+//
+//        // Depends on addNote()
+//        // Search for 3
+//        List<Note> noteListSearched = new ArrayList<>();
+//        for (Note note : noteList) {
+//            if (note.getTitle().contains("3")) {
+//                noteListSearched.add(note);
+//            }
+//        }
+//        noteListSearched.sort(Comparator.comparing(Note::getTitle));
+//        noteAdapter.updateSearchList("3");
+//        assertEquals(noteListSearched, noteAdapter.getItems());
+//    }
+//
+//    @Test
+//    public void updateGroupNotesList() {
+//    }
 
     @Test
     public void updateList() {
