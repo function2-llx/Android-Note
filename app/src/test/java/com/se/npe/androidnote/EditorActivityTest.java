@@ -1,24 +1,9 @@
 package com.se.npe.androidnote;
 
-import android.app.Activity;
 import android.content.Intent;
-<<<<<<< app/src/test/java/com/se/npe/androidnote/EditorActivityTest.java
-import android.os.Bundle;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.MenuItem;
-import android.view.View;
-
-import com.dmcbig.mediapicker.PickerConfig;
-import com.getbase.floatingactionbutton.FloatingActionsMenu;
-import com.se.npe.androidnote.editor.SortRichEditor;
-
-import static org.junit.Assert.*;
 import static org.robolectric.Shadows.shadowOf;
 
-import org.bouncycastle.util.Integers;
-=======
->>>>>>> app/src/test/java/com/se/npe/androidnote/EditorActivityTest.java
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,10 +13,6 @@ import org.robolectric.RuntimeEnvironment;
 
 import com.se.npe.androidnote.editor.SoundPlayer;
 import com.se.npe.androidnote.models.TableOperate;
-import com.se.npe.androidnote.sound.ResultPool;
-
-import java.lang.reflect.Method;
-import java.util.Date;
 
 import java.lang.reflect.Method;
 
@@ -78,6 +59,7 @@ public class EditorActivityTest {
             method.setAccessible(true);
             method.invoke(activity, 1);
         } catch (Exception e) {
+            /* no operation */
         }
     }
 
@@ -91,6 +73,7 @@ public class EditorActivityTest {
             method.setAccessible(true);
             method.invoke(activity, 1);
         } catch (Exception e) {
+            /* no operation */
         }
     }
 
@@ -111,6 +94,7 @@ public class EditorActivityTest {
         try {
             activity.onOptionsItemSelected(menuItem);
         } catch (Exception e) {
+            /* no operation */
         }
     }
 

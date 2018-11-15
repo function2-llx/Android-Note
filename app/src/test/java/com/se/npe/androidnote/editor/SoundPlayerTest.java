@@ -39,6 +39,7 @@ public class SoundPlayerTest {
         try {
             sound.setSource("test");
         } catch (Exception e) {
+            /* no operation */
         }
     }
 
@@ -53,6 +54,7 @@ public class SoundPlayerTest {
             sound.findViewById(R.id.sound_player_play).performClick();
             sound.findViewById(R.id.sound_player_play).performClick();
         } catch (Exception e) {
+            /* no operation */
         }
     }
 }
