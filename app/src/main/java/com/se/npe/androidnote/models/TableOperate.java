@@ -8,15 +8,9 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.Log;
 
-import com.se.npe.androidnote.events.NoteClearEvent;
-import com.se.npe.androidnote.events.NoteDeleteEvent;
-import com.se.npe.androidnote.events.NoteModifyEvent;
 import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.interfaces.INoteCollection;
 import com.se.npe.androidnote.util.Logger;
-
-import org.greenrobot.eventbus.EventBus;
-import org.greenrobot.eventbus.Subscribe;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,7 +32,6 @@ public class TableOperate implements INoteCollection {
     private static TableOperate tableOperate;
 
     public static void init(Context context) {
-
         tableOperate = new TableOperate(context);
         TableConfig.SAVE_PATH = Objects.requireNonNull(context.getExternalFilesDir(null)).getAbsolutePath();
         initConfigFile();
@@ -71,7 +64,6 @@ public class TableOperate implements INoteCollection {
     private TableOperate(Context context) {
         manager = DBManager.newInstances(context);
         db = manager.getDataBase();
-        EventBus.getDefault().register(this);
     }
 
     //Note结构编码
@@ -296,37 +288,10 @@ public class TableOperate implements INoteCollection {
         return noteList.get(0);
     }
 
-    @Override
-    protected void finalize() throws Throwable {
-        EventBus.getDefault().unregister(this);
-        super.finalize();
-    }
-
     public void modify(Note note) {
         if (note.getIndex() == -1)
             addNote(note);
         else
             setNote(note);
-
-    }
-
-    @Subscribe(sticky = true)
-    public void onReceiveNote(NoteModifyEvent event) {
-        Note note = event.getNote();
-        if (note.getIndex() == -1)
-            addNote(note);
-        else
-            setNote(note);
-        System.err.print(note.getTitle());
-    }
-
-    @Subscribe(sticky = true)
-    public void onDeleteNote(NoteDeleteEvent event) {
-        removeNote(event.getNote());
-    }
-
-    @Subscribe(sticky = true)
-    public void onClearNote(NoteClearEvent event) {
-        removeAllNotes();
     }
 }

@@ -1,5 +1,7 @@
 package com.se.npe.androidnote.interfaces;
 
+import java.io.Serializable;
+
 /**
  * Abstract data type in a note(only a mark interface)
  * A note is organized as a list of IData
@@ -8,7 +10,7 @@ package com.se.npe.androidnote.interfaces;
  * @author MashPlant
  */
 
-public interface IData {
+public interface IData extends Serializable {
 
     String getType();
 
