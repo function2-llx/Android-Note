@@ -11,9 +11,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
-import java.util.Comparator;
-
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 @RunWith(RobolectricTestRunner.class)
 public class TableConfigTest {
@@ -34,7 +32,7 @@ public class TableConfigTest {
 
     @Test
     public void sorterTest() {
-        assertEquals(TableConfig.Sorter.getSorterFields()[0] , TableConfig.Sorter.getDefaultSorterField());
+        assertEquals(TableConfig.Sorter.getSorterFields()[0], TableConfig.Sorter.getDefaultSorterField());
         TableConfig.Sorter.getSorterFieldToComparator(TableConfig.Sorter.getDefaultSorterField());
         assertEquals(TableConfig.Sorter.getDefaultSorterField(), TableConfig.Sorter.getSorterOptionToField(R.id.sort_title));
     }

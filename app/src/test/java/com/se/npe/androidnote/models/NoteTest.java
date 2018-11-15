@@ -74,7 +74,7 @@ public class NoteTest {
 
     @Test
     public void setGroup() {
-        final String groupName = DataExample.getExampleGroupName("setGroup test");
+        final String groupName = DataExample.getExampleGroupName("setCurrentGroup test");
         note.setGroupName(groupName);
         assertEquals(groupName, note.getGroupName());
     }
@@ -102,7 +102,7 @@ public class NoteTest {
 
     @Test
     public void setModifyTime() {
-        // set modifyNote time & get modifyNote time
+        // set modify time & get modify time
         Date modifyTime = new Date();
         note.setModifyTime(modifyTime);
         assertEquals(modifyTime, note.getModifyTime());

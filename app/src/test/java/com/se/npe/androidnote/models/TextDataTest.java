@@ -31,7 +31,7 @@ public class TextDataTest {
 
     @Test
     public void getPath() {
-        assertEquals("",textData.getPath());
+        assertEquals("", textData.getPath());
     }
 
     @Test

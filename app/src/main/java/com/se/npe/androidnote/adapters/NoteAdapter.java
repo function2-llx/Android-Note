@@ -12,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.marshalchen.ultimaterecyclerview.UltimateViewAdapter;
@@ -39,10 +38,12 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
     private ListActivity activity;
     private List<Note> noteList;
     private Comparator<Note> comparator;
+    private String currentGroup;
 
     public NoteAdapter(ListActivity activity) {
         this.activity = activity;
         this.comparator = TableConfig.Sorter.getSorterFieldToComparator(TableOperate.getSearchConfig());
+        this.currentGroup = "";
     }
 
     /* ViewHolder */
@@ -120,22 +121,14 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 
     /* Actions of Note in NoteCollection */
 
-    // All notes
-    public void updateAllNotesList() {
-        updateList(TableOperate.getInstance().getAllNotes("",null));
-    }
-
     // Search for notes
-    //ultimate version
-    public void updateSearchList(String param, String group, List<String> tags) {
-        Toast.makeText(activity, param + group + tags.toString(), Toast.LENGTH_SHORT).show();
-        updateList(TableOperate.getInstance().fuzzySearch(param, group, tags));
+    public void updateSearchList(String param, List<String> tags) {
+        updateList(TableOperate.getInstance().fuzzySearch(param, currentGroup, tags));
     }
-
 
     // Group notes
-    public void updateGroupNotesList(String groupName) {
-        this.updateList(TableOperate.getInstance().getAllNotes(groupName,null));
+    public void updateGroupNotesList() {
+        this.updateList(TableOperate.getInstance().getAllNotes(currentGroup, null));
     }
 
     private void updateList(@NonNull List<Note> list) {
@@ -147,8 +140,18 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
     public void setSortField(String sortField) {
         TableOperate.setSearchConfig(sortField);
         this.comparator = TableConfig.Sorter.getSorterFieldToComparator(sortField);
+        // not calling updateGroupNoteList() to speed up
         noteList.sort(comparator);
         this.notifyDataSetChanged();
+    }
+
+    public String getCurrentGroup() {
+        return this.currentGroup;
+    }
+
+    public void setCurrentGroup(String groupName) {
+        this.currentGroup = groupName;
+        updateGroupNotesList();
     }
 
     public void insert(Note note, int position) {
@@ -218,10 +221,10 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
             this.title = itemView.findViewById(R.id.text_view_title);
             this.text = itemView.findViewById(R.id.text_view_text);
 
-            //group the note belongs to
+            // group the note belongs to
             this.group = itemView.findViewById(R.id.text_view_group);
 
-            // create & modifyNote time
+            // create & modify time
             int textWidth = getScreenWidth() / 3 * 2;
             this.createTimeDisplayer = itemView.findViewById(R.id.text_view_create_time);
             this.createTimeDisplayer.setWidth(textWidth);
@@ -243,7 +246,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
             if (group.isEmpty())
                 this.group.setText("");
             else
-                this.group.setText("group: " + group);
+                this.group.setText(getResources().getString(R.string.note_group, group));
         }
 
         public void setCreateDate(Date date) {
@@ -265,7 +268,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         public void onClick(@NonNull View v) {
             Note selectedNote = getItem(getAdapterPosition());
             Intent intent = new Intent(activity, EditorActivity.class);
-            intent.putExtra(EditorActivity.CURRENT_GROUP, activity.getCurrentGroup());
+            intent.putExtra(EditorActivity.CURRENT_GROUP, currentGroup);
             intent.putExtra(EditorActivity.INITIAL_NOTE, selectedNote);
             activity.startActivity(intent);
         }
@@ -284,7 +287,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
                     case R.id.preview:
                         activity.startActivity(new Intent(activity, EditorActivity.class)
                                 .putExtra(EditorActivity.VIEW_ONLY, true)
-                                .putExtra(EditorActivity.CURRENT_GROUP, activity.getCurrentGroup())
+                                .putExtra(EditorActivity.CURRENT_GROUP, currentGroup)
                                 .putExtra(EditorActivity.INITIAL_NOTE, selectedNote));
                         break;
 
@@ -300,7 +303,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
                         builder.setPositiveButton("confirm", (dialog, which) -> {
                             selectedNote.setGroupName(groupName.get(selected[0]));
                             TableOperate.getInstance().modifyNote(selectedNote);
-                            activity.updateList();
+                            updateGroupNotesList();
                         });
                         builder.setNegativeButton("cancel", null);
                         builder.setSingleChoiceItems(groupName.toArray(new String[0]), selected[0],
@@ -312,7 +315,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
                     case R.id.remove_from_current_group:
                         selectedNote.setGroupName("");
                         TableOperate.getInstance().modifyNote(selectedNote);
-                        activity.updateList();
+                        updateGroupNotesList();
                         break;
 
                     default:

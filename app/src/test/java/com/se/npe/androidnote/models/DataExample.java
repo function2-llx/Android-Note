@@ -23,13 +23,13 @@ public class DataExample {
 
     // Path
     @NonNull
-    static String getExamplePath(String mixIn) {
+    public static String getExamplePath(String mixIn) {
         return Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + mixIn;
     }
 
     // GroupName
     @NonNull
-    static String getExampleGroupName(String mixIn) {
+    public static String getExampleGroupName(String mixIn) {
         return "Group" + mixIn;
     }
 
@@ -89,14 +89,14 @@ public class DataExample {
     }
 
     @NonNull
-    static List<String> getExampleNoteTags(String mixIn) {
+    public static List<String> getExampleNoteTags(String mixIn) {
         List<String> tags = new ArrayList<>();
         tags.add(getExampleNoteTag(mixIn));
         return tags;
     }
 
     @NonNull
-    static String getExampleNoteTag(String mixIn) {
+    public static String getExampleNoteTag(String mixIn) {
         return "Tag" + mixIn;
     }
 

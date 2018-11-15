@@ -19,6 +19,7 @@
     <string name="title_capacity">%d/%d</string>
     <string name="note_create_time">create: %s</string>
     <string name="note_modify_time">modify: %s</string>
+    <string name="note_group">group: %s</string>
     <!-- Toolbar -->
     <string name="action_licenses">Licenses</string>
     <string name="action_settings">Settings</string>

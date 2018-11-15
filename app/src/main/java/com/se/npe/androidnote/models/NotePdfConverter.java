@@ -194,7 +194,7 @@ public class NotePdfConverter implements INoteFileConverter {
                     Logger.log(EXCEPTION_TAG, e);
                 }
             }
-            // create & modifyNote time
+            // create & modify time
             try {
                 document.newPage();
                 document.add(new Chunk(lineSeparator));

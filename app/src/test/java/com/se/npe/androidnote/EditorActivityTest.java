@@ -1,15 +1,12 @@
 package com.se.npe.androidnote;
 
 import android.content.Intent;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
-import com.se.npe.androidnote.sound.ResultPool;
-
-import java.lang.reflect.Method;
-import java.util.Date;
 
 import java.lang.reflect.Method;
 

@@ -31,7 +31,7 @@ public class PictureDataTest {
 
     @Test
     public void getText() {
-        assertEquals("",pictureData.getText());
+        assertEquals("", pictureData.getText());
     }
 
     @Test

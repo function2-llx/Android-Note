@@ -52,12 +52,7 @@ public class ListActivity extends AppCompatActivity {
     private UltimateRecyclerView ultimateRecyclerView;
     private Toolbar toolbar;
     private SubMenu groupMenu;
-    private String currentGroup = "";
     private TagGroupManager tagGroupManager;
-
-    public String getCurrentGroup() {
-        return currentGroup;
-    }
 
     /* Options menu */
 
@@ -123,7 +118,7 @@ public class ListActivity extends AppCompatActivity {
         switch (item.getItemId()) {
             case R.id.menu_new_note:
                 startActivity(new Intent(ListActivity.this, EditorActivity.class)
-                        .putExtra(EditorActivity.CURRENT_GROUP, currentGroup));
+                        .putExtra(EditorActivity.CURRENT_GROUP, noteAdapter.getCurrentGroup()));
                 break;
 
             case R.id.menu_open:
@@ -177,7 +172,7 @@ public class ListActivity extends AppCompatActivity {
 
         this.noteAdapter = new NoteAdapter(this);
         this.ultimateRecyclerView.setAdapter(noteAdapter);
-        this.noteAdapter.updateAllNotesList();
+        this.noteAdapter.updateGroupNotesList();
 
         this.enableRefresh();
         while (ActivityCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO)
@@ -188,7 +183,7 @@ public class ListActivity extends AppCompatActivity {
 
         //new note button
         findViewById(R.id.new_note_button).setOnClickListener(v -> startActivity(new Intent(ListActivity.this, EditorActivity.class)
-                .putExtra(EditorActivity.CURRENT_GROUP, currentGroup)));
+                .putExtra(EditorActivity.CURRENT_GROUP, noteAdapter.getCurrentGroup())));
 
         setNavigationView();
         initDrawerToggle();
@@ -196,7 +191,7 @@ public class ListActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
-        updateList();
+        noteAdapter.updateGroupNotesList();
         super.onResume();
     }
 
@@ -276,8 +271,7 @@ public class ListActivity extends AppCompatActivity {
         navigationView.setNavigationItemSelectedListener(menuItem -> {
             switch (menuItem.getGroupId()) {
                 case R.id.group_all_notes: {
-                    noteAdapter.updateAllNotesList();
-                    currentGroup = "";
+                    noteAdapter.setCurrentGroup("");
                     setTitle(getString(R.string.list_title));
                     drawerLayout.closeDrawers();
                     break;
@@ -285,8 +279,7 @@ public class ListActivity extends AppCompatActivity {
 
                 case R.id.group_groups: {
                     String groupName = menuItem.getTitle().toString();
-                    noteAdapter.updateGroupNotesList(groupName);
-                    currentGroup = groupName;
+                    noteAdapter.setCurrentGroup(groupName);
                     setTitle(groupName);
                     drawerLayout.closeDrawers();
                     break;
@@ -312,7 +305,7 @@ public class ListActivity extends AppCompatActivity {
 
     private void showList() {
         ultimateRecyclerView.setVisibility(View.VISIBLE);
-        updateList();
+        noteAdapter.updateGroupNotesList();
     }
 
     private void hideList() {
@@ -331,7 +324,7 @@ public class ListActivity extends AppCompatActivity {
             showList();
             String query = searchView.getQuery().toString();
             List<String> tags = tagGroupManager.getCheckedTags();
-            noteAdapter.updateSearchList(query, currentGroup, tags);
+            noteAdapter.updateSearchList(query, tags);
         });
 
         // open event
@@ -371,17 +364,10 @@ public class ListActivity extends AppCompatActivity {
 
     }
 
-    public void updateList() {
-        if (currentGroup.isEmpty())
-            noteAdapter.updateAllNotesList();
-        else
-            noteAdapter.updateGroupNotesList(currentGroup);
-    }
-
     // refresh the list
     private void enableRefresh() {
         this.ultimateRecyclerView.setDefaultOnRefreshListener(() -> new Handler().postDelayed(() -> {
-            updateList();
+            noteAdapter.updateGroupNotesList();
             ListActivity.this.ultimateRecyclerView.setRefreshing(false);
             layoutManager.scrollToPosition(0);
         }, 500));
