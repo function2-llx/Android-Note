@@ -25,7 +25,7 @@ public class INoteFileConverterTest {
     public void setUp() {
         AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
         Context context = activity.getApplicationContext();
-        TableOperate.init(context); // initialize TableConfig.SAVE_PATH
+        TableOperate.init(context); // initialize SAVE_PATH
     }
 
     @Test

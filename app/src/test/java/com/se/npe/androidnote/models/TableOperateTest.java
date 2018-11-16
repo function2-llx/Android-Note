@@ -24,7 +24,7 @@ public class TableOperateTest {
 
     private TableOperate tableOperate;
     private List<Note> noteList;
-    private static final int NOTE_LIST_SIZE = 20;
+    public static final int NOTE_LIST_SIZE = 20;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();

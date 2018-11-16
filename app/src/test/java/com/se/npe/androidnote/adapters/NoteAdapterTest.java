@@ -37,7 +37,6 @@ import static org.robolectric.Shadows.shadowOf;
 public class NoteAdapterTest {
 
     private NoteAdapter noteAdapter;
-    private static final int NOTE_LIST_SIZE = 20;
     private List<Note> noteList; // used to check noteAdapter is right
     private ListActivity activity;
     private UltimateRecyclerView ultimateRecyclerView;
@@ -62,7 +61,7 @@ public class NoteAdapterTest {
 
     @Test
     public void getAdapterItemCount() {
-        assertEquals(NOTE_LIST_SIZE, noteAdapter.getAdapterItemCount());
+        assertEquals(TableOperateTest.NOTE_LIST_SIZE, noteAdapter.getAdapterItemCount());
     }
 
     @Test
@@ -112,20 +111,20 @@ public class NoteAdapterTest {
         assertEquals(noteList, noteAdapter.getItems());
 
         // add notes
-        for (int i = NOTE_LIST_SIZE; i < NOTE_LIST_SIZE + NOTE_LIST_SIZE; ++i) {
+        for (int i = TableOperateTest.NOTE_LIST_SIZE; i < TableOperateTest.NOTE_LIST_SIZE + TableOperateTest.NOTE_LIST_SIZE; ++i) {
             Note note = DataExample.getExampleNote(String.valueOf(i));
             TableOperate.getInstance().addNote(note);
         }
         // before updateGroupNotesList
-        assertEquals(NOTE_LIST_SIZE, noteAdapter.getAdapterItemCount());
+        assertEquals(TableOperateTest.NOTE_LIST_SIZE, noteAdapter.getAdapterItemCount());
         noteAdapter.updateGroupNotesList();
         // after updateGroupNotesList
-        assertEquals(NOTE_LIST_SIZE + NOTE_LIST_SIZE, noteAdapter.getAdapterItemCount());
+        assertEquals(TableOperateTest.NOTE_LIST_SIZE + TableOperateTest.NOTE_LIST_SIZE, noteAdapter.getAdapterItemCount());
     }
 
     @Test
     public void updateList() {
-        assertEquals(NOTE_LIST_SIZE, noteAdapter.getAdapterItemCount());
+        assertEquals(TableOperateTest.NOTE_LIST_SIZE, noteAdapter.getAdapterItemCount());
     }
 
     @Test
@@ -153,16 +152,16 @@ public class NoteAdapterTest {
     public void insert() {
         // insert at end
         Note noteEnd = DataExample.getExampleNote(DataExample.EXAMPLE_MIX_IN + "end");
-        noteAdapter.insert(noteEnd, NOTE_LIST_SIZE);
-        noteList.add(NOTE_LIST_SIZE, noteEnd);
-        assertEquals(noteEnd, noteAdapter.getItem(NOTE_LIST_SIZE));
+        noteAdapter.insert(noteEnd, TableOperateTest.NOTE_LIST_SIZE);
+        noteList.add(TableOperateTest.NOTE_LIST_SIZE, noteEnd);
+        assertEquals(noteEnd, noteAdapter.getItem(TableOperateTest.NOTE_LIST_SIZE));
         // insert at start
         Note noteStart = DataExample.getExampleNote(DataExample.EXAMPLE_MIX_IN + "start");
         noteAdapter.insert(noteStart, 0);
         noteList.add(0, noteStart);
         assertEquals(noteStart, noteAdapter.getItem(0));
         // insert at middle
-        for (int i = 5; i <= NOTE_LIST_SIZE; i += 5) {
+        for (int i = 5; i <= TableOperateTest.NOTE_LIST_SIZE; i += 5) {
             Note note = DataExample.getExampleNote(DataExample.EXAMPLE_MIX_IN + i);
             noteAdapter.insert(note, i);
             noteList.add(i, note);
@@ -174,15 +173,15 @@ public class NoteAdapterTest {
     @Test
     public void remove() {
         // remove at end
-        noteAdapter.remove(NOTE_LIST_SIZE - 1);
-        noteList.remove(NOTE_LIST_SIZE - 1);
+        noteAdapter.remove(TableOperateTest.NOTE_LIST_SIZE - 1);
+        noteList.remove(TableOperateTest.NOTE_LIST_SIZE - 1);
         assertEquals(noteList, noteAdapter.getItems());
         // remove at start
         noteAdapter.remove(0);
         noteList.remove(0);
         assertEquals(noteList, noteAdapter.getItems());
         // remove at middle
-        for (int i = 5; i < NOTE_LIST_SIZE; i += 5) {
+        for (int i = 5; i < TableOperateTest.NOTE_LIST_SIZE; i += 5) {
             noteAdapter.remove(i);
             noteList.remove(i);
             assertEquals(noteList, noteAdapter.getItems());

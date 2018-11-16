@@ -20,14 +20,13 @@ import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.SubMenu;
-import android.view.View;
 import android.widget.EditText;
-import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.se.npe.androidnote.adapters.NoteAdapter;
+import com.se.npe.androidnote.adapters.TagGroupManager;
 import com.se.npe.androidnote.interfaces.INoteFileConverter;
 import com.se.npe.androidnote.models.FileOperate;
 import com.se.npe.androidnote.models.Note;
@@ -35,10 +34,11 @@ import com.se.npe.androidnote.models.NotePdfConverter;
 import com.se.npe.androidnote.models.NoteZipConverter;
 import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.models.TableOperate;
-import com.se.npe.androidnote.models.TagGroupManager;
 
 import java.util.List;
 import java.util.Objects;
+
+import co.lujun.androidtagview.TagView;
 
 /**
  * show a list of the preview of note(data stored in noteCollection)
@@ -295,66 +295,62 @@ public class ListActivity extends AppCompatActivity {
             groupMenu.add(R.id.group_groups, Menu.NONE, Menu.NONE, groupName);
     }
 
-    private void showList() {
-        ultimateRecyclerView.setVisibility(View.VISIBLE);
-        noteAdapter.updateGroupNotesList();
-    }
-
-    private void hideList() {
-        ultimateRecyclerView.setVisibility(View.INVISIBLE);
-    }
-
     // search
     private void configureSearchView(@NonNull SearchView searchView) {
         TagGroupManager tagGroupManager = findViewById(R.id.tag_group_manager);
 
         searchView.setQueryHint("search for your note");
-
         searchView.setSubmitButtonEnabled(true);
-        ImageView goButton = searchView.findViewById(R.id.search_go_btn);
-        goButton.setOnClickListener(v -> {
-            tagGroupManager.hide();
-            showList();
-            String query = searchView.getQuery().toString();
-            List<String> tags = tagGroupManager.getCheckedTags();
-            noteAdapter.updateSearchList(query, tags);
-        });
 
-        // open event
+        // open searchView
         searchView.setOnSearchClickListener(v -> {
-            tagGroupManager.updateTags();
             tagGroupManager.show();
-            hideList();
             disableRefresh();
         });
 
-        // close event
+        // close searchView
         searchView.setOnCloseListener(() -> {
             tagGroupManager.hide();
-            showList();
             enableRefresh();
             return false;
         });
 
+        // search
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
             public boolean onQueryTextSubmit(String query) {
-                goButton.callOnClick();
+                performSearch(query, tagGroupManager);
                 return true;
             }
 
             @Override
             public boolean onQueryTextChange(String newText) {
-                if (newText.isEmpty()) {
-                    hideList();
-                    tagGroupManager.show();
-                } else
-                    goButton.callOnClick();
+                performSearch(newText, tagGroupManager);
                 return true;
             }
         });
 
+        // click tag
+        tagGroupManager.setOnTagClickListener(new TagView.OnTagClickListener() {
+            @Override
+            public void onTagClick(int position, String text) {
+                tagGroupManager.switchCheckedState(position);
+                performSearch(searchView.getQuery().toString(), tagGroupManager);
+            }
 
+            @Override
+            public void onTagLongClick(int position, String text) {
+            }
+
+            @Override
+            public void onTagCrossClick(int position) {
+            }
+        });
+    }
+
+    private void performSearch(String query, @NonNull TagGroupManager tagGroupManager) {
+        List<String> tags = tagGroupManager.getCheckedTags();
+        noteAdapter.updateSearchList(query, tags);
     }
 
     // refresh the list

@@ -1,10 +1,11 @@
-package com.se.npe.androidnote.models;
+package com.se.npe.androidnote.adapters;
 
 import android.content.Context;
 import android.util.AttributeSet;
 import android.view.View;
 
 import com.se.npe.androidnote.R;
+import com.se.npe.androidnote.models.TableOperate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.List;
 import co.lujun.androidtagview.TagContainerLayout;
 import co.lujun.androidtagview.TagView;
 
-public class TagGroupManager extends TagContainerLayout{
+public class TagGroupManager extends TagContainerLayout {
 
     public TagGroupManager(Context context) {
         this(context, null);
@@ -24,32 +25,20 @@ public class TagGroupManager extends TagContainerLayout{
 
     public TagGroupManager(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        this.setOnTagClickListener(new TagView.OnTagClickListener() {
-            @Override
-            public void onTagClick(int position, String text) {
-                switchCheckedState(position);
-            }
-
-            @Override
-            public void onTagLongClick(int position, String text) {
-
-            }
-
-            @Override
-            public void onTagCrossClick(int position) {
-
-            }
-        });
         this.setBackgroundColor(getResources().getColor(R.color.white, null));
         this.setRippleAlpha(0);
         this.setVisibility(View.INVISIBLE);
     }
 
+    private List<String> tagList;
     private boolean[] checked;
-    List<String> tagList;
 
     private void setChecked(int position, boolean checkedState) {
         checked[position] = checkedState;
+        setCheckedTagView(position, checkedState);
+    }
+
+    private void setCheckedTagView(int position, boolean checkedState) {
         TagView tagView = getTagView(position);
         if (checkedState)
             tagView.setTagBorderColor(getResources().getColor(R.color.checked_color, null));
@@ -57,14 +46,25 @@ public class TagGroupManager extends TagContainerLayout{
             tagView.setTagBorderColor(getResources().getColor(R.color.unchecked_color, null));
     }
 
-    void switchCheckedState(int position) {
-        this.setChecked(position, !checked[position]);
+    public void switchCheckedState(int position) {
+        setChecked(position, !checked[position]);
+    }
+
+    public void init() {
+        // initialize
+        tagList = TableOperate.getInstance().getAllTags();
+        checked = new boolean[tagList.size() + 1]; // initialized false (not checked)
+        // the final tag: all checked
+        tagList.add("all");
+        checked[checked.length - 1] = true; // initialized true
+        // set tags
+        this.setTags(tagList);
+        for (int i = 0; i < checked.length; i++)
+            setCheckedTagView(i, checked[i]);
     }
 
     public void show() {
-        this.setTags(tagList);
-        for (int i = 0; i < checked.length; i++)
-            setChecked(i, checked[i]);
+        init();
         this.setVisibility(View.VISIBLE);
     }
 
@@ -73,18 +73,14 @@ public class TagGroupManager extends TagContainerLayout{
         this.removeAllViews();
     }
 
-    public void updateTags() {
-        tagList = TableOperate.getInstance().getAllTags();
-        checked = new boolean[tagList.size()];
-    }
-
     public List<String> getCheckedTags() {
+        if (checked[checked.length - 1]) // all checked
+            return null;
+
         List<String> ret = new ArrayList<>();
-        for (int i = 0; i < checked.length; i++)
+        for (int i = 0; i < checked.length - 1; i++)
             if (checked[i])
                 ret.add(tagList.get(i));
-
         return ret;
     }
-
 }

@@ -33,11 +33,6 @@ public class PictureData implements IData {
     }
 
     @Override
-    public String toString() {
-        return "Picture" + TableConfig.FileSave.LINE_SEPARATOR + picturePath;
-    }
-
-    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
@@ -48,5 +43,10 @@ public class PictureData implements IData {
     @Override
     public int hashCode() {
         return Objects.hash(picturePath);
+    }
+
+    @Override
+    public String toString() {
+        return "Picture" + TableConfig.FileSave.LINE_SEPARATOR + picturePath;
     }
 }
