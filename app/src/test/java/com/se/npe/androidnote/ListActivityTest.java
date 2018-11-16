@@ -10,6 +10,7 @@ import android.support.v7.widget.SearchView;
 import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
 import com.se.npe.androidnote.adapters.NoteAdapter;
+import com.se.npe.androidnote.adapters.TagGroupManager;
 import com.se.npe.androidnote.models.DataExample;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.SingletonResetter;
@@ -29,8 +30,11 @@ import org.robolectric.shadows.ShadowLooper;
 import org.robolectric.shadows.support.v4.ShadowSwipeRefreshLayout;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Objects;
+
+import co.lujun.androidtagview.TagView;
 
 import static com.se.npe.androidnote.EditorActivity.CURRENT_GROUP;
 import static com.se.npe.androidnote.EditorActivity.VIEW_ONLY;
@@ -107,11 +111,51 @@ public class ListActivityTest {
     }
 
     @Test
-    public void onSearch() {
+    public void onSearch() throws NoSuchFieldException, IllegalAccessException {
         SearchView searchView = activity.findViewById(R.id.action_search);
-        searchView.performClick();
-        searchView.setQuery("title", false);
-        searchView.setQuery("wtf???", true);
+        TagGroupManager tagGroupManager = activity.findViewById(R.id.tag_group_manager);
+
+        // open searchView
+        searchView.setIconified(false);
+
+        // query searchView
+        searchView.setQuery("title", false); // text changed
+        assertEquals(TableOperateTest.NOTE_LIST_SIZE, noteAdapter.getItemCount());
+        searchView.findViewById(R.id.search_go_btn).performClick(); // submit
+        assertEquals(TableOperateTest.NOTE_LIST_SIZE, noteAdapter.getItemCount());
+        searchView.setQuery("wtf???", true); // text changed & submit
+        assertEquals(0, noteAdapter.getItemCount());
+
+        // get onTagClickListener
+        Field field = TagGroupManager.class.getSuperclass().getDeclaredField("mOnTagClickListener");
+        field.setAccessible(true);
+        TagView.OnTagClickListener onTagClickListener = (TagView.OnTagClickListener) field.get(tagGroupManager);
+
+        // click tag
+        searchView.setQuery("", true);
+        onTagClickListener.onTagClick(3, null); // click tag 3 with tag-all unchecked
+        assertEquals(1, noteAdapter.getItemCount());
+        onTagClickListener.onTagClick(8, null); // click tag 3 & 8 with tag-all unchecked
+        assertEquals(2, noteAdapter.getItemCount());
+        onTagClickListener.onTagClick(TableOperateTest.NOTE_LIST_SIZE, null); // click tag 3 & 8 with tag-all checked
+        assertEquals(TableOperateTest.NOTE_LIST_SIZE, noteAdapter.getItemCount());
+
+        // click tag & query searchView
+        searchView.setQuery("8", false); // click tag 3 & 8 with tag-all checked
+        assertEquals(2, noteAdapter.getItemCount()); // 8, 18
+        searchView.setQuery("13", true);
+        assertEquals(1, noteAdapter.getItemCount());
+        onTagClickListener.onTagClick(TableOperateTest.NOTE_LIST_SIZE, null); // click tag 3 & 8 with tag-all unchecked
+        searchView.setQuery("8", false);
+        assertEquals(1, noteAdapter.getItemCount());
+        searchView.setQuery("13", true);
+        assertEquals(0, noteAdapter.getItemCount());
+
+        // just to cover onTagLongClick & onTagCrossClick
+        onTagClickListener.onTagLongClick(0, null);
+        onTagClickListener.onTagCrossClick(0);
+
+        searchView.setIconified(true); // close searchView
     }
 
     private void onActivityResult(Intent openFileIntent) {

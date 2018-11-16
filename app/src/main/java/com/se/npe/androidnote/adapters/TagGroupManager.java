@@ -47,6 +47,8 @@ public class TagGroupManager extends TagContainerLayout {
     }
 
     public void switchCheckedState(int position) {
+        if (position != checked.length - 1)
+            setChecked(checked.length - 1, false); // uncheck tag-all
         setChecked(position, !checked[position]);
     }
 

@@ -20,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 @RunWith(RobolectricTestRunner.class)
@@ -45,16 +44,16 @@ public class TagGroupManagerTest {
     @Test
     public void switchCheckedState() {
         tagGroupManager.init();
-        // check 0 & 3 with tag-all checked
+        // check 0 & 3 with tag-all unchecked
         tagGroupManager.switchCheckedState(0);
         tagGroupManager.switchCheckedState(3);
-        assertNull(tagGroupManager.getCheckedTags());
-        // check 0 with tag-all unchecked
-        tagGroupManager.switchCheckedState(TableOperateTest.NOTE_LIST_SIZE);
         List<String> tagList = new ArrayList<>();
         tagList.add(DataExample.getExampleNoteTag(String.valueOf(0)));
         tagList.add(DataExample.getExampleNoteTag(String.valueOf(3)));
         assertEquals(tagList, tagGroupManager.getCheckedTags());
+        // check 0 & 3 with tag-all checked
+        tagGroupManager.switchCheckedState(TableOperateTest.NOTE_LIST_SIZE);
+        assertNull(tagGroupManager.getCheckedTags());
     }
 
     @Test
