@@ -39,6 +39,17 @@ public class NoteZipConverter implements INoteFileConverter {
             this.filePathName = filePathName;
         }
 
+        private String getUnusedDir(String dir) {
+            int index;
+            for (index = 0; ; index++) {
+                File file = new File(dir + Integer.toString(index));
+                if (!file.exists()) {
+                    break;
+                }
+            }
+            return dir + Integer.toString(index);
+        }
+
         @Override
         protected Note doInBackground(Void... voids) {
 
@@ -63,14 +74,15 @@ public class NoteZipConverter implements INoteFileConverter {
 
             // resource files (picture, sound, video)
             File tempFolder = new File(INoteFileConverter.getExportDirPath() + "/temp");
-            boolean ok = tempFolder.renameTo(new File(INoteFileConverter.getExportDirPath() + '/' + note.getTitle() + "_unzip"));
+            String savingPath = getUnusedDir(INoteFileConverter.getExportDirPath() + '/' + note.getTitle() + "_unzip");
+            boolean ok = tempFolder.renameTo(new File(savingPath));
             ReturnValueEater.eat(ok);
 
             // structure of the note
             for (int i = 1; i < strArray.length; i++) {
                 if (strArray[i].charAt(0) == 'S') {
                     String[] tempArray = strArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
-                    SoundData tempSoundData = new SoundData(INoteFileConverter.getExportDirPath() + tempArray[1], tempArray[2]);
+                    SoundData tempSoundData = new SoundData(savingPath + tempArray[1], tempArray[2]);
                     note.getContent().add(tempSoundData);
                 } else if (strArray[i].charAt(0) == 'T') {
                     String[] tempArray = strArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
@@ -78,11 +90,11 @@ public class NoteZipConverter implements INoteFileConverter {
                     note.getContent().add(tempTextData);
                 } else if (strArray[i].charAt(0) == 'V') {
                     String[] tempArray = strArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
-                    VideoData tempVideoData = new VideoData(INoteFileConverter.getExportDirPath() + tempArray[1]);
+                    VideoData tempVideoData = new VideoData(savingPath + tempArray[1]);
                     note.getContent().add(tempVideoData);
                 } else if (strArray[i].charAt(0) == 'P') {
                     String[] tempArray = strArray[i].split(TableConfig.FileSave.LINE_SEPARATOR);
-                    PictureData tempPictureData = new PictureData(INoteFileConverter.getExportDirPath() + tempArray[1]);
+                    PictureData tempPictureData = new PictureData(savingPath + tempArray[1]);
                     note.getContent().add(tempPictureData);
                 }
             }
@@ -149,17 +161,17 @@ public class NoteZipConverter implements INoteFileConverter {
                 String newDir;
                 switch (contentList.get(i).getType()) {
                     case "Pic":
-                        newDir = "/" + note.getTitle() + "_unzip/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
+                        newDir = "/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
                         string.append("Picture").append(TableConfig.FileSave.LINE_SEPARATOR).append(newDir).append(TableConfig.FileSave.LIST_SEPARATOR);
                         break;
 
                     case "Sound":
-                        newDir = "/" + note.getTitle() + "_unzip/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
+                        newDir = "/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
                         string.append("Sound").append(TableConfig.FileSave.LINE_SEPARATOR).append(newDir).append(TableConfig.FileSave.LINE_SEPARATOR).append(contentList.get(i).getText()).append(TableConfig.FileSave.LIST_SEPARATOR);
                         break;
 
                     case "Video":
-                        newDir = "/" + note.getTitle() + "_unzip/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
+                        newDir = "/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
                         string.append("Video").append(TableConfig.FileSave.LINE_SEPARATOR).append(newDir).append(TableConfig.FileSave.LIST_SEPARATOR);
                         break;
 

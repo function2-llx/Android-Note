@@ -25,7 +25,8 @@ import java.util.List;
 
 public class TableOperate implements INoteCollection {
     private static final String LOG_TAG = Note.class.getSimpleName();
-
+    private static final String constantStringWhere = " where ";
+    //Magic avoid Code Smell
     private DBManager manager;
     private SQLiteDatabase db;
     private static File configFile;
@@ -35,6 +36,38 @@ public class TableOperate implements INoteCollection {
         tableOperate = new TableOperate(context);
         TableConfig.FileSave.setSavePath(context.getExternalFilesDir(null).getAbsolutePath());
         initConfigFile();
+    }
+
+    private static String getCondition(String label, String parameter, boolean op) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(label);
+        if (op) {
+            stringBuilder.append(" like ");
+            stringBuilder.append("'%");
+            stringBuilder.append(parameter);
+            stringBuilder.append("%'");
+        } else {
+            stringBuilder.append(" = ");
+            stringBuilder.append("'");
+            stringBuilder.append(parameter);
+            stringBuilder.append("'");
+        }
+        return stringBuilder.toString();
+    }
+
+    private static String getSql(String tableName, String condition1, String condition2) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("Select * from ");
+        stringBuilder.append(tableName);
+        if (!condition1.equals("")) {
+            stringBuilder.append(constantStringWhere);
+            stringBuilder.append(condition1);
+        }
+        if (!condition2.equals("")) {
+            stringBuilder.append(" AND ");
+            stringBuilder.append(condition2);
+        }
+        return stringBuilder.toString();
     }
 
     private static void initConfigFile() {
@@ -142,9 +175,9 @@ public class TableOperate implements INoteCollection {
         ArrayList<Note> noteList = new ArrayList<>();
         Cursor c;
         if (groupName.equals("")) {
-            c = db.rawQuery("select * from " + TableConfig.Note.NOTE_TABLE_NAME, null);
+            c = db.rawQuery(getSql(TableConfig.Note.NOTE_TABLE_NAME, "", ""), null);
         } else {
-            c = db.rawQuery("select * from " + TableConfig.Note.NOTE_TABLE_NAME + " where " + TableConfig.Note.NOTE_GROUP + "= ?", new String[]{groupName});
+            c = db.rawQuery(getSql(TableConfig.Note.NOTE_TABLE_NAME, getCondition(TableConfig.Note.NOTE_GROUP, groupName, false), ""), null);
         }
         while (c.moveToNext()) {
             Note temp = new Note(c.getString(1), stringToContent(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToTagList(c.getString(5)), c.getString(6));
@@ -168,11 +201,9 @@ public class TableOperate implements INoteCollection {
         ArrayList<Note> noteList = new ArrayList<>();
         String sql;
         if (groupName.equals("")) {
-            sql = "select * from " + TableConfig.Note.NOTE_TABLE_NAME
-                    + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%'";
+            sql = getSql(TableConfig.Note.NOTE_TABLE_NAME, getCondition(TableConfig.Note.NOTE_TITLE, parameter, true), "");
         } else {
-            sql = "select * from " + TableConfig.Note.NOTE_TABLE_NAME
-                    + " where " + TableConfig.Note.NOTE_TITLE + " like '%" + parameter + "%' AND " + TableConfig.Note.NOTE_GROUP + " = " + "'" + groupName + "'";
+            sql = getSql(TableConfig.Note.NOTE_TABLE_NAME, getCondition(TableConfig.Note.NOTE_TITLE, parameter, true), getCondition(TableConfig.Note.NOTE_GROUP, groupName, false));
         }
         Cursor c = db.rawQuery(sql, null);
         while (c.moveToNext()) {
@@ -199,7 +230,7 @@ public class TableOperate implements INoteCollection {
     }
 
     public void removeGroup(String groupName) {
-        db.execSQL("delete from " + TableConfig.Group.GROUP_TABLE_NAME + " where " + TableConfig.Group.GROUP_NAME + "=?", new String[]{groupName});
+        db.execSQL("delete from " + TableConfig.Group.GROUP_TABLE_NAME + constantStringWhere + TableConfig.Group.GROUP_NAME + "=?", new String[]{groupName});
         List<Note> noteList = getAllNotes(groupName, null);
         for (int i = 0; i < noteList.size(); i++) {
             removeNote(noteList.get(i));
@@ -209,7 +240,7 @@ public class TableOperate implements INoteCollection {
     @Override
     public List<String> getAllGroups() {
         ArrayList<String> groupnameList = new ArrayList<>();
-        Cursor c = db.rawQuery("select * from " + TableConfig.Group.GROUP_TABLE_NAME, null);
+        Cursor c = db.rawQuery(getSql(TableConfig.Group.GROUP_TABLE_NAME, "", ""), null);
         while (c.moveToNext()) {
             groupnameList.add(c.getString(0));
         }
@@ -220,13 +251,13 @@ public class TableOperate implements INoteCollection {
 
     public List<String> getAllTags() {
         ArrayList<String> tagNameList = new ArrayList<>();
-        Cursor c = db.rawQuery("select * from " + TableConfig.Note.NOTE_TABLE_NAME, null);
+        Cursor c = db.rawQuery(getSql(TableConfig.Note.NOTE_TABLE_NAME, "", ""), null);
         while (c.moveToNext()) {
             String tag = c.getString(5);
-            List<String> taglist = stringToTagList(tag);
-            for (int i = 0; i < taglist.size(); i++) {
-                if (!tagNameList.contains(taglist.get(i))) {
-                    tagNameList.add(taglist.get(i));
+            List<String> tagList = stringToTagList(tag);
+            for (int i = 0; i < tagList.size(); i++) {
+                if (!tagNameList.contains(tagList.get(i))) {
+                    tagNameList.add(tagList.get(i));
                 }
             }
         }
@@ -245,18 +276,17 @@ public class TableOperate implements INoteCollection {
         cValue.put(TableConfig.Note.NOTE_TAG, tagListToString(note.getTag()));
         cValue.put(TableConfig.Note.NOTE_GROUP, note.getGroupName());
         db.insert(TableConfig.Note.NOTE_TABLE_NAME, null, cValue);
-        String sql = "select * from " + TableConfig.Note.NOTE_TABLE_NAME;
+        String sql = getSql(TableConfig.Note.NOTE_TABLE_NAME, "", "");
         Cursor cursor = db.rawQuery(sql, null);
         cursor.moveToLast();
         int count = cursor.getInt(0);
         cursor.close();
-        Log.d("debug0001", Integer.toString(count));
         note.setIndex(count);
     }
 
     @Override
     public void setNote(Note note) {
-        db.execSQL("update " + TableConfig.Note.NOTE_TABLE_NAME + " set " + TableConfig.Note.NOTE_TITLE + "=?," + TableConfig.Note.NOTE_TAG + "=?," + TableConfig.Note.NOTE_START_TIME + "=?," + TableConfig.Note.NOTE_MODIFY_TIME + "=?," + TableConfig.Note.NOTE_GROUP + "=?," + TableConfig.Note.NOTE_CONTENT + "=? where " + TableConfig.Note.NOTE_ID + "=?",
+        db.execSQL("update " + TableConfig.Note.NOTE_TABLE_NAME + " set " + TableConfig.Note.NOTE_TITLE + "=?," + TableConfig.Note.NOTE_TAG + "=?," + TableConfig.Note.NOTE_START_TIME + "=?," + TableConfig.Note.NOTE_MODIFY_TIME + "=?," + TableConfig.Note.NOTE_GROUP + "=?," + TableConfig.Note.NOTE_CONTENT + "=?" + constantStringWhere + TableConfig.Note.NOTE_ID + "=?",
                 new Object[]{note.getTitle(), tagListToString(note.getTag()), Long.toString(note.getStartTime().getTime()), Long.toString(note.getModifyTime().getTime()), note.getGroupName(), contentToString(note.getContent()), Integer.toString(note.getIndex())});
     }
 
@@ -269,7 +299,7 @@ public class TableOperate implements INoteCollection {
 
     @Override
     public void removeNote(Note note) {
-        db.execSQL("delete from " + TableConfig.Note.NOTE_TABLE_NAME + " where " + TableConfig.Note.NOTE_ID + "=?", new String[]{Integer.toString(note.getIndex())});
+        db.execSQL("delete from " + TableConfig.Note.NOTE_TABLE_NAME + constantStringWhere + TableConfig.Note.NOTE_ID + "=?", new String[]{Integer.toString(note.getIndex())});
     }
 
     @Override
@@ -279,7 +309,7 @@ public class TableOperate implements INoteCollection {
 
     Note getNoteAt(int index) {
         ArrayList<Note> noteList = new ArrayList<>();
-        Cursor c = db.rawQuery("select * from " + TableConfig.Note.NOTE_TABLE_NAME + " where " + TableConfig.Note.NOTE_ID + "= ?", new String[]{Integer.toString(index)});
+        Cursor c = db.rawQuery(getSql(TableConfig.Note.NOTE_TABLE_NAME, getCondition(TableConfig.Note.NOTE_ID, Integer.toString(index), false), ""), null);
         while (c.moveToNext()) {
             Note temp = new Note(c.getString(1), stringToContent(c.getString(2)), c.getInt(0), c.getString(3), c.getString(4), stringToTagList(c.getString(5)), c.getString(6));
             noteList.add(temp);

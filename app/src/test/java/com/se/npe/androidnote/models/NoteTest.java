@@ -32,10 +32,9 @@ public class NoteTest {
         // set up tableOperate
         AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
         TableOperate.init(activity.getApplicationContext());
-        TableOperate tableOperate = TableOperate.getInstance();
         // add note to initialize DBindex
-        tableOperate.addNote(note);
-        tableOperate.addNote(noteNotEquals);
+        TableOperate.getInstance().addNote(note);
+        TableOperate.getInstance().addNote(noteNotEquals);
     }
 
     @After
@@ -87,9 +86,9 @@ public class NoteTest {
 
     @Test
     public void setContent() {
-        final List<IData> noteContent = DataExample.getExampleDataList("setContent test");
-        note.setContent(noteContent);
-        assertEquals(noteContent, note.getContent());
+        final List<IData> contentList = DataExample.getExampleDataList("setContent test");
+        note.setContent(contentList);
+        assertEquals(contentList, note.getContent());
     }
 
     @Test

@@ -101,6 +101,17 @@ public class TableOperateTest {
     }
 
     @Test
+    public void getAllTags() {
+        Note tempNote = new Note();
+        tempNote.getTag().add("Test_Tag");
+        assertEquals(20, TableOperate.getInstance().getAllTags().size());
+        TableOperate.getInstance().addNote(tempNote);
+        assertEquals(21, TableOperate.getInstance().getAllTags().size());
+        TableOperate.getInstance().removeNote(tempNote);
+        assertEquals(20, TableOperate.getInstance().getAllTags().size());
+    }
+
+    @Test
     public void getAllNotes() {
         // Whole note list
         assertEquals(noteList, tableOperate.getAllNotes("", null));
