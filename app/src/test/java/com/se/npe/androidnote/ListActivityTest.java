@@ -3,9 +3,12 @@ package com.se.npe.androidnote;
 import android.Manifest;
 import android.content.Intent;
 import android.net.Uri;
+import android.support.design.widget.NavigationView;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
+import android.view.Menu;
+import android.view.SubMenu;
 
 import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
@@ -97,7 +100,7 @@ public class ListActivityTest {
     }
 
     @Test
-    public void onNavigate() {
+    public void onNavigate() throws NoSuchFieldException, IllegalAccessException {
 //        NavigationView navigationView = activity.findViewById(R.id.nav_view);
 //        MenuItem menuItem = navigationView.getMenu().findItem(R.id.group_all_notes);
 //        navigationView.setCheckedItem(R.id.group_all_notes);
@@ -108,6 +111,20 @@ public class ListActivityTest {
 //        assertEquals("", noteAdapter.getCurrentGroup());
 //        shadowActivity.clickMenuItem(R.id.group_groups);
 //        shadowActivity.clickMenuItem(R.id.group_operations);
+        NavigationView navigationView = activity.findViewById(R.id.nav_view);
+        // get OnNavigationItemSelectedListener
+        Field field = NavigationView.class.getDeclaredField("listener");
+        field.setAccessible(true);
+        NavigationView.OnNavigationItemSelectedListener onNavigationItemSelectedListener = (NavigationView.OnNavigationItemSelectedListener) field.get(navigationView);
+
+        Menu navigationViewGroupMenu = navigationView.getMenu().findItem(R.id.groups).getSubMenu();
+        onNavigationItemSelectedListener.onNavigationItemSelected(navigationViewGroupMenu.findItem(R.id.all_notes));
+//        refreshGroups
+//        onNavigationItemSelectedListener.onNavigationItemSelected(navigationViewGroupMenu.getItem(1));
+//        onNavigationItemSelectedListener.onNavigationItemSelected(navigationViewGroupMenu.findItem(R.id.group_groups));
+        Menu navigationViewGroupManageMenu = navigationView.getMenu().findItem(R.id.group_manage).getSubMenu();
+        onNavigationItemSelectedListener.onNavigationItemSelected(navigationViewGroupManageMenu.findItem(R.id.new_group));
+        onNavigationItemSelectedListener.onNavigationItemSelected(navigationViewGroupManageMenu.findItem(R.id.manage_group));
     }
 
     @Test
@@ -126,8 +143,8 @@ public class ListActivityTest {
         searchView.setQuery("wtf???", true); // text changed & submit
         assertEquals(0, noteAdapter.getItemCount());
 
-        // get onTagClickListener
-        Field field = TagGroupManager.class.getSuperclass().getDeclaredField("mOnTagClickListener");
+        // get OnTagClickListener
+        Field field = TagView.class.getDeclaredField("mOnTagClickListener");
         field.setAccessible(true);
         TagView.OnTagClickListener onTagClickListener = (TagView.OnTagClickListener) field.get(tagGroupManager);
 
@@ -161,6 +178,7 @@ public class ListActivityTest {
         onTagClickListener.onTagCrossClick(0);
 
         searchView.setIconified(true); // close searchView
+        searchView.findViewById(R.id.search_close_btn).performClick(); // close searchView
     }
 
     private void onActivityResult(Intent openFileIntent) {
