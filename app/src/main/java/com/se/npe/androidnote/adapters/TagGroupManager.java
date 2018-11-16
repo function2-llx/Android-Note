@@ -82,13 +82,15 @@ public class TagGroupManager extends TagContainerLayout {
     }
 
     public List<String> getCheckedTags() {
-        if (checked[checked.length - 1]) // all checked
-            return null;
-
         List<String> ret = new ArrayList<>();
-        for (int i = 0; i < checked.length - 1; i++)
-            if (checked[i])
+
+        if (checked[checked.length - 1]) // all checked
+            for (int i = 0; i < checked.length - 1; i++)
                 ret.add(tagList.get(i));
+        else
+            for (int i = 0; i < checked.length - 1; i++)
+                if (checked[i])
+                    ret.add(tagList.get(i));
         return ret;
     }
 }

@@ -16,6 +16,8 @@ import java.util.List;
 
 public class DataExample {
     public static final String EXAMPLE_MIX_IN = "test";
+    public static final String EXAMPLE_TITLE_WHOLE_NOTE_LIST = "title";
+    public static final String EXAMPLE_TITLE_EMPTY_NOTE_LIST = "wtf???";
 
     // no constructor
     private DataExample() {

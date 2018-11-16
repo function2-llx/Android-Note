@@ -164,11 +164,11 @@ public class ListActivityTest {
         searchView.setIconified(false);
 
         // query searchView
-        searchView.setQuery("title", false); // text changed
+        searchView.setQuery(DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST, false); // text changed
         assertEquals(TableOperateTest.NOTE_LIST_SIZE, noteAdapter.getItemCount());
         searchView.findViewById(R.id.search_go_btn).performClick(); // submit
         assertEquals(TableOperateTest.NOTE_LIST_SIZE, noteAdapter.getItemCount());
-        searchView.setQuery("wtf???", true); // text changed & submit
+        searchView.setQuery(DataExample.EXAMPLE_TITLE_EMPTY_NOTE_LIST, true); // text changed & submit
         assertEquals(0, noteAdapter.getItemCount());
 
         // get OnTagClickListener
@@ -224,7 +224,7 @@ public class ListActivityTest {
 
     @Test
     public void setTitle() {
-        final CharSequence title = "title";
+        final CharSequence title = DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST;
         activity.setTitle(title);
         assertEquals(title, activity.getTitle());
         assertEquals(title, Objects.requireNonNull(activity.getSupportActionBar()).getTitle());

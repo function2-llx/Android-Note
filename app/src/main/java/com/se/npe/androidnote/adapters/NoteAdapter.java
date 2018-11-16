@@ -109,7 +109,6 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
     public void onBindHeaderViewHolder(RecyclerView.ViewHolder viewHolder, int position) {
         TextView textView = viewHolder.itemView.findViewById(R.id.stick_text);
         textView.setText(String.valueOf(generateHeaderId(position)));
-        // viewHolder.itemView.setBackgroundColor(Color.parseColor("#AA70DB93"));
     }
 
     /* footer */
@@ -211,7 +210,8 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
                 return screenWidth;
             DisplayMetrics outMetrics = new DisplayMetrics();
             activity.getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
-            return screenWidth = outMetrics.widthPixels;
+            screenWidth = outMetrics.widthPixels;
+            return screenWidth;
         }
 
         public ViewHolder(View itemView) {

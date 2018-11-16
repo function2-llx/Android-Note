@@ -12,9 +12,9 @@ import java.util.List;
  */
 
 public interface INoteCollection {
-    List<Note> getAllNotes(String groupName,List<String> tagList);
+    List<Note> getAllNotes(String groupName, List<String> tagList);
 
-    List<Note> fuzzySearch(String parameter,String groupName,List<String> tagList);
+    List<Note> fuzzySearch(String parameter, String groupName, List<String> tagList);
 
     void addGroup(String groupName);
 

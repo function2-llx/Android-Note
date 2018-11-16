@@ -67,10 +67,10 @@ public class NoteAdapterTest {
     @Test
     public void updateSearchList() {
         // Whole note list
-        noteAdapter.updateSearchList("title", null);
+        noteAdapter.updateSearchList(DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST, null);
         assertEquals(noteList, noteAdapter.getItems());
         // Empty note list
-        noteAdapter.updateSearchList("wtf???", null);
+        noteAdapter.updateSearchList(DataExample.EXAMPLE_TITLE_EMPTY_NOTE_LIST, null);
         assertEquals(new ArrayList<Note>(), noteAdapter.getItems());
 
         // Depends on addNote()
@@ -86,7 +86,7 @@ public class NoteAdapterTest {
         for (Note note : noteList)
             if (note.getTag().contains(DataExample.getExampleNoteTag("5")))
                 noteListSearched.add(note);
-        noteAdapter.updateSearchList("title", DataExample.getExampleNoteTags("5"));
+        noteAdapter.updateSearchList(DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST, DataExample.getExampleNoteTags("5"));
         assertEquals(noteListSearched, noteAdapter.getItems());
         noteListSearched.clear(); // Pay attention to clear noteListSearch
         // Search for tag 10 & group 10
@@ -94,12 +94,12 @@ public class NoteAdapterTest {
             if (note.getTag().contains(DataExample.getExampleNoteTag("10")))
                 noteListSearched.add(note);
         noteAdapter.setCurrentGroup(DataExample.getExampleGroupName("10"));
-        noteAdapter.updateSearchList("title", DataExample.getExampleNoteTags("10"));
+        noteAdapter.updateSearchList(DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST, DataExample.getExampleNoteTags("10"));
         assertEquals(noteListSearched, noteAdapter.getItems());
         noteListSearched.clear(); // Pay attention to clear noteListSearch
         // Search for tag 13 & group 15
         noteAdapter.setCurrentGroup(DataExample.getExampleGroupName("13"));
-        noteAdapter.updateSearchList("title", DataExample.getExampleNoteTags("15"));
+        noteAdapter.updateSearchList(DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST, DataExample.getExampleNoteTags("15"));
         assertEquals(noteListSearched, noteAdapter.getItems());
         noteListSearched.clear(); // Pay attention to clear noteListSearch
     }

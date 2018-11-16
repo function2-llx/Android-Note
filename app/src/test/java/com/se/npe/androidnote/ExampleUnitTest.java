@@ -5,7 +5,7 @@ import org.junit.Test;
 
 public final class ExampleUnitTest {
     @Test
-    public final void addition_isCorrect() {
+    public final void additionIsCorrect() {
         Assert.assertEquals(2 + 2, 4);
     }
 }

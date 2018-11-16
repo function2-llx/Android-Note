@@ -5,9 +5,9 @@ import android.support.annotation.NonNull;
 import com.se.npe.androidnote.interfaces.IData;
 
 import java.io.Serializable;
-import java.util.List;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -148,12 +148,12 @@ public class Note implements Serializable {
     public PreviewData getPreview() {
         String text = null;
         String picPath = null;
-        List<IData> content = getContent();
-        for (int i = 0; i < content.size(); i++) {
-            if (picPath == null && content.get(i).toString().charAt(0) == 'P') {
-                picPath = content.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
-            } else if (text == null && content.get(i).toString().charAt(0) == 'T') {
-                text = content.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
+        List<IData> noteContent = getContent();
+        for (int i = 0; i < noteContent.size(); i++) {
+            if (picPath == null && noteContent.get(i).toString().charAt(0) == 'P') {
+                picPath = noteContent.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
+            } else if (text == null && noteContent.get(i).toString().charAt(0) == 'T') {
+                text = noteContent.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
             }
         }
         if (text == null) text = "无预览文字";

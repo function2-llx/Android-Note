@@ -210,26 +210,23 @@ public class ListActivity extends AppCompatActivity {
 
         navigationView.setNavigationItemSelectedListener(menuItem -> {
             switch (menuItem.getGroupId()) {
-                case R.id.group_all_notes: {
+                case R.id.group_all_notes:
                     noteAdapter.setCurrentGroup("");
                     setTitle(getString(R.string.list_title));
                     drawerLayout.closeDrawers();
                     break;
-                }
 
-                case R.id.group_groups: {
+                case R.id.group_groups:
                     String groupName = menuItem.getTitle().toString();
                     noteAdapter.setCurrentGroup(groupName);
                     setTitle(groupName);
                     drawerLayout.closeDrawers();
                     break;
-                }
 
-                case R.id.group_operations: {
+                case R.id.group_operations:
                     handleGroupManage(menuItem);
-
                     break;
-                }
+
                 default:
                     break;
             }
@@ -241,10 +238,10 @@ public class ListActivity extends AppCompatActivity {
     private void handleGroupManage(@NonNull MenuItem menuItem) {
         List<String> allGroups = TableOperate.getInstance().getAllGroups();
         String[] allGroupsArray = allGroups.toArray(new String[0]);
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
         switch (menuItem.getItemId()) {
-            case R.id.new_group: {
+            case R.id.new_group:
                 EditText editText = new EditText(this);
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("New group");
                 builder.setView(editText);
                 builder.setPositiveButton("add", ((dialog, which) -> {
@@ -262,10 +259,8 @@ public class ListActivity extends AppCompatActivity {
                 builder.setNegativeButton("cancel", null);
                 builder.show();
                 break;
-            }
 
-            case R.id.manage_group: {
-                AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            case R.id.manage_group:
                 builder.setTitle(getString(R.string.manage_groups));
                 boolean selected[] = new boolean[allGroupsArray.length];
                 builder.setMultiChoiceItems(allGroupsArray, new boolean[allGroupsArray.length], (dialog, which, isChecked) -> selected[which] = isChecked);
@@ -278,7 +273,6 @@ public class ListActivity extends AppCompatActivity {
                 builder.setNegativeButton("cancel", null);
                 builder.show();
                 break;
-            }
 
             default:
                 break;
@@ -338,10 +332,12 @@ public class ListActivity extends AppCompatActivity {
 
             @Override
             public void onTagLongClick(int position, String text) {
+                // do nothing
             }
 
             @Override
             public void onTagCrossClick(int position) {
+                // do nothing
             }
         });
     }

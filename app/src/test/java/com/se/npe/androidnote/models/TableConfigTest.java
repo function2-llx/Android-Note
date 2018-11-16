@@ -31,7 +31,7 @@ public class TableConfigTest {
 
     @Test
     public void savePathTest() {
-        String savePath = "/test";
+        String savePath = DataExample.getExamplePath(DataExample.EXAMPLE_MIX_IN);
         TableConfig.FileSave.setSavePath(savePath);
         assertEquals(savePath, TableConfig.FileSave.getSavePath());
     }

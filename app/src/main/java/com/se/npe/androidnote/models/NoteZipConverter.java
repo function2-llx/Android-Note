@@ -1,7 +1,6 @@
 package com.se.npe.androidnote.models;
 
 import android.support.annotation.NonNull;
-import android.util.Log;
 
 import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.interfaces.INoteFileConverter;
@@ -48,7 +47,7 @@ public class NoteZipConverter implements INoteFileConverter {
 
             // read the file "data.txt"
             File file = new File(getTempDirPath() + "/data.txt");
-            byte []b = new byte[(int) file.length()];
+            byte[] b = new byte[(int) file.length()];
             try (InputStream inputStream = new FileInputStream(file)) {
                 int len = inputStream.read(b);
                 if (len == -1) return new Note();
@@ -91,12 +90,6 @@ public class NoteZipConverter implements INoteFileConverter {
             // time
             note.setStartTime(new Date());
             note.setModifyTime(new Date());
-
-            Log.d("debug0001", "testload");
-            Log.d("debug0001", note.getTitle());
-            for (int i = 0; i < note.getContent().size(); i++) {
-                Log.d("debug0001", note.getContent().get(i).getType() + note.getContent().get(i).getPath());
-            }
 
             return note;
         }
@@ -153,21 +146,21 @@ public class NoteZipConverter implements INoteFileConverter {
             // structure of the note
             StringBuilder string = new StringBuilder(note.getTitle() + TableConfig.FileSave.LIST_SEPARATOR);
             for (int i = 0; i < contentList.size(); i++) {
-                String newdir;
+                String newDir;
                 switch (contentList.get(i).getType()) {
                     case "Pic":
-                        newdir = "/" + note.getTitle() + "_unzip/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
-                        string.append("Picture").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LIST_SEPARATOR);
+                        newDir = "/" + note.getTitle() + "_unzip/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
+                        string.append("Picture").append(TableConfig.FileSave.LINE_SEPARATOR).append(newDir).append(TableConfig.FileSave.LIST_SEPARATOR);
                         break;
 
                     case "Sound":
-                        newdir = "/" + note.getTitle() + "_unzip/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
-                        string.append("Sound").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LINE_SEPARATOR).append(contentList.get(i).getText()).append(TableConfig.FileSave.LIST_SEPARATOR);
+                        newDir = "/" + note.getTitle() + "_unzip/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
+                        string.append("Sound").append(TableConfig.FileSave.LINE_SEPARATOR).append(newDir).append(TableConfig.FileSave.LINE_SEPARATOR).append(contentList.get(i).getText()).append(TableConfig.FileSave.LIST_SEPARATOR);
                         break;
 
                     case "Video":
-                        newdir = "/" + note.getTitle() + "_unzip/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
-                        string.append("Video").append(TableConfig.FileSave.LINE_SEPARATOR).append(newdir).append(TableConfig.FileSave.LIST_SEPARATOR);
+                        newDir = "/" + note.getTitle() + "_unzip/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
+                        string.append("Video").append(TableConfig.FileSave.LINE_SEPARATOR).append(newDir).append(TableConfig.FileSave.LIST_SEPARATOR);
                         break;
 
                     default:
@@ -181,13 +174,11 @@ public class NoteZipConverter implements INoteFileConverter {
             File file = new File(getTempDirPath() + "/data.txt");
             try {
                 // delete original file
-                if (file.exists() && !file.delete()) {
-                    throw new IOException("delete fails");
+                if (file.exists()) {
+                    ReturnValueEater.eat(file.delete());
                 }
                 // create file
-                if (!file.createNewFile()) {
-                    throw new IOException("createNewFile fails");
-                }
+                ReturnValueEater.eat(file.createNewFile());
             } catch (IOException e) {
                 Logger.log(EXCEPTION_TAG, e);
             }
@@ -198,11 +189,11 @@ public class NoteZipConverter implements INoteFileConverter {
             }
 
             // zip
-            String zipFileName = INoteFileConverter.getExportDirPath() + "/" + fileName + ".note";
+            String zipFileName = INoteFileConverter.getExportDirPath() + File.separator + fileName + ".note";
             FileOperate.zip(getTempDirPath(), zipFileName);
 
             // delete temp folder
-            tempFolder.delete();
+            ReturnValueEater.eat(tempFolder.delete());
 
             return zipFileName;
         }

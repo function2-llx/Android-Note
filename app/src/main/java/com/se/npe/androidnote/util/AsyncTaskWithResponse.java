@@ -3,7 +3,6 @@ package com.se.npe.androidnote.util;
 import android.os.AsyncTask;
 
 /**
- *
  * @param <P> Parameters
  * @param <G> Progress
  * @param <R> Result

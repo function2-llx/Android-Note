@@ -127,9 +127,9 @@ public class TableOperateTest {
     public void fuzzySearch() {
         // Depends on example note
         // Whole note list
-        assertEquals(noteList, tableOperate.fuzzySearch("title", "", null));
+        assertEquals(noteList, tableOperate.fuzzySearch(DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST, "", null));
         // Empty note list
-        assertEquals(new ArrayList<Note>(), tableOperate.fuzzySearch("wtf???", "", null));
+        assertEquals(new ArrayList<Note>(), tableOperate.fuzzySearch(DataExample.EXAMPLE_TITLE_EMPTY_NOTE_LIST, "", null));
 
         List<Note> noteListSearched = new ArrayList<>();
         // Search for title 3
@@ -139,18 +139,18 @@ public class TableOperateTest {
         noteListSearched.clear(); // Pay attention to clear noteListSearch
         // Search for tag 5
         noteListSearched.add(noteList.get(5));
-        assertEquals(noteListSearched, tableOperate.fuzzySearch("title", "", DataExample.getExampleNoteTags("5")));
+        assertEquals(noteListSearched, tableOperate.fuzzySearch(DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST, "", DataExample.getExampleNoteTags("5")));
         noteListSearched.clear(); // Pay attention to clear noteListSearch
         // Search for group 7
         noteListSearched.add(noteList.get(7));
-        assertEquals(noteListSearched, tableOperate.fuzzySearch("title", DataExample.getExampleGroupName("7"), null));
+        assertEquals(noteListSearched, tableOperate.fuzzySearch(DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST, DataExample.getExampleGroupName("7"), null));
         noteListSearched.clear(); // Pay attention to clear noteListSearch
         // Search for tag 10 & group 10
         noteListSearched.add(noteList.get(10));
-        assertEquals(noteListSearched, tableOperate.fuzzySearch("title", DataExample.getExampleGroupName("10"), DataExample.getExampleNoteTags("10")));
+        assertEquals(noteListSearched, tableOperate.fuzzySearch(DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST, DataExample.getExampleGroupName("10"), DataExample.getExampleNoteTags("10")));
         noteListSearched.clear(); // Pay attention to clear noteListSearch
         // Search for tag 13 & group 15
-        assertEquals(noteListSearched, tableOperate.fuzzySearch("title", DataExample.getExampleGroupName("13"), DataExample.getExampleNoteTags("15")));
+        assertEquals(noteListSearched, tableOperate.fuzzySearch(DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST, DataExample.getExampleGroupName("13"), DataExample.getExampleNoteTags("15")));
         noteListSearched.clear(); // Pay attention to clear noteListSearch
     }
 
@@ -181,7 +181,7 @@ public class TableOperateTest {
 
     @Test
     public void modifyNote() {
-        noteList.get(0).setTitle("title");
+        noteList.get(0).setTitle(DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST);
         tableOperate.modifyNote(noteList.get(0));
         tableOperate.modifyNote(DataExample.getExampleNote(DataExample.EXAMPLE_MIX_IN));
     }
