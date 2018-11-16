@@ -5,10 +5,11 @@ import android.content.Intent;
 import android.net.Uri;
 import android.support.design.widget.NavigationView;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.SearchView;
 import android.view.Menu;
-import android.view.SubMenu;
+import android.widget.EditText;
 
 import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerView;
@@ -29,11 +30,14 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 import org.robolectric.shadows.ShadowActivity;
+import org.robolectric.shadows.ShadowAlertDialog;
 import org.robolectric.shadows.ShadowLooper;
+import org.robolectric.shadows.ShadowToast;
 import org.robolectric.shadows.support.v4.ShadowSwipeRefreshLayout;
 
 import java.io.File;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -42,6 +46,7 @@ import co.lujun.androidtagview.TagView;
 import static com.se.npe.androidnote.EditorActivity.CURRENT_GROUP;
 import static com.se.npe.androidnote.EditorActivity.VIEW_ONLY;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.robolectric.Shadows.shadowOf;
 
 @RunWith(RobolectricTestRunner.class)
@@ -100,31 +105,54 @@ public class ListActivityTest {
     }
 
     @Test
-    public void onNavigate() throws NoSuchFieldException, IllegalAccessException {
-//        NavigationView navigationView = activity.findViewById(R.id.nav_view);
-//        MenuItem menuItem = navigationView.getMenu().findItem(R.id.group_all_notes);
-//        navigationView.setCheckedItem(R.id.group_all_notes);
-//        shadowOf(navigationView).getOnClickListener().performClick(0);
-//        navigationView.getMenu().performIdentifierAction(R.id.group_all_notes, 0);
-        // trick: click menu item of NavigationView directly
-//        shadowActivity.clickMenuItem(R.id.group_all_notes);
-//        assertEquals("", noteAdapter.getCurrentGroup());
-//        shadowActivity.clickMenuItem(R.id.group_groups);
-//        shadowActivity.clickMenuItem(R.id.group_operations);
+    public void onNavigate() throws NoSuchFieldException, NoSuchMethodException, IllegalAccessException, ClassNotFoundException, InstantiationException, InvocationTargetException {
         NavigationView navigationView = activity.findViewById(R.id.nav_view);
+        activity.refreshGroups(); // refresh groups
         // get OnNavigationItemSelectedListener
         Field field = NavigationView.class.getDeclaredField("listener");
         field.setAccessible(true);
         NavigationView.OnNavigationItemSelectedListener onNavigationItemSelectedListener = (NavigationView.OnNavigationItemSelectedListener) field.get(navigationView);
 
         Menu navigationViewGroupMenu = navigationView.getMenu().findItem(R.id.groups).getSubMenu();
-        onNavigationItemSelectedListener.onNavigationItemSelected(navigationViewGroupMenu.findItem(R.id.all_notes));
-//        refreshGroups
-//        onNavigationItemSelectedListener.onNavigationItemSelected(navigationViewGroupMenu.getItem(1));
-//        onNavigationItemSelectedListener.onNavigationItemSelected(navigationViewGroupMenu.findItem(R.id.group_groups));
         Menu navigationViewGroupManageMenu = navigationView.getMenu().findItem(R.id.group_manage).getSubMenu();
+
+        // group_all_notes
+        onNavigationItemSelectedListener.onNavigationItemSelected(navigationViewGroupMenu.findItem(R.id.all_notes));
+        assertEquals("", noteAdapter.getCurrentGroup());
+
+        // group_groups
+        onNavigationItemSelectedListener.onNavigationItemSelected(navigationViewGroupMenu.getItem(3));
+        assertEquals(DataExample.getExampleGroupName(String.valueOf(2)), noteAdapter.getCurrentGroup()); // item3 -> note2 -> group2
+
+        // new_group
         onNavigationItemSelectedListener.onNavigationItemSelected(navigationViewGroupManageMenu.findItem(R.id.new_group));
+        AlertDialog alertDialog = (AlertDialog) ShadowAlertDialog.getLatestDialog();
+        // get EditText of AlertDialog
+        field = AlertDialog.class.getDeclaredField("mAlert");
+        field.setAccessible(true);
+        Object alertController = field.get(alertDialog);
+        field = alertController.getClass().getDeclaredField("mView");
+        field.setAccessible(true);
+        EditText alertDialogEditText = (EditText) field.get(alertController);
+        // empty group name
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick(); // click confirm
+        assertNotNull(ShadowToast.getLatestToast());
+        // repeated group name
+        alertDialogEditText.setText(DataExample.getExampleGroupName(String.valueOf(7)));
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick(); // click confirm
+        assertNotNull(ShadowToast.getLatestToast());
+        // new group name
+        assertEquals(TableOperateTest.NOTE_LIST_SIZE, TableOperate.getInstance().getAllGroups().size());
+        alertDialogEditText.setText(DataExample.getExampleGroupName(DataExample.EXAMPLE_MIX_IN));
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick(); // click confirm
+        assertEquals(TableOperateTest.NOTE_LIST_SIZE + 1, TableOperate.getInstance().getAllGroups().size());
+
+        // manage_group
         onNavigationItemSelectedListener.onNavigationItemSelected(navigationViewGroupManageMenu.findItem(R.id.manage_group));
+        alertDialog = (AlertDialog) ShadowAlertDialog.getLatestDialog();
+        // remove groups
+        // TODO: use reflection to set mCheckedItems
+        alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick(); // click confirm
     }
 
     @Test
@@ -144,7 +172,7 @@ public class ListActivityTest {
         assertEquals(0, noteAdapter.getItemCount());
 
         // get OnTagClickListener
-        Field field = TagView.class.getDeclaredField("mOnTagClickListener");
+        Field field = TagGroupManager.class.getSuperclass().getDeclaredField("mOnTagClickListener");
         field.setAccessible(true);
         TagView.OnTagClickListener onTagClickListener = (TagView.OnTagClickListener) field.get(tagGroupManager);
 

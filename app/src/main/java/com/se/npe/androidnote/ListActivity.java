@@ -243,41 +243,39 @@ public class ListActivity extends AppCompatActivity {
         String[] allGroupsArray = allGroups.toArray(new String[0]);
         switch (menuItem.getItemId()) {
             case R.id.new_group: {
-                EditText editText = new EditText(ListActivity.this);
-                AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
+                EditText editText = new EditText(this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle("New group");
-                builder.setPositiveButton("add", null);
-                builder.setNegativeButton("cancel", null);
                 builder.setView(editText);
-                AlertDialog dialog = builder.create();
-                dialog.show();
-                dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+                builder.setPositiveButton("add", ((dialog, which) -> {
                     String groupName = editText.getText().toString();
                     if (groupName.isEmpty())
-                        Toast.makeText(ListActivity.this, "input something?", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ListActivity.this, "Group name needed.", Toast.LENGTH_SHORT).show();
                     else if (allGroups.contains(groupName))
-                        Toast.makeText(ListActivity.this, groupName + " already exist", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ListActivity.this, groupName + " already exists.", Toast.LENGTH_SHORT).show();
                     else {
                         TableOperate.getInstance().addGroup(groupName);
                         refreshGroups();
                         dialog.cancel();
                     }
-                });
+                }));
+                builder.setNegativeButton("cancel", null);
+                builder.show();
                 break;
             }
 
             case R.id.manage_group: {
-                AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(this);
                 builder.setTitle(getString(R.string.manage_groups));
                 boolean selected[] = new boolean[allGroupsArray.length];
                 builder.setMultiChoiceItems(allGroupsArray, new boolean[allGroupsArray.length], (dialog, which, isChecked) -> selected[which] = isChecked);
-                builder.setNegativeButton("cancel", null);
                 builder.setPositiveButton("confirm", (dialog, which) -> {
                     for (int i = 0; i < allGroupsArray.length; i++)
                         if (selected[i])
                             TableOperate.getInstance().removeGroup(allGroupsArray[i]);
                     refreshGroups();
                 });
+                builder.setNegativeButton("cancel", null);
                 builder.show();
                 break;
             }
@@ -287,7 +285,7 @@ public class ListActivity extends AppCompatActivity {
         }
     }
 
-    private void refreshGroups() {
+    void refreshGroups() {
         groupMenu.removeGroup(R.id.group_groups);
         List<String> allGroups = TableOperate.getInstance().getAllGroups();
 
