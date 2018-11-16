@@ -2,7 +2,6 @@ package com.se.npe.androidnote.models;
 
 import android.support.annotation.NonNull;
 
-import com.mob.tools.mscript.commands.Return;
 import com.se.npe.androidnote.util.Logger;
 import com.se.npe.androidnote.util.ReturnValueEater;
 
@@ -109,7 +108,7 @@ public class FileOperate {
      */
     public static void unzip(String zipFileName, String outputDirectory) {
         File dest = new File(outputDirectory);
-        dest.mkdirs();
+        ReturnValueEater.eat(dest.mkdirs());
         try (ZipFile zipFile = new ZipFile(zipFileName)) {
             Enumeration e = zipFile.entries();
             while (e.hasMoreElements()) {
@@ -131,6 +130,11 @@ public class FileOperate {
     }
 
     private static void unzipFile(ZipFile zipFile, @NonNull ZipEntry zipEntry, String outputDirectory) {
+        int lastFileSeparatorIndex = zipEntry.getName().lastIndexOf(File.separator);
+        if (lastFileSeparatorIndex != -1) {
+            File df = new File(outputDirectory + File.separator + zipEntry.getName().substring(0, lastFileSeparatorIndex));
+            ReturnValueEater.eat(df.mkdirs());
+        }
         try (InputStream in = zipFile.getInputStream(zipEntry);
              OutputStream out = new FileOutputStream(outputDirectory + File.separator + zipEntry.getName())) {
             int c;
@@ -143,5 +147,4 @@ public class FileOperate {
             Logger.log("UnzipFile", e);
         }
     }
-
 }

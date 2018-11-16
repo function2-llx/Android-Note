@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.se.npe.androidnote.interfaces.INoteFileConverter;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,11 +32,16 @@ public class NoteZipConverterTest {
         TableOperate.init(context); // initialize SAVE_PATH
     }
 
+    @After
+    public void tearDown() {
+        SingletonResetter.resetTableOperateSingleton();
+    }
+
     @Test
     public void importNoteFromFile() {
         exportNoteToFile();
         noteZipConverter.importNoteFromFile((Note note) ->
-                        assertEquals(DataExample.getExampleNote(DataExample.EXAMPLE_MIX_IN), note)
+                        assertEquals(DataExample.getExampleNote(DataExample.EXAMPLE_MIX_IN).getTitle(), note.getTitle())
                 , getExportFilePath());
     }
 

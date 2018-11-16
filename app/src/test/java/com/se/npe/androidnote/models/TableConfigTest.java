@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.se.npe.androidnote.R;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -21,6 +22,11 @@ public class TableConfigTest {
         AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
         Context context = activity.getApplicationContext();
         TableOperate.init(context); // initialize SAVE_PATH
+    }
+
+    @After
+    public void tearDown() {
+        SingletonResetter.resetTableOperateSingleton();
     }
 
     @Test

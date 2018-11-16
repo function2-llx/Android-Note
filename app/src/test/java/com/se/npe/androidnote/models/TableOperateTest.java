@@ -71,14 +71,16 @@ public class TableOperateTest {
 
     @Test
     public void groupFunctionTest() {
+        // add group
         List<String> groupList = new ArrayList<>();
-
-        TableOperate.getInstance().addGroup(DataExample.getExampleGroupName("1"));
-        groupList.add(DataExample.getExampleGroupName("1"));
+        for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
+            groupList.add(DataExample.getExampleGroupName(String.valueOf(i)));
+        }
         assertEquals(groupList, TableOperate.getInstance().getAllGroups());
-
-        TableOperate.getInstance().removeGroup(DataExample.getExampleGroupName("1"));
-        assertEquals(new ArrayList<>(), TableOperate.getInstance().getAllGroups());
+        // remove group
+        TableOperate.getInstance().removeGroup(DataExample.getExampleGroupName("3"));
+        groupList.remove(3);
+        assertEquals(groupList, TableOperate.getInstance().getAllGroups());
     }
 
     @Test

@@ -3,8 +3,10 @@ package com.se.npe.androidnote.interfaces;
 import android.content.Context;
 import android.support.v7.app.AppCompatActivity;
 
+import com.se.npe.androidnote.models.SingletonResetter;
 import com.se.npe.androidnote.models.TableOperate;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,6 +28,11 @@ public class INoteFileConverterTest {
         AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
         Context context = activity.getApplicationContext();
         TableOperate.init(context); // initialize SAVE_PATH
+    }
+
+    @After
+    public void tearDown() {
+        SingletonResetter.resetTableOperateSingleton();
     }
 
     @Test

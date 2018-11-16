@@ -19,9 +19,9 @@ public class FileOperateTest {
     private File file;
     private String fileMixIn = "file";
     private File directory;
-    private String directoryMixIn = "directory" + File.separator;
+    private String directoryMixIn = "directory";
     private File fileInDirectory;
-    private String fileInDirectoryMixIn = directoryMixIn + fileMixIn;
+    private String fileInDirectoryMixIn = directoryMixIn + File.separator + fileMixIn;
     private File zipFile;
     private String zipFileMixIn = "file.zip";
     private File zipDirectory;
@@ -53,22 +53,29 @@ public class FileOperateTest {
 
     @Test
     public void zip() {
+        // zip file
         FileOperate.zip(file.getAbsolutePath(), zipFile.getAbsolutePath());
         assertTrue(zipFile.exists());
         assertTrue(file.exists());
+        // zip directory
         FileOperate.zip(directory.getAbsolutePath(), zipDirectory.getAbsolutePath());
         assertTrue(zipDirectory.exists());
         assertTrue(directory.exists());
+        assertTrue(fileInDirectory.exists());
     }
 
     @Test
     public void unzip() throws IOException {
         zip();
-        FileOperate.unzip(zipDirectory.getAbsolutePath(), directory.getAbsolutePath());
-        assertTrue(directory.exists());
-        assertTrue(fileInDirectory.exists());
-        File anotherDirectory = new File(DataExample.getExamplePath(directoryMixIn + directoryMixIn));
-        File anotherFileInDirectory = new File(DataExample.getExamplePath(directoryMixIn + directoryMixIn + fileMixIn));
+        String anotherDirectoryMixin = "directory2";
+        // unzip file
+        FileOperate.unzip(zipFile.getAbsolutePath(), DataExample.getExamplePath(anotherDirectoryMixin));
+        File anotherFile = new File(DataExample.getExamplePath(anotherDirectoryMixin + File.separator + fileMixIn));
+        assertTrue(anotherFile.exists());
+        // unzip directory
+        FileOperate.unzip(zipDirectory.getAbsolutePath(), DataExample.getExamplePath(anotherDirectoryMixin));
+        File anotherDirectory = new File(DataExample.getExamplePath(anotherDirectoryMixin + File.separator + directoryMixIn));
+        File anotherFileInDirectory = new File(DataExample.getExamplePath(anotherDirectoryMixin + File.separator + fileInDirectoryMixIn));
         assertTrue(anotherDirectory.exists());
         assertTrue(anotherFileInDirectory.exists());
         assertFileEquals(fileInDirectory, anotherFileInDirectory);
