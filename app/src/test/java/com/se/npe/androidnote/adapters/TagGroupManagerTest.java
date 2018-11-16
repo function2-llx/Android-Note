@@ -51,7 +51,7 @@ public class TagGroupManagerTest {
         tagList.add(DataExample.getExampleNoteTag(String.valueOf(0)));
         tagList.add(DataExample.getExampleNoteTag(String.valueOf(3)));
         assertEquals(tagList, tagGroupManager.getCheckedTags());
-        // check 0 & 3 with tag-all checked
+        // with tag-all checked
         tagGroupManager.switchCheckedState(TableOperateTest.NOTE_LIST_SIZE);
         assertNull(tagGroupManager.getCheckedTags());
     }

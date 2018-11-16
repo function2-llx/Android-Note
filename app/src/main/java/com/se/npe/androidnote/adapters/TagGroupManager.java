@@ -44,12 +44,18 @@ public class TagGroupManager extends TagContainerLayout {
             tagView.setTagBorderColor(getResources().getColor(R.color.checked_color, null));
         else
             tagView.setTagBorderColor(getResources().getColor(R.color.unchecked_color, null));
+        tagView.invalidate();
     }
 
     public void switchCheckedState(int position) {
-        if (position != checked.length - 1)
-            setChecked(checked.length - 1, false); // uncheck tag-all
         setChecked(position, !checked[position]);
+        if (checked[checked.length - 1]) // with checked tag-all
+            if (position != checked.length - 1) // check other tag with checked tag-all
+                setChecked(checked.length - 1, false); // uncheck tag-all
+            else // check tag-all with checked tag-all
+                for (int i = 0; i < checked.length - 1; i++) // uncheck all other tags
+                    if (checked[i])
+                        setChecked(i, false);
     }
 
     public void init() {

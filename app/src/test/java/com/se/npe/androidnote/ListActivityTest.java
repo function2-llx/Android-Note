@@ -137,19 +137,24 @@ public class ListActivityTest {
         assertEquals(1, noteAdapter.getItemCount());
         onTagClickListener.onTagClick(8, null); // click tag 3 & 8 with tag-all unchecked
         assertEquals(2, noteAdapter.getItemCount());
-        onTagClickListener.onTagClick(TableOperateTest.NOTE_LIST_SIZE, null); // click tag 3 & 8 with tag-all checked
-        assertEquals(TableOperateTest.NOTE_LIST_SIZE, noteAdapter.getItemCount());
 
         // click tag & query searchView
-        searchView.setQuery("8", false); // click tag 3 & 8 with tag-all checked
-        assertEquals(2, noteAdapter.getItemCount()); // 8, 18
-        searchView.setQuery("13", true);
-        assertEquals(1, noteAdapter.getItemCount());
-        onTagClickListener.onTagClick(TableOperateTest.NOTE_LIST_SIZE, null); // click tag 3 & 8 with tag-all unchecked
         searchView.setQuery("8", false);
         assertEquals(1, noteAdapter.getItemCount());
         searchView.setQuery("13", true);
         assertEquals(0, noteAdapter.getItemCount());
+
+        // with tag-all checked
+        // click tag
+        searchView.setQuery("", true);
+        onTagClickListener.onTagClick(TableOperateTest.NOTE_LIST_SIZE, null);
+        assertEquals(TableOperateTest.NOTE_LIST_SIZE, noteAdapter.getItemCount());
+
+        // click tag & query searchView
+        searchView.setQuery("8", false);
+        assertEquals(2, noteAdapter.getItemCount()); // 8, 18
+        searchView.setQuery("13", true);
+        assertEquals(1, noteAdapter.getItemCount());
 
         // just to cover onTagLongClick & onTagCrossClick
         onTagClickListener.onTagLongClick(0, null);
