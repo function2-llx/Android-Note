@@ -40,9 +40,8 @@ public class NotePdfConverterTest {
     @Test
     public void importNoteFromFile() {
         exportNoteToFile();
-        notePdfConverter.importNoteFromFile((Note note) -> {
-                    assertEquals(DataExample.EXAMPLE_MIX_IN, note.getTitle());
-                }
+        notePdfConverter.importNoteFromFile((Note note) ->
+                        assertEquals(DataExample.EXAMPLE_MIX_IN, note.getTitle())
                 , getExportFilePath());
     }
 
