@@ -31,6 +31,25 @@ public class HorizontalEditScrollViewTest {
 
     @Test
     public void onClick() {
+        markdownController.onClick(activity.findViewById(R.id.img_header1));
+        markdownController.onClick(activity.findViewById(R.id.img_header2));
+        markdownController.onClick(activity.findViewById(R.id.img_header3));
+        markdownController.onClick(activity.findViewById(R.id.img_header4));
+        markdownController.onClick(activity.findViewById(R.id.img_header5));
+        markdownController.onClick(activity.findViewById(R.id.img_header6));
+        markdownController.onClick(activity.findViewById(R.id.img_bold));
+        markdownController.onClick(activity.findViewById(R.id.img_italic));
+        markdownController.onClick(activity.findViewById(R.id.img_center_align));
+        markdownController.onClick(activity.findViewById(R.id.img_horizontal_rules));
+        markdownController.onClick(activity.findViewById(R.id.img_todo));
+        markdownController.onClick(activity.findViewById(R.id.img_todo_done));
+        markdownController.onClick(activity.findViewById(R.id.img_strike_through));
+        markdownController.onClick(activity.findViewById(R.id.img_inline_code));
+        markdownController.onClick(activity.findViewById(R.id.img_code));
+        markdownController.onClick(activity.findViewById(R.id.img_block_quote));
+        markdownController.onClick(activity.findViewById(R.id.img_unorder_list));
+        markdownController.onClick(activity.findViewById(R.id.img_order_list));
+        markdownController.onClick(activity.findViewById(R.id.img_link));
     }
 
     @Test
