@@ -1,8 +1,2 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string-array name="sort_options_human_readable">
-        <item>sort by title</item>
-        <item>sort by created time</item>
-        <item>sort by modified time</item>
-    </string-array>
-</resources>
+<resources></resources>

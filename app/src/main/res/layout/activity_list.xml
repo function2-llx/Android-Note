@@ -18,25 +18,24 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/colorPrimary"
-            app:title="@string/list_title" >
+            app:title="@string/list_title">
 
         </android.support.v7.widget.Toolbar>
 
 
-
         <com.se.npe.androidnote.adapters.TagGroupManager
+            android:id="@+id/tag_group_manager"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/tag_group_manager"
             android:layout_margin="0dp"
+            android:background="@color/white"
             android:padding="10dp"
             android:visibility="invisible"
             app:container_enable_drag="false"
             app:horizontal_interval="10dp"
-            app:vertical_interval="10dp"
             app:tag_clickable="true"
-            android:background="@color/white"
-            app:tag_theme="pure_teal" >
+            app:tag_theme="pure_teal"
+            app:vertical_interval="10dp">
 
         </com.se.npe.androidnote.adapters.TagGroupManager>
 
@@ -52,12 +51,12 @@
             android:id="@+id/new_note_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:clickable="true"
             android:layout_gravity="end"
             android:layout_marginTop="-70dp"
             android:layout_marginRight="10dp"
-            app:srcCompat="@android:drawable/ic_menu_add"
-            android:focusable="true" />
+            android:clickable="true"
+            android:focusable="true"
+            app:srcCompat="@android:drawable/ic_menu_add" />
 
 
     </LinearLayout>

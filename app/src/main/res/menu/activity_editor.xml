@@ -3,20 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/menu_markdown"
-        android:title="@string/markdown"
         android:icon="@mipmap/icon_markdown"
+        android:title="@string/markdown"
         app:showAsAction="always" />
     <item
         android:id="@+id/menu_save"
-        android:title="@string/save"
         android:icon="@mipmap/icon_save"
-        app:showAsAction="always" >
-    </item>
+        android:title="@string/save"
+        app:showAsAction="always"></item>
     <item
         android:id="@+id/share"
-        app:showAsAction="always"
         android:icon="@mipmap/icon_share"
-        android:title="@string/share" />
+        android:title="@string/share"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/export"

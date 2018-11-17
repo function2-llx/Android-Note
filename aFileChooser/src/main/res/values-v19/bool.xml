@@ -2,6 +2,5 @@
 <resources>
 
     <bool name="use_activity">false</bool>
-    <bool name="use_provider">true</bool>
 
 </resources>

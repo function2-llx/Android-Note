@@ -2,8 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:title="@string/menu_new_note"
-        android:id="@+id/menu_new_note"/>
+        android:id="@+id/menu_new_note"
+        android:title="@string/menu_new_note" />
 
     <item
         android:id="@+id/menu_open"
@@ -13,28 +13,28 @@
         android:id="@+id/action_search"
         android:title="@string/menu_search"
         app:actionViewClass="android.support.v7.widget.SearchView"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
 
 
     <item
         android:id="@+id/menu_sort"
-        android:title="@string/menu_sort"
+        android:checkable="true"
         android:icon="@drawable/sort"
-        app:showAsAction="always"
-        android:checkable="true">
+        android:title="@string/menu_sort"
+        app:showAsAction="always">
         <menu>
             <group
                 android:id="@+id/sort_options"
-                android:checkableBehavior="single" >
+                android:checkableBehavior="single">
                 <item
-                    android:title="@string/sort_title"
-                    android:id="@+id/sort_title" />
+                    android:id="@+id/sort_title"
+                    android:title="@string/sort_title" />
                 <item
-                    android:title="@string/sort_created_time"
-                    android:id="@+id/sort_created_time" />
+                    android:id="@+id/sort_created_time"
+                    android:title="@string/sort_created_time" />
                 <item
-                    android:title="@string/sort_modified_time"
-                    android:id="@+id/sort_modified_time" />
+                    android:id="@+id/sort_modified_time"
+                    android:title="@string/sort_modified_time" />
             </group>
         </menu>
     </item>

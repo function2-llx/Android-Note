@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/viewonly_share"
-        app:showAsAction="always"
         android:icon="@mipmap/icon_share"
-        android:title="@string/share" />
+        android:title="@string/share"
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/viewonly_export"
