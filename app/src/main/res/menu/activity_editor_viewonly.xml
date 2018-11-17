@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/viewonly_share"
-        android:icon="@mipmap/icon_share"
+        android:icon="@drawable/baseline_share_white_48dp"
         android:title="@string/share"
         app:showAsAction="always" />
 

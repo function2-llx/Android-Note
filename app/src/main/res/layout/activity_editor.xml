@@ -56,4 +56,5 @@
             app:fab_icon="@drawable/baseline_sort_white_48dp"
             app:fab_title="insert video" />
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
+
 </android.support.design.widget.CoordinatorLayout>

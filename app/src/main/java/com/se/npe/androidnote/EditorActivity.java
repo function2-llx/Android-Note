@@ -112,9 +112,9 @@ public class EditorActivity extends AppCompatActivity {
 
             case R.id.menu_markdown:
                 if (editor.changeIsMarkdown()) {
-                    item.setTitle("Plain");
+                    item.setTitle(R.string.plain_text);
                 } else {
-                    item.setTitle("Markdown");
+                    item.setTitle(R.string.markdown);
                 }
                 break;
 
