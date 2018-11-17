@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
 
@@ -25,7 +24,7 @@ public class TableOperateTest {
 
     private TableOperate tableOperate;
     private List<Note> noteList;
-    private static final int NOTE_LIST_SIZE = 20;
+    public static final int NOTE_LIST_SIZE = 20;
 
     @Rule
     public ExpectedException expectedException = ExpectedException.none();
@@ -53,10 +52,10 @@ public class TableOperateTest {
     @Test
     public void initConfigFile() {
         // successfully create dir
-        File configDir = new File(TableConfig.SAVE_PATH + "/config");
+        File configDir = new File(TableConfig.FileSave.getSavePath() + "/config");
         assertNotNull(configDir);
         // successfully create file
-        File configFile = new File(TableConfig.SAVE_PATH + "/config/searchconfig.txt");
+        File configFile = new File(TableConfig.FileSave.getSavePath() + "/config/searchconfig.txt");
         assertNotNull(configFile);
         assertNotNull(configDir.listFiles());
     }
@@ -72,19 +71,30 @@ public class TableOperateTest {
 
     @Test
     public void groupFunctionTest() {
+        // add group
         List<String> groupList = new ArrayList<>();
-        groupList.add(DataExample.getExampleGroupName("1"));
+        for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
+            groupList.add(DataExample.getExampleGroupName(String.valueOf(i)));
+        }
+        assertEquals(groupList, TableOperate.getInstance().getAllGroups());
+        // remove group
+        TableOperate.getInstance().removeGroup(DataExample.getExampleGroupName("3"));
+        groupList.remove(3);
+        assertEquals(groupList, TableOperate.getInstance().getAllGroups());
+    }
 
-        TableOperate.getInstance().addGroup(DataExample.getExampleGroupName("1"));
-        assertEquals(groupList,TableOperate.getInstance().getAllGroup());
-
-        TableOperate.getInstance().removeGroup(DataExample.getExampleGroupName("1"));
-        assertEquals(new ArrayList<>(),TableOperate.getInstance().getAllGroup());
+    @Test
+    public void tagFunctionTest() {
+        List<String> tagList = new ArrayList<>();
+        for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
+            tagList.add(DataExample.getExampleNoteTag(String.valueOf(i)));
+        }
+        assertEquals(tagList, tableOperate.getAllTags());
     }
 
     @Test
     public void setSearchConfigAndGetSearchConfig() {
-        for (String searchConfig : TableConfig.Sorter.SORTER_FIELDS) {
+        for (String searchConfig : TableConfig.Sorter.getSorterFields()) {
             TableOperate.setSearchConfig(searchConfig);
             assertEquals(searchConfig, TableOperate.getSearchConfig());
         }
@@ -94,76 +104,74 @@ public class TableOperateTest {
     public void getAllTags() {
         Note tempNote = new Note();
         tempNote.getTag().add("Test_Tag");
-        assertEquals(20,TableOperate.getInstance().getAllTags().size());
+        assertEquals(20, TableOperate.getInstance().getAllTags().size());
         TableOperate.getInstance().addNote(tempNote);
-        assertEquals(21,TableOperate.getInstance().getAllTags().size());
+        assertEquals(21, TableOperate.getInstance().getAllTags().size());
         TableOperate.getInstance().removeNote(tempNote);
-        assertEquals(20,TableOperate.getInstance().getAllTags().size());
+        assertEquals(20, TableOperate.getInstance().getAllTags().size());
     }
 
     @Test
     public void getAllNotes() {
-        List<String> tagList = new ArrayList<>();
-        tagList.add("TagZ");
-        assertEquals(noteList, tableOperate.getAllNotes("",null));
-        assertEquals(2,tableOperate.getAllNotes(DataExample.getExampleGroupName("1"),null).size());
-        assertEquals(2,tableOperate.getAllNotes("",tagList).size());
-        assertEquals(1,tableOperate.getAllNotes(DataExample.getExampleGroupName("1"),tagList).size());
+        // Whole note list
+        assertEquals(noteList, tableOperate.getAllNotes("", null));
+
+        List<Note> noteListSearched = new ArrayList<>();
+        // Search for tag 3 & group 3
+        noteListSearched.add(noteList.get(3));
+        assertEquals(noteListSearched, tableOperate.getAllNotes(DataExample.getExampleGroupName("3"), DataExample.getExampleNoteTags("3")));
+        noteListSearched.clear(); // Pay attention to clear noteListSearch
+        // Search for tag 5
+        noteListSearched.add(noteList.get(5));
+        assertEquals(noteListSearched, tableOperate.getAllNotes("", DataExample.getExampleNoteTags("5")));
+        noteListSearched.clear(); // Pay attention to clear noteListSearch
+        // Search for group 7
+        noteListSearched.add(noteList.get(7));
+        assertEquals(noteListSearched, tableOperate.getAllNotes(DataExample.getExampleGroupName("7"), null));
+        noteListSearched.clear(); // Pay attention to clear noteListSearch
+        // Search for tag 3 & group 13
+        assertEquals(noteListSearched, tableOperate.getAllNotes(DataExample.getExampleGroupName("3"), DataExample.getExampleNoteTags("13")));
+        noteListSearched.clear(); // Pay attention to clear noteListSearch
     }
 
     @Test
     public void fuzzySearch() {
         // Depends on example note
-        // Whole note list cannot be test - precise search
+        // Whole note list
+        assertEquals(noteList, tableOperate.fuzzySearch(DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST, "", null));
         // Empty note list
-        assertEquals(new ArrayList<Note>(), tableOperate.fuzzySearch("wtf???","",null));
+        assertEquals(new ArrayList<Note>(), tableOperate.fuzzySearch(DataExample.EXAMPLE_TITLE_EMPTY_NOTE_LIST, "", null));
 
         List<Note> noteListSearched = new ArrayList<>();
-        // Search for 3 using old note
-        noteListSearched.add(this.noteList.get(3));
-        assertEquals(noteListSearched, tableOperate.fuzzySearch(this.noteList.get(3).getTitle(),"",null));
+        // Search for title 3
+        noteListSearched.add(noteList.get(3));
+        noteListSearched.add(noteList.get(13));
+        assertEquals(noteListSearched, tableOperate.fuzzySearch("3", "", null));
         noteListSearched.clear(); // Pay attention to clear noteListSearch
-        // Search for 3 using new note
-        // Not equals because new note has a different data
-        noteListSearched.add(DataExample.getExampleNote(String.valueOf(3)));
-        assertNotEquals(noteListSearched, tableOperate.fuzzySearch(this.noteList.get(3).getTitle(),"",null));
-        noteListSearched.clear();
-
-        List<String> tagList = new ArrayList<>();
-        tagList.add("TagZ");
-        assertEquals(20,tableOperate.fuzzySearch("This","",null).size());
-        assertEquals(2,tableOperate.fuzzySearch("This",DataExample.getExampleGroupName("1"),null).size());
-        assertEquals(1,tableOperate.fuzzySearch("This",DataExample.getExampleGroupName("1"),tagList).size());
-        assertEquals(2,tableOperate.fuzzySearch("This","",tagList).size());
+        // Search for tag 5
+        noteListSearched.add(noteList.get(5));
+        assertEquals(noteListSearched, tableOperate.fuzzySearch(DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST, "", DataExample.getExampleNoteTags("5")));
+        noteListSearched.clear(); // Pay attention to clear noteListSearch
+        // Search for group 7
+        noteListSearched.add(noteList.get(7));
+        assertEquals(noteListSearched, tableOperate.fuzzySearch(DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST, DataExample.getExampleGroupName("7"), null));
+        noteListSearched.clear(); // Pay attention to clear noteListSearch
+        // Search for tag 10 & group 10
+        noteListSearched.add(noteList.get(10));
+        assertEquals(noteListSearched, tableOperate.fuzzySearch(DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST, DataExample.getExampleGroupName("10"), DataExample.getExampleNoteTags("10")));
+        noteListSearched.clear(); // Pay attention to clear noteListSearch
+        // Search for tag 13 & group 15
+        assertEquals(noteListSearched, tableOperate.fuzzySearch(DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST, DataExample.getExampleGroupName("13"), DataExample.getExampleNoteTags("15")));
+        noteListSearched.clear(); // Pay attention to clear noteListSearch
     }
 
     public static void addExampleNote(List<Note> noteList) {
-        for (int i = 0; i < NOTE_LIST_SIZE - 3; ++i) {
+        for (int i = 0; i < NOTE_LIST_SIZE; ++i) {
             Note note = DataExample.getExampleNote(String.valueOf(i));
             TableOperate.getInstance().addNote(note);
+            TableOperate.getInstance().addGroup(note.getGroupName());
             noteList.add(note);
         }
-        Note note;
-
-        //Note with Group1
-        note = DataExample.getExampleNote(String.valueOf(NOTE_LIST_SIZE - 1));
-        note.setGroupName(DataExample.getExampleGroupName("1"));
-        TableOperate.getInstance().addNote(note);
-        noteList.add(note);
-
-        //Note with Group1 and TagZ
-        note = DataExample.getExampleNote(String.valueOf(NOTE_LIST_SIZE - 1));
-        note.setGroupName(DataExample.getExampleGroupName("1"));
-        note.getTag().add("TagZ");
-        TableOperate.getInstance().addNote(note);
-        noteList.add(note);
-
-        //Note with Group2 and TagZ
-        note = DataExample.getExampleNote(String.valueOf(NOTE_LIST_SIZE - 1));
-        note.setGroupName(DataExample.getExampleGroupName("2"));
-        note.getTag().add("TagZ");
-        TableOperate.getInstance().addNote(note);
-        noteList.add(note);
     }
 
     @Test
@@ -179,7 +187,14 @@ public class TableOperateTest {
             noteList.set(i, note);
             assertEquals(note, tableOperate.getNoteAt(note.getIndex()));
         }
-        assertEquals(noteList, tableOperate.getAllNotes("",null));
+        assertEquals(noteList, tableOperate.getAllNotes("", null));
+    }
+
+    @Test
+    public void modifyNote() {
+        noteList.get(0).setTitle(DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST);
+        tableOperate.modifyNote(noteList.get(0));
+        tableOperate.modifyNote(DataExample.getExampleNote(DataExample.EXAMPLE_MIX_IN));
     }
 
     @Test
@@ -191,18 +206,18 @@ public class TableOperateTest {
             // Old note get index -> New note remove
             tableOperate.removeNote(noteList.get(i));
             noteList.remove(i);
-            assertEquals(noteList, tableOperate.getAllNotes("",null));
+            assertEquals(noteList, tableOperate.getAllNotes("", null));
         }
         // Remove note at end
         tableOperate.removeNote(noteList.get(noteList.size() - 1));
         noteList.remove(noteList.size() - 1);
-        assertEquals(noteList, tableOperate.getAllNotes("",null));
+        assertEquals(noteList, tableOperate.getAllNotes("", null));
         // Remove all notes one by one
         for (int i = 0; i < noteList.size(); ++i) {
             tableOperate.removeNote(noteList.get(i));
         }
         noteList.clear();
-        assertEquals(noteList, tableOperate.getAllNotes("",null));
+        assertEquals(noteList, tableOperate.getAllNotes("", null));
         // Remove note before start/after end will not throw exception
     }
 
@@ -210,7 +225,7 @@ public class TableOperateTest {
     public void removeAllNotes() {
         tableOperate.removeAllNotes();
         noteList.clear();
-        assertEquals(noteList, tableOperate.getAllNotes("",null));
+        assertEquals(noteList, tableOperate.getAllNotes("", null));
     }
 
     @Test

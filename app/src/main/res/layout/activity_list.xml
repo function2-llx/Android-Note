@@ -24,7 +24,7 @@
 
 
 
-        <com.se.npe.androidnote.models.TagGroupManager
+        <com.se.npe.androidnote.adapters.TagGroupManager
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:id="@+id/tag_group_manager"
@@ -38,7 +38,7 @@
             android:background="@color/white"
             app:tag_theme="pure_teal" >
 
-        </com.se.npe.androidnote.models.TagGroupManager>
+        </com.se.npe.androidnote.adapters.TagGroupManager>
 
         <com.marshalchen.ultimaterecyclerview.UltimateRecyclerView
             android:id="@+id/ultimate_recycler_view"

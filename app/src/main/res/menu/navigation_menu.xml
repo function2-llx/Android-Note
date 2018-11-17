@@ -4,6 +4,7 @@
 
 
     <item
+        android:id="@+id/group_manage"
         android:title="@string/manage_groups" >
         <menu>
             <group

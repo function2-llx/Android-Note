@@ -2,24 +2,23 @@ package com.se.npe.androidnote;
 
 import android.content.Intent;
 import android.view.MenuItem;
-import static org.robolectric.Shadows.shadowOf;
 
+import com.se.npe.androidnote.editor.SoundPlayer;
+import com.se.npe.androidnote.models.SingletonResetter;
+import com.se.npe.androidnote.models.TableOperate;
+
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
-<<<<<<< app/src/test/java/com/se/npe/androidnote/EditorActivityTest.java
-=======
 import org.robolectric.RuntimeEnvironment;
-
-import com.se.npe.androidnote.editor.SoundPlayer;
-import com.se.npe.androidnote.models.TableOperate;
->>>>>>> app/src/test/java/com/se/npe/androidnote/EditorActivityTest.java
 
 import java.lang.reflect.Method;
 
 import static org.junit.Assert.assertNotNull;
+import static org.robolectric.Shadows.shadowOf;
 
 @RunWith(RobolectricTestRunner.class)
 public class EditorActivityTest {
@@ -29,6 +28,11 @@ public class EditorActivityTest {
     public void setUp() {
         activity = Robolectric.setupActivity(EditorActivity.class);
         assertNotNull(activity);
+    }
+
+    @After
+    public void tearDown() {
+        SingletonResetter.resetTableOperateSingleton();
     }
 
     @Test
@@ -98,7 +102,6 @@ public class EditorActivityTest {
             activity.onOptionsItemSelected(menuItem);
         } catch (Exception e) {
             /* no operation */
->>>>>>> app/src/test/java/com/se/npe/androidnote/EditorActivityTest.java
         }
     }
 

@@ -48,10 +48,10 @@ public class NoteTest {
         content.add(new TextData("text"));
         List<String> tags = new ArrayList<>();
         tags.add("TagZ");
-        Note note1 = new Note("title",content);
-        Note note2 = new Note("title",content,tags);
+        Note note1 = new Note(DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST, content);
+        Note note2 = new Note(DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST, content, tags);
         note1.getTag().add("TagZ");
-        assertEquals(note1,note2);
+        assertEquals(note1, note2);
     }
 
     @Test
@@ -65,6 +65,19 @@ public class NoteTest {
         note.setTitle(title);
         assertEquals(title, note.getTitle());
     }
+
+    @Test
+    public void getGroup() {
+        assertEquals(DataExample.getExampleGroupName(DataExample.EXAMPLE_MIX_IN), note.getGroupName());
+    }
+
+    @Test
+    public void setGroup() {
+        final String groupName = DataExample.getExampleGroupName("setCurrentGroup test");
+        note.setGroupName(groupName);
+        assertEquals(groupName, note.getGroupName());
+    }
+
 
     @Test
     public void getContent() {
@@ -96,12 +109,12 @@ public class NoteTest {
 
     @Test
     public void getTag() {
-        assertEquals(DataExample.getExampleNoteTag(DataExample.EXAMPLE_MIX_IN), note.getTag());
+        assertEquals(DataExample.getExampleNoteTags(DataExample.EXAMPLE_MIX_IN), note.getTag());
     }
 
     @Test
     public void setTag() {
-        final List<String> tagList = DataExample.getExampleNoteTag("setTag test");
+        final List<String> tagList = DataExample.getExampleNoteTags("setTag test");
         note.setTag(tagList);
         assertEquals(tagList, note.getTag());
     }
@@ -110,13 +123,6 @@ public class NoteTest {
     public void getIndex() {
         // index starts from 1
         assertEquals(1, note.getIndex());
-    }
-
-    @Test
-    public void groupFunc() {
-        assertEquals("",note.getGroupName());
-        note.setGroupName(DataExample.getExampleGroupName("1"));
-        assertEquals(DataExample.getExampleGroupName("1"),note.getGroupName());
     }
 
     @Test
@@ -137,12 +143,12 @@ public class NoteTest {
         tempNote.setStartTime(new Date());
         tempNote.setModifyTime(new Date());
 
-        assertEquals("text",tempNote.getPreview().text);
-        assertEquals("Pic",tempNote.getPreview().picturePath);
-        assertEquals("Group",tempNote.getPreview().groupName);
-        assertEquals(tempNote.getStartTime(),tempNote.getPreview().startTime);
-        assertEquals(tempNote.getModifyTime(),tempNote.getPreview().modifyTime);
-        assertEquals("this is tile for -1",tempNote.getPreview().title);
+        assertEquals("text", tempNote.getPreview().text);
+        assertEquals("Pic", tempNote.getPreview().picturePath);
+        assertEquals("Group", tempNote.getPreview().groupName);
+        assertEquals(tempNote.getStartTime(), tempNote.getPreview().startTime);
+        assertEquals(tempNote.getModifyTime(), tempNote.getPreview().modifyTime);
+        assertEquals("this is tile for -1", tempNote.getPreview().title);
     }
 
     @Test

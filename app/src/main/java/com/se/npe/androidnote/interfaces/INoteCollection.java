@@ -12,15 +12,15 @@ import java.util.List;
  */
 
 public interface INoteCollection {
-    List<Note> getAllNotes(String groupName,List<String> tagList);
+    List<Note> getAllNotes(String groupName, List<String> tagList);
 
-    List<Note> fuzzySearch(String parameter,String groupName,List<String> tagList);
+    List<Note> fuzzySearch(String parameter, String groupName, List<String> tagList);
 
     void addGroup(String groupName);
 
     void removeGroup(String groupName);
 
-    List<String> getAllGroup();
+    List<String> getAllGroups();
 
     void addNote(Note note);
 

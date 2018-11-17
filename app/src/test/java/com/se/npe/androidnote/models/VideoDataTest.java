@@ -36,7 +36,7 @@ public class VideoDataTest {
 
     @Test
     public void getText() {
-        assertEquals("",videoData.getText());
+        assertEquals("", videoData.getText());
     }
 
     @Test

@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 
 import com.se.npe.androidnote.interfaces.IData;
 import com.se.npe.androidnote.util.Logger;
+import com.se.npe.androidnote.util.ReturnValueEater;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -14,22 +15,23 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DataExample {
+    public static final String EXAMPLE_MIX_IN = "test";
+    public static final String EXAMPLE_TITLE_WHOLE_NOTE_LIST = "title";
+    public static final String EXAMPLE_TITLE_EMPTY_NOTE_LIST = "wtf???";
+
     // no constructor
     private DataExample() {
-
     }
-
-    public static final String EXAMPLE_MIX_IN = "test";
 
     // Path
     @NonNull
-    static String getExamplePath(String mixIn) {
-        return Environment.getExternalStorageDirectory().getAbsolutePath() + "/" + mixIn;
+    public static String getExamplePath(String mixIn) {
+        return Environment.getExternalStorageDirectory().getAbsolutePath() + File.separator + mixIn;
     }
 
     // GroupName
     @NonNull
-    static String getExampleGroupName(String mixIn) {
+    public static String getExampleGroupName(String mixIn) {
         return "Group" + mixIn;
     }
 
@@ -52,7 +54,7 @@ public class DataExample {
 
     @NonNull
     static String getExamplePicturePath(String mixIn) {
-        return getExamplePath("PictureData/" + mixIn + ".jpg");
+        return getExamplePath("PictureData" + File.separator + mixIn + ".jpg");
     }
 
     // SoundData
@@ -63,7 +65,7 @@ public class DataExample {
 
     @NonNull
     static String getExampleSoundPath(String mixIn) {
-        return getExamplePath("SoundData/" + mixIn + ".mp3");
+        return getExamplePath("SoundData" + File.separator + mixIn + ".mp3");
     }
 
     @NonNull
@@ -79,7 +81,7 @@ public class DataExample {
 
     @NonNull
     static String getExampleVideoPath(String mixIn) {
-        return getExamplePath("VideoData/" + mixIn + ".wav");
+        return getExamplePath("VideoData" + File.separator + mixIn + ".wav");
     }
 
     // Note
@@ -89,11 +91,15 @@ public class DataExample {
     }
 
     @NonNull
-    static List<String> getExampleNoteTag(String mixIn) {
+    public static List<String> getExampleNoteTags(String mixIn) {
         List<String> tags = new ArrayList<>();
-        tags.add("tag");
-        tags.add(mixIn);
+        tags.add(getExampleNoteTag(mixIn));
         return tags;
+    }
+
+    @NonNull
+    public static String getExampleNoteTag(String mixIn) {
+        return "Tag" + mixIn;
     }
 
     @NonNull
@@ -109,15 +115,14 @@ public class DataExample {
 
     @NonNull
     public static Note getExampleNote(String mixIn) {
-        return new Note(getExampleNoteTitle(mixIn), getExampleDataList(mixIn), getExampleNoteTag(mixIn));
+        return new Note(getExampleNoteTitle(mixIn), getExampleDataList(mixIn), getExampleNoteTags(mixIn), getExampleGroupName(mixIn));
     }
 
     // File
     static File getExampleFile(String mixIn) {
-        String path = getExamplePath(mixIn);
-        File file = new File(path);
+        File file = new File(getExamplePath(mixIn));
         try (OutputStream os = new FileOutputStream(file)) {
-            file.createNewFile();
+            ReturnValueEater.eat(file.createNewFile());
             byte[] buffer = new byte[128];
             for (int i = 0; i < buffer.length; ++i) {
                 buffer[i] = (byte) i;
@@ -130,9 +135,8 @@ public class DataExample {
     }
 
     static File getExampleDirectory(String mixIn) {
-        String path = getExamplePath(mixIn);
-        File directory = new File(path);
-        directory.mkdirs();
+        File directory = new File(getExamplePath(mixIn));
+        ReturnValueEater.eat(directory.mkdirs());
         return directory;
     }
 }
