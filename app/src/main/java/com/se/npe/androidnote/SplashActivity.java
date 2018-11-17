@@ -117,7 +117,7 @@ public class SplashActivity extends Activity {
                     break;
             }
             noteFileConverter.importNoteFromFile((Note note) -> {
-                TableOperate.getInstance().modify(note);
+                TableOperate.getInstance().modifyNote(note);
                 EventBus.getDefault().postSticky(note);
                 intent.putExtra(EditorActivity.VIEW_ONLY, true);
                 startActivity(intent);
