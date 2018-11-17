@@ -262,7 +262,7 @@ public class ListActivity extends AppCompatActivity {
 
             case R.id.manage_group:
                 builder.setTitle(getString(R.string.manage_groups));
-                boolean selected[] = new boolean[allGroupsArray.length];
+                boolean[] selected = new boolean[allGroupsArray.length];
                 builder.setMultiChoiceItems(allGroupsArray, new boolean[allGroupsArray.length], (dialog, which, isChecked) -> selected[which] = isChecked);
                 builder.setPositiveButton("confirm", (dialog, which) -> {
                     for (int i = 0; i < allGroupsArray.length; i++)
