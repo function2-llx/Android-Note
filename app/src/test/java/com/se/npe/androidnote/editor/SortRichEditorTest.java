@@ -98,6 +98,7 @@ public class SortRichEditorTest {
 
     @Test
     public void testOnTouchEvent() {
+        /* no test */
     }
 
     @Test

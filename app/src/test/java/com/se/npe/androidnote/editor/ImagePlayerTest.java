@@ -19,7 +19,7 @@ public class ImagePlayerTest {
     ImagePlayer image = null;
 
     @Before
-    public void setUp() throws Exception {
+    public void setUp() {
         activity = Robolectric.setupActivity(EditorActivity.class);
         assertNotNull(activity);
         editor = activity.findViewById(R.id.rich_editor);
