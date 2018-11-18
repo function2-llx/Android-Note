@@ -295,48 +295,6 @@ public class EditorActivity extends AppCompatActivity {
         startActivityForResult(intent, code);
     }
 
-    class PictureAsyncTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params) {
-            OutputStream outputStream = null;
-            InputStream inputStream = null;
-            try {
-                File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "rxMarkdown");
-                if (!dir.exists()) {
-                    boolean ok = dir.mkdirs();
-                    ReturnValueEater.eat(ok);
-                }
-                outputStream = new FileOutputStream(dir.getAbsolutePath() + File.separator + "b.jpg");
-                AssetManager assetManager = getAssets();
-                inputStream = assetManager.open("b.jpg");
-                byte[] buffer = new byte[1024];
-                int read;
-                while ((read = inputStream.read(buffer)) != -1) {
-                    outputStream.write(buffer, 0, read);
-                }
-                outputStream.flush();
-            } catch (IOException e) {
-                Logger.log(LOG_TAG, e);
-            } finally {
-                if (outputStream != null) {
-                    try {
-                        outputStream.close();
-                    } catch (IOException e) {
-                        Logger.log(LOG_TAG, e);
-                    }
-                }
-                try {
-                    if (inputStream != null) {
-                        inputStream.close();
-                    }
-                } catch (IOException e) {
-                    Logger.log(LOG_TAG, e);
-                }
-            }
-            return null;
-        }
-    }
-
     void handleMediaResult(int requestCode) {
         File f = new File(OUTPUT_DIR + tempMediaUri.getPath());
         try (FileOutputStream fos = new FileOutputStream(f); InputStream fis = getContentResolver().openInputStream(tempMediaUri)) {
