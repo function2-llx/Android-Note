@@ -5,6 +5,7 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 public class MySQLiteOpenHelper extends SQLiteOpenHelper {
+    private static final String TEXT_FIELD = "TEXT";
     private static MySQLiteOpenHelper helper;
 
     private MySQLiteOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
@@ -17,7 +18,7 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
 
     public static synchronized MySQLiteOpenHelper getInstance(Context context) {
         if (helper == null) {
-            helper = new MySQLiteOpenHelper(context, TableConfig.TABLE_NAME);
+            helper = new MySQLiteOpenHelper(context, TableConfig.Note.NOTE_TABLE_NAME);
         }
         return helper;
     }
@@ -30,16 +31,16 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
      */
     @Override
     public void onCreate(SQLiteDatabase sqLiteDatabase) {
-        sqLiteDatabase.execSQL("create table if not exists " + TableConfig.TABLE_NAME + "("
+        sqLiteDatabase.execSQL("create table if not exists " + TableConfig.Note.NOTE_TABLE_NAME + '('
                 + TableConfig.Note.NOTE_ID + " integer not null primary key autoincrement,"
                 + TableConfig.Note.NOTE_TITLE + " verchar(50),"
-                + TableConfig.Note.NOTE_CONTENT + " TEXT,"
-                + TableConfig.Note.NOTE_START_TIME + " TEXT,"
-                + TableConfig.Note.NOTE_MODIFY_TIME + " TEXT,"
-                + TableConfig.Note.NOTE_TAG + " TEXT,"
-                + TableConfig.Note.NOTE_GROUP + " TEXT)");
-        sqLiteDatabase.execSQL("create table if not exists " + TableConfig.GROUP_TABLE + "("
-                + TableConfig.Group.GROUP_NAME + " TEXT)");
+                + TableConfig.Note.NOTE_CONTENT + ' ' + TEXT_FIELD + ','
+                + TableConfig.Note.NOTE_START_TIME + ' ' + TEXT_FIELD + ','
+                + TableConfig.Note.NOTE_MODIFY_TIME + ' ' + TEXT_FIELD + ','
+                + TableConfig.Note.NOTE_TAG + ' ' + TEXT_FIELD + ','
+                + TableConfig.Note.NOTE_GROUP + ' ' + TEXT_FIELD + ')');
+        sqLiteDatabase.execSQL("create table if not exists " + TableConfig.Group.GROUP_TABLE_NAME + '('
+                + TableConfig.Group.GROUP_NAME + ' ' + TEXT_FIELD + ')');
     }
 
     /**
@@ -53,7 +54,7 @@ public class MySQLiteOpenHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase sqLiteDatabase, int oldVersion, int newVersion) {
         // Work well in early development
-        sqLiteDatabase.execSQL("drop table if exists " + TableConfig.TABLE_NAME);
+        sqLiteDatabase.execSQL("drop table if exists " + TableConfig.Note.NOTE_TABLE_NAME);
         onCreate(sqLiteDatabase);
     }
 }

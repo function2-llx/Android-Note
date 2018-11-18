@@ -75,7 +75,8 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-web:3.0.2'
     androidTestImplementation 'com.android.support.test.espresso.idling:idling-concurrent:3.0.2'
     // Robolectric dependencies
-    testImplementation 'org.robolectric:robolectric:4.0.1'
+    testImplementation 'org.robolectric:robolectric:4.0.2'
+    testImplementation 'org.robolectric:shadows-supportv4:4.0.2'
     // View dependencies
     implementation 'com.marshalchen.ultimaterecyclerview:library:0.7.3'
     configurations.all {

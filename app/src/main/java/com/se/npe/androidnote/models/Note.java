@@ -72,6 +72,13 @@ public class Note implements Serializable {
         this.tag = tag;
     }
 
+    public Note(String title, List<IData> content, List<String> tag, String groupName) {
+        this.title = title;
+        this.content = content;
+        this.tag = tag;
+        this.groupName = groupName;
+    }
+
     public Note(String title, List<IData> content, int index, String timeStart, String timeModify, List<String> tag, String groupName) {
         this.indexDB = index;
         this.title = title;
@@ -141,12 +148,12 @@ public class Note implements Serializable {
     public PreviewData getPreview() {
         String text = null;
         String picPath = null;
-        List<IData> content = getContent();
-        for (int i = 0; i < content.size(); i++) {
-            if (picPath == null && content.get(i).toString().charAt(0) == 'P') {
-                picPath = content.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
-            } else if (text == null && content.get(i).toString().charAt(0) == 'T') {
-                text = content.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
+        List<IData> contentList = getContent();
+        for (int i = 0; i < contentList.size(); i++) {
+            if (picPath == null && contentList.get(i).toString().charAt(0) == 'P') {
+                picPath = contentList.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
+            } else if (text == null && contentList.get(i).toString().charAt(0) == 'T') {
+                text = contentList.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
             }
         }
         if (text == null) text = "无预览文字";
@@ -156,24 +163,32 @@ public class Note implements Serializable {
 
     @Override
     public boolean equals(Object o) {
-        // Identify note by its DBindex
-        return o instanceof Note && ((Note) o).indexDB == indexDB;
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Note note = (Note) o;
+        return indexDB == note.indexDB &&
+                Objects.equals(title, note.title) &&
+                Objects.equals(content, note.content) &&
+                Objects.equals(startTime, note.startTime) &&
+                Objects.equals(modifyTime, note.modifyTime) &&
+                Objects.equals(tag, note.tag) &&
+                Objects.equals(groupName, note.groupName);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(indexDB);
+        return Objects.hash(title, content, startTime, modifyTime, tag, indexDB, groupName);
     }
 
     @Override
     public String toString() {
         String string = "Title:" + getTitle() + "\nContents:";
-        List<IData> templist = getContent();
+        List<IData> tempList = getContent();
         StringBuilder sb = new StringBuilder();
         sb.append(string);
-        for (int i = 0; i < templist.size(); i++) {
+        for (int i = 0; i < tempList.size(); i++) {
             sb.append('\n');
-            sb.append(templist.get(i).toString());
+            sb.append(tempList.get(i).toString());
         }
         return sb.toString();
     }

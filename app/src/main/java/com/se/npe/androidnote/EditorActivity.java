@@ -3,6 +3,7 @@ package com.se.npe.androidnote;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
@@ -27,9 +28,11 @@ import com.dmcbig.mediapicker.PickerActivity;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
+import com.ipaulpro.afilechooser.utils.FileUtils;
 import com.mob.MobSDK;
 import com.se.npe.androidnote.editor.SortRichEditor;
 import com.se.npe.androidnote.interfaces.INoteFileConverter;
+import com.se.npe.androidnote.models.FileOperate;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.NotePdfConverter;
 import com.se.npe.androidnote.models.NoteZipConverter;
@@ -87,10 +90,8 @@ public class EditorActivity extends AppCompatActivity {
         sp.setImageUrl("https://hmls.hfbank.com.cn/hfapp-api/9.png");
         sp.setShareType(Platform.SHARE_FILE);
         INoteFileConverter noteFileConverter = new NoteZipConverter();
-        noteFileConverter.exportNoteToFile((String fileName) -> {
-            sp.setFilePath(fileName);
-            weChat.share(sp);
-        }, note, "temp");
+        noteFileConverter.exportNoteToFile(sp::setFilePath, note, "temp");
+        weChat.share(sp);
     }
 
     @Override
@@ -159,6 +160,10 @@ public class EditorActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void startActivity(Intent intent) {
+        super.startActivity(intent);
+    }
 
     private void save() {
         if (isViewOnly) {
@@ -170,7 +175,7 @@ public class EditorActivity extends AppCompatActivity {
         note.setStartTime(createTime);
         note.setModifyTime(new Date());
         note.setGroupName(currentGroup);
-        TableOperate.getInstance().modify(note);
+        TableOperate.getInstance().modifyNote(note);
         oldNote = note;
     }
 
@@ -179,11 +184,13 @@ public class EditorActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_editor);
 
+
         setSupportActionBar(findViewById(R.id.toolbar));
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeButtonEnabled(true);
 
         editor = findViewById(R.id.rich_editor);
+
         final FloatingActionsMenu insertMedia = findViewById(R.id.insert_media);
         findViewById(R.id.insert_picture).setOnClickListener(v -> {
             insertMedia.collapse();
@@ -252,12 +259,6 @@ public class EditorActivity extends AppCompatActivity {
             ResultPool.getInstance().startRecording();
         } catch (IOException e) {
             Logger.log(LOG_TAG, e);
-        }
-
-        try {
-            MobSDK.init(this);
-        } catch (Throwable e) {
-            // no-op
         }
     }
 

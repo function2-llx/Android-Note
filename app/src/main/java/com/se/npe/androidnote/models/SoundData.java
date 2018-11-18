@@ -37,8 +37,11 @@ public class SoundData implements IData {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof SoundData && ((SoundData) o).soundPath.equals(soundPath)
-                && ((SoundData) o).text.equals(text);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SoundData soundData = (SoundData) o;
+        return Objects.equals(soundPath, soundData.soundPath) &&
+                Objects.equals(text, soundData.text);
     }
 
     @Override

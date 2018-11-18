@@ -12,7 +12,7 @@ import java.util.Objects;
  */
 
 public class VideoData implements IData {
-    String videoPath;
+    private String videoPath;
 
     public VideoData(String videoPath) {
         this.videoPath = videoPath;
@@ -35,7 +35,10 @@ public class VideoData implements IData {
 
     @Override
     public boolean equals(Object o) {
-        return o instanceof VideoData && ((VideoData) o).videoPath.equals(videoPath);
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        VideoData videoData = (VideoData) o;
+        return Objects.equals(videoPath, videoData.videoPath);
     }
 
     @Override

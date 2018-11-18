@@ -21,7 +21,7 @@ import static org.junit.Assert.assertSame;
 @RunWith(RobolectricTestRunner.class)
 public class MySQLiteOpenHelperTest {
 
-    Context context;
+    private Context context;
 
     @Before
     public void setUp() {
@@ -64,7 +64,7 @@ public class MySQLiteOpenHelperTest {
         Constructor mySQLiteOpenHelperConstructor = mySQLiteOpenHelperClass.getDeclaredConstructor(Context.class, String.class, SQLiteDatabase.CursorFactory.class, int.class);
         mySQLiteOpenHelperConstructor.setAccessible(true);
         // Depends on the private constructor of MySQLiteOpenHelper
-        mySQLiteOpenHelperUpgraded = (MySQLiteOpenHelper) mySQLiteOpenHelperConstructor.newInstance(context, TableConfig.TABLE_NAME, null, DATABASE_UPGRADED_VERSION);
+        mySQLiteOpenHelperUpgraded = (MySQLiteOpenHelper) mySQLiteOpenHelperConstructor.newInstance(context, TableConfig.Note.NOTE_TABLE_NAME, null, DATABASE_UPGRADED_VERSION);
         assertNotNull(mySQLiteOpenHelperUpgraded);
         // Check database version is upgraded
         assertEquals(mySQLiteOpenHelperUpgraded.getWritableDatabase().getVersion(), DATABASE_UPGRADED_VERSION);

@@ -6,6 +6,7 @@ import android.support.v7.app.AppCompatActivity;
 
 import com.se.npe.androidnote.interfaces.INoteFileConverter;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -28,14 +29,19 @@ public class NotePdfConverterTest {
         notePdfConverter = new NotePdfConverter();
         AppCompatActivity activity = Robolectric.setupActivity(AppCompatActivity.class);
         Context context = activity.getApplicationContext();
-        TableConfig.SAVE_PATH = context.getExternalFilesDir(null).getAbsolutePath(); // initialize SAVE_PATH
+        TableOperate.init(context); // initialize SAVE_PATH
+    }
+
+    @After
+    public void tearDown() {
+        SingletonResetter.resetTableOperateSingleton();
     }
 
     @Test
     public void importNoteFromFile() {
         exportNoteToFile();
         notePdfConverter.importNoteFromFile((Note note) ->
-                        assertEquals(DataExample.getExampleNote(DataExample.EXAMPLE_MIX_IN), note)
+                        assertEquals(DataExample.EXAMPLE_MIX_IN, note.getTitle())
                 , getExportFilePath());
     }
 

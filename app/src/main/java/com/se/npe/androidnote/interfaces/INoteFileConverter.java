@@ -6,6 +6,7 @@ import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.TableConfig;
 import com.se.npe.androidnote.util.AsyncTaskWithResponse;
 import com.se.npe.androidnote.util.Logger;
+import com.se.npe.androidnote.util.ReturnValueEater;
 
 import java.io.File;
 import java.io.IOException;
@@ -42,22 +43,17 @@ public interface INoteFileConverter {
      * @return File to export
      */
     static File createFileToExport(String fileName) {
-        String exportDirPath = getExportDirPath();
-        File exportDir = new File(exportDirPath);
-        // create dir
-        exportDir.mkdirs();
-
-        String exportFilePath = getExportFilePath(fileName);
-        File exportFile = new File(exportFilePath);
+        File exportDir = new File(getExportDirPath());
+        File exportFile = new File(getExportFilePath(fileName));
         try {
+            // create dir
+            ReturnValueEater.eat(exportDir.mkdirs());
             // delete original file
-            if (exportFile.exists() && !exportFile.delete()) {
-                throw new IOException("delete fails");
+            if (exportFile.exists()) {
+                ReturnValueEater.eat(exportFile.delete());
             }
             // create file
-            if (!exportFile.createNewFile()) {
-                throw new IOException("createNewFile fails");
-            }
+            ReturnValueEater.eat(exportFile.createNewFile());
         } catch (IOException e) {
             Logger.log("CreateFile", e);
         }
@@ -67,11 +63,11 @@ public interface INoteFileConverter {
 
     @NonNull
     static String getExportDirPath() {
-        return TableConfig.SAVE_PATH + "/Export";
+        return TableConfig.FileSave.getSavePath() + File.separator + "Export";
     }
 
     @NonNull
     static String getExportFilePath(String fileName) {
-        return getExportDirPath() + '/' + fileName;
+        return getExportDirPath() + File.separator + fileName;
     }
 }

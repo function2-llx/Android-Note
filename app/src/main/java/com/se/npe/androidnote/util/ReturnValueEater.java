@@ -11,8 +11,10 @@ public class ReturnValueEater {
     }
 
     public static void eat(int i) {
+        // do nothing to eat int
     }
 
     public static void eat(boolean b) {
+        // do nothing to eat boolean
     }
 }

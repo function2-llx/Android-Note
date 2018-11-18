@@ -7,6 +7,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 
 public class Logger {
+    // no constructor
+    private Logger() {
+    }
+
     // print the exception to logcat rather than e.printStackTrace() (in this way no output at all)
     public static void log(String tag, @NonNull Exception e) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
