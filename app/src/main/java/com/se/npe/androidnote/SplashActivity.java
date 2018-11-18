@@ -2,7 +2,6 @@ package com.se.npe.androidnote;
 
 import android.Manifest;
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.net.Uri;
@@ -11,7 +10,6 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechUtility;
@@ -23,8 +21,6 @@ import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.NotePdfConverter;
 import com.se.npe.androidnote.models.NoteZipConverter;
 import com.se.npe.androidnote.models.TableOperate;
-
-import org.greenrobot.eventbus.EventBus;
 
 import java.lang.ref.WeakReference;
 import java.util.Objects;
@@ -74,8 +70,8 @@ public class SplashActivity extends Activity {
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
     private static String[] PERMISSIONS_STORAGE = {
-        Manifest.permission.READ_EXTERNAL_STORAGE,
-        Manifest.permission.WRITE_EXTERNAL_STORAGE
+            Manifest.permission.READ_EXTERNAL_STORAGE,
+            Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
 
     @Override
@@ -85,7 +81,7 @@ public class SplashActivity extends Activity {
 
         //manually ask for RW permission
         while (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) { // We don't have permission so prompt the user
-            ActivityCompat.requestPermissions( this,
+            ActivityCompat.requestPermissions(this,
                     PERMISSIONS_STORAGE,
                     REQUEST_EXTERNAL_STORAGE
             );
@@ -100,7 +96,6 @@ public class SplashActivity extends Activity {
         }
 
         if (Objects.equals(getIntent().getAction(), Intent.ACTION_VIEW)) {
-            Intent intent = new Intent(this, EditorActivity.class);
             final Uri uri = getIntent().getData();
             String path = FileUtils.getPath(this, uri);
             INoteFileConverter noteFileConverter;
@@ -117,9 +112,10 @@ public class SplashActivity extends Activity {
                     break;
             }
             noteFileConverter.importNoteFromFile((Note note) -> {
-                TableOperate.getInstance().modifyNote(note);
-                EventBus.getDefault().postSticky(note);
+                TableOperate.getInstance().addNote(note);
+                Intent intent = new Intent(this, EditorActivity.class);
                 intent.putExtra(EditorActivity.VIEW_ONLY, true);
+                intent.putExtra(EditorActivity.INITIAL_NOTE, note);
                 startActivity(intent);
             }, path);
         }

@@ -251,6 +251,7 @@ public class SortRichEditor extends ScrollView {
 
             @Override
             public void afterTextChanged(Editable s) {
+                // no-op
             }
         });
 
@@ -263,9 +264,31 @@ public class SortRichEditor extends ScrollView {
         titleLayout.addView(textLimit);
     }
 
+    private static void stopVideo(VideoPlayer videoPlayer) {
+        if (videoPlayer.getJzvdStd().isCurrentPlay()) {
+            videoPlayer.getJzvdStd().onStateAutoComplete();
+        }
+    }
+
+    private void onAddTag(EditText editText) {
+        tags.clearAllSelect();
+        String input = editText.getText().toString().trim();
+        ArrayList<String> list = new ArrayList<>(tags.getLabels());
+        if (input.isEmpty()) {
+            Toast.makeText(getContext(), "Input is empty", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (list.contains(input)) {
+            Toast.makeText(getContext(), "Duplicate tag", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        list.add(list.size() - 2, input);
+        tags.setLabels(list);
+    }
+
     private void initTag() {
         tags = new LabelsView(getContext());
-        final LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+        LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
         lp.leftMargin = DEFAULT_MARGIN;
         lp.rightMargin = DEFAULT_MARGIN;
         lp.topMargin = DEFAULT_MARGIN;
@@ -285,24 +308,11 @@ public class SortRichEditor extends ScrollView {
         tags.setOnLabelClickListener((label, data, position) -> {
             if (position == tags.getLabels().size() - 2) {
                 final EditText editText = new EditText(getContext());
-                editText.setLayoutParams(lp);
                 AlertDialog.Builder inputDialog =
                         new AlertDialog.Builder(getContext());
                 inputDialog.setTitle("Tag name").setView(editText);
                 inputDialog.setPositiveButton("Ok",
-                        (dialog, which) -> {
-                            tags.clearAllSelect();
-                            String input = editText.getText().toString().trim();
-                            ArrayList<String> list = new ArrayList<>(tags.getLabels());
-                            if (input.isEmpty()) {
-                                Toast.makeText(getContext(), "Input is empty", Toast.LENGTH_SHORT).show();
-                            } else if (list.contains(input)) {
-                                Toast.makeText(getContext(), "Duplicate tag", Toast.LENGTH_SHORT).show();
-                            } else {
-                                list.add(list.size() - 2, input);
-                                tags.setLabels(list);
-                            }
-                        }).show();
+                        (dialog, which) -> onAddTag(editText)).show();
             } else if (position == tags.getLabels().size() - 1) {
                 ArrayList<String> list = new ArrayList<>(tags.getLabels());
                 ArrayList<Integer> remove = new ArrayList<>(tags.getSelectLabels());
@@ -392,16 +402,13 @@ public class SortRichEditor extends ScrollView {
 
     private LinearLayout createContainer() {
         LayoutParams layoutParams = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT);
-        final LinearLayout containerLayout = new LinearLayout(getContext()) {
+        final LinearLayout buildingContainerLayout = new LinearLayout(getContext()) {
             @Override
             public boolean dispatchTouchEvent(MotionEvent event) {
                 // lock the page, so that when there are many medias, touch event won't
                 // won't be interpreted as page turning
-                if (isSort) {
-                    getParent().requestDisallowInterceptTouchEvent(true);
-                } else {
-                    getParent().requestDisallowInterceptTouchEvent(false);
-                }
+                getParent().requestDisallowInterceptTouchEvent(isSort);
+
                 viewDragHelper.processTouchEvent(event);
                 int action = event.getAction();
                 switch (action) {
@@ -435,12 +442,12 @@ public class SortRichEditor extends ScrollView {
 
 
         };
-        containerLayout.setPadding(0, DEFAULT_MARGIN, 0, DEFAULT_MARGIN);
-        containerLayout.setOrientation(LinearLayout.VERTICAL);
-        containerLayout.setBackgroundColor(Color.WHITE);
-        containerLayout.setLayoutParams(layoutParams);
-        setupLayoutTransitions(containerLayout);
-        return containerLayout;
+        buildingContainerLayout.setPadding(0, DEFAULT_MARGIN, 0, DEFAULT_MARGIN);
+        buildingContainerLayout.setOrientation(LinearLayout.VERTICAL);
+        buildingContainerLayout.setBackgroundColor(Color.WHITE);
+        buildingContainerLayout.setLayoutParams(layoutParams);
+        setupLayoutTransitions(buildingContainerLayout);
+        return buildingContainerLayout;
     }
 
     // restore the size of child view
@@ -478,9 +485,7 @@ public class SortRichEditor extends ScrollView {
                 if (itemView instanceof RelativeLayout) {
                     View media = ((RelativeLayout) itemView).getChildAt(0);
                     if (media instanceof VideoPlayer) {
-                        if (((VideoPlayer) media).getJzvdStd().isCurrentPlay()) {
-                            ((VideoPlayer) media).getJzvdStd().onStateAutoComplete();
-                        }
+                        stopVideo((VideoPlayer) media);
                     } else if (media instanceof SoundPlayer) {
                         ((SoundPlayer) media).destroy();
                     }
@@ -667,9 +672,7 @@ public class SortRichEditor extends ScrollView {
                 if (media instanceof SoundPlayer) {
                     ((SoundPlayer) media).destroy();
                 } else if (media instanceof VideoPlayer) {
-                    if (((VideoPlayer) media).getJzvdStd().isCurrentPlay()) {
-                        ((VideoPlayer) media).getJzvdStd().onAutoCompletion();
-                    }
+                    stopVideo((VideoPlayer) media);
                 }
             }
             containerLayout.removeView(view);
@@ -951,23 +954,6 @@ public class SortRichEditor extends ScrollView {
         return super.onTouchEvent(ev);
     }
 
-    @Override
-    public boolean performClick() {
-        return super.performClick();
-    }
-
-    // update the indexArray according to current child position
-    private void resetChildPosition() {
-        indexArray.clear();
-        int num = containerLayout.getChildCount();
-        for (int i = 0; i < num; ++i) {
-            View child = containerLayout.getChildAt(i);
-            int tagID = Integer.parseInt(child.getTag().toString());
-            int sortIndex = (preSortPositionArray.get(tagID) - DEFAULT_MARGIN) / (SIZE_REDUCE_VIEW + DEFAULT_MARGIN);
-            indexArray.put(i, sortIndex);
-        }
-    }
-
     public void addPicture(String picturePath) {
         prepareAddMedia();
         insertMedia(index -> insertPictureAtIndex(index, picturePath));
@@ -1002,10 +988,9 @@ public class SortRichEditor extends ScrollView {
                 View media = ((RelativeLayout) v).getChildAt(0);
                 if (media instanceof SoundPlayer) {
                     ((SoundPlayer) media).destroy();
-                } else if (media instanceof VideoPlayer) {
-                    if (((VideoPlayer) media).getJzvdStd().isCurrentPlay()) {
-                        ((VideoPlayer) media).getJzvdStd().onAutoCompletion();
-                    }
+                } else if (media instanceof VideoPlayer
+                        && ((VideoPlayer) media).getJzvdStd().isCurrentPlay()) {
+                    ((VideoPlayer) media).getJzvdStd().onAutoCompletion();
                 }
             }
         }
@@ -1059,6 +1044,20 @@ public class SortRichEditor extends ScrollView {
         postDelayed(new NoteLoader(this, note), 50);
     }
 
+    private IData buildNoteHandleRelativeLayout(RelativeLayout relativeLayout) {
+        IData data = null;
+        View view = relativeLayout.getChildAt(0);
+        if (view instanceof ImagePlayer) {
+            data = new PictureData(view.getTag().toString());
+        } else if (view instanceof SoundPlayer) {
+            String text = ((SoundPlayer) view).getEditText().getText().toString();
+            data = new SoundData(view.getTag().toString(), text.isEmpty() ? " " : text);
+        } else if (view instanceof VideoPlayer) {
+            data = new VideoData(view.getTag().toString());
+        }
+        return data;
+    }
+
     public Note buildNote() {
         List<IData> contentList = new ArrayList<>();
         int num = containerLayout.getChildCount();
@@ -1072,15 +1071,7 @@ public class SortRichEditor extends ScrollView {
                     data = new TextData(item.getText().toString());
                 }
             } else if (itemView instanceof RelativeLayout) {
-                View view = ((RelativeLayout) itemView).getChildAt(0);
-                if (view instanceof ImagePlayer) {
-                    data = new PictureData(view.getTag().toString());
-                } else if (view instanceof SoundPlayer) {
-                    String text = ((SoundPlayer) view).getEditText().getText().toString();
-                    data = new SoundData(view.getTag().toString(), text.isEmpty() ? " " : text);
-                } else if (view instanceof VideoPlayer) {
-                    data = new VideoData(view.getTag().toString());
-                }
+                data = buildNoteHandleRelativeLayout(((RelativeLayout) itemView));
             }
             if (data != null) {
                 contentList.add(data);
@@ -1139,6 +1130,18 @@ public class SortRichEditor extends ScrollView {
             int releasedViewPos = preSortPositionArray.get(releasedViewID);
             viewDragHelper.settleCapturedViewAt(releasedChild.getLeft(), releasedViewPos);
             invalidate();
+        }
+
+        // update the indexArray according to current child position
+        private void resetChildPosition() {
+            indexArray.clear();
+            int num = containerLayout.getChildCount();
+            for (int i = 0; i < num; ++i) {
+                View child = containerLayout.getChildAt(i);
+                int tagID = Integer.parseInt(child.getTag().toString());
+                int sortIndex = (preSortPositionArray.get(tagID) - DEFAULT_MARGIN) / (SIZE_REDUCE_VIEW + DEFAULT_MARGIN);
+                indexArray.put(i, sortIndex);
+            }
         }
 
         @Override

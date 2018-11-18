@@ -235,6 +235,29 @@ public class ListActivity extends AppCompatActivity {
         });
     }
 
+    private void handleNewGroup(List<String> allGroups) {
+        EditText editText = new EditText(ListActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
+        builder.setTitle("New group");
+        builder.setPositiveButton("add", null);
+        builder.setNegativeButton("cancel", null);
+        builder.setView(editText);
+        AlertDialog dialog = builder.create();
+        dialog.show();
+        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
+            String groupName = editText.getText().toString();
+            if (groupName.isEmpty())
+                Toast.makeText(ListActivity.this, "input something?", Toast.LENGTH_SHORT).show();
+            else if (allGroups.contains(groupName))
+                Toast.makeText(ListActivity.this, groupName + " already exist", Toast.LENGTH_SHORT).show();
+            else {
+                TableOperate.getInstance().addGroup(groupName);
+                refreshGroups();
+                dialog.cancel();
+            }
+        });
+    }
+
     private void handleGroupManage(@NonNull MenuItem menuItem) {
         List<String> allGroups = TableOperate.getInstance().getAllGroups();
         String[] allGroupsArray = allGroups.toArray(new String[0]);
@@ -262,7 +285,7 @@ public class ListActivity extends AppCompatActivity {
 
             case R.id.manage_group:
                 builder.setTitle(getString(R.string.manage_groups));
-                boolean selected[] = new boolean[allGroupsArray.length];
+                boolean[] selected = new boolean[allGroupsArray.length];
                 builder.setMultiChoiceItems(allGroupsArray, new boolean[allGroupsArray.length], (dialog, which, isChecked) -> selected[which] = isChecked);
                 builder.setPositiveButton("confirm", (dialog, which) -> {
                     for (int i = 0; i < allGroupsArray.length; i++)

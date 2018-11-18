@@ -39,17 +39,6 @@ public class NoteZipConverter implements INoteFileConverter {
             this.filePathName = filePathName;
         }
 
-        private String getUnusedDir(String dir) {
-            int index;
-            for (index = 0; ; index++) {
-                File file = new File(dir + Integer.toString(index));
-                if (!file.exists()) {
-                    break;
-                }
-            }
-            return dir + Integer.toString(index);
-        }
-
         @Override
         protected Note doInBackground(Void... voids) {
 
@@ -74,7 +63,7 @@ public class NoteZipConverter implements INoteFileConverter {
 
             // resource files (picture, sound, video)
             File tempFolder = new File(INoteFileConverter.getExportDirPath() + "/temp");
-            String savingPath = getUnusedDir(INoteFileConverter.getExportDirPath() + '/' + note.getTitle() + "_unzip");
+            String savingPath = getUnusedDir(INoteFileConverter.getExportDirPath() + File.separator + note.getTitle() + "_unzip");
             boolean ok = tempFolder.renameTo(new File(savingPath));
             ReturnValueEater.eat(ok);
 
@@ -105,6 +94,18 @@ public class NoteZipConverter implements INoteFileConverter {
 
             return note;
         }
+
+        @NonNull
+        private String getUnusedDir(String dir) {
+            int index;
+            for (index = 0; ; index++) {
+                File file = new File(dir + Integer.toString(index));
+                if (!file.exists()) {
+                    break;
+                }
+            }
+            return dir + Integer.toString(index);
+        }
     }
 
     static class ExportNoteToZipTask extends AsyncTaskWithResponse<Void, Void, String> {
@@ -132,52 +133,38 @@ public class NoteZipConverter implements INoteFileConverter {
             File desFile;
             List<IData> contentList = note.getContent();
             for (int i = 0; i < contentList.size(); i++) {
-                switch (contentList.get(i).getType()) {
-                    case "Pic":
-                        srcFile = new File(contentList.get(i).getPath());
-                        FileOperate.getSuffix(contentList.get(i).getPath());
-                        desFile = new File(getTempDirPath() + "/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath()));
-                        FileOperate.copy(srcFile, desFile);
-                        break;
-                    case "Sound":
-                        srcFile = new File(contentList.get(i).getPath());
-                        desFile = new File(getTempDirPath() + "/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath()));
-                        FileOperate.copy(srcFile, desFile);
-                        break;
-                    case "Video":
-                        srcFile = new File(contentList.get(i).getPath());
-                        desFile = new File(getTempDirPath() + "/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath()));
-                        FileOperate.copy(srcFile, desFile);
-                        break;
-
-                    default:
-                        break;
+                if (contentList.get(i) instanceof PictureData) {
+                    srcFile = new File(contentList.get(i).getPath());
+                    FileOperate.getSuffix(contentList.get(i).getPath());
+                    desFile = new File(getTempDirPath() + "/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath()));
+                    FileOperate.copy(srcFile, desFile);
+                } else if (contentList.get(i) instanceof SoundData) {
+                    srcFile = new File(contentList.get(i).getPath());
+                    desFile = new File(getTempDirPath() + "/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath()));
+                    FileOperate.copy(srcFile, desFile);
+                } else if (contentList.get(i) instanceof VideoData) {
+                    srcFile = new File(contentList.get(i).getPath());
+                    desFile = new File(getTempDirPath() + "/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath()));
+                    FileOperate.copy(srcFile, desFile);
                 }
             }
+
 
             // structure of the note
             StringBuilder string = new StringBuilder(note.getTitle() + TableConfig.FileSave.LIST_SEPARATOR);
             for (int i = 0; i < contentList.size(); i++) {
                 String newDir;
-                switch (contentList.get(i).getType()) {
-                    case "Pic":
-                        newDir = "/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
-                        string.append("Picture").append(TableConfig.FileSave.LINE_SEPARATOR).append(newDir).append(TableConfig.FileSave.LIST_SEPARATOR);
-                        break;
-
-                    case "Sound":
-                        newDir = "/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
-                        string.append("Sound").append(TableConfig.FileSave.LINE_SEPARATOR).append(newDir).append(TableConfig.FileSave.LINE_SEPARATOR).append(contentList.get(i).getText()).append(TableConfig.FileSave.LIST_SEPARATOR);
-                        break;
-
-                    case "Video":
-                        newDir = "/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
-                        string.append("Video").append(TableConfig.FileSave.LINE_SEPARATOR).append(newDir).append(TableConfig.FileSave.LIST_SEPARATOR);
-                        break;
-
-                    default:
-                        string.append(contentList.get(i).toString()).append(TableConfig.FileSave.LIST_SEPARATOR);
-                        break;
+                if (contentList.get(i) instanceof PictureData) {
+                    newDir = "/Picdata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
+                    string.append("Picture").append(TableConfig.FileSave.LINE_SEPARATOR).append(newDir).append(TableConfig.FileSave.LIST_SEPARATOR);
+                } else if (contentList.get(i) instanceof SoundData) {
+                    newDir = "/Sounddata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
+                    string.append("Sound").append(TableConfig.FileSave.LINE_SEPARATOR).append(newDir).append(TableConfig.FileSave.LINE_SEPARATOR).append(contentList.get(i).getText()).append(TableConfig.FileSave.LIST_SEPARATOR);
+                } else if (contentList.get(i) instanceof VideoData) {
+                    newDir = "/Videodata" + Integer.toString(i) + "." + FileOperate.getSuffix(contentList.get(i).getPath());
+                    string.append("Video").append(TableConfig.FileSave.LINE_SEPARATOR).append(newDir).append(TableConfig.FileSave.LIST_SEPARATOR);
+                } else if (contentList.get(i) instanceof TextData) {
+                    string.append(contentList.get(i).toString()).append(TableConfig.FileSave.LIST_SEPARATOR);
                 }
             }
             byte[] bs = string.toString().getBytes();
@@ -212,7 +199,7 @@ public class NoteZipConverter implements INoteFileConverter {
     }
 
     @NonNull
-    static String getTempDirPath() {
-        return INoteFileConverter.getExportDirPath() + "/temp";
+    private static String getTempDirPath() {
+        return INoteFileConverter.getExportDirPath() + File.separator + "temp";
     }
 }
