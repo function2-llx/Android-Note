@@ -1,6 +1,7 @@
 package com.se.npe.androidnote.adapters;
 
 import android.content.Context;
+import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
 
@@ -81,16 +82,15 @@ public class TagGroupManager extends TagContainerLayout {
         this.removeAllViews();
     }
 
+    @Nullable
     public List<String> getCheckedTags() {
-        List<String> ret = new ArrayList<>();
-
         if (checked[checked.length - 1]) // all checked
-            for (int i = 0; i < checked.length - 1; i++)
+            return null;
+
+        List<String> ret = new ArrayList<>();
+        for (int i = 0; i < checked.length - 1; i++)
+            if (checked[i])
                 ret.add(tagList.get(i));
-        else
-            for (int i = 0; i < checked.length - 1; i++)
-                if (checked[i])
-                    ret.add(tagList.get(i));
         return ret;
     }
 }
