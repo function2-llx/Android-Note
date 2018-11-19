@@ -20,12 +20,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 @RunWith(RobolectricTestRunner.class)
 public class TagGroupManagerTest {
 
     private TagGroupManager tagGroupManager;
-    private List<String> wholeTagList;
 
     @Before
     public void setUp() {
@@ -34,11 +34,6 @@ public class TagGroupManagerTest {
         tagGroupManager = new TagGroupManager(context);
         TableOperate.init(context); // initialize SAVE_PATH
         TableOperateTest.addExampleNote(new ArrayList<>());
-
-        wholeTagList = new ArrayList<>();
-        for (int i = 0; i < TableOperateTest.NOTE_LIST_SIZE; ++i) {
-            wholeTagList.add(DataExample.getExampleNoteTag(String.valueOf(i)));
-        }
     }
 
     @After
@@ -58,20 +53,20 @@ public class TagGroupManagerTest {
         assertEquals(tagList, tagGroupManager.getCheckedTags());
         // with tag-all checked
         tagGroupManager.switchCheckedState(TableOperateTest.NOTE_LIST_SIZE);
-        assertEquals(wholeTagList, tagGroupManager.getCheckedTags());
+        assertNull(tagGroupManager.getCheckedTags());
     }
 
     @Test
     public void init() {
         tagGroupManager.init();
-        assertEquals(wholeTagList, tagGroupManager.getCheckedTags());
+        assertNull(tagGroupManager.getCheckedTags());
     }
 
     @Test
     public void showAndHide() {
         tagGroupManager.show();
         assertEquals(View.VISIBLE, tagGroupManager.getVisibility());
-        assertEquals(wholeTagList, tagGroupManager.getCheckedTags());
+        assertNull(tagGroupManager.getCheckedTags());
         tagGroupManager.hide();
         assertEquals(View.INVISIBLE, tagGroupManager.getVisibility());
     }
