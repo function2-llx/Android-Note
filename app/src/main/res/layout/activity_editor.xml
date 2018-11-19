@@ -26,12 +26,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
-        android:layout_marginBottom="48dp">
+        android:layout_marginBottom="48dp"
+        app:fab_addButtonColorNormal="@color/colorSecondary">
 
         <com.getbase.floatingactionbutton.FloatingActionButton
             android:id="@+id/insert_sound"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:fab_colorNormal="@color/colorSecondary"
             app:fab_icon="@drawable/baseline_mic_white_48dp"
             app:fab_title="insert sound" />
 
@@ -39,6 +41,7 @@
             android:id="@+id/insert_picture"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:fab_colorNormal="@color/colorSecondary"
             app:fab_icon="@drawable/baseline_photo_camera_white_48dp"
             app:fab_title="insert picture" />
 
@@ -46,6 +49,7 @@
             android:id="@+id/insert_video"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:fab_colorNormal="@color/colorSecondary"
             app:fab_icon="@drawable/baseline_videocam_white_48dp"
             app:fab_title="insert video" />
 
@@ -53,8 +57,9 @@
             android:id="@+id/rearrange_editor"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:fab_colorNormal="@color/colorSecondary"
             app:fab_icon="@drawable/baseline_sort_white_48dp"
-            app:fab_title="insert video" />
+            app:fab_title="sort" />
     </com.getbase.floatingactionbutton.FloatingActionsMenu>
 
 </android.support.design.widget.CoordinatorLayout>

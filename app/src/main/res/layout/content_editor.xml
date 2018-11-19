@@ -14,7 +14,7 @@
         android:layout_height="match_parent"
         android:layout_marginTop="?attr/actionBarSize"
         android:background="#fff"
-        android:gravity="left|top" />
+        android:gravity="start|top" />
 
     <com.se.npe.androidnote.editor.HorizontalEditScrollView
         android:id="@+id/scroll_edit"
