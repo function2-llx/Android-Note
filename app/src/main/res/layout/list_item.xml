@@ -18,14 +18,12 @@
         android:paddingStart="10dp"
         android:paddingEnd="10dp">
 
-
         <TextView
             android:id="@+id/text_view_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="5dp"
             android:singleLine="true"
-            android:text="title"
             android:textSize="20sp"
             android:textStyle="bold" />
 
@@ -33,30 +31,26 @@
             android:id="@+id/text_view_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:singleLine="true"
-            android:text="content" />
+            android:singleLine="true" />
 
         <TextView
             android:id="@+id/text_view_group"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:singleLine="true"
-            android:text="group" />
+            android:singleLine="true" />
 
 
         <TextView
             android:id="@+id/text_view_create_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:singleLine="true"
-            android:text="2018" />
+            android:singleLine="true" />
 
         <TextView
             android:id="@+id/text_view_modify_time"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:singleLine="true"
-            android:text="2018" />
+            android:singleLine="true" />
 
     </LinearLayout>
 
@@ -69,8 +63,7 @@
         <ImageView
             android:id="@+id/image_view"
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:contentDescription="TODO" />
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 

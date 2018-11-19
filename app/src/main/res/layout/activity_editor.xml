@@ -19,7 +19,7 @@
             app:title="@string/editor_title" />
     </LinearLayout>
 
-    <include layout="@layout/content_editor" />
+    <include layout="@layout/editor_content" />
 
     <com.getbase.floatingactionbutton.FloatingActionsMenu
         android:id="@+id/insert_media"

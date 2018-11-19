@@ -61,7 +61,7 @@ public class HorizontalEditScrollView extends FrameLayout implements View.OnClic
 
     public HorizontalEditScrollView(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        LayoutInflater.from(context).inflate(R.layout.layout_horizontal_scroll, this, true);
+        LayoutInflater.from(context).inflate(R.layout.editor_horizontal_scroll, this, true);
     }
 
     public void setEditTextAndConfig(@NonNull MarkdownEditText markdownEditText,

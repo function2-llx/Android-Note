@@ -50,7 +50,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_list_item, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
         final ViewHolder holder = new ViewHolder(v);
         v.setOnClickListener(holder);
         v.setOnLongClickListener(holder);
@@ -100,7 +100,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 
     @Override
     public RecyclerView.ViewHolder onCreateHeaderViewHolder(ViewGroup parent) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.stick_header_item, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_header, parent, false);
         return new RecyclerView.ViewHolder(v) {
         };
     }
@@ -294,11 +294,8 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
                     case R.id.set_group:
                         List<String> groupName = TableOperate.getInstance().getAllGroups();
 
-                        View dialogView = View.inflate(activity, R.layout.set_group_dialog, null);
-
                         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                         builder.setTitle("set group");
-                        builder.setView(dialogView);
                         final int[] selected = {0};
                         builder.setPositiveButton("confirm", (dialog, which) -> {
                             selectedNote.setGroupName(groupName.get(selected[0]));
