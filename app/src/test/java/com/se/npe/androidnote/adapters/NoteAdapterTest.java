@@ -209,6 +209,14 @@ public class NoteAdapterTest {
     }
 
     @Test
+    public void emptyViewHolder() {
+        Note note = new Note();
+        note.setTitle("");
+        noteAdapter.insert(note, 0);
+        createViewHolder();
+    }
+
+    @Test
     public void clickViewHolder() {
         createViewHolder();
         // click view holder

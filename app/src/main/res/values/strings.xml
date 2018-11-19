@@ -1,24 +1,62 @@
 <resources>
     <string name="app_name">AndroidNote</string>
 
+    <!--List-->
+    <string name="list_title">Notes</string>
+    <string name="list_search">Search</string>
+    <string name="list_search_hint">"Search for notes"</string>
+    <string name="list_sort">Sort</string>
+    <string name="list_sort_title">Sort by Title</string>
+    <string name="list_sort_created_time">Sort by Created Time</string>
+    <string name="list_sort_modified_time">Sort by Modified Time</string>
+    <string name="list_new_note">New Note</string>
+    <string name="list_settings">Settings</string>
+    <string name="list_clear">Clear</string>
+
+    <!--Navigation-->
+    <string name="groups_title">Groups</string>
+    <string name="group_all_notes">All Notes</string>
+    <string name="new_group">New Group</string>
+    <string name="remove_group">Remove Groups</string>
+    <string name="drawer_open">Open</string>
+    <string name="drawer_close">Close</string>
+
+    <!--Editor-->
     <string name="editor_title">Editor</string>
-    <string name="list_title">List of Notes</string>
+    <string name="editor_title_capacity">%d/%d</string>
+    <string name="editor_markdown">Markdown</string>
+    <string name="editor_plain_text">Plain Text</string>
 
-    <string name="menu_search">Search</string>
-    <string name="menu_sort">Sort</string>
-    <string name="menu_settings">Settings</string>
-    <string name="menu_new_note">New note</string>
+    <!--Sound Recorder-->
+    <string name="record_prompt">Tap the button to start recording</string>
+    <string name="record_in_progress">Recording</string>
 
-    <string name="sort_created_time">Sort by created time</string>
-    <string name="sort_modified_time">Sort by modified time</string>
-    <string name="sort_title">Sort by title</string>
+    <!--Note-->
+    <string name="note_preview">Preview</string>
+    <string name="note_delete">Delete</string>
+    <string name="note_set_group">Set Group</string>
+    <string name="note_remove_group">Remove Group</string>
 
-    <string name="title_capacity">%d/%d</string>
+    <string name="note_open">Open</string>
+    <string name="note_save">Save</string>
+    <string name="note_share">Share</string>
+    <string name="note_export">Export</string>
+
+    <!--Note Preview-->
     <string name="note_preview_title">NO TITLE</string>
     <string name="note_preview_text">NO PREVIEW TEXT</string>
     <string name="note_preview_group">Group: %s</string>
     <string name="note_preview_create_time">Created:\u0020\u0020 %s</string>
     <string name="note_preview_modify_time">Modified: %s</string>
+
+    <!--Shortcut-->
+    <string name="shortcut_search_disable">Search Unavailable</string>
+    <string name="shortcut_search_long">Search Note</string>
+    <string name="shortcut_search_short">Search Note</string>
+    <string name="shortcut_new_disable">New Unavailable</string>
+    <string name="shortcut_new_long">New Note</string>
+    <string name="shortcut_new_short">New Note</string>
+
     <!-- Toolbar -->
 
     <!-- Toasts -->
@@ -27,31 +65,6 @@
 
     <!-- Dialogs -->
 
-    <string name="record_prompt">Tap the button to start recording</string>
-    <string name="record_in_progress">Recording</string>
-
     <!-- Preferences -->
-    <string name="delete">Delete</string>
-    <string name="clear">Clear</string>
 
-    <string name="shortcut_search_disable">Search Unavailable</string>
-    <string name="shortcut_search_long">Search Note</string>
-    <string name="shortcut_search_short">Search Note</string>
-    <string name="shortcut_new_disable">New Unavailable</string>
-    <string name="shortcut_new_long">New Note</string>
-    <string name="shortcut_new_short">New Note</string>
-    <string name="group_all_notes">All notes</string>
-
-    <string name="open">open</string>
-    <string name="close">close</string>
-    <string name="save">Save</string>
-    <string name="share">Share</string>
-    <string name="export">Export</string>
-    <string name="set_group">set group</string>
-    <string name="groups">Groups</string>
-    <string name="new_group">new group</string>
-    <string name="manage_groups">manage groups</string>
-    <string name="remove_from_current_group">remove from current group</string>
-    <string name="markdown">Markdown</string>
-    <string name="plain_text">Plain Text</string>
 </resources>

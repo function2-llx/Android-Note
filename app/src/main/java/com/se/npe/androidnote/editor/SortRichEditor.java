@@ -217,7 +217,7 @@ public class SortRichEditor extends ScrollView {
         parentLayout.addView(titleLayout);
 
         final TextView textLimit = new TextView(getContext());
-        textLimit.setText(getResources().getString(R.string.title_capacity,
+        textLimit.setText(getResources().getString(R.string.editor_title_capacity,
                 0, TITLE_WORD_LIMIT_COUNT));
         textLimit.setTextColor(Color.parseColor("#aaaaaa"));
         textLimit.setTextSize(13);
@@ -245,7 +245,7 @@ public class SortRichEditor extends ScrollView {
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
                 String titleStr = title.getText().toString();
-                textLimit.setText(getResources().getString(R.string.title_capacity,
+                textLimit.setText(getResources().getString(R.string.editor_title_capacity,
                         titleStr.length(), TITLE_WORD_LIMIT_COUNT));
             }
 

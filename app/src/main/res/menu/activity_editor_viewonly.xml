@@ -4,12 +4,12 @@
     <item
         android:id="@+id/viewonly_share"
         android:icon="@drawable/baseline_share_white_48dp"
-        android:title="@string/share"
+        android:title="@string/note_share"
         app:showAsAction="always" />
 
     <item
         android:id="@+id/viewonly_export"
-        android:title="@string/export">
+        android:title="@string/note_export">
 
     </item>
 </menu>

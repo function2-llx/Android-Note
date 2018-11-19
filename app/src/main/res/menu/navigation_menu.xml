@@ -4,7 +4,7 @@
 
     <item
         android:id="@+id/group_manage"
-        android:title="@string/manage_groups">
+        android:title="@string/remove_group">
         <menu>
             <group android:id="@+id/group_operations">
                 <item
@@ -14,7 +14,7 @@
                 <item
                     android:id="@+id/manage_group"
                     android:icon="@mipmap/icon_remove"
-                    android:title="@string/manage_groups" />
+                    android:title="@string/remove_group" />
             </group>
         </menu>
     </item>
@@ -22,7 +22,7 @@
     <item
         android:id="@+id/groups"
         android:icon="@mipmap/icon_group"
-        android:title="@string/groups">
+        android:title="@string/groups_title">
         <menu>
             <group android:id="@+id/group_all_notes">
                 <item

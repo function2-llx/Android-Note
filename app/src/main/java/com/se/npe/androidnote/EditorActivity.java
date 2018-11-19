@@ -3,7 +3,6 @@ package com.se.npe.androidnote;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
@@ -28,11 +27,8 @@ import com.dmcbig.mediapicker.PickerActivity;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
-import com.ipaulpro.afilechooser.utils.FileUtils;
-import com.mob.MobSDK;
 import com.se.npe.androidnote.editor.SortRichEditor;
 import com.se.npe.androidnote.interfaces.INoteFileConverter;
-import com.se.npe.androidnote.models.FileOperate;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.NotePdfConverter;
 import com.se.npe.androidnote.models.NoteZipConverter;
@@ -113,9 +109,9 @@ public class EditorActivity extends AppCompatActivity {
             case R.id.menu_markdown:
                 // shows the mode (markdown/plain_text) to change to
                 if (editor.changeIsMarkdown()) {
-                    item.setTitle(R.string.markdown);
+                    item.setTitle(R.string.editor_markdown);
                 } else {
-                    item.setTitle(R.string.plain_text);
+                    item.setTitle(R.string.editor_plain_text);
                 }
                 break;
 

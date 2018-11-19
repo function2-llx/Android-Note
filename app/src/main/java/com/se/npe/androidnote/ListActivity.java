@@ -195,7 +195,7 @@ public class ListActivity extends AppCompatActivity {
 
     private void initDrawerToggle() {
         drawerLayout = findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.open, R.string.close);
+        ActionBarDrawerToggle drawerToggle = new ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.drawer_open, R.string.drawer_close);
         drawerToggle.syncState();
     }
 
@@ -261,7 +261,7 @@ public class ListActivity extends AppCompatActivity {
                 break;
 
             case R.id.manage_group:
-                builder.setTitle(getString(R.string.manage_groups));
+                builder.setTitle(getString(R.string.remove_group));
                 boolean[] selected = new boolean[allGroupsArray.length];
                 builder.setMultiChoiceItems(allGroupsArray, new boolean[allGroupsArray.length], (dialog, which, isChecked) -> selected[which] = isChecked);
                 builder.setPositiveButton("confirm", (dialog, which) -> {
@@ -291,7 +291,7 @@ public class ListActivity extends AppCompatActivity {
     private void configureSearchView(@NonNull SearchView searchView) {
         TagGroupManager tagGroupManager = findViewById(R.id.tag_group_manager);
 
-        searchView.setQueryHint("search for your note");
+        searchView.setQueryHint(getResources().getString(R.string.list_search_hint));
         searchView.setSubmitButtonEnabled(true);
 
         // open searchView
