@@ -14,9 +14,11 @@
     <string name="sort_title">Sort by title</string>
 
     <string name="title_capacity">%d/%d</string>
-    <string name="note_create_time">create: %s</string>
-    <string name="note_modify_time">modify: %s</string>
-    <string name="note_group">group: %s</string>
+    <string name="note_preview_title">NO TITLE</string>
+    <string name="note_preview_text">NO PREVIEW TEXT</string>
+    <string name="note_preview_group">Group: %s</string>
+    <string name="note_preview_create_time">Created:\u0020\u0020 %s</string>
+    <string name="note_preview_modify_time">Modified: %s</string>
     <!-- Toolbar -->
 
     <!-- Toasts -->

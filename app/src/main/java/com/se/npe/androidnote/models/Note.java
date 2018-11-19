@@ -156,7 +156,7 @@ public class Note implements Serializable {
                 text = contentList.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
             }
         }
-        if (text == null) text = "无预览文字";
+        if (text == null) text = "";
         if (picPath == null) picPath = "";
         return new Note.PreviewData(title, text, groupName, picPath, startTime, modifyTime);
     }
