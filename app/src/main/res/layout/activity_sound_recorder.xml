@@ -25,7 +25,7 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="64dp"
         android:fontFamily="sans-serif-light"
-        android:textSize="60sp" />
+        android:textSize="48sp" />
 
     <ProgressBar
         android:id="@+id/recordProgressBar"
@@ -34,12 +34,19 @@
         android:layout_height="200dp"
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="27dp"
-        android:background="@drawable/record_progress_bar_background"
+        android:layout_marginTop="24dp"
         android:indeterminate="false"
         android:max="100"
         android:progress="0"
         android:progressDrawable="@drawable/record_progress_bar" />
+
+    <ImageView
+        android:id="@+id/recorder_icon"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="276dp"
+        android:src="@drawable/baseline_mic_none_black_48dp" />
 
     <TextView
         android:id="@+id/recording_status_text"
