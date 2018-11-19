@@ -16,5 +16,5 @@
         android:title="@string/export" />
     <item
         android:id="@+id/menu_markdown"
-        android:title="@string/markdown" />
+        android:title="@string/plain_text" />
 </menu>

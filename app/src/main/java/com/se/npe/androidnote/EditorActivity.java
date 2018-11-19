@@ -111,10 +111,11 @@ public class EditorActivity extends AppCompatActivity {
 
 
             case R.id.menu_markdown:
+                // shows the mode (markdown/plain_text) to change to
                 if (editor.changeIsMarkdown()) {
-                    item.setTitle(R.string.plain_text);
-                } else {
                     item.setTitle(R.string.markdown);
+                } else {
+                    item.setTitle(R.string.plain_text);
                 }
                 break;
 
