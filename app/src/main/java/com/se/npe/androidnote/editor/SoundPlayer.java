@@ -6,6 +6,7 @@ import android.os.Handler;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 
@@ -33,7 +34,12 @@ public class SoundPlayer extends RelativeLayout {
             int now = progressBar.getMax() * mediaPlayer.getCurrentPosition() / mediaPlayer.getDuration();
             progressBar.setProgress(now);
             if (mediaPlayer.isPlaying()) {
+                // playing go on
                 new Handler().postDelayed(this, 100);
+            } else {
+                // playing over
+                ImageView playButton = ref.get().findViewById(R.id.sound_player_play);
+                playButton.setImageResource(R.drawable.baseline_play_arrow_white_48dp);
             }
         }
     }
@@ -50,11 +56,14 @@ public class SoundPlayer extends RelativeLayout {
         super(context, attrs);
         LayoutInflater.from(context).inflate(R.layout.sound_player, this);
         mediaPlayer = new MediaPlayer();
-        findViewById(R.id.sound_player_play).setOnClickListener(v -> {
+        ImageView playButton = findViewById(R.id.sound_player_play);
+        playButton.setOnClickListener(v -> {
             if (mediaPlayer.isPlaying()) {
                 mediaPlayer.pause();
+                playButton.setImageResource(R.drawable.baseline_play_arrow_white_48dp);
             } else {
                 mediaPlayer.start();
+                playButton.setImageResource(R.drawable.baseline_pause_white_48dp);
                 new Handler().postDelayed(new ProgressSetter(this), 100);
             }
         });

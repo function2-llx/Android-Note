@@ -2,6 +2,9 @@ package com.se.npe.androidnote.adapters;
 
 import android.app.AlertDialog;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
@@ -9,7 +12,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.PopupMenu;
 import android.widget.TextView;
 
@@ -50,17 +52,8 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.activity_list_item, parent, false);
-        final ViewHolder holder = new ViewHolder(v);
-        v.setOnClickListener(holder);
-        v.setOnLongClickListener(holder);
-
-        //把文字部分设置为屏幕宽度的2/3
-        LinearLayout textLayout = v.findViewById(R.id.text_layout);
-        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) textLayout.getLayoutParams();
-        params.width = getScreenWidth() / 3 * 2;
-        textLayout.setLayoutParams(params);
-        return holder;
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_item, parent, false);
+        return new ViewHolder(v);
     }
 
     @Override
@@ -100,7 +93,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 
     @Override
     public RecyclerView.ViewHolder onCreateHeaderViewHolder(ViewGroup parent) {
-        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.stick_header_item, parent, false);
+        View v = LayoutInflater.from(parent.getContext()).inflate(R.layout.list_header, parent, false);
         return new RecyclerView.ViewHolder(v) {
         };
     }
@@ -183,12 +176,6 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         return this.comparator;
     }
 
-    private int getScreenWidth() {
-        DisplayMetrics outMetrics = new DisplayMetrics();
-        activity.getWindowManager().getDefaultDisplay().getMetrics(outMetrics);
-        return outMetrics.widthPixels;
-    }
-
     /**
      * Adapt Note to item-like View
      *
@@ -203,7 +190,9 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         private TextView modifyTimeDisplayer;
 
         private ImageView imageView;
+
         int screenWidth = -1;
+        Bitmap emptyImage = null;
 
         private int getScreenWidth() {
             if (screenWidth != -1)
@@ -214,52 +203,78 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
             return screenWidth;
         }
 
+        private Bitmap getEmptyImage() {
+            if (emptyImage != null)
+                return emptyImage;
+            Bitmap old = BitmapFactory.decodeResource(getResources(), R.drawable.no_image_available);
+            int width = old.getWidth();
+            int height = old.getHeight();
+            float scale = ((float) getScreenWidth() / 3) / width;
+            Matrix matrix = new Matrix();
+            matrix.postScale(scale, scale);
+            emptyImage = Bitmap.createBitmap(old, 0, 0, width, height, matrix, true);
+            return emptyImage;
+        }
+
         public ViewHolder(View itemView) {
             super(itemView);
 
+            int textWidth = getScreenWidth() / 3 * 2;
             // title & text
             this.title = itemView.findViewById(R.id.text_view_title);
+            this.title.setWidth(textWidth);
             this.text = itemView.findViewById(R.id.text_view_text);
-
+            this.text.setWidth(textWidth);
             // group the note belongs to
             this.group = itemView.findViewById(R.id.text_view_group);
-
+            this.group.setWidth(textWidth);
             // create & modify time
-            int textWidth = getScreenWidth() / 3 * 2;
             this.createTimeDisplayer = itemView.findViewById(R.id.text_view_create_time);
             this.createTimeDisplayer.setWidth(textWidth);
             this.modifyTimeDisplayer = itemView.findViewById(R.id.text_view_modify_time);
             this.modifyTimeDisplayer.setWidth(textWidth);
             // image
             this.imageView = itemView.findViewById(R.id.image_view);
+
+            // click listener
+            itemView.setOnClickListener(this);
+            itemView.setOnLongClickListener(this);
         }
 
-        public void setTitle(String title) {
-            this.title.setText(title);
-        }
-
-        public void setText(String text) {
-            this.text.setText(text);
-        }
-
-        public void setGroup(String group) {
-            if (group == null || group.isEmpty())
-                this.group.setText("this note does not belong to any group");
+        public void setTitle(@NonNull String title) {
+            if (title.isEmpty())
+                this.title.setText(getResources().getString(R.string.note_preview_title));
             else
-                this.group.setText(getResources().getString(R.string.note_group, group));
+                this.title.setText(title);
         }
 
-        public void setCreateDate(Date date) {
-            this.createTimeDisplayer.setText(getResources().getString(R.string.note_create_time, getFormatDate(date)));
+        public void setText(@NonNull String text) {
+            if (text.isEmpty())
+                this.text.setText(getResources().getString(R.string.note_preview_text));
+            else
+                this.text.setText(text);
         }
 
-        public void setModifyDate(Date date) {
-            this.modifyTimeDisplayer.setText(getResources().getString(R.string.note_modify_time, getFormatDate(date)));
+        public void setGroup(@NonNull String group) {
+            if (group.isEmpty()) {
+                this.group.setVisibility(View.GONE);
+            } else {
+                this.group.setText(getResources().getString(R.string.note_preview_group, group));
+                this.group.setVisibility(View.VISIBLE);
+            }
         }
 
-        public void setImage(String imagePath) {
+        public void setCreateDate(@NonNull Date date) {
+            this.createTimeDisplayer.setText(getResources().getString(R.string.note_preview_create_time, getFormatDate(date)));
+        }
+
+        public void setModifyDate(@NonNull Date date) {
+            this.modifyTimeDisplayer.setText(getResources().getString(R.string.note_preview_modify_time, getFormatDate(date)));
+        }
+
+        public void setImage(@NonNull String imagePath) {
             if (imagePath.isEmpty())
-                this.imageView.setImageBitmap(null);    //clear the previous image
+                this.imageView.setImageBitmap(this.getEmptyImage());    //clear the previous image
             else
                 new PictureLoader(imageView, getScreenWidth() / 3).execute(imagePath);
         }
@@ -294,11 +309,8 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
                     case R.id.set_group:
                         List<String> groupName = TableOperate.getInstance().getAllGroups();
 
-                        View dialogView = View.inflate(activity, R.layout.set_group_dialog, null);
-
                         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                         builder.setTitle("set group");
-                        builder.setView(dialogView);
                         final int[] selected = {0};
                         builder.setPositiveButton("confirm", (dialog, which) -> {
                             selectedNote.setGroupName(groupName.get(selected[0]));
@@ -327,8 +339,8 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
             return true;
         }
 
-        private String getFormatDate(Date date) {
-            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd  HH:mm:ss", Locale.getDefault());
+        private String getFormatDate(@NonNull Date date) {
+            SimpleDateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
             return format.format(date);
         }
     }

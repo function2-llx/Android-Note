@@ -26,9 +26,6 @@ public class TagGroupManager extends TagContainerLayout {
 
     public TagGroupManager(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
-        this.setBackgroundColor(getResources().getColor(R.color.white, null));
-        this.setRippleAlpha(0);
-        this.setVisibility(View.INVISIBLE);
     }
 
     private List<String> tagList;
