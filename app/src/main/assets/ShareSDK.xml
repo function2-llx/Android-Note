@@ -18,7 +18,7 @@
     <ShortMessage Enable="false" />
     <!--从Wechat得到的AppId-->
     <Wechat AppId="wxec99b1ef4e23b81e" AppSecret="38a4f8204cc784f81f9f0daaf31e02e3"
-        BypassApproval="false" />
+        BypassApproval="false"  Enable="true"/>
     <WechatMoments AppId="wxec99b1ef4e23b81e" AppSecret="38a4f8204cc784f81f9f0daaf31e02e3"
         BypassApproval="false" />
     <QQ Enable="false" />

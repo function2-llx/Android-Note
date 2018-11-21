@@ -5,9 +5,7 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -41,10 +39,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 import cn.sharesdk.framework.Platform;
 import cn.sharesdk.onekeyshare.OnekeyShare;
@@ -80,14 +78,44 @@ public class EditorActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    private void shareWechat(Platform weChat, Platform.ShareParams sp) {
+    private void shareWechat(Platform weChat, Platform.ShareParams sp, String fileName) {
         Note note = editor.buildNote();
-        sp.setTitle(note.getTitle() + ".note");
-        sp.setImageUrl("https://hmls.hfbank.com.cn/hfapp-api/9.png");
+
         sp.setShareType(Platform.SHARE_FILE);
-        INoteFileConverter noteFileConverter = new NoteZipConverter();
-        noteFileConverter.exportNoteToFile(sp::setFilePath, note, "temp");
+        sp.setTitle(note.getTitle() + ".note");
+        sp.setText("test");
+        sp.setImageUrl("https://hmls.hfbank.com.cn/hfapp-api/9.png");
+        sp.setFilePath(fileName);
         weChat.share(sp);
+    }
+
+    private void share() {
+        OnekeyShare oks = new OnekeyShare();
+        oks.disableSSOWhenAuthorize();
+
+        oks.setTitle("test");
+        oks.setText("test");
+        oks.setImageUrl("https://hmls.hfbank.com.cn/hfapp-api/9.png");
+
+        Note note = editor.buildNote();
+        INoteFileConverter noteFileConverter = new NoteZipConverter();
+        noteFileConverter.exportNoteToFile((String fileName) -> {
+            oks.setFilePath(fileName);
+            oks.setShareContentCustomizeCallback(
+                (platform, shareParams) -> {
+                    if (platform.getName().equals(Wechat.NAME))
+                        shareWechat(platform, shareParams, fileName);
+                }
+            );
+            oks.show(this);
+        }, note, "temp");
+//        oks.setShareContentCustomizeCallback(
+//                (platform, paramsToShare) -> {
+//                    if (platform.getName().equals(Wechat.NAME))
+//                        shareWechat(platform, paramsToShare);
+//                }
+//        );
+
     }
 
     @Override
@@ -117,16 +145,7 @@ public class EditorActivity extends AppCompatActivity {
 
             case R.id.viewonly_share:
             case R.id.share:
-                OnekeyShare oks = new OnekeyShare();
-                oks.disableSSOWhenAuthorize();
-                oks.setShareContentCustomizeCallback(
-                        (platform, paramsToShare) -> {
-                            if (platform.getName().equals(Wechat.NAME))
-                                shareWechat(platform, paramsToShare);
-                        }
-                );
-                oks.show(this);
-
+                share();
                 break;
 
             case R.id.viewonly_export:
@@ -261,7 +280,7 @@ public class EditorActivity extends AppCompatActivity {
 
     private void openCamera(int code) {
         Intent intent = new Intent(
-                code == REQUEST_IMAGE_CAPTURE ? MediaStore.ACTION_IMAGE_CAPTURE : MediaStore.ACTION_VIDEO_CAPTURE);
+            code == REQUEST_IMAGE_CAPTURE ? MediaStore.ACTION_IMAGE_CAPTURE : MediaStore.ACTION_VIDEO_CAPTURE);
         SimpleDateFormat timeStampFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
         String filename = timeStampFormat.format(new Date());
         File tempFile = new File(Environment.getExternalStorageDirectory(), filename);
@@ -359,7 +378,6 @@ public class EditorActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         save();
-        editor.destroy();
         super.onBackPressed();
     }
 

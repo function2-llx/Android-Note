@@ -42,7 +42,6 @@ public class SplashActivity extends Activity {
             publishProgress("loading ifly...");
             SpeechUtility.createUtility(ref.get(), SpeechConstant.APPID + "=5bbc8c0f");
 
-
             return null;
         }
 
