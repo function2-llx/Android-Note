@@ -14,6 +14,8 @@ import static org.junit.Assert.assertNotNull;
 
 @RunWith(RobolectricTestRunner.class)
 public class EditorMarkdownTest {
+    private static final String[] INPUT = {"hello", "new\nline", "2333"};
+
     private EditorActivity activity;
     private HorizontalEditScrollView markdownController;
     private MarkdownEditText editText;
@@ -30,39 +32,43 @@ public class EditorMarkdownTest {
         editText = (MarkdownEditText) (editor.lastFocusEdit);
     }
 
+    private void click(int id, String input) {
+        editText.setText(input);
+        for (int i = 0; i < Math.min(10, input.length()); ++i) {
+            editText.setSelection(0, i);
+            markdownController.onClick(activity.findViewById(id));
+        }
+    }
+
+    private void longClick(int id, String input) {
+        editText.setText(input);
+        for (int i = 0; i < Math.min(10, input.length()); ++i) {
+            editText.setSelection(0, i);
+            markdownController.onLongClick(activity.findViewById(id));
+        }
+    }
+
     @Test
     public void testBlockQuotesController() {
-        editText.setText("hello");
-        editText.setSelection(0, 5);
-        markdownController.onLongClick(activity.findViewById(R.id.img_block_quote));
-        editText.setSelection(0, 0);
-        markdownController.onLongClick(activity.findViewById(R.id.img_block_quote));
-        editText.setSelection(0, 5);
-        markdownController.onClick(activity.findViewById(R.id.img_block_quote));
-        editText.setSelection(0, 0);
-        markdownController.onClick(activity.findViewById(R.id.img_block_quote));
+        for (String input : INPUT) {
+            click(R.id.img_block_quote, input);
+            longClick(R.id.img_block_quote, input);
+        }
     }
 
     @Test
     public void testStyleController() {
-        editText.setText("hello");
-        editText.setSelection(0, 5);
-        markdownController.onClick(activity.findViewById(R.id.img_bold));
-        editText.setSelection(0, 1);
-        markdownController.onClick(activity.findViewById(R.id.img_bold));
-        editText.setSelection(0, 0);
-        markdownController.onClick(activity.findViewById(R.id.img_bold));
-        editText.setSelection(0, 5);
-        markdownController.onClick(activity.findViewById(R.id.img_italic));
-        editText.setSelection(0, 1);
-        markdownController.onClick(activity.findViewById(R.id.img_italic));
-        editText.setSelection(0, 0);
-        markdownController.onClick(activity.findViewById(R.id.img_italic));
+        for (String input : INPUT) {
+            click(R.id.img_bold, input);
+            click(R.id.img_italic, input);
+        }
     }
 
     @Test
     public void testStrikeThroughController() {
-
+        for (String input : INPUT) {
+            click(R.id.img_strike_through, input);
+        }
     }
 
     @Test
@@ -89,6 +95,9 @@ public class EditorMarkdownTest {
 
     @Test
     public void testListController() {
-
+        for (String input : INPUT) {
+            click(R.id.img_unorder_list, "hello");
+            click(R.id.img_order_list, "hello");
+        }
     }
 }
