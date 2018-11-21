@@ -78,17 +78,15 @@ public class EditorActivity extends AppCompatActivity {
         return super.onCreateOptionsMenu(menu);
     }
 
-    private void shareWechat(Platform weChat, Platform.ShareParams sp) {
+    private void shareWechat(Platform weChat, Platform.ShareParams sp, String fileName) {
         Note note = editor.buildNote();
+
+        sp.setShareType(Platform.SHARE_FILE);
         sp.setTitle(note.getTitle() + ".note");
         sp.setText("test");
         sp.setImageUrl("https://hmls.hfbank.com.cn/hfapp-api/9.png");
-        sp.setShareType(Platform.SHARE_FILE);
-        INoteFileConverter noteFileConverter = new NoteZipConverter();
-        noteFileConverter.exportNoteToFile((String fileName) -> {
-            sp.setFilePath(fileName);
-            weChat.share(sp);
-        }, note, "temp");
+        sp.setFilePath(fileName);
+        weChat.share(sp);
     }
 
     private void share() {
@@ -104,15 +102,9 @@ public class EditorActivity extends AppCompatActivity {
         noteFileConverter.exportNoteToFile((String fileName) -> {
             oks.setFilePath(fileName);
             oks.setShareContentCustomizeCallback(
-                (platform, sp) -> {
-                    if (platform.getName().equals(Wechat.NAME)) {
-                        sp.setTitle(note.getTitle() + ".note");
-                        sp.setText("test");
-                        sp.setImageUrl("https://hmls.hfbank.com.cn/hfapp-api/9.png");
-                        sp.setShareType(Platform.SHARE_FILE);
-                        sp.setFilePath(fileName);
-                        platform.share(sp);
-                    }
+                (platform, shareParams) -> {
+                    if (platform.getName().equals(Wechat.NAME))
+                        shareWechat(platform, shareParams, fileName);
                 }
             );
             oks.show(this);
