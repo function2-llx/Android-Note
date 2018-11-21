@@ -20,10 +20,7 @@ import android.support.annotation.Nullable;
 import android.text.style.AlignmentSpan;
 import android.widget.EditText;
 
-import com.yydcdut.markdown.span.MDOrderListSpan;
-import com.yydcdut.markdown.span.MDUnOrderListSpan;
 import com.yydcdut.markdown.utils.TextHelper;
-import com.yydcdut.rxmarkdown.RxMDEditText;
 
 public class Utils {
     // no constructor

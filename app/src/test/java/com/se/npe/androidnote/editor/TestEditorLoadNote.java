@@ -1,9 +1,7 @@
 package com.se.npe.androidnote.editor;
 
-import android.view.KeyEvent;
 import android.widget.EditText;
 
-import com.donkingliang.labels.LabelsView;
 import com.se.npe.androidnote.EditorActivity;
 import com.se.npe.androidnote.R;
 import com.se.npe.androidnote.interfaces.IData;
@@ -27,11 +25,10 @@ import static org.junit.Assert.assertNotNull;
 public class TestEditorLoadNote {
     private static final String DATA = "hello";
     private SortRichEditor editor;
-    private EditorActivity activity;
 
     @Before
     public void setUp() {
-        activity = Robolectric.setupActivity(EditorActivity.class);
+        EditorActivity activity = Robolectric.setupActivity(EditorActivity.class);
         assertNotNull(activity);
         editor = activity.findViewById(R.id.rich_editor);
         assertNotNull(editor);
