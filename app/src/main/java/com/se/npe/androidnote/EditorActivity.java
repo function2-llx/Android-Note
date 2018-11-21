@@ -108,13 +108,6 @@ public class EditorActivity extends AppCompatActivity {
             );
             oks.show(this);
         }, note, "temp");
-//        oks.setShareContentCustomizeCallback(
-//                (platform, paramsToShare) -> {
-//                    if (platform.getName().equals(Wechat.NAME))
-//                        shareWechat(platform, paramsToShare);
-//                }
-//        );
-
     }
 
     @Override
@@ -173,11 +166,6 @@ public class EditorActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void startActivity(Intent intent) {
-        super.startActivity(intent);
     }
 
     private void save() {

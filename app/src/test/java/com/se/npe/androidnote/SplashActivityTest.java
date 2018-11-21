@@ -12,7 +12,6 @@ import org.robolectric.RobolectricTestRunner;
 import org.robolectric.RuntimeEnvironment;
 
 import java.io.File;
-import java.lang.reflect.Field;
 
 @RunWith(RobolectricTestRunner.class)
 public class SplashActivityTest {

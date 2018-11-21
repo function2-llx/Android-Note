@@ -21,20 +21,17 @@ import org.robolectric.RobolectricTestRunner;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
 
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
 public class SortRichEditorTest {
     private SortRichEditor editor;
-    private EditorActivity activity;
     private static final String MEDIA_PATH = "tmp";
 
     @Before
     public void setUp() {
-        activity = Robolectric.setupActivity(EditorActivity.class);
+        EditorActivity activity = Robolectric.setupActivity(EditorActivity.class);
         assertNotNull(activity);
         editor = activity.findViewById(R.id.rich_editor);
         assertNotNull(editor);

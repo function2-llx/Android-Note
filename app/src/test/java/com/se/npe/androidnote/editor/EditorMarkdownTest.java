@@ -14,7 +14,7 @@ import static org.junit.Assert.assertNotNull;
 
 @RunWith(RobolectricTestRunner.class)
 public class EditorMarkdownTest {
-    private static final String[] INPUT = {"hello", "new\nline", "2333"};
+    private static final String[] INPUT = {"hello", "new\nline", "1 2 3 4 5"};
 
     private EditorActivity activity;
     private HorizontalEditScrollView markdownController;
@@ -96,8 +96,8 @@ public class EditorMarkdownTest {
     @Test
     public void testListController() {
         for (String input : INPUT) {
-            click(R.id.img_unorder_list, "hello");
-            click(R.id.img_order_list, "hello");
+            click(R.id.img_unorder_list, input);
+            click(R.id.img_order_list, input);
         }
     }
 }
