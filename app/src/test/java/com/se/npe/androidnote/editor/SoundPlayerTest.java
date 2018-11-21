@@ -9,9 +9,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
-import static android.os.SystemClock.sleep;
-import static org.junit.Assert.*;
-import static org.robolectric.Shadows.shadowOf;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(RobolectricTestRunner.class)
 public class SoundPlayerTest {

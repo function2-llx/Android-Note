@@ -1,7 +1,5 @@
 package com.se.npe.androidnote.editor;
 
-import android.view.View;
-
 import com.se.npe.androidnote.EditorActivity;
 import com.se.npe.androidnote.R;
 
@@ -11,7 +9,7 @@ import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotNull;
 
 @RunWith(RobolectricTestRunner.class)
 public class HorizontalEditScrollViewTest {
