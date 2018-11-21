@@ -5,9 +5,7 @@ import android.app.AlertDialog;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.AssetManager;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.os.Handler;
@@ -41,10 +39,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.OutputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 
 import cn.sharesdk.framework.Platform;
 import cn.sharesdk.onekeyshare.OnekeyShare;
@@ -84,7 +82,6 @@ public class EditorActivity extends AppCompatActivity {
         Note note = editor.buildNote();
         sp.setTitle(note.getTitle() + ".note");
         sp.setText("test");
-//        sp.setShareType(Platform.SHARE_IMAGE);
         sp.setImageUrl("https://hmls.hfbank.com.cn/hfapp-api/9.png");
         sp.setShareType(Platform.SHARE_FILE);
         INoteFileConverter noteFileConverter = new NoteZipConverter();
@@ -92,7 +89,41 @@ public class EditorActivity extends AppCompatActivity {
             sp.setFilePath(fileName);
             weChat.share(sp);
         }, note, "temp");
-//        Toast.makeText(this, sp.getFilePath(), Toast.LENGTH_SHORT).show();
+    }
+
+    private void share() {
+        OnekeyShare oks = new OnekeyShare();
+        oks.disableSSOWhenAuthorize();
+
+        oks.setTitle("test");
+        oks.setText("test");
+        oks.setImageUrl("https://hmls.hfbank.com.cn/hfapp-api/9.png");
+
+        Note note = editor.buildNote();
+        INoteFileConverter noteFileConverter = new NoteZipConverter();
+        noteFileConverter.exportNoteToFile((String fileName) -> {
+            oks.setFilePath(fileName);
+            oks.setShareContentCustomizeCallback(
+                (platform, sp) -> {
+                    if (platform.getName().equals(Wechat.NAME)) {
+                        sp.setTitle(note.getTitle() + ".note");
+                        sp.setText("test");
+                        sp.setImageUrl("https://hmls.hfbank.com.cn/hfapp-api/9.png");
+                        sp.setShareType(Platform.SHARE_FILE);
+                        sp.setFilePath(fileName);
+                        platform.share(sp);
+                    }
+                }
+            );
+            oks.show(this);
+        }, note, "temp");
+//        oks.setShareContentCustomizeCallback(
+//                (platform, paramsToShare) -> {
+//                    if (platform.getName().equals(Wechat.NAME))
+//                        shareWechat(platform, paramsToShare);
+//                }
+//        );
+
     }
 
     @Override
@@ -122,16 +153,7 @@ public class EditorActivity extends AppCompatActivity {
 
             case R.id.viewonly_share:
             case R.id.share:
-                OnekeyShare oks = new OnekeyShare();
-                oks.disableSSOWhenAuthorize();
-                oks.setShareContentCustomizeCallback(
-                        (platform, paramsToShare) -> {
-                            if (platform.getName().equals(Wechat.NAME))
-                                shareWechat(platform, paramsToShare);
-                        }
-                );
-                oks.show(this);
-
+                share();
                 break;
 
             case R.id.viewonly_export:
