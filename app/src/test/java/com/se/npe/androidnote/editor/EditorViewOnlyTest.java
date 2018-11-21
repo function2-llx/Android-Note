@@ -2,6 +2,7 @@ package com.se.npe.androidnote.editor;
 
 import com.se.npe.androidnote.EditorActivity;
 import com.se.npe.androidnote.R;
+import com.se.npe.androidnote.util.ReturnValueEater;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -10,9 +11,10 @@ import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 @RunWith(RobolectricTestRunner.class)
-public class EditorMarkdownTest {
+public class EditorViewOnlyTest {
     private SortRichEditor editor;
     private EditorActivity activity;
 
@@ -25,27 +27,8 @@ public class EditorMarkdownTest {
     }
 
     @Test
-    public void testBlockQuotesController() {
-
-    }
-
-    @Test
-    public void testStyleController() {
-
-    }
-
-    @Test
-    public void testStrikeThroughController() {
-
-    }
-
-    @Test
-    public void testCodeController() {
-
-    }
-
-    @Test
-    public void testListController() {
-
+    public void setViewOnly() {
+        editor.setViewOnly();
+        assertTrue(editor.testIsViewOnly());
     }
 }
