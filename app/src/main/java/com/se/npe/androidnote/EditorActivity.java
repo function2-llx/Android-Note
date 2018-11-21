@@ -186,11 +186,14 @@ public class EditorActivity extends AppCompatActivity {
             return;
         }
         Note note = editor.buildNote();
-        if (oldNote != null)
+        if (oldNote != null) {
             note.setIndex(oldNote.getIndex());
+            note.setGroupName(oldNote.getGroupName());
+        } else {
+            note.setGroupName(currentGroup);
+        }
         note.setStartTime(createTime);
         note.setModifyTime(new Date());
-        note.setGroupName(currentGroup);
         TableOperate.getInstance().modifyNote(note);
         oldNote = note;
     }
@@ -259,6 +262,7 @@ public class EditorActivity extends AppCompatActivity {
         }
         // set current group
         this.currentGroup = getIntent().getStringExtra(CURRENT_GROUP);
+
         // set old note
         this.oldNote = (Note) getIntent().getSerializableExtra(INITIAL_NOTE);
 
