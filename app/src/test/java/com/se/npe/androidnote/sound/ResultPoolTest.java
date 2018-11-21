@@ -1,6 +1,7 @@
 package com.se.npe.androidnote.sound;
 
 import com.se.npe.androidnote.util.ReturnValueEater;
+import com.se.npe.androidnote.util.ThreadSleep;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -42,7 +43,7 @@ public class ResultPoolTest {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        Thread.sleep(ResultPool.SLEEP_MILL + 100);
+        ThreadSleep.sleep(ResultPool.SLEEP_MILL + 100);
         try {
             instance.generateWav(System.currentTimeMillis() - 100);
         } catch (Exception e) {

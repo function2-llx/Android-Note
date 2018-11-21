@@ -1,5 +1,7 @@
 package com.se.npe.androidnote;
 
+import com.se.npe.androidnote.util.ThreadSleep;
+
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -9,17 +11,17 @@ import org.robolectric.RobolectricTestRunner;
 @RunWith(RobolectricTestRunner.class)
 public class SoundRecorderActivityTest {
     private SoundRecorderActivity activity;
-//    private ShadowActivity shadowActivity;
 
     @Before
     public void setUp() {
+
         activity = Robolectric.setupActivity(SoundRecorderActivity.class);
-//        shadowActivity = shadowOf(activity);
     }
 
     @Test
     public void onRecord() {
         activity.onRecord(true);
+        ThreadSleep.sleep(1000);
         activity.onRecord(false);
     }
 }

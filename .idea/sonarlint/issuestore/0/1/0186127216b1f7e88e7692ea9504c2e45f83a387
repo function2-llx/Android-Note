@@ -1,0 +1,3 @@
+
+‹"squid:ClassVariableVisibilityCheck"WMake isUnderTest a static final constant or non-public and provide accessors if needed.(Úƒ³S8Ñ¿¯ó,
+Nsquid:S1444"1Make this "public static isUnderTest" field final(Úƒ³S8Ñ¿¯ó,
