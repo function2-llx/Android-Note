@@ -23,7 +23,7 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!--外存储读权限，构建语法需要用到此权限 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    
+
     <!--获取账户信息，用于分享功能-->
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <!--改变账户信息，用于分享功能-->
@@ -52,22 +52,20 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
             <intent-filter tools:ignore="AppLinkUrlError">
-                <action android:name="android.intent.action.VIEW"/>
-                <category android:name="android.intent.category.DEFAULT"/>
-                <data android:mimeType="*/*"/>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
             </intent-filter>
-
-
             <!--add static shortcut-->
             <meta-data
                 android:name="android.app.shortcuts"
                 android:resource="@xml/static_shortcut" />
         </activity>
+
         <activity android:name=".EditorActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
-
 
         </activity>
         <activity android:name=".ListActivity">
@@ -75,6 +73,7 @@
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
+
         <activity android:name=".SoundRecorderActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -82,33 +81,6 @@
         </activity>
 
         <!-- MobSDK有关分享的activity -->
-        <activity
-            android:name="com.mob.tools.MobUIShell"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar"
-            android:windowSoftInputMode="stateHidden|adjustResize">
-            <!--QQ分享回调-->
-            <intent-filter>
-                <!--从QQ得到的AppId-->
-                <data android:scheme="tencent100371282" />
-                <action android:name="android.intent.action.VIEW" />
-
-                <category android:name="android.intent.category.BROWSABLE" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-            <!-- 调用新浪原生SDK，需要注册的回调activity -->
-            <intent-filter>
-                <action android:name="com.sina.weibo.sdk.action.ACTION_SDK_REQ_ACTIVITY" />
-                <category android:name="android.intent.category.DEFAULT" />
-            </intent-filter>
-        </activity>
-        <!--微信分享回调 -->
-        <activity
-            android:name=".share.wechat.WXEntryActivity"
-            android:configChanges="keyboardHidden|orientation|screenSize"
-            android:exported="true"
-            android:screenOrientation="portrait"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
         <!-- 填写您从Mob开发者后台中得到的AppKey和AppSecret -->
         <meta-data
             android:name="Mob-AppKey"
@@ -117,12 +89,13 @@
             android:name="Mob-AppSecret"
             android:value="5f3c3c3c32e727d3fb2c874f7446150a" />
 
+        <!--aFileChooser有关打开文件的activity-->
         <activity
             android:name="com.ipaulpro.afilechooser.FileChooserActivity"
-            android:icon="@drawable/ic_chooser"
             android:enabled="@bool/use_activity"
             android:exported="true"
-            android:label="@string/choose_file" >
+            android:icon="@drawable/ic_chooser"
+            android:label="@string/choose_file">
             <intent-filter>
                 <action android:name="android.intent.action.GET_CONTENT" />
 
