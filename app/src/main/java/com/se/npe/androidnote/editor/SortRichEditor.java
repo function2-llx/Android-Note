@@ -120,7 +120,8 @@ public class SortRichEditor extends ScrollView {
 
     private OnFocusChangeListener focusListener;
 
-    private EditText lastFocusEdit;
+    // set to public only for test
+    public EditText lastFocusEdit;
 
     private SoundPlayer lastAddedSoundPlayer;
 
@@ -278,9 +279,9 @@ public class SortRichEditor extends ScrollView {
         }
     }
 
-    private void onAddTag(EditText editText) {
+    // set to public only for test
+    public void onAddTag(String input) {
         tags.clearAllSelect();
-        String input = editText.getText().toString().trim();
         ArrayList<String> list = new ArrayList<>(tags.getLabels());
         if (input.isEmpty()) {
             Toast.makeText(getContext(), "Input is empty", Toast.LENGTH_SHORT).show();
@@ -320,7 +321,7 @@ public class SortRichEditor extends ScrollView {
                         new AlertDialog.Builder(getContext());
                 inputDialog.setTitle("Tag name").setView(editText);
                 inputDialog.setPositiveButton("Ok",
-                        (dialog, which) -> onAddTag(editText)).show();
+                        (dialog, which) -> onAddTag(editText.getText().toString().trim())).show();
             } else if (position == tags.getLabels().size() - 1) {
                 ArrayList<String> list = new ArrayList<>(tags.getLabels());
                 ArrayList<Integer> remove = new ArrayList<>(tags.getSelectLabels());
@@ -620,7 +621,8 @@ public class SortRichEditor extends ScrollView {
         }
     }
 
-    private void onBackspacePress(EditText editTxt) {
+    // set to public only for test
+    public void onBackspacePress(EditText editTxt) {
         int startSelection = editTxt.getSelectionStart();
         if (startSelection == 0) { // the cursor is at 0, now deleted the view before it
             int editIndex = containerLayout.indexOfChild(editTxt);
@@ -896,7 +898,8 @@ public class SortRichEditor extends ScrollView {
         containerLayout.addView(createPlaceholder(), index);
     }
 
-    private EditText insertEditTextAtIndex(int index, String editStr) {
+    // set to public only for test
+    public EditText insertEditTextAtIndex(int index, String editStr) {
         DeletableEditText editText = createEditText();
         editText.setText(editStr);
         containerLayout.setLayoutTransition(null);
@@ -1141,7 +1144,8 @@ public class SortRichEditor extends ScrollView {
         }
 
         // update the indexArray according to current child position
-        private void resetChildPosition() {
+        // set to public only for test
+        public void resetChildPosition() {
             indexArray.clear();
             int num = containerLayout.getChildCount();
             for (int i = 0; i < num; ++i) {

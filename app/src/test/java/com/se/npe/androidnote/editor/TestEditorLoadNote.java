@@ -1,5 +1,9 @@
 package com.se.npe.androidnote.editor;
 
+import android.view.KeyEvent;
+import android.widget.EditText;
+
+import com.donkingliang.labels.LabelsView;
 import com.se.npe.androidnote.EditorActivity;
 import com.se.npe.androidnote.R;
 import com.se.npe.androidnote.interfaces.IData;
@@ -48,6 +52,11 @@ public class TestEditorLoadNote {
             data.add(new SoundData(DATA, DATA));
             note.setContent(data);
             new SortRichEditor.NoteLoader(editor, note).run();
+            for (int i = 0; i < 2; ++i)
+                editor.insertEditTextAtIndex(editor.containerLayout.getChildCount(), "");
+            for (int i = 0; i < 2; ++i)
+                editor.onBackspacePress((EditText)
+                        (editor.containerLayout.getChildAt(editor.containerLayout.getChildCount() - 2)));
             assertNotNull(editor.buildNote());
         } catch (Exception e) {
             e.printStackTrace();

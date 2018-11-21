@@ -4,7 +4,9 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
+import com.donkingliang.labels.LabelsView;
 import com.se.npe.androidnote.EditorActivity;
 import com.se.npe.androidnote.R;
 import com.se.npe.androidnote.util.ReturnValueEater;
@@ -93,10 +95,11 @@ public class SortRichEditorTest {
         editor.viewDragHelperCallBack.onViewPositionChanged(first, 0, 0, 0, 0);
         try {
             editor.viewDragHelperCallBack.onViewReleased(first, 0, 0);
-        }catch (Exception e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         editor.sort();
+        editor.viewDragHelperCallBack.resetChildPosition();
         editor.sort();
         SoundPlayer.isUnderTest = false;
     }
@@ -104,6 +107,21 @@ public class SortRichEditorTest {
     @Test
     public void testClickEmptyView() {
         editor.emptyView.performClick();
+
+    }
+
+    @Test
+    public void modifyTags() {
+        LabelsView tags = editor.tags;
+        int size = tags.getLabels().size();
+        TextView hackTextView = new TextView(editor.getContext());
+        hackTextView.setTag(R.id.tag_key_position, size - 2);
+        tags.onClick(hackTextView);
+        hackTextView.setTag(R.id.tag_key_position, size - 1);
+        tags.onClick(hackTextView);
+        editor.onAddTag("hello");
+        editor.onAddTag(""); // empty
+        editor.onAddTag("hello"); // duplicate
     }
 
     @After
