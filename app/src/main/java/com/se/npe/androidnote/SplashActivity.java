@@ -73,6 +73,14 @@ public class SplashActivity extends Activity {
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
 
+    private void init() {
+        if (!initialized) {
+            MobSDK.init(getApplicationContext());
+            new ResourceInit(this).execute();
+            initialized = true;
+        }
+    }
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -87,12 +95,13 @@ public class SplashActivity extends Activity {
             );
         }
 
-
         state = findViewById(R.id.splash_init_state);
-        if (!initialized) {
-            MobSDK.init(getApplicationContext());
-            new ResourceInit(this).execute();
-            initialized = true;
+
+        // actually will only happen when undet test
+        try {
+            init();
+        } catch (NoClassDefFoundError e) {
+            // no-op
         }
 
         if (Objects.equals(getIntent().getAction(), Intent.ACTION_VIEW)) {

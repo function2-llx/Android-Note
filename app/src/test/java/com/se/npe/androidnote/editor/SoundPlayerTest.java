@@ -3,6 +3,7 @@ package com.se.npe.androidnote.editor;
 import com.se.npe.androidnote.EditorActivity;
 import com.se.npe.androidnote.R;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -13,17 +14,17 @@ import static org.junit.Assert.assertNotNull;
 
 @RunWith(RobolectricTestRunner.class)
 public class SoundPlayerTest {
-    EditorActivity activity = null;
-    SortRichEditor editor = null;
-    SoundPlayer sound = null;
+    private SoundPlayer sound = null;
 
     @Before
-    public void setUp() throws Exception {
-        activity = Robolectric.setupActivity(EditorActivity.class);
+    public void setUp() {
+        SoundPlayer.isUnderTest = true;
+        EditorActivity activity = Robolectric.setupActivity(EditorActivity.class);
         assertNotNull(activity);
-        editor = activity.findViewById(R.id.rich_editor);
+        SortRichEditor editor = activity.findViewById(R.id.rich_editor);
         assertNotNull(editor);
-        sound = new SoundPlayer(editor.getContext());
+        editor.addSound("tmp.wav");
+        sound = (SoundPlayer) (editor.containerLayout.getChildAt(0));
         assertNotNull(sound);
     }
 
@@ -54,5 +55,15 @@ public class SoundPlayerTest {
         } catch (Exception e) {
             /* no operation */
         }
+    }
+
+    @Test
+    public void testProgressSetter() {
+        new SoundPlayer.ProgressSetter(sound).run();
+    }
+
+    @After
+    public void tearDown() {
+        SoundPlayer.isUnderTest = false;
     }
 }
