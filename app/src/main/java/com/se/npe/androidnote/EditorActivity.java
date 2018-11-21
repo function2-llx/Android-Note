@@ -3,7 +3,6 @@ package com.se.npe.androidnote;
 import android.Manifest;
 import android.app.AlertDialog;
 import android.content.ContentValues;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetManager;
@@ -28,11 +27,8 @@ import com.dmcbig.mediapicker.PickerActivity;
 import com.dmcbig.mediapicker.PickerConfig;
 import com.dmcbig.mediapicker.entity.Media;
 import com.getbase.floatingactionbutton.FloatingActionsMenu;
-import com.ipaulpro.afilechooser.utils.FileUtils;
-import com.mob.MobSDK;
 import com.se.npe.androidnote.editor.SortRichEditor;
 import com.se.npe.androidnote.interfaces.INoteFileConverter;
-import com.se.npe.androidnote.models.FileOperate;
 import com.se.npe.androidnote.models.Note;
 import com.se.npe.androidnote.models.NotePdfConverter;
 import com.se.npe.androidnote.models.NoteZipConverter;
@@ -111,10 +107,11 @@ public class EditorActivity extends AppCompatActivity {
 
 
             case R.id.menu_markdown:
+                // shows the mode (markdown/plain_text) to change to
                 if (editor.changeIsMarkdown()) {
-                    item.setTitle("Plain");
+                    item.setTitle(R.string.editor_markdown);
                 } else {
-                    item.setTitle("Markdown");
+                    item.setTitle(R.string.editor_plain_text);
                 }
                 break;
 
@@ -293,48 +290,6 @@ public class EditorActivity extends AppCompatActivity {
         intent.putExtra(PickerConfig.MAX_SELECT_SIZE, MAX_SIZE);
         intent.putExtra(PickerConfig.MAX_SELECT_COUNT, MAX_PICK);
         startActivityForResult(intent, code);
-    }
-
-    class PictureAsyncTask extends AsyncTask<Void, Void, Void> {
-        @Override
-        protected Void doInBackground(Void... params) {
-            OutputStream outputStream = null;
-            InputStream inputStream = null;
-            try {
-                File dir = new File(Environment.getExternalStorageDirectory() + File.separator + "rxMarkdown");
-                if (!dir.exists()) {
-                    boolean ok = dir.mkdirs();
-                    ReturnValueEater.eat(ok);
-                }
-                outputStream = new FileOutputStream(dir.getAbsolutePath() + File.separator + "b.jpg");
-                AssetManager assetManager = getAssets();
-                inputStream = assetManager.open("b.jpg");
-                byte[] buffer = new byte[1024];
-                int read;
-                while ((read = inputStream.read(buffer)) != -1) {
-                    outputStream.write(buffer, 0, read);
-                }
-                outputStream.flush();
-            } catch (IOException e) {
-                Logger.log(LOG_TAG, e);
-            } finally {
-                if (outputStream != null) {
-                    try {
-                        outputStream.close();
-                    } catch (IOException e) {
-                        Logger.log(LOG_TAG, e);
-                    }
-                }
-                try {
-                    if (inputStream != null) {
-                        inputStream.close();
-                    }
-                } catch (IOException e) {
-                    Logger.log(LOG_TAG, e);
-                }
-            }
-            return null;
-        }
     }
 
     void handleMediaResult(int requestCode) {

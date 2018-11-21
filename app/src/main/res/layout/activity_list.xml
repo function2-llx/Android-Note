@@ -10,7 +10,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="#EEE9E9"
+        android:background="@color/background_gray"
         android:orientation="vertical">
 
         <android.support.v7.widget.Toolbar
@@ -18,51 +18,48 @@
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
             android:background="@color/colorPrimary"
-            app:title="@string/list_title" >
-
-        </android.support.v7.widget.Toolbar>
-
-
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+            app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+            app:title="@string/list_title" />
 
         <com.se.npe.androidnote.adapters.TagGroupManager
+            android:id="@+id/tag_group_manager"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/tag_group_manager"
             android:layout_margin="0dp"
             android:padding="10dp"
             android:visibility="invisible"
-            app:container_enable_drag="false"
+            app:container_background_color="@color/background_white"
+            app:container_border_color="@color/background_gray"
+            app:container_border_width="5dp"
             app:horizontal_interval="10dp"
-            app:vertical_interval="10dp"
             app:tag_clickable="true"
-            android:background="@color/white"
-            app:tag_theme="pure_teal" >
-
-        </com.se.npe.androidnote.adapters.TagGroupManager>
+            app:tag_max_length="8"
+            app:tag_ripple_duration="300"
+            app:tag_theme="pure_teal"
+            app:vertical_interval="10dp" />
 
         <com.marshalchen.ultimaterecyclerview.UltimateRecyclerView
             android:id="@+id/ultimate_recycler_view"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            app:recyclerviewEmptyView="@layout/activity_list_empty_view">
-
-        </com.marshalchen.ultimaterecyclerview.UltimateRecyclerView>
+            app:recyclerviewEmptyView="@layout/list_empty_view" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/new_note_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_gravity="bottom|end"
+            android:layout_marginTop="-96dp"
+            android:layout_marginEnd="12dp"
             android:clickable="true"
-            android:layout_gravity="end"
-            android:layout_marginTop="-70dp"
-            android:layout_marginRight="10dp"
-            app:srcCompat="@android:drawable/ic_menu_add"
-            android:focusable="true" />
-
+            android:focusable="true"
+            app:backgroundTint="@color/colorSecondary"
+            app:srcCompat="@drawable/baseline_add_white_48dp" />
 
     </LinearLayout>
 
-    <!--左滑-->
+    <!--左滑导航栏-->
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -73,12 +70,10 @@
             android:id="@+id/nav_view"
             android:layout_width="wrap_content"
             android:layout_height="match_parent"
-            android:background="@color/white"
+            android:background="@color/background_gray"
             app:headerLayout="@layout/nav_header"
-            app:itemBackground="@color/white"
-            app:menu="@menu/navigation_menu">
-
-        </android.support.design.widget.NavigationView>
+            app:itemBackground="@color/background_gray"
+            app:menu="@menu/navigation_menu" />
 
     </LinearLayout>
 

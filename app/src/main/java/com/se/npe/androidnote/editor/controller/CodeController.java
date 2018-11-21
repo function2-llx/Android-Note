@@ -23,6 +23,9 @@ import com.yydcdut.markdown.MarkdownEditText;
 
 public class CodeController {
     private MarkdownEditText mRxMDEditText;
+    private static final String CODE_BEGIN = "```\n";
+    private static final String CODE_END = "\n```";
+    private static final String CODE_END_NEW_LINE = "\n```\n";
 
     public CodeController(MarkdownEditText rxMDEditText) {
         mRxMDEditText = rxMDEditText;
@@ -59,42 +62,46 @@ public class CodeController {
         }
     }
 
+    private void doCodeHandleStartEqEnd(int start, int end) {
+        int position0 = Utils.findBeforeNewLineChar(mRxMDEditText.getText(), start) + 1;
+        int position1 = Utils.findNextNewLineChar(mRxMDEditText.getText(), end);
+        if (position1 == -1) {
+            position1 = mRxMDEditText.length();
+        }
+        Editable editable = mRxMDEditText.getText();
+        if (position0 >= 4 && position1 < mRxMDEditText.length() - 4) {
+            boolean begin = "```".equals(editable.subSequence(Utils.safePosition(position0 - 1 - "```".length(), editable), Utils.safePosition(position0 - 1, editable)).toString());
+            if (begin && CODE_BEGIN.equals(editable.subSequence(Utils.safePosition(position1 + 1, editable), Utils.safePosition(position1 + 1 + CODE_BEGIN.length(), editable)).toString())) {
+                mRxMDEditText.getText().delete(position1 + 1, position1 + 1 + CODE_BEGIN.length());
+                mRxMDEditText.getText().delete(position0 - CODE_END.length(), position0);
+                return;
+            }
+        }
+
+        int selectedStart = mRxMDEditText.getSelectionStart();
+        char c = mRxMDEditText.getText().charAt(position1 >= mRxMDEditText.length() ? mRxMDEditText.length() - 1 : position1);
+        if (c == '\n') {
+            mRxMDEditText.getText().insert(position1, CODE_END);
+        } else {
+            mRxMDEditText.getText().insert(position1, CODE_END_NEW_LINE);
+        }
+        mRxMDEditText.getText().insert(position0, CODE_BEGIN);
+        mRxMDEditText.setSelection(selectedStart + CODE_BEGIN.length(), selectedStart + CODE_BEGIN.length());
+    }
+
     public void doCode() {
         int start = mRxMDEditText.getSelectionStart();
         int end = mRxMDEditText.getSelectionEnd();
         if (start == end) {
-            int position0 = Utils.findBeforeNewLineChar(mRxMDEditText.getText(), start) + 1;
-            int position1 = Utils.findNextNewLineChar(mRxMDEditText.getText(), end);
-            if (position1 == -1) {
-                position1 = mRxMDEditText.length();
-            }
-            Editable editable = mRxMDEditText.getText();
-            if (position0 >= 4 && position1 < mRxMDEditText.length() - 4) {
-                boolean begin = "```".equals(editable.subSequence(Utils.safePosition(position0 - 1 - "```".length(), editable), Utils.safePosition(position0 - 1, editable)).toString());
-                if (begin && "```\n".equals(editable.subSequence(Utils.safePosition(position1 + 1, editable), Utils.safePosition(position1 + 1 + "```\n".length(), editable)).toString())) {
-                    mRxMDEditText.getText().delete(position1 + 1, position1 + 1 + "```\n".length());
-                    mRxMDEditText.getText().delete(position0 - "\n```".length(), position0);
-                    return;
-                }
-            }
-
-            int selectedStart = mRxMDEditText.getSelectionStart();
-            char c = mRxMDEditText.getText().charAt(position1 >= mRxMDEditText.length() ? mRxMDEditText.length() - 1 : position1);
-            if (c == '\n') {
-                mRxMDEditText.getText().insert(position1, "\n```");
-            } else {
-                mRxMDEditText.getText().insert(position1, "\n```\n");
-            }
-            mRxMDEditText.getText().insert(position0, "```\n");
-            mRxMDEditText.setSelection(selectedStart + "```\n".length(), selectedStart + "```\n".length());
+            doCodeHandleStartEqEnd(start, end);
         } else if (end - start > 6) {
             Editable editable = mRxMDEditText.getText();
             if ("```".equals(editable.subSequence(Utils.safePosition(start, editable), Utils.safePosition(start + "```".length(), editable)).toString()) &&
                     "```".equals(editable.subSequence(Utils.safePosition(end - "```".length(), editable), Utils.safePosition(end, editable)).toString())) {
                 int selectedStart = mRxMDEditText.getSelectionStart();
                 int selectedEnd = mRxMDEditText.getSelectionEnd();
-                mRxMDEditText.getText().delete(end - "\n```".length(), end);
-                mRxMDEditText.getText().delete(start, start + "```\n".length());
+                mRxMDEditText.getText().delete(end - CODE_END.length(), end);
+                mRxMDEditText.getText().delete(start, start + CODE_BEGIN.length());
                 mRxMDEditText.setSelection(selectedStart, selectedEnd - 8);
                 return;
             }
@@ -111,19 +118,19 @@ public class CodeController {
         int endAdd = 0;
         char c = mRxMDEditText.getText().charAt(end >= mRxMDEditText.length() ? mRxMDEditText.length() - 1 : end);
         if (c == '\n') {
-            mRxMDEditText.getText().insert(end, "\n```");
+            mRxMDEditText.getText().insert(end, CODE_END);
             endAdd += 4;
         } else {
-            mRxMDEditText.getText().insert(end, "\n```\n");
+            mRxMDEditText.getText().insert(end, CODE_END_NEW_LINE);
             endAdd += 5;
             selectedStart = selectedStart + 1;
         }
         char c1 = mRxMDEditText.getText().charAt(start - 1 < 0 ? 0 : start - 1);
         if (c1 == '\n' || start - 1 < 0) {
-            mRxMDEditText.getText().insert(start, "```\n");
+            mRxMDEditText.getText().insert(start, CODE_BEGIN);
             endAdd += 4;
         } else {
-            mRxMDEditText.getText().insert(start, "\n```\n");
+            mRxMDEditText.getText().insert(start, CODE_END_NEW_LINE);
             endAdd += 4;
         }
         mRxMDEditText.setSelection(selectedStart, selectedEnd + endAdd);

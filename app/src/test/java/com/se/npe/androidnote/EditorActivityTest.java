@@ -91,7 +91,6 @@ public class EditorActivityTest {
         clickOptionsMenuItem(R.id.menu_save);
         clickOptionsMenuItem(R.id.menu_markdown);
         clickOptionsMenuItem(R.id.viewonly_share);
-        clickOptionsMenuItem(R.id.share);
         clickOptionsMenuItem(R.id.viewonly_export);
         clickOptionsMenuItem(R.id.export);
     }
