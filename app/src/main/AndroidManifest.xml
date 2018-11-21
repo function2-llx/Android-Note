@@ -81,6 +81,11 @@
         </activity>
 
         <!-- MobSDK有关分享的activity -->
+        <activity
+            android:name="com.mob.tools.MobUIShell"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
         <!-- 填写您从Mob开发者后台中得到的AppKey和AppSecret -->
         <meta-data
             android:name="Mob-AppKey"
