@@ -60,23 +60,6 @@ public class ResultPoolTest {
     }
 
     @Test
-    public void testIFlyFeeder() {
-        try {
-            ResultPool.IFlyFeeder feeder = new ResultPool.IFlyFeeder(ResultPool.getInstance());
-            feeder.execute();
-            feeder.onCancelled();
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-        try {
-            ResultPool.IFlyFeeder feeder = new ResultPool.IFlyFeeder(ResultPool.getInstance());
-            feeder.onCancelled();
-        } catch (Throwable e) {
-            e.printStackTrace();
-        }
-    }
-
-    @Test
     public void testRecognizerListener() {
         try {
             ResultPool.MyRecognizerListener listener = new ResultPool.MyRecognizerListener(
