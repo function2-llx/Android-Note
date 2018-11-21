@@ -1,5 +1,8 @@
 package com.se.npe.androidnote.editor;
 
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 
 import com.se.npe.androidnote.EditorActivity;
@@ -50,59 +53,6 @@ public class SortRichEditorTest {
     }
 
     @Test
-    public void testEmptyViewClick() {
-        Class<?> clazz = SortRichEditor.class;
-        Field field = null;
-        RelativeLayout emptyView = null;
-
-        EditorActivity activity2 = Robolectric.setupActivity(EditorActivity.class);
-        SortRichEditor editor2 = activity2.findViewById(R.id.rich_editor);
-
-        try {
-            field = clazz.getDeclaredField("emptyView");
-        } catch (NoSuchFieldException e) {
-            e.printStackTrace();
-        }
-        assertNotNull(field);
-
-        // sonar cube complains about it, and thinks we need a null check
-        // actually we don't
-        if (field != null) {
-            field.setAccessible(true);
-        }
-
-        try {
-            if (field != null) {
-                emptyView = (RelativeLayout) field.get(editor2);
-            }
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-        assertNotNull(emptyView);
-
-        editor2.sort();
-
-        // same as above
-        if (emptyView != null) {
-            emptyView.performClick();
-        }
-
-        try {
-            emptyView = (RelativeLayout) field.get(editor);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-        assertNotNull(emptyView);
-
-        // same as above
-        if (emptyView != null) {
-            emptyView.performClick();
-        }
-    }
-
-    @Test
     public void sort() {
         assertNotNull(editor);
         editor.sort();
@@ -138,6 +88,25 @@ public class SortRichEditorTest {
             e.printStackTrace();
         }
         editor.destroy();
+        LinearLayout containerLayout = editor.containerLayout;
+        for (int i = 0; i < containerLayout.getChildCount(); ++i) {
+            if (containerLayout.getChildAt(i) instanceof RelativeLayout) {
+                RelativeLayout media = (RelativeLayout) containerLayout.getChildAt(i);
+                View delete = media.getChildAt(1);
+                delete.performClick();
+            }
+        }
+        for (int i = 0; i < containerLayout.getChildCount(); ++i) {
+            if (containerLayout.getChildAt(i) instanceof ImageView) {
+                ImageView placeholder = (ImageView) containerLayout.getChildAt(i);
+                placeholder.performClick();
+            }
+        }
+    }
+
+    @Test
+    public void testClickEmptyView() {
+        editor.emptyView.performClick();
     }
 
     @After

@@ -115,7 +115,8 @@ public class SortRichEditor extends ScrollView {
     //              ...
     private LinearLayout parentLayout;
 
-    private LinearLayout containerLayout;
+    // set to public only for test
+    public LinearLayout containerLayout;
 
     private OnFocusChangeListener focusListener;
 
@@ -166,9 +167,11 @@ public class SortRichEditor extends ScrollView {
 
     private boolean isMarkdown = false;
 
-    private RelativeLayout emptyView;
+    // set to public only for test
+    public RelativeLayout emptyView;
 
-    private LabelsView tags;
+    // set to public only for test
+    public LabelsView tags;
 
     private HorizontalEditScrollView markdownController = null;
 
