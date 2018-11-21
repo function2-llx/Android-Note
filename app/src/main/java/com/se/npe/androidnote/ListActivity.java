@@ -56,14 +56,18 @@ public class ListActivity extends AppCompatActivity {
     // Can only use lower 16 bits for requestCode
     private static final int REQUEST_OPEN_FILE = 23333;
 
+    SearchView searchView;
+    MenuItem searchItem;
+
     // options menu
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // search
         this.getMenuInflater().inflate(R.menu.activity_list, menu);
-        MenuItem searchItem = menu.findItem(R.id.action_search);
-        SearchView searchView = (SearchView) searchItem.getActionView();
-        this.configureSearchView(searchView);
+        searchItem = menu.findItem(R.id.action_search);
+        searchView = (SearchView) searchItem.getActionView();
+
+        this.configureSearchView();
 
         // launch from short cut
         if (getIntent().hasExtra("SEARCH")) {
@@ -199,6 +203,8 @@ public class ListActivity extends AppCompatActivity {
         drawerToggle.syncState();
     }
 
+
+
     // navigation view
     public void setNavigationView() {
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -310,16 +316,33 @@ public class ListActivity extends AppCompatActivity {
             groupMenu.add(R.id.group_groups, Menu.NONE, Menu.NONE, groupName);
     }
 
-    // search
-    private void configureSearchView(@NonNull SearchView searchView) {
-        TagGroupManager tagGroupManager = findViewById(R.id.tag_group_manager);
+    private boolean searching = false;
+    private TagGroupManager tagGroupManager;
 
+    @Override
+    public void onBackPressed() {
+        if (searching) {
+            tagGroupManager.hide();
+            enableRefresh();
+            searching = false;
+            searchView.onActionViewCollapsed();
+        } else
+            super.onBackPressed();
+    }
+
+    // search
+    private void configureSearchView() {
+        if (searchView == null)
+            throw new AssertionError();
+
+        tagGroupManager = findViewById(R.id.tag_group_manager);
         searchView.setQueryHint(getResources().getString(R.string.list_search_hint));
         searchView.setSubmitButtonEnabled(true);
 
         // open searchView
         searchView.setOnSearchClickListener(v -> {
             tagGroupManager.show();
+            searching = true;
             disableRefresh();
         });
 
@@ -327,6 +350,7 @@ public class ListActivity extends AppCompatActivity {
         searchView.setOnCloseListener(() -> {
             tagGroupManager.hide();
             enableRefresh();
+            searching = false;
             return false;
         });
 
