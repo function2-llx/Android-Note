@@ -72,21 +72,10 @@ public class SortRichEditorTest {
 
     @Test
     public void testAddMedia() {
-        try {
-            editor.addSound(MEDIA_PATH);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            editor.addPicture(MEDIA_PATH);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        try {
-            editor.addVideo(MEDIA_PATH);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        SoundPlayer.isUnderTest = true;
+        editor.addSound(MEDIA_PATH);
+        editor.addPicture(MEDIA_PATH);
+        editor.addVideo(MEDIA_PATH);
         editor.destroy();
         LinearLayout containerLayout = editor.containerLayout;
         for (int i = 0; i < containerLayout.getChildCount(); ++i) {
@@ -102,6 +91,7 @@ public class SortRichEditorTest {
                 placeholder.performClick();
             }
         }
+        SoundPlayer.isUnderTest = false;
     }
 
     @Test
