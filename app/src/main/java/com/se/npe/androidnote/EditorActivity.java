@@ -83,11 +83,16 @@ public class EditorActivity extends AppCompatActivity {
     private void shareWechat(Platform weChat, Platform.ShareParams sp) {
         Note note = editor.buildNote();
         sp.setTitle(note.getTitle() + ".note");
+        sp.setText("test");
+//        sp.setShareType(Platform.SHARE_IMAGE);
         sp.setImageUrl("https://hmls.hfbank.com.cn/hfapp-api/9.png");
         sp.setShareType(Platform.SHARE_FILE);
         INoteFileConverter noteFileConverter = new NoteZipConverter();
-        noteFileConverter.exportNoteToFile(sp::setFilePath, note, "temp");
-        weChat.share(sp);
+        noteFileConverter.exportNoteToFile((String fileName) -> {
+            sp.setFilePath(fileName);
+            weChat.share(sp);
+        }, note, "temp");
+//        Toast.makeText(this, sp.getFilePath(), Toast.LENGTH_SHORT).show();
     }
 
     @Override
@@ -261,7 +266,7 @@ public class EditorActivity extends AppCompatActivity {
 
     private void openCamera(int code) {
         Intent intent = new Intent(
-                code == REQUEST_IMAGE_CAPTURE ? MediaStore.ACTION_IMAGE_CAPTURE : MediaStore.ACTION_VIDEO_CAPTURE);
+            code == REQUEST_IMAGE_CAPTURE ? MediaStore.ACTION_IMAGE_CAPTURE : MediaStore.ACTION_VIDEO_CAPTURE);
         SimpleDateFormat timeStampFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
         String filename = timeStampFormat.format(new Date());
         File tempFile = new File(Environment.getExternalStorageDirectory(), filename);
@@ -359,7 +364,6 @@ public class EditorActivity extends AppCompatActivity {
     @Override
     public void onBackPressed() {
         save();
-        editor.destroy();
         super.onBackPressed();
     }
 
