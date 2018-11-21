@@ -1,16 +1,26 @@
 package com.se.npe.androidnote.editor;
 
+import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.TextView;
 
+import com.donkingliang.labels.LabelsView;
 import com.se.npe.androidnote.EditorActivity;
 import com.se.npe.androidnote.R;
+import com.se.npe.androidnote.util.ReturnValueEater;
 
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.robolectric.Robolectric;
 import org.robolectric.RobolectricTestRunner;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 
 import static org.junit.Assert.assertNotNull;
@@ -20,6 +30,7 @@ import static org.junit.Assert.assertTrue;
 public class SortRichEditorTest {
     private SortRichEditor editor;
     private EditorActivity activity;
+    private static final String MEDIA_PATH = "tmp";
 
     @Before
     public void setUp() {
@@ -27,62 +38,20 @@ public class SortRichEditorTest {
         assertNotNull(activity);
         editor = activity.findViewById(R.id.rich_editor);
         assertNotNull(editor);
-    }
 
-    @Test
-    public void testEmptyViewClick() {
-        Class<?> clazz = SortRichEditor.class;
-        Field field = null;
-        RelativeLayout emptyView = null;
-
-        EditorActivity activity2 = Robolectric.setupActivity(EditorActivity.class);
-        SortRichEditor editor2 = activity2.findViewById(R.id.rich_editor);
-
+        // create medias for insertion
+        File f = new File(MEDIA_PATH);
         try {
-            field = clazz.getDeclaredField("emptyView");
-        } catch (NoSuchFieldException e) {
+            ReturnValueEater.eat(f.createNewFile());
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        assertNotNull(field);
-
-        // sonar cube complains about it, and thinks we need a null check
-        // actually we don't
-        if (field != null) {
-            field.setAccessible(true);
-        }
-
-        try {
-            if (field != null) {
-                emptyView = (RelativeLayout) field.get(editor2);
-            }
-        } catch (IllegalAccessException e) {
+        try (FileOutputStream out = new FileOutputStream(f)) {
+            byte[] b = new byte[1000];
+            out.write(b, 0, b.length);
+        } catch (IOException e) {
             e.printStackTrace();
         }
-
-        assertNotNull(emptyView);
-
-        editor2.sort();
-
-        // same as above
-        if (emptyView != null) {
-            emptyView.performClick();
-        }
-
-        try {
-            emptyView = (RelativeLayout) field.get(editor);
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        }
-
-        assertNotNull(emptyView);
-        emptyView.performClick();
-    }
-
-    @Test
-    public void sort() {
-        assertNotNull(editor);
-        editor.sort();
-        editor.sort();
     }
 
     @Test
@@ -97,23 +66,67 @@ public class SortRichEditorTest {
     }
 
     @Test
-    public void testOnTouchEvent() {
-        /* no test */
-    }
-
-    @Test
-    public void testPerformClick() {
-        editor.performClick();
-    }
-
-    @Test
-    public void testDestroy() {
+    public void testUse() {
+        SoundPlayer.isUnderTest = true;
+        editor.addSound(MEDIA_PATH);
+        editor.addPicture(MEDIA_PATH);
+        editor.addVideo(MEDIA_PATH);
         editor.destroy();
+        LinearLayout containerLayout = editor.containerLayout;
+        for (int i = 0; i < containerLayout.getChildCount(); ++i) {
+            if (containerLayout.getChildAt(i) instanceof RelativeLayout) {
+                RelativeLayout media = (RelativeLayout) containerLayout.getChildAt(i);
+                View delete = media.getChildAt(1);
+                delete.performClick();
+            }
+        }
+        for (int i = 0; i < containerLayout.getChildCount(); ++i) {
+            if (containerLayout.getChildAt(i) instanceof ImageView) {
+                ImageView placeholder = (ImageView) containerLayout.getChildAt(i);
+                placeholder.performClick();
+            }
+        }
+        editor.sort();
+        editor.sort();
+        View first = containerLayout.getChildAt(0);
+        editor.viewDragHelperCallBack.tryCaptureView(first, 0);
+        editor.viewDragHelperCallBack.clampViewPositionHorizontal(first, 0, 0);
+        editor.viewDragHelperCallBack.clampViewPositionVertical(first, 0, 0);
+        editor.viewDragHelperCallBack.onViewPositionChanged(first, 0, 0, 0, 0);
+        try {
+            editor.viewDragHelperCallBack.onViewReleased(first, 0, 0);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        editor.sort();
+        editor.viewDragHelperCallBack.resetChildPosition();
+        editor.sort();
+        SoundPlayer.isUnderTest = false;
     }
 
     @Test
-    public void setViewOnly() {
-        editor.setViewOnly();
-        assertTrue(editor.testIsViewOnly());
+    public void testClickEmptyView() {
+        editor.emptyView.performClick();
+
+    }
+
+    @Test
+    public void modifyTags() {
+        LabelsView tags = editor.tags;
+        int size = tags.getLabels().size();
+        TextView hackTextView = new TextView(editor.getContext());
+        hackTextView.setTag(R.id.tag_key_position, size - 2);
+        tags.onClick(hackTextView);
+        hackTextView.setTag(R.id.tag_key_position, size - 1);
+        tags.onClick(hackTextView);
+        editor.onAddTag("hello");
+        editor.onAddTag(""); // empty
+        editor.onAddTag("hello"); // duplicate
+    }
+
+    @After
+    public void tearDown() {
+        File f = new File(MEDIA_PATH);
+        ReturnValueEater.eat(f.delete());
     }
 }

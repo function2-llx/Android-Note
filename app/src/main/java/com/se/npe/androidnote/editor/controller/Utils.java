@@ -77,22 +77,6 @@ public class Utils {
         return centerSpan != null;
     }
 
-    public static boolean hasOrderListSpan(RxMDEditText rxMDEditText, int start, int end) {
-        MDOrderListSpan orderListSpan = Utils.getSpans(rxMDEditText, start, end, MDOrderListSpan.class);
-        return orderListSpan != null;
-    }
-
-    public static boolean hasUnOrderListSpan(RxMDEditText rxMDEditText, int start, int end) {
-        MDUnOrderListSpan unOrderListSpan = Utils.getSpans(rxMDEditText, start, end, MDUnOrderListSpan.class);
-        return unOrderListSpan != null;
-    }
-
-
-    public static boolean hasTodoDone(RxMDEditText rxMDEditText, int start) {
-        CharSequence charSequence = rxMDEditText.getText().subSequence(start, start + "- [x] ".length());
-        return charSequence.toString().equalsIgnoreCase("- [x] ");
-    }
-
     public static int safePosition(int position, CharSequence s) {
         return TextHelper.safePosition(position, s);
     }

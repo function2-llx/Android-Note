@@ -224,7 +224,8 @@ public class ResultPool {
         results.clear();
     }
 
-    private void putResult(long time, String result) {
+    // set to public only for test
+    public void putResult(long time, String result) {
         if (!times.isEmpty()) {
             long lastTime = times.get(times.size() - 1);
             if (lastTime > time) {

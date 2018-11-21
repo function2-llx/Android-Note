@@ -19,6 +19,7 @@ import java.lang.ref.WeakReference;
 
 public class SoundPlayer extends RelativeLayout {
     private static final String LOG_TAG = SoundPlayer.class.getSimpleName();
+    public static boolean isUnderTest = false;
 
     static class ProgressSetter implements Runnable {
         WeakReference<SoundPlayer> ref;
@@ -78,12 +79,14 @@ public class SoundPlayer extends RelativeLayout {
     }
 
     public void setSource(String source) {
-        try {
-            mediaPlayer.setDataSource(source);
-        } catch (IOException e) {
-            Logger.log(LOG_TAG, e);
+        if (!isUnderTest) {
+            try {
+                mediaPlayer.setDataSource(source);
+            } catch (IOException e) {
+                Logger.log(LOG_TAG, e);
+            }
+            mediaPlayer.prepareAsync();
         }
-        mediaPlayer.prepareAsync();
     }
 
     public EditText getEditText() {

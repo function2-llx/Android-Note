@@ -17,4 +17,12 @@ public class ReturnValueEater {
     public static void eat(boolean b) {
         // do nothing to eat boolean
     }
+
+    public static void eat(long l) {
+        // do nothing to eat long
+    }
+
+    public static void eat(String s) {
+        // do nothing to eat String
+    }
 }

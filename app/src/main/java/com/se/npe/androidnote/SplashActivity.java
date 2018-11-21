@@ -68,7 +68,7 @@ public class SplashActivity extends Activity {
     private boolean initialized = false;
 
     private static final int REQUEST_EXTERNAL_STORAGE = 1;
-    private static String[] PERMISSIONS_STORAGE = {
+    private static final String[] PERMISSIONS_STORAGE = {
             Manifest.permission.READ_EXTERNAL_STORAGE,
             Manifest.permission.WRITE_EXTERNAL_STORAGE
     };
@@ -79,7 +79,8 @@ public class SplashActivity extends Activity {
         setContentView(R.layout.activity_splash);
 
         //manually ask for RW permission
-        while (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) { // We don't have permission so prompt the user
+        while (ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            // We don't have permission so prompt the user
             ActivityCompat.requestPermissions(this,
                     PERMISSIONS_STORAGE,
                     REQUEST_EXTERNAL_STORAGE
