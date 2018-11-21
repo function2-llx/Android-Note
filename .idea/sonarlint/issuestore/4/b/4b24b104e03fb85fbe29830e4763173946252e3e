@@ -1,6 +1,8 @@
 
-“"squid:ClassVariableVisibilityCheck"[Make containerLayout a static final constant or non-public and provide accessors if needed.(›Å­àûÿÿÿÿ8ÿêÎ³ó,
-"squid:ClassVariableVisibilityCheck"UMake emptyView a static final constant or non-public and provide accessors if needed.(ğæíèúÿÿÿÿ8ÿêÎ³ó,
-ˆ"squid:ClassVariableVisibilityCheck"PMake tags a static final constant or non-public and provide accessors if needed.(Î½µûÿÿÿÿ8ÿêÎ³ó,
-nsquid:S3776"RRefactor this method to reduce its Cognitive Complexity from 16 to the 15 allowed.(È”£˜8ÿêÎ³ó,
-nsquid:S3776"RRefactor this method to reduce its Cognitive Complexity from 27 to the 15 allowed.(Ú„”Á8ÿêÎ³ó,
+“"squid:ClassVariableVisibilityCheck"[Make containerLayout a static final constant or non-public and provide accessors if needed.(›Å­àûÿÿÿÿ8ØıÃ·ó,
+‘"squid:ClassVariableVisibilityCheck"YMake lastFocusEdit a static final constant or non-public and provide accessors if needed.(ƒªÅÿÿÿÿÿ8ØıÃ·ó,
+š"squid:ClassVariableVisibilityCheck"bMake viewDragHelperCallBack a static final constant or non-public and provide accessors if needed.(˜Â†·ÿÿÿÿÿ8ØıÃ·ó,
+"squid:ClassVariableVisibilityCheck"UMake emptyView a static final constant or non-public and provide accessors if needed.(ğæíèúÿÿÿÿ8ØıÃ·ó,
+ˆ"squid:ClassVariableVisibilityCheck"PMake tags a static final constant or non-public and provide accessors if needed.(Î½µûÿÿÿÿ8ØıÃ·ó,
+nsquid:S3776"RRefactor this method to reduce its Cognitive Complexity from 16 to the 15 allowed.(È”£˜8ØıÃ·ó,
+nsquid:S3776"RRefactor this method to reduce its Cognitive Complexity from 27 to the 15 allowed.(Ú„”Á8ØıÃ·ó,
