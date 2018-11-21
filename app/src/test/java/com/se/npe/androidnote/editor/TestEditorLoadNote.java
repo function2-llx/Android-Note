@@ -48,6 +48,7 @@ public class TestEditorLoadNote {
             data.add(new SoundData(DATA, DATA));
             note.setContent(data);
             new SortRichEditor.NoteLoader(editor, note).run();
+            assertNotNull(editor.buildNote());
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

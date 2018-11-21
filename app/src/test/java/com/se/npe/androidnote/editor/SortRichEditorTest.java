@@ -53,13 +53,6 @@ public class SortRichEditorTest {
     }
 
     @Test
-    public void sort() {
-        assertNotNull(editor);
-        editor.sort();
-        editor.sort();
-    }
-
-    @Test
     public void changeIsMarkdown() {
         editor.changeIsMarkdown();
         editor.changeIsMarkdown();
@@ -71,7 +64,7 @@ public class SortRichEditorTest {
     }
 
     @Test
-    public void testAddMedia() {
+    public void testUse() {
         SoundPlayer.isUnderTest = true;
         editor.addSound(MEDIA_PATH);
         editor.addPicture(MEDIA_PATH);
@@ -91,6 +84,20 @@ public class SortRichEditorTest {
                 placeholder.performClick();
             }
         }
+        editor.sort();
+        editor.sort();
+        View first = containerLayout.getChildAt(0);
+        editor.viewDragHelperCallBack.tryCaptureView(first, 0);
+        editor.viewDragHelperCallBack.clampViewPositionHorizontal(first, 0, 0);
+        editor.viewDragHelperCallBack.clampViewPositionVertical(first, 0, 0);
+        editor.viewDragHelperCallBack.onViewPositionChanged(first, 0, 0, 0, 0);
+        try {
+            editor.viewDragHelperCallBack.onViewReleased(first, 0, 0);
+        }catch (Exception e) {
+            e.printStackTrace();
+        }
+        editor.sort();
+        editor.sort();
         SoundPlayer.isUnderTest = false;
     }
 

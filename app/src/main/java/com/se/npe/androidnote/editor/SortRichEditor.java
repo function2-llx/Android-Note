@@ -132,6 +132,10 @@ public class SortRichEditor extends ScrollView {
     // a helper class to implement drag-and-sort
     private ViewDragHelper viewDragHelper;
 
+    // callback of viewDragHelper
+    // set to public only for test
+    public ViewDragHelperCallBack viewDragHelperCallBack;
+
     // save the height of edit text
     private SparseIntArray editTextHeightArray = new SparseIntArray();
 
@@ -193,7 +197,8 @@ public class SortRichEditor extends ScrollView {
         initContainerLayout();
         initEmptyView();
 
-        viewDragHelper = ViewDragHelper.create(containerLayout, 1.5f, new ViewDragHelperCallBack());
+        viewDragHelperCallBack = new ViewDragHelperCallBack();
+        viewDragHelper = ViewDragHelper.create(containerLayout, 1.5f, viewDragHelperCallBack);
     }
 
     // a split line to split title and content
@@ -1109,7 +1114,7 @@ public class SortRichEditor extends ScrollView {
         }
     }
 
-    private class ViewDragHelperCallBack extends ViewDragHelper.Callback {
+    class ViewDragHelperCallBack extends ViewDragHelper.Callback {
         @Override
         public boolean tryCaptureView(@NonNull View child, int pointerId) {
             return isSort;
