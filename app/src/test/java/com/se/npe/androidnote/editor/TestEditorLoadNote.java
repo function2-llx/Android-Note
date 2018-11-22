@@ -1,6 +1,7 @@
 package com.se.npe.androidnote.editor;
 
 import android.widget.EditText;
+import android.widget.LinearLayout;
 
 import com.se.npe.androidnote.EditorActivity;
 import com.se.npe.androidnote.R;
@@ -37,7 +38,7 @@ public class TestEditorLoadNote {
     @Test
     public void loadNote() {
         try {
-            SoundPlayer.isUnderTest = true;
+            SoundPlayer.setIsUnderTest(true);
             Note note = new Note();
             ArrayList<String> tags = new ArrayList<>();
             tags.add(DATA);
@@ -49,16 +50,17 @@ public class TestEditorLoadNote {
             data.add(new SoundData(DATA, DATA));
             note.setContent(data);
             new SortRichEditor.NoteLoader(editor, note).run();
+            LinearLayout containerLayout = editor.getContainerLayout();
             for (int i = 0; i < 2; ++i)
-                editor.insertEditTextAtIndex(editor.containerLayout.getChildCount(), "");
+                editor.insertEditTextAtIndex(containerLayout.getChildCount(), "");
             for (int i = 0; i < 2; ++i)
                 editor.onBackspacePress((EditText)
-                        (editor.containerLayout.getChildAt(editor.containerLayout.getChildCount() - 2)));
+                        (containerLayout.getChildAt(containerLayout.getChildCount() - 2)));
             assertNotNull(editor.buildNote());
         } catch (Exception e) {
-            e.printStackTrace();
+            // no-op
         } finally {
-            SoundPlayer.isUnderTest = false;
+            SoundPlayer.setIsUnderTest(false);
         }
     }
 }

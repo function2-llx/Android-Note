@@ -23,13 +23,13 @@ public class AudioUtilTest {
         try {
             ReturnValueEater.eat(f.createNewFile());
         } catch (IOException e) {
-            e.printStackTrace();
+            // no-op
         }
         try (FileOutputStream out = new FileOutputStream(f)) {
             byte[] b = new byte[100000];
             out.write(b, 0, b.length);
         } catch (IOException e) {
-            e.printStackTrace();
+            // no-op
         }
     }
 
@@ -38,7 +38,7 @@ public class AudioUtilTest {
         try {
             AudioUtil.pcmToWav(PCM_PATH, WAV_PATH, 0, 1000);
         } catch (IOException e) {
-            e.printStackTrace();
+            // no-op
         }
     }
 

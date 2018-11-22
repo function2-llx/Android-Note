@@ -41,13 +41,13 @@ public class SortRichEditorTest {
         try {
             ReturnValueEater.eat(f.createNewFile());
         } catch (IOException e) {
-            e.printStackTrace();
+            // no-op
         }
         try (FileOutputStream out = new FileOutputStream(f)) {
             byte[] b = new byte[1000];
             out.write(b, 0, b.length);
         } catch (IOException e) {
-            e.printStackTrace();
+            // no-op
         }
     }
 
@@ -64,12 +64,12 @@ public class SortRichEditorTest {
 
     @Test
     public void testUse() {
-        SoundPlayer.isUnderTest = true;
+        SoundPlayer.setIsUnderTest(true);
         editor.addSound(MEDIA_PATH);
         editor.addPicture(MEDIA_PATH);
         editor.addVideo(MEDIA_PATH);
         editor.destroy();
-        LinearLayout containerLayout = editor.containerLayout;
+        LinearLayout containerLayout = editor.getContainerLayout();
         for (int i = 0; i < containerLayout.getChildCount(); ++i) {
             if (containerLayout.getChildAt(i) instanceof RelativeLayout) {
                 RelativeLayout media = (RelativeLayout) containerLayout.getChildAt(i);
@@ -86,30 +86,31 @@ public class SortRichEditorTest {
         editor.sort();
         editor.sort();
         View first = containerLayout.getChildAt(0);
-        editor.viewDragHelperCallBack.tryCaptureView(first, 0);
-        editor.viewDragHelperCallBack.clampViewPositionHorizontal(first, 0, 0);
-        editor.viewDragHelperCallBack.clampViewPositionVertical(first, 0, 0);
-        editor.viewDragHelperCallBack.onViewPositionChanged(first, 0, 0, 0, 0);
+        SortRichEditor.ViewDragHelperCallBack viewDragHelperCallBack = editor.getViewDragHelperCallBack();
+        viewDragHelperCallBack.tryCaptureView(first, 0);
+        viewDragHelperCallBack.clampViewPositionHorizontal(first, 0, 0);
+        viewDragHelperCallBack.clampViewPositionVertical(first, 0, 0);
+        viewDragHelperCallBack.onViewPositionChanged(first, 0, 0, 0, 0);
         try {
-            editor.viewDragHelperCallBack.onViewReleased(first, 0, 0);
+            viewDragHelperCallBack.onViewReleased(first, 0, 0);
         } catch (Exception e) {
-            e.printStackTrace();
+            // no-op
         }
         editor.sort();
-        editor.viewDragHelperCallBack.resetChildPosition();
+        viewDragHelperCallBack.resetChildPosition();
         editor.sort();
-        SoundPlayer.isUnderTest = false;
+        SoundPlayer.setIsUnderTest(false);
     }
 
     @Test
     public void testClickEmptyView() {
-        editor.emptyView.performClick();
+        editor.getEmptyView().performClick();
 
     }
 
     @Test
     public void modifyTags() {
-        LabelsView tags = editor.tags;
+        LabelsView tags = editor.getTags();
         int size = tags.getLabels().size();
         TextView hackTextView = new TextView(editor.getContext());
         hackTextView.setTag(R.id.tag_key_position, size - 2);

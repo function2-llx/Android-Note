@@ -13,15 +13,13 @@ import static org.junit.Assert.assertNotNull;
 
 @RunWith(RobolectricTestRunner.class)
 public class VideoPlayerTest {
-    EditorActivity activity = null;
-    SortRichEditor editor = null;
-    VideoPlayer video = null;
+    private VideoPlayer video = null;
 
     @Before
-    public void setUp() throws Exception {
-        activity = Robolectric.setupActivity(EditorActivity.class);
+    public void setUp() {
+        EditorActivity activity = Robolectric.setupActivity(EditorActivity.class);
         assertNotNull(activity);
-        editor = activity.findViewById(R.id.rich_editor);
+        SortRichEditor editor = activity.findViewById(R.id.rich_editor);
         assertNotNull(editor);
         video = new VideoPlayer(editor.getContext());
         assertNotNull(video);

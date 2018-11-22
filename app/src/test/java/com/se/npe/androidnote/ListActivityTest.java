@@ -37,7 +37,6 @@ import org.robolectric.shadows.support.v4.ShadowSwipeRefreshLayout;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -102,12 +101,12 @@ public class ListActivityTest {
             shadowSwipeRefreshLayout.getOnRefreshListener().onRefresh(); // swipe-refresh on
             ShadowLooper.runUiThreadTasksIncludingDelayedTasks(); // enable delayed swipe-refresh
         } catch (IllegalStateException e) {
-            e.printStackTrace();
+            // no-op
         }
     }
 
     @Test
-    public void onNavigate() throws NoSuchFieldException, NoSuchMethodException, IllegalAccessException, ClassNotFoundException, InstantiationException, InvocationTargetException {
+    public void onNavigate() throws NoSuchFieldException, IllegalAccessException {
         NavigationView navigationView = activity.findViewById(R.id.nav_view);
         activity.refreshGroups(); // refresh groups
         // get OnNavigationItemSelectedListener
@@ -153,7 +152,6 @@ public class ListActivityTest {
         onNavigationItemSelectedListener.onNavigationItemSelected(navigationViewGroupManageMenu.findItem(R.id.manage_group));
         alertDialog = (AlertDialog) ShadowAlertDialog.getLatestDialog();
         // remove groups
-        // TODO: use reflection to set mCheckedItems
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick(); // click confirm
     }
 
@@ -235,6 +233,7 @@ public class ListActivityTest {
     public static ListActivity initListActivity() {
         TableOperate.init(RuntimeEnvironment.application.getApplicationContext()); // workaround for TableOperate.init()
         PermissionTest.grantPermission(RuntimeEnvironment.application, Manifest.permission.RECORD_AUDIO); // workaround for permission RECORD_AUDIO
+        PermissionTest.grantPermission(RuntimeEnvironment.application, Manifest.permission.WRITE_EXTERNAL_STORAGE); // workaround for permission WRITE_EXTERNAL_STORAGE
         return Robolectric.setupActivity(ListActivity.class);
     }
 

@@ -19,7 +19,13 @@ import java.lang.ref.WeakReference;
 
 public class SoundPlayer extends RelativeLayout {
     private static final String LOG_TAG = SoundPlayer.class.getSimpleName();
-    public static boolean isUnderTest = false;
+
+    private static boolean isUnderTest = false;
+
+    // setter only for test
+    public static void setIsUnderTest(boolean isUnderTest) {
+        SoundPlayer.isUnderTest = isUnderTest;
+    }
 
     static class ProgressSetter implements Runnable {
         WeakReference<SoundPlayer> ref;
