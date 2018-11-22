@@ -147,9 +147,25 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
         updateGroupNotesList();
     }
 
-    public void insert(Note note, int position) {
+    public void insert(Note note) {
+        int position = 0;
+        for (Note noteInList : noteList) {
+            if (comparator.compare(noteInList, note) > 0)
+                break;
+            ++position;
+        }
+        insert(note, position);
+    }
+
+    void insert(Note note, int position) {
         TableOperate.getInstance().addNote(note);
         super.insertInternal(this.noteList, note, position);
+    }
+
+    public void modify(Note note) {
+        // Can we remove & insert to do the same thing?
+        TableOperate.getInstance().setNote(note);
+        updateGroupNotesList();
     }
 
     public void remove(int position) {
