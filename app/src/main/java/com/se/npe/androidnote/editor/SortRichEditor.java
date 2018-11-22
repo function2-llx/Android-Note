@@ -115,11 +115,13 @@ public class SortRichEditor extends ScrollView {
     //              ...
     private LinearLayout parentLayout;
 
-    private LinearLayout containerLayout;
+    // set to public only for test
+    public LinearLayout containerLayout;
 
     private OnFocusChangeListener focusListener;
 
-    private EditText lastFocusEdit;
+    // set to public only for test
+    public EditText lastFocusEdit;
 
     private SoundPlayer lastAddedSoundPlayer;
 
@@ -130,6 +132,10 @@ public class SortRichEditor extends ScrollView {
 
     // a helper class to implement drag-and-sort
     private ViewDragHelper viewDragHelper;
+
+    // callback of viewDragHelper
+    // set to public only for test
+    public ViewDragHelperCallBack viewDragHelperCallBack;
 
     // save the height of edit text
     private SparseIntArray editTextHeightArray = new SparseIntArray();
@@ -166,9 +172,11 @@ public class SortRichEditor extends ScrollView {
 
     private boolean isMarkdown = false;
 
-    private RelativeLayout emptyView;
+    // set to public only for test
+    public RelativeLayout emptyView;
 
-    private LabelsView tags;
+    // set to public only for test
+    public LabelsView tags;
 
     private HorizontalEditScrollView markdownController = null;
 
@@ -190,7 +198,8 @@ public class SortRichEditor extends ScrollView {
         initContainerLayout();
         initEmptyView();
 
-        viewDragHelper = ViewDragHelper.create(containerLayout, 1.5f, new ViewDragHelperCallBack());
+        viewDragHelperCallBack = new ViewDragHelperCallBack();
+        viewDragHelper = ViewDragHelper.create(containerLayout, 1.5f, viewDragHelperCallBack);
     }
 
     // a split line to split title and content
@@ -270,9 +279,9 @@ public class SortRichEditor extends ScrollView {
         }
     }
 
-    private void onAddTag(EditText editText) {
+    // set to public only for test
+    public void onAddTag(String input) {
         tags.clearAllSelect();
-        String input = editText.getText().toString().trim();
         ArrayList<String> list = new ArrayList<>(tags.getLabels());
         if (input.isEmpty()) {
             Toast.makeText(getContext(), "Input is empty", Toast.LENGTH_SHORT).show();
@@ -312,7 +321,7 @@ public class SortRichEditor extends ScrollView {
                         new AlertDialog.Builder(getContext());
                 inputDialog.setTitle("Tag name").setView(editText);
                 inputDialog.setPositiveButton("Ok",
-                        (dialog, which) -> onAddTag(editText)).show();
+                        (dialog, which) -> onAddTag(editText.getText().toString().trim())).show();
             } else if (position == tags.getLabels().size() - 1) {
                 ArrayList<String> list = new ArrayList<>(tags.getLabels());
                 ArrayList<Integer> remove = new ArrayList<>(tags.getSelectLabels());
@@ -612,7 +621,8 @@ public class SortRichEditor extends ScrollView {
         }
     }
 
-    private void onBackspacePress(EditText editTxt) {
+    // set to public only for test
+    public void onBackspacePress(EditText editTxt) {
         int startSelection = editTxt.getSelectionStart();
         if (startSelection == 0) { // the cursor is at 0, now deleted the view before it
             int editIndex = containerLayout.indexOfChild(editTxt);
@@ -888,7 +898,8 @@ public class SortRichEditor extends ScrollView {
         containerLayout.addView(createPlaceholder(), index);
     }
 
-    private EditText insertEditTextAtIndex(int index, String editStr) {
+    // set to public only for test
+    public EditText insertEditTextAtIndex(int index, String editStr) {
         DeletableEditText editText = createEditText();
         editText.setText(editStr);
         containerLayout.setLayoutTransition(null);
@@ -1106,7 +1117,7 @@ public class SortRichEditor extends ScrollView {
         }
     }
 
-    private class ViewDragHelperCallBack extends ViewDragHelper.Callback {
+    class ViewDragHelperCallBack extends ViewDragHelper.Callback {
         @Override
         public boolean tryCaptureView(@NonNull View child, int pointerId) {
             return isSort;
@@ -1133,7 +1144,8 @@ public class SortRichEditor extends ScrollView {
         }
 
         // update the indexArray according to current child position
-        private void resetChildPosition() {
+        // set to public only for test
+        public void resetChildPosition() {
             indexArray.clear();
             int num = containerLayout.getChildCount();
             for (int i = 0; i < num; ++i) {

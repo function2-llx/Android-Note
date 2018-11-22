@@ -68,7 +68,8 @@ public class SoundRecorderActivity extends AppCompatActivity {
     }
 
     // Recording Start/Stop
-    private void onRecord(boolean start) {
+    // make public only for test
+    public void onRecord(boolean start) {
         if (start) {
             // start recording
             mRecordButton.setIcon(R.drawable.ic_media_stop);
