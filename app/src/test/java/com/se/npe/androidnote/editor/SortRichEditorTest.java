@@ -86,17 +86,18 @@ public class SortRichEditorTest {
         editor.sort();
         editor.sort();
         View first = containerLayout.getChildAt(0);
-        editor.viewDragHelperCallBack.tryCaptureView(first, 0);
-        editor.viewDragHelperCallBack.clampViewPositionHorizontal(first, 0, 0);
-        editor.viewDragHelperCallBack.clampViewPositionVertical(first, 0, 0);
-        editor.viewDragHelperCallBack.onViewPositionChanged(first, 0, 0, 0, 0);
+        SortRichEditor.ViewDragHelperCallBack viewDragHelperCallBack = editor.getViewDragHelperCallBack();
+        viewDragHelperCallBack.tryCaptureView(first, 0);
+        viewDragHelperCallBack.clampViewPositionHorizontal(first, 0, 0);
+        viewDragHelperCallBack.clampViewPositionVertical(first, 0, 0);
+        viewDragHelperCallBack.onViewPositionChanged(first, 0, 0, 0, 0);
         try {
-            editor.viewDragHelperCallBack.onViewReleased(first, 0, 0);
+            viewDragHelperCallBack.onViewReleased(first, 0, 0);
         } catch (Exception e) {
             // no-op
         }
         editor.sort();
-        editor.viewDragHelperCallBack.resetChildPosition();
+        viewDragHelperCallBack.resetChildPosition();
         editor.sort();
         SoundPlayer.setIsUnderTest(false);
     }

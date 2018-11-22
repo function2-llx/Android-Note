@@ -132,8 +132,7 @@ public class SortRichEditor extends ScrollView {
     private ViewDragHelper viewDragHelper;
 
     // callback of viewDragHelper
-    // set to public only for test
-    public ViewDragHelperCallBack viewDragHelperCallBack;
+    private ViewDragHelperCallBack viewDragHelperCallBack;
 
     // save the height of edit text
     private SparseIntArray editTextHeightArray = new SparseIntArray();
