@@ -21,7 +21,7 @@ public class ResultPoolTest {
         try {
             instance.putResult(150, "error");
         } catch (Exception e) {
-            e.printStackTrace();
+           // no-op
         }
         instance.clearAll();
     }
@@ -42,13 +42,13 @@ public class ResultPoolTest {
         try {
             instance.startRecording();
         } catch (IOException e) {
-            e.printStackTrace();
+           // no-op
         }
         ThreadSleep.sleep(ResultPool.SLEEP_MILL + 100);
         try {
             instance.generateWav(System.currentTimeMillis() - 100);
         } catch (Exception e) {
-            e.printStackTrace();
+           // no-op
         }
         instance.stopRecording();
         ReturnValueEater.eat(instance.resultFrom(0));
@@ -73,7 +73,7 @@ public class ResultPoolTest {
             listener.onResult(new RecognizerResult("。"), false);
             listener.onResult(new RecognizerResult(""), false);
         } catch (Throwable e) {
-            e.printStackTrace();
+           // no-op
         }
     }
 }

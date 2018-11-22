@@ -54,7 +54,7 @@ public class NoteTest {
             note1.getTag().add("TagZ");
             assertEquals(note1, note2);
         } catch (IllegalStateException e) {
-            e.printStackTrace();
+            // no-op
         }
     }
 

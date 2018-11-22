@@ -56,7 +56,7 @@ public class TestEditorLoadNote {
                         (editor.containerLayout.getChildAt(editor.containerLayout.getChildCount() - 2)));
             assertNotNull(editor.buildNote());
         } catch (Exception e) {
-            e.printStackTrace();
+            // no-op
         } finally {
             SoundPlayer.isUnderTest = false;
         }

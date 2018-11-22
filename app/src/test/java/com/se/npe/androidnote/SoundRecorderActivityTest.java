@@ -24,7 +24,7 @@ public class SoundRecorderActivityTest {
             ThreadSleep.sleep(1000);
             activity.onRecord(false);
         } catch (Exception e) {
-            e.printStackTrace();
+            // no-op
         }
     }
 }

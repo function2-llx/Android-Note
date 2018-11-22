@@ -12,6 +12,7 @@ import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechRecognizer;
 import com.se.npe.androidnote.util.Logger;
 import com.se.npe.androidnote.util.ReturnValueEater;
+import com.se.npe.androidnote.util.ThreadSleep;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -149,11 +150,7 @@ public class ResultPool {
                     iat.writeAudio(voiceBuffer, 0, voiceBuffer.length);
                     iat.stopListening();
                 }
-                try {
-                    Thread.sleep(SLEEP_MILL);
-                } catch (InterruptedException e) {
-                    Logger.log(LOG_TAG, e);
-                }
+                ThreadSleep.sleep(SLEEP_MILL);
             }
         }
     }

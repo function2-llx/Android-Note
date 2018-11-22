@@ -37,7 +37,6 @@ import org.robolectric.shadows.support.v4.ShadowSwipeRefreshLayout;
 
 import java.io.File;
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Objects;
 
@@ -59,15 +58,11 @@ public class ListActivityTest {
 
     @Before
     public void setUp() {
-        try {
-            activity = initListActivity();
-            shadowActivity = shadowOf(activity);
-            ultimateRecyclerView = activity.findViewById(R.id.ultimate_recycler_view);
-            noteAdapter = (NoteAdapter) ultimateRecyclerView.getAdapter();
-            TableOperateTest.addExampleNote(new ArrayList<>());
-        } catch (IllegalStateException e) {
-            // no-op
-        }
+        activity = initListActivity();
+        shadowActivity = shadowOf(activity);
+        ultimateRecyclerView = activity.findViewById(R.id.ultimate_recycler_view);
+        noteAdapter = (NoteAdapter) ultimateRecyclerView.getAdapter();
+        TableOperateTest.addExampleNote(new ArrayList<>());
     }
 
     @After
@@ -157,7 +152,6 @@ public class ListActivityTest {
         onNavigationItemSelectedListener.onNavigationItemSelected(navigationViewGroupManageMenu.findItem(R.id.manage_group));
         alertDialog = (AlertDialog) ShadowAlertDialog.getLatestDialog();
         // remove groups
-        // TODO: use reflection to set mCheckedItems
         alertDialog.getButton(AlertDialog.BUTTON_POSITIVE).performClick(); // click confirm
     }
 
@@ -239,6 +233,7 @@ public class ListActivityTest {
     public static ListActivity initListActivity() {
         TableOperate.init(RuntimeEnvironment.application.getApplicationContext()); // workaround for TableOperate.init()
         PermissionTest.grantPermission(RuntimeEnvironment.application, Manifest.permission.RECORD_AUDIO); // workaround for permission RECORD_AUDIO
+        PermissionTest.grantPermission(RuntimeEnvironment.application, Manifest.permission.WRITE_EXTERNAL_STORAGE); // workaround for permission WRITE_EXTERNAL_STORAGE
         return Robolectric.setupActivity(ListActivity.class);
     }
 

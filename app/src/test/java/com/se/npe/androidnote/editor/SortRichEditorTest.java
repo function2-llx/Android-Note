@@ -41,13 +41,13 @@ public class SortRichEditorTest {
         try {
             ReturnValueEater.eat(f.createNewFile());
         } catch (IOException e) {
-            e.printStackTrace();
+            // no-op
         }
         try (FileOutputStream out = new FileOutputStream(f)) {
             byte[] b = new byte[1000];
             out.write(b, 0, b.length);
         } catch (IOException e) {
-            e.printStackTrace();
+            // no-op
         }
     }
 
@@ -93,7 +93,7 @@ public class SortRichEditorTest {
         try {
             editor.viewDragHelperCallBack.onViewReleased(first, 0, 0);
         } catch (Exception e) {
-            e.printStackTrace();
+            // no-op
         }
         editor.sort();
         editor.viewDragHelperCallBack.resetChildPosition();
