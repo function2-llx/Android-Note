@@ -301,6 +301,7 @@ public class ListActivity extends AppCompatActivity {
                         if (selected[i])
                             TableOperate.getInstance().removeGroup(allGroupsArray[i]);
                     refreshGroups();
+                    noteAdapter.updateGroupNotesList();
                 });
                 builder.setNegativeButton(CANCEL, null);
                 builder.show();
