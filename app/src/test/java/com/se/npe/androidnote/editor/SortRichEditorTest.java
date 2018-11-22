@@ -64,12 +64,12 @@ public class SortRichEditorTest {
 
     @Test
     public void testUse() {
-        SoundPlayer.isUnderTest = true;
+        SoundPlayer.setIsUnderTest(true);
         editor.addSound(MEDIA_PATH);
         editor.addPicture(MEDIA_PATH);
         editor.addVideo(MEDIA_PATH);
         editor.destroy();
-        LinearLayout containerLayout = editor.containerLayout;
+        LinearLayout containerLayout = editor.getContainerLayout();
         for (int i = 0; i < containerLayout.getChildCount(); ++i) {
             if (containerLayout.getChildAt(i) instanceof RelativeLayout) {
                 RelativeLayout media = (RelativeLayout) containerLayout.getChildAt(i);
@@ -98,18 +98,18 @@ public class SortRichEditorTest {
         editor.sort();
         editor.viewDragHelperCallBack.resetChildPosition();
         editor.sort();
-        SoundPlayer.isUnderTest = false;
+        SoundPlayer.setIsUnderTest(false);
     }
 
     @Test
     public void testClickEmptyView() {
-        editor.emptyView.performClick();
+        editor.getEmptyView().performClick();
 
     }
 
     @Test
     public void modifyTags() {
-        LabelsView tags = editor.tags;
+        LabelsView tags = editor.getTags();
         int size = tags.getLabels().size();
         TextView hackTextView = new TextView(editor.getContext());
         hackTextView.setTag(R.id.tag_key_position, size - 2);

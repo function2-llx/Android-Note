@@ -20,15 +20,15 @@ public class SoundPlayerTest {
 
     @Before
     public void setUp() {
-        SoundPlayer.isUnderTest = true;
+        SoundPlayer.setIsUnderTest(true);
         EditorActivity activity = Robolectric.setupActivity(EditorActivity.class);
         assertNotNull(activity);
         SortRichEditor editor = activity.findViewById(R.id.rich_editor);
         assertNotNull(editor);
         editor.addSound("tmp.wav");
-        for (int i = 0; i < editor.containerLayout.getChildCount(); ++i) {
-            if (editor.containerLayout.getChildAt(i) instanceof RelativeLayout) {
-                sound = (SoundPlayer) ((RelativeLayout) editor.containerLayout.getChildAt(i))
+        for (int i = 0; i < editor.getContainerLayout().getChildCount(); ++i) {
+            if (editor.getContainerLayout().getChildAt(i) instanceof RelativeLayout) {
+                sound = (SoundPlayer) ((RelativeLayout) editor.getContainerLayout().getChildAt(i))
                         .getChildAt(0);
             }
         }
@@ -75,6 +75,6 @@ public class SoundPlayerTest {
 
     @After
     public void tearDown() {
-        SoundPlayer.isUnderTest = false;
+        SoundPlayer.setIsUnderTest(false);
     }
 }

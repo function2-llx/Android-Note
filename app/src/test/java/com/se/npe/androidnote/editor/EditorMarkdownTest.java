@@ -28,8 +28,8 @@ public class EditorMarkdownTest {
         assertNotNull(editor);
         markdownController = activity.findViewById(R.id.scroll_edit);
         assertNotNull(markdownController);
-        editor.emptyView.performClick();
-        editText = (MarkdownEditText) (editor.lastFocusEdit);
+        editor.getEmptyView().performClick();
+        editText = (MarkdownEditText) (editor.getLastFocusEdit());
     }
 
     private void click(int id, String input) {

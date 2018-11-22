@@ -115,13 +115,11 @@ public class SortRichEditor extends ScrollView {
     //              ...
     private LinearLayout parentLayout;
 
-    // set to public only for test
-    public LinearLayout containerLayout;
+    private LinearLayout containerLayout;
 
     private OnFocusChangeListener focusListener;
 
-    // set to public only for test
-    public EditText lastFocusEdit;
+    private EditText lastFocusEdit;
 
     private SoundPlayer lastAddedSoundPlayer;
 
@@ -172,13 +170,32 @@ public class SortRichEditor extends ScrollView {
 
     private boolean isMarkdown = false;
 
-    // set to public only for test
-    public RelativeLayout emptyView;
+    private RelativeLayout emptyView;
 
-    // set to public only for test
-    public LabelsView tags;
+    private LabelsView tags;
 
     private HorizontalEditScrollView markdownController = null;
+
+    // getters only for test
+    public LinearLayout getContainerLayout() {
+        return containerLayout;
+    }
+
+    public EditText getLastFocusEdit() {
+        return lastFocusEdit;
+    }
+
+    public ViewDragHelperCallBack getViewDragHelperCallBack() {
+        return viewDragHelperCallBack;
+    }
+
+    public RelativeLayout getEmptyView() {
+        return emptyView;
+    }
+
+    public LabelsView getTags() {
+        return tags;
+    }
 
     public SortRichEditor(Context context) {
         this(context, null);

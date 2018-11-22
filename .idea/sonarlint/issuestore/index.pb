@@ -19,8 +19,6 @@ s
 Capp/src/main/java/com/se/npe/androidnote/editor/SortRichEditor.java,4/b/4b24b104e03fb85fbe29830e4763173946252e3e
 p
 @app/src/main/java/com/se/npe/androidnote/editor/SoundPlayer.java,d/e/debfb50e7388bf067847573380db736d831c3b3b
-ç
-]app/src/test/java/com/se/npe/androidnote/editor/controller/HorizontalRulesControllerTest.java,6/2/62c26c3d0af55f8a11ac45e994e756f9b602987c
 ~
 Napp/src/main/java/com/se/npe/androidnote/editor/controller/TodoController.java,c/c/cc53a18f32f4e821f911d4043a015a8f0448d9cc
 p
@@ -113,3 +111,9 @@ w
 Gapp/src/test/java/com/se/npe/androidnote/SoundRecorderActivityTest.java,1/a/1a98cdaf1cf2c37432ecf214353b187ea43f0fa6
 p
 @app/src/test/java/com/se/npe/androidnote/SplashActivityTest.java,8/8/88c6da85dcc5f2613466babf56d106199721910a
+
+Oapp/src/main/java/cn/sharesdk/onekeyshare/themes/classic/port/EditPagePort.java,d/5/d5e55ecf7cfbf9f80fa7aa3c2d2e9e16ecc9a039
+q
+Aapp/src/main/java/com/se/npe/androidnote/models/TableOperate.java,4/c/4c9851f9e431a5d6e9c4b36b953a04fb5127a0ef
+m
+=app/src/main/java/com/se/npe/androidnote/sound/AudioUtil.java,8/0/8057d11356e75007fd0750856308f46ebbcebca0

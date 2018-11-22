@@ -1,0 +1,7 @@
+
+Isquid:S1066"/Merge this if statement with the enclosing one.(ÖÂïıÿÿÿÿ
+Lsquid:S2589"7Remove this expression which always evaluates to "true"(¡†”ö
+gsquid:S3776"RRefactor this method to reduce its Cognitive Complexity from 17 to the 15 allowed.(¬«İ§
+=squid:S1148"#Use a logger to log this exception.(€ÉÔ…ıÿÿÿÿ
+=squid:S1148"#Use a logger to log this exception.(€ÉÔ…ıÿÿÿÿ
+Osquid:S1161":Add the "@Override" annotation above this method signature(Î¢È
