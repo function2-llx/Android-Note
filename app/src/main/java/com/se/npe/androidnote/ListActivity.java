@@ -151,7 +151,7 @@ public class ListActivity extends AppCompatActivity {
                     break;
             }
             noteFileConverter.importNoteFromFile((Note note) ->
-                            TableOperate.getInstance().addNote(note)
+                            noteAdapter.insert(note)
                     , path);
         }
     }

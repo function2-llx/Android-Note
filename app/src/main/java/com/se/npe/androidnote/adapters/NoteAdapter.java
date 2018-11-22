@@ -334,8 +334,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
                         final int[] selected = {0};
                         builder.setPositiveButton("confirm", (dialog, which) -> {
                             selectedNote.setGroupName(groupName.get(selected[0]));
-                            TableOperate.getInstance().modifyNote(selectedNote);
-                            updateGroupNotesList();
+                            modify(selectedNote);
                         });
                         builder.setNegativeButton("cancel", null);
                         builder.setSingleChoiceItems(groupName.toArray(new String[0]), selected[0],
@@ -346,8 +345,7 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 
                     case R.id.remove_from_current_group:
                         selectedNote.setGroupName("");
-                        TableOperate.getInstance().modifyNote(selectedNote);
-                        updateGroupNotesList();
+                        modify(selectedNote);
                         break;
 
                     default:
