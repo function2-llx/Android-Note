@@ -45,7 +45,9 @@ import co.lujun.androidtagview.TagView;
 import static com.se.npe.androidnote.EditorActivity.CURRENT_GROUP;
 import static com.se.npe.androidnote.EditorActivity.VIEW_ONLY;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 import static org.robolectric.Shadows.shadowOf;
 
 @RunWith(RobolectricTestRunner.class)
@@ -94,15 +96,11 @@ public class ListActivityTest {
 
     @Test
     public void onRefresh() {
-        try {
-            SwipeRefreshLayout swipeRefreshLayout = ultimateRecyclerView.mSwipeRefreshLayout;
-            ShadowSwipeRefreshLayout shadowSwipeRefreshLayout = (ShadowSwipeRefreshLayout) shadowOf(swipeRefreshLayout);
-            swipeRefreshLayout.post(() -> swipeRefreshLayout.setRefreshing(true)); // swipe-refresh animation
-            shadowSwipeRefreshLayout.getOnRefreshListener().onRefresh(); // swipe-refresh on
-            ShadowLooper.runUiThreadTasksIncludingDelayedTasks(); // enable delayed swipe-refresh
-        } catch (IllegalStateException e) {
-            // no-op
-        }
+        SwipeRefreshLayout swipeRefreshLayout = ultimateRecyclerView.mSwipeRefreshLayout;
+        ShadowSwipeRefreshLayout shadowSwipeRefreshLayout = (ShadowSwipeRefreshLayout) shadowOf(swipeRefreshLayout);
+        swipeRefreshLayout.post(() -> swipeRefreshLayout.setRefreshing(true)); // swipe-refresh animation
+        shadowSwipeRefreshLayout.getOnRefreshListener().onRefresh(); // swipe-refresh on
+        ShadowLooper.runUiThreadTasksIncludingDelayedTasks(); // enable delayed swipe-refresh
     }
 
     @Test
@@ -181,8 +179,9 @@ public class ListActivityTest {
         onTagClickListener.onTagClick(3, null); // click tag 3 with tag-all unchecked
         assertEquals(1, noteAdapter.getItemCount());
         onTagClickListener.onTagClick(8, null); // click tag 3 & 8 with tag-all unchecked
-        assertEquals(2, noteAdapter.getItemCount());
+        assertEquals(0, noteAdapter.getItemCount());
 
+        onTagClickListener.onTagClick(3, null); // click tag 8 with tag-all unchecked
         // click tag & query searchView
         searchView.setQuery("8", false);
         assertEquals(1, noteAdapter.getItemCount());
@@ -220,6 +219,18 @@ public class ListActivityTest {
         // suffix: pdf
         uri = FileUtils.getUri(new File(DataExample.getExamplePath(DataExample.EXAMPLE_MIX_IN) + ".pdf"));
         shadowActivity.receiveResult(openFileIntent, AppCompatActivity.RESULT_OK, new Intent().setData(uri));
+    }
+
+    @Test
+    public void onBackPressed() {
+        // open searchView
+        SearchView searchView = activity.findViewById(R.id.action_search);
+        searchView.setIconified(false);
+        // press back button
+        activity.onBackPressed();
+        assertTrue(searchView.isIconified());
+        // press back button again
+        activity.onBackPressed();
     }
 
     @Test

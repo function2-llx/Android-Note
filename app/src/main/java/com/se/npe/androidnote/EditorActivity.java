@@ -173,15 +173,18 @@ public class EditorActivity extends AppCompatActivity {
             return;
         }
         Note note = editor.buildNote();
-        if (oldNote != null) {
-            note.setIndex(oldNote.getIndex());
-            note.setGroupName(oldNote.getGroupName());
-        } else {
-            note.setGroupName(currentGroup);
-        }
         note.setStartTime(createTime);
         note.setModifyTime(new Date());
-        TableOperate.getInstance().modifyNote(note);
+        if (oldNote != null) {
+            // existed note
+            note.setIndex(oldNote.getIndex());
+            note.setGroupName(oldNote.getGroupName());
+            TableOperate.getInstance().setNote(note);
+        } else {
+            // new note
+            note.setGroupName(currentGroup);
+            TableOperate.getInstance().addNote(note);
+        }
         oldNote = note;
     }
 

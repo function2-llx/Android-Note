@@ -151,7 +151,7 @@ public class ListActivity extends AppCompatActivity {
                     break;
             }
             noteFileConverter.importNoteFromFile((Note note) ->
-                            TableOperate.getInstance().addNote(note)
+                            noteAdapter.insert(note)
                     , path);
         }
     }
@@ -242,34 +242,9 @@ public class ListActivity extends AppCompatActivity {
         });
     }
 
-    private void handleNewGroup(List<String> allGroups) {
-        EditText editText = new EditText(ListActivity.this);
-        AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
-        builder.setTitle("New group");
-        builder.setPositiveButton("add", null);
-        builder.setNegativeButton(CANCEL, null);
-        builder.setView(editText);
-        AlertDialog dialog = builder.create();
-        dialog.show();
-        dialog.getButton(AlertDialog.BUTTON_POSITIVE).setOnClickListener(v -> {
-            String groupName = editText.getText().toString();
-            if (groupName.isEmpty())
-                Toast.makeText(ListActivity.this, "input something?", Toast.LENGTH_SHORT).show();
-            else if (allGroups.contains(groupName))
-                Toast.makeText(ListActivity.this, groupName + " already exist", Toast.LENGTH_SHORT).show();
-            else {
-                TableOperate.getInstance().addGroup(groupName);
-                refreshGroups();
-                dialog.cancel();
-            }
-        });
-    }
-
     private void handleGroupManage(@NonNull MenuItem menuItem) {
         List<String> allGroups = TableOperate.getInstance().getAllGroups();
-        allGroups.remove(noteAdapter.getCurrentGroup());
 
-        String[] allGroupsArray = allGroups.toArray(new String[0]);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         switch (menuItem.getItemId()) {
             case R.id.new_group:
@@ -293,6 +268,9 @@ public class ListActivity extends AppCompatActivity {
                 break;
 
             case R.id.manage_group:
+                // remove current group
+                allGroups.remove(noteAdapter.getCurrentGroup());
+                String[] allGroupsArray = allGroups.toArray(new String[0]);
                 builder.setTitle(getString(R.string.remove_group));
                 boolean[] selected = new boolean[allGroupsArray.length];
                 builder.setMultiChoiceItems(allGroupsArray, new boolean[allGroupsArray.length], (dialog, which, isChecked) -> selected[which] = isChecked);
@@ -327,7 +305,6 @@ public class ListActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (searching) {
             tagGroupManager.hide();
-            enableRefresh();
             noteAdapter.updateGroupNotesList();
             searching = false;
             searchView.onActionViewCollapsed();
@@ -337,9 +314,6 @@ public class ListActivity extends AppCompatActivity {
 
     // search
     private void configureSearchView() {
-        if (searchView == null)
-            throw new AssertionError();
-
         tagGroupManager = findViewById(R.id.tag_group_manager);
         searchView.setQueryHint(getResources().getString(R.string.list_search_hint));
         searchView.setSubmitButtonEnabled(true);
@@ -348,13 +322,11 @@ public class ListActivity extends AppCompatActivity {
         searchView.setOnSearchClickListener(v -> {
             tagGroupManager.show();
             searching = true;
-            disableRefresh();
         });
 
         // close searchView
         searchView.setOnCloseListener(() -> {
             tagGroupManager.hide();
-            enableRefresh();
             noteAdapter.updateGroupNotesList();
             searching = false;
             return false;
@@ -403,13 +375,12 @@ public class ListActivity extends AppCompatActivity {
     // refresh the list
     private void enableRefresh() {
         this.ultimateRecyclerView.setDefaultOnRefreshListener(() -> new Handler().postDelayed(() -> {
-            noteAdapter.updateGroupNotesList();
+            if (searching)
+                performSearch(searchView.getQuery().toString(), tagGroupManager);
+            else
+                noteAdapter.updateGroupNotesList();
             ultimateRecyclerView.setRefreshing(false);
             layoutManager.scrollToPosition(0);
         }, 500));
-    }
-
-    private void disableRefresh() {
-        ultimateRecyclerView.mSwipeRefreshLayout.setEnabled(false);
     }
 }
