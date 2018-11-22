@@ -199,12 +199,14 @@ public class TableOperate implements INoteCollection {
             if (tagList == null) noteList.add(temp);
             else {
                 List<String> tempTag = temp.getTag();
+                boolean flag = true;
                 for (int i = 0; i < tagList.size(); i++) {
-                    if (tempTag.contains(tagList.get(i))) {
-                        noteList.add(temp);
+                    if (!tempTag.contains(tagList.get(i))) {
+                        flag = false;
                         break;
                     }
                 }
+                if(flag)noteList.add(temp);
             }
         }
         c.close();
