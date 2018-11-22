@@ -47,6 +47,8 @@ import co.lujun.androidtagview.TagView;
  * @author llx
  */
 public class ListActivity extends AppCompatActivity {
+    private static final String CANCEL = "cancel";
+
     private LinearLayoutManager layoutManager;
     private NoteAdapter noteAdapter;
     private UltimateRecyclerView ultimateRecyclerView;
@@ -204,7 +206,6 @@ public class ListActivity extends AppCompatActivity {
     }
 
 
-
     // navigation view
     public void setNavigationView() {
         NavigationView navigationView = findViewById(R.id.nav_view);
@@ -246,7 +247,7 @@ public class ListActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(ListActivity.this);
         builder.setTitle("New group");
         builder.setPositiveButton("add", null);
-        builder.setNegativeButton("cancel", null);
+        builder.setNegativeButton(CANCEL, null);
         builder.setView(editText);
         AlertDialog dialog = builder.create();
         dialog.show();
@@ -285,7 +286,7 @@ public class ListActivity extends AppCompatActivity {
                         dialog.cancel();
                     }
                 }));
-                builder.setNegativeButton("cancel", null);
+                builder.setNegativeButton(CANCEL, null);
                 builder.show();
                 break;
 
@@ -299,7 +300,7 @@ public class ListActivity extends AppCompatActivity {
                             TableOperate.getInstance().removeGroup(allGroupsArray[i]);
                     refreshGroups();
                 });
-                builder.setNegativeButton("cancel", null);
+                builder.setNegativeButton(CANCEL, null);
                 builder.show();
                 break;
 

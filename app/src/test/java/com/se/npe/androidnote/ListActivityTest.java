@@ -95,13 +95,15 @@ public class ListActivityTest {
 
     @Test
     public void onRefresh() {
-        SwipeRefreshLayout swipeRefreshLayout = ultimateRecyclerView.mSwipeRefreshLayout;
-        ShadowSwipeRefreshLayout shadowSwipeRefreshLayout = (ShadowSwipeRefreshLayout) shadowOf(swipeRefreshLayout);
-        swipeRefreshLayout.post(() ->
-                swipeRefreshLayout.setRefreshing(true)
-        ); // swipe-refresh animation
-        shadowSwipeRefreshLayout.getOnRefreshListener().onRefresh(); // swipe-refresh on
-        ShadowLooper.runUiThreadTasksIncludingDelayedTasks(); // enable delayed swipe-refresh
+        try {
+            SwipeRefreshLayout swipeRefreshLayout = ultimateRecyclerView.mSwipeRefreshLayout;
+            ShadowSwipeRefreshLayout shadowSwipeRefreshLayout = (ShadowSwipeRefreshLayout) shadowOf(swipeRefreshLayout);
+            swipeRefreshLayout.post(() -> swipeRefreshLayout.setRefreshing(true)); // swipe-refresh animation
+            shadowSwipeRefreshLayout.getOnRefreshListener().onRefresh(); // swipe-refresh on
+            ShadowLooper.runUiThreadTasksIncludingDelayedTasks(); // enable delayed swipe-refresh
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test

@@ -11,6 +11,7 @@ import com.iflytek.cloud.SpeechConstant;
 import com.iflytek.cloud.SpeechError;
 import com.iflytek.cloud.SpeechRecognizer;
 import com.se.npe.androidnote.util.Logger;
+import com.se.npe.androidnote.util.ReturnValueEater;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -41,6 +42,51 @@ public class ResultPool {
     private AudioUtil.AudioRecordThread recorder;
     private long startTime;
 
+    static class MyRecognizerListener implements RecognizerListener {
+        ResultPool target;
+        long now;
+
+        MyRecognizerListener(ResultPool target, long now) {
+            this.target = target;
+            this.now = now;
+        }
+
+        @Override
+        public void onVolumeChanged(int i, byte[] bytes) {
+            // no-op
+        }
+
+        @Override
+        public void onBeginOfSpeech() {
+            // no-op
+        }
+
+        @Override
+        public void onEndOfSpeech() {
+            // no-op
+        }
+
+        @Override
+        public void onResult(RecognizerResult recognizerResult, boolean isLast) {
+            // skip '。' & space
+            String result = recognizerResult.getResultString();
+            if ("".equals(result) || "。".equals(result)) {
+                return;
+            }
+            target.putResult(now, result);
+        }
+
+        @Override
+        public void onError(SpeechError speechError) {
+            // no-op
+        }
+
+        @Override
+        public void onEvent(int i, int i1, int i2, Bundle bundle) {
+            // no-op
+        }
+    }
+
     static class IFlyFeeder extends AsyncTask<Void, Void, Void> {
         private WeakReference<ResultPool> ref;
         private int currentPcmByte;
@@ -54,12 +100,16 @@ public class ResultPool {
             } catch (IOException e) {
                 Logger.log(LOG_TAG, e);
             }
-            iat = SpeechRecognizer.createRecognizer(null, null);
-            iat.setParameter(SpeechConstant.DOMAIN, "iat");
-            iat.setParameter(SpeechConstant.LANGUAGE, "zh_cn");
-            iat.setParameter(SpeechConstant.ACCENT, "mandarin");
-            iat.setParameter(SpeechConstant.AUDIO_SOURCE, "-1");
-            iat.setParameter(SpeechConstant.RESULT_TYPE, "plain");
+            try {
+                iat = SpeechRecognizer.createRecognizer(null, null);
+                iat.setParameter(SpeechConstant.DOMAIN, "iat");
+                iat.setParameter(SpeechConstant.LANGUAGE, "zh_cn");
+                iat.setParameter(SpeechConstant.ACCENT, "mandarin");
+                iat.setParameter(SpeechConstant.AUDIO_SOURCE, "-1");
+                iat.setParameter(SpeechConstant.RESULT_TYPE, "plain");
+            } catch (VerifyError e) {
+                // no-op
+            }
         }
 
         @Override
@@ -74,14 +124,14 @@ public class ResultPool {
 
         @Override
         protected Void doInBackground(Void... voids) {
-            final ResultPool target = ref.get();
+            ResultPool target = ref.get();
             while (true) {
                 // must check cancelled or not to terminate doInBackground()
                 // (calling cancel() from outside WON'T terminate doInBackground())
                 if (isCancelled()) {
                     return null;
                 }
-                final long now = System.currentTimeMillis();
+                long now = System.currentTimeMillis();
                 byte[] voiceBuffer = null;
                 try {
                     voiceBuffer = new byte[fis.available() - currentPcmByte];
@@ -95,42 +145,7 @@ public class ResultPool {
                     Logger.log(LOG_TAG, e);
                 }
                 if (voiceBuffer != null && voiceBuffer.length != 0) {
-                    iat.startListening(new RecognizerListener() {
-                        @Override
-                        public void onVolumeChanged(int i, byte[] bytes) {
-                            // no-op
-                        }
-
-                        @Override
-                        public void onBeginOfSpeech() {
-                            // no-op
-                        }
-
-                        @Override
-                        public void onEndOfSpeech() {
-                            // no-op
-                        }
-
-                        @Override
-                        public void onResult(RecognizerResult recognizerResult, boolean isLast) {
-                            // skip '。' & space
-                            String result = recognizerResult.getResultString();
-                            if ("".equals(result) || "。".equals(result)) {
-                                return;
-                            }
-                            target.putResult(now, result);
-                        }
-
-                        @Override
-                        public void onError(SpeechError speechError) {
-                            // no-op
-                        }
-
-                        @Override
-                        public void onEvent(int i, int i1, int i2, Bundle bundle) {
-                            // no-op
-                        }
-                    });
+                    iat.startListening(new MyRecognizerListener(target, now));
                     iat.writeAudio(voiceBuffer, 0, voiceBuffer.length);
                     iat.stopListening();
                 }
@@ -156,13 +171,9 @@ public class ResultPool {
         }
         File f = new File(TEMP_OUTPUT_PATH);
         if (f.exists()) {
-            if (!f.delete()) {
-                throw new IOException("delete file failed " + TEMP_OUTPUT_PATH);
-            }
+            ReturnValueEater.eat(f.delete());
         }
-        if (!f.createNewFile()) {
-            throw new IOException("create file failed " + TEMP_OUTPUT_PATH);
-        }
+        ReturnValueEater.eat(f.createNewFile());
         try {
             startTime = System.currentTimeMillis();
             recorder = new AudioUtil.AudioRecordThread(TEMP_OUTPUT_PATH);
@@ -224,7 +235,8 @@ public class ResultPool {
         results.clear();
     }
 
-    private void putResult(long time, String result) {
+    // set to public only for test
+    public void putResult(long time, String result) {
         if (!times.isEmpty()) {
             long lastTime = times.get(times.size() - 1);
             if (lastTime > time) {

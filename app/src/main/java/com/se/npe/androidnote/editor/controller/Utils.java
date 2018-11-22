@@ -20,10 +20,7 @@ import android.support.annotation.Nullable;
 import android.text.style.AlignmentSpan;
 import android.widget.EditText;
 
-import com.yydcdut.markdown.span.MDOrderListSpan;
-import com.yydcdut.markdown.span.MDUnOrderListSpan;
 import com.yydcdut.markdown.utils.TextHelper;
-import com.yydcdut.rxmarkdown.RxMDEditText;
 
 public class Utils {
     // no constructor
@@ -75,22 +72,6 @@ public class Utils {
     public static boolean hasCenterSpan(EditText editText, int start, int end) {
         AlignmentSpan.Standard centerSpan = Utils.getSpans(editText, start, end, AlignmentSpan.Standard.class);
         return centerSpan != null;
-    }
-
-    public static boolean hasOrderListSpan(RxMDEditText rxMDEditText, int start, int end) {
-        MDOrderListSpan orderListSpan = Utils.getSpans(rxMDEditText, start, end, MDOrderListSpan.class);
-        return orderListSpan != null;
-    }
-
-    public static boolean hasUnOrderListSpan(RxMDEditText rxMDEditText, int start, int end) {
-        MDUnOrderListSpan unOrderListSpan = Utils.getSpans(rxMDEditText, start, end, MDUnOrderListSpan.class);
-        return unOrderListSpan != null;
-    }
-
-
-    public static boolean hasTodoDone(RxMDEditText rxMDEditText, int start) {
-        CharSequence charSequence = rxMDEditText.getText().subSequence(start, start + "- [x] ".length());
-        return charSequence.toString().equalsIgnoreCase("- [x] ");
     }
 
     public static int safePosition(int position, CharSequence s) {

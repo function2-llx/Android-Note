@@ -44,14 +44,18 @@ public class NoteTest {
 
     @Test
     public void buildTest() {
-        List<IData> content = new ArrayList<>();
-        content.add(new TextData("text"));
-        List<String> tags = new ArrayList<>();
-        tags.add("TagZ");
-        Note note1 = new Note(DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST, content);
-        Note note2 = new Note(DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST, content, tags);
-        note1.getTag().add("TagZ");
-        assertEquals(note1, note2);
+        try {
+            List<IData> content = new ArrayList<>();
+            content.add(new TextData("text"));
+            List<String> tags = new ArrayList<>();
+            tags.add("TagZ");
+            Note note1 = new Note(DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST, content);
+            Note note2 = new Note(DataExample.EXAMPLE_TITLE_WHOLE_NOTE_LIST, content, tags);
+            note1.getTag().add("TagZ");
+            assertEquals(note1, note2);
+        } catch (IllegalStateException e) {
+            e.printStackTrace();
+        }
     }
 
     @Test

@@ -42,7 +42,6 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 
 import cn.sharesdk.framework.Platform;
 import cn.sharesdk.onekeyshare.OnekeyShare;
@@ -109,13 +108,6 @@ public class EditorActivity extends AppCompatActivity {
             );
             oks.show(this);
         }, note, "temp");
-//        oks.setShareContentCustomizeCallback(
-//                (platform, paramsToShare) -> {
-//                    if (platform.getName().equals(Wechat.NAME))
-//                        shareWechat(platform, paramsToShare);
-//                }
-//        );
-
     }
 
     @Override
@@ -174,11 +166,6 @@ public class EditorActivity extends AppCompatActivity {
                 break;
         }
         return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    public void startActivity(Intent intent) {
-        super.startActivity(intent);
     }
 
     private void save() {
