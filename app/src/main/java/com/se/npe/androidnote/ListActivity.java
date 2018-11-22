@@ -267,6 +267,8 @@ public class ListActivity extends AppCompatActivity {
 
     private void handleGroupManage(@NonNull MenuItem menuItem) {
         List<String> allGroups = TableOperate.getInstance().getAllGroups();
+        allGroups.remove(noteAdapter.getCurrentGroup());
+
         String[] allGroupsArray = allGroups.toArray(new String[0]);
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         switch (menuItem.getItemId()) {
