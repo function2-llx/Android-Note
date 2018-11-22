@@ -14,6 +14,7 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.marshalchen.ultimaterecyclerview.UltimateRecyclerviewViewHolder;
 import com.marshalchen.ultimaterecyclerview.UltimateViewAdapter;
@@ -308,7 +309,10 @@ public class NoteAdapter extends UltimateViewAdapter<NoteAdapter.ViewHolder> {
 
                     case R.id.set_group:
                         List<String> groupName = TableOperate.getInstance().getAllGroups();
-
+                        if (groupName.isEmpty()) {
+                            Toast.makeText(activity, "no group available", Toast.LENGTH_SHORT).show();
+                            break;
+                        }
                         AlertDialog.Builder builder = new AlertDialog.Builder(activity);
                         builder.setTitle("set group");
                         final int[] selected = {0};

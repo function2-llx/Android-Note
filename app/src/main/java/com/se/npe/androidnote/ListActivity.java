@@ -301,6 +301,7 @@ public class ListActivity extends AppCompatActivity {
                         if (selected[i])
                             TableOperate.getInstance().removeGroup(allGroupsArray[i]);
                     refreshGroups();
+                    noteAdapter.updateGroupNotesList();
                 });
                 builder.setNegativeButton(CANCEL, null);
                 builder.show();
@@ -327,6 +328,7 @@ public class ListActivity extends AppCompatActivity {
         if (searching) {
             tagGroupManager.hide();
             enableRefresh();
+            noteAdapter.updateGroupNotesList();
             searching = false;
             searchView.onActionViewCollapsed();
         } else
@@ -353,6 +355,7 @@ public class ListActivity extends AppCompatActivity {
         searchView.setOnCloseListener(() -> {
             tagGroupManager.hide();
             enableRefresh();
+            noteAdapter.updateGroupNotesList();
             searching = false;
             return false;
         });
