@@ -59,11 +59,15 @@ public class ListActivityTest {
 
     @Before
     public void setUp() {
-        activity = initListActivity();
-        shadowActivity = shadowOf(activity);
-        ultimateRecyclerView = activity.findViewById(R.id.ultimate_recycler_view);
-        noteAdapter = (NoteAdapter) ultimateRecyclerView.getAdapter();
-        TableOperateTest.addExampleNote(new ArrayList<>());
+        try {
+            activity = initListActivity();
+            shadowActivity = shadowOf(activity);
+            ultimateRecyclerView = activity.findViewById(R.id.ultimate_recycler_view);
+            noteAdapter = (NoteAdapter) ultimateRecyclerView.getAdapter();
+            TableOperateTest.addExampleNote(new ArrayList<>());
+        } catch (IllegalStateException e) {
+            // no-op
+        }
     }
 
     @After
@@ -102,12 +106,12 @@ public class ListActivityTest {
             shadowSwipeRefreshLayout.getOnRefreshListener().onRefresh(); // swipe-refresh on
             ShadowLooper.runUiThreadTasksIncludingDelayedTasks(); // enable delayed swipe-refresh
         } catch (IllegalStateException e) {
-            e.printStackTrace();
+            // no-op
         }
     }
 
     @Test
-    public void onNavigate() throws NoSuchFieldException, NoSuchMethodException, IllegalAccessException, ClassNotFoundException, InstantiationException, InvocationTargetException {
+    public void onNavigate() throws NoSuchFieldException, IllegalAccessException {
         NavigationView navigationView = activity.findViewById(R.id.nav_view);
         activity.refreshGroups(); // refresh groups
         // get OnNavigationItemSelectedListener
