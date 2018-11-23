@@ -101,10 +101,10 @@ public class EditorActivity extends AppCompatActivity {
         noteFileConverter.exportNoteToFile((String fileName) -> {
             oks.setFilePath(fileName);
             oks.setShareContentCustomizeCallback(
-                (platform, shareParams) -> {
-                    if (platform.getName().equals(Wechat.NAME))
-                        shareWechat(platform, shareParams, fileName);
-                }
+                    (platform, shareParams) -> {
+                        if (platform.getName().equals(Wechat.NAME))
+                            shareWechat(platform, shareParams, fileName);
+                    }
             );
             oks.show(this);
         }, note, "temp");
@@ -274,7 +274,7 @@ public class EditorActivity extends AppCompatActivity {
 
     private void openCamera(int code) {
         Intent intent = new Intent(
-            code == REQUEST_IMAGE_CAPTURE ? MediaStore.ACTION_IMAGE_CAPTURE : MediaStore.ACTION_VIDEO_CAPTURE);
+                code == REQUEST_IMAGE_CAPTURE ? MediaStore.ACTION_IMAGE_CAPTURE : MediaStore.ACTION_VIDEO_CAPTURE);
         SimpleDateFormat timeStampFormat = new SimpleDateFormat("yyyy_MM_dd_HH_mm_ss");
         String filename = timeStampFormat.format(new Date());
         File tempFile = new File(Environment.getExternalStorageDirectory(), filename);

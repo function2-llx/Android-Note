@@ -47,6 +47,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.function.Consumer;
 
 import cn.jzvd.Jzvd;
+import cn.jzvd.JzvdStd;
 
 public class SortRichEditor extends ScrollView {
     private static final int TITLE_WORD_LIMIT_COUNT = 30;
@@ -360,7 +361,7 @@ public class SortRichEditor extends ScrollView {
         emptyView.setLayoutParams(lp);
         emptyView.setOnClickListener(v -> {
             if (isSort) {
-                endSortUI();
+                sort();
             } else {
                 int childCount = containerLayout.getChildCount();
                 if (childCount == 0 || !(containerLayout.getChildAt(childCount - 1) instanceof TextView)) {
@@ -880,11 +881,16 @@ public class SortRichEditor extends ScrollView {
         insertMediaAtIndex(index, pictureLayout);
     }
 
-
     private void insertVideoAtIndex(int index, String videoPath) {
         RelativeLayout videoLayout = createVideoLayout();
         VideoPlayer video = (VideoPlayer) videoLayout.getChildAt(0);
-        video.getJzvdStd().setUp(videoPath, "", Jzvd.SCREEN_WINDOW_LIST);
+        JzvdStd jzvdStd = video.getJzvdStd();
+        jzvdStd.setUp(videoPath, "", Jzvd.SCREEN_WINDOW_LIST);
+        // the api of jzvd is too bad
+        // I cannot easily know when it enters or quit a full screen video
+        // so I ban it all
+        jzvdStd.fullscreenButton.setOnClickListener(null);
+        jzvdStd.fullscreenButton.setVisibility(GONE);
         video.setTag(videoPath); // tag stored in VideoPlayer itself
         new ThumbnailLoader(video.getJzvdStd().thumbImageView).executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, videoPath);
         insertMediaAtIndex(index, videoLayout);
