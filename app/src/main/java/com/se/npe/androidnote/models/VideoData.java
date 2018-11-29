@@ -1,8 +1,8 @@
 package com.se.npe.androidnote.models;
 
-import android.view.View;
-
 import com.se.npe.androidnote.interfaces.IData;
+
+import java.util.Objects;
 
 /**
  * Sound data <-> a piece of video in the editor
@@ -12,24 +12,42 @@ import com.se.npe.androidnote.interfaces.IData;
  */
 
 public class VideoData implements IData {
-    String videoPath;
+    private String videoPath;
 
     public VideoData(String videoPath) {
         this.videoPath = videoPath;
     }
 
-    public String getVideoPath() {
+    @Override
+    public String getPath() {
         return videoPath;
     }
 
     @Override
-    public boolean equals(Object another) {
-        return another.getClass() == this.getClass()
-                && this.videoPath.equals(((VideoData) another).videoPath);
+    public String getType() {
+        return "Video";
+    }
+
+    @Override
+    public String getText() {
+        return "";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        VideoData videoData = (VideoData) o;
+        return Objects.equals(videoPath, videoData.videoPath);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(videoPath);
     }
 
     @Override
     public String toString() {
-        return "Video" + "asdfg" + videoPath;
+        return "Video" + TableConfig.FileSave.LINE_SEPARATOR + videoPath;
     }
 }

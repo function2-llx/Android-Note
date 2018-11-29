@@ -1,10 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
-        android:title="@string/preview"
-        android:id="@+id/list_item_preview" />
-
+        android:id="@+id/preview"
+        android:title="@string/note_preview" />
     <item
         android:id="@+id/delete"
-        android:title="@string/delete" />
+        android:title="@string/note_delete" />
+
+    <item
+        android:id="@+id/set_group"
+        android:title="@string/note_set_group" />
+
+    <item
+        android:id="@+id/remove_from_current_group"
+        android:title="@string/note_remove_group" />
 </menu>

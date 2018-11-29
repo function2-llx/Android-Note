@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <item
+        android:id="@+id/group_manage"
+        android:title="@string/groups_manage_title">
+        <menu>
+            <group android:id="@+id/group_operations">
+                <item
+                    android:id="@+id/new_group"
+                    android:icon="@drawable/baseline_group_add_black_48dp"
+                    android:title="@string/new_group" />
+                <item
+                    android:id="@+id/manage_group"
+                    android:icon="@drawable/baseline_remove_circle_black_48dp"
+                    android:title="@string/remove_group" />
+            </group>
+        </menu>
+    </item>
+
+    <item
+        android:id="@+id/groups"
+        android:icon="@drawable/baseline_group_black_48dp"
+        android:title="@string/groups_title">
+        <menu>
+            <group android:id="@+id/group_all_notes">
+                <item
+                    android:id="@+id/all_notes"
+                    android:icon="@drawable/baseline_note_black_48dp"
+                    android:title="@string/group_all_notes" />
+            </group>
+            <group android:id="@+id/group_groups" />
+
+        </menu>
+    </item>
+
+    <!--<item-->
+    <!--android:title="@string/menu_settings"-->
+    <!--android:icon="@mipmap/settings" />-->
+
+</menu>

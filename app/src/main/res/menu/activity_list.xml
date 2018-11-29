@@ -2,40 +2,48 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:title="@string/menu_new_note"
-        android:id="@+id/menu_new_note"/>
+        android:id="@+id/menu_new_note"
+        android:title="@string/list_new_note" />
+
+    <item
+        android:id="@+id/menu_open"
+        android:title="@string/note_open" />
 
     <item
         android:id="@+id/action_search"
-        android:title="@string/menu_search"
+        android:title="@string/list_search"
         app:actionViewClass="android.support.v7.widget.SearchView"
-        app:showAsAction="always"/>
+        app:showAsAction="always" />
 
     <item
         android:id="@+id/menu_sort"
-        android:title="@string/menu_sort"
-        app:showAsAction="always"
-        >
+        android:checkable="true"
+        android:icon="@drawable/baseline_sort_white_48dp"
+        android:title="@string/list_sort"
+        app:showAsAction="ifRoom">
         <menu>
-            <item
-                android:id="@+id/sort_created_time"
-                android:title="@string/sort_created_time"/>
-
-            <item
-                android:id="@+id/sort_modified_time"
-                android:title="@string/sort_modified_time"/>
-            <item
-                android:id="@+id/sort_title"
-                android:title="@string/sort_title"/>
+            <group
+                android:id="@+id/sort_options"
+                android:checkableBehavior="single">
+                <item
+                    android:id="@+id/sort_title"
+                    android:title="@string/list_sort_title" />
+                <item
+                    android:id="@+id/sort_created_time"
+                    android:title="@string/list_sort_created_time" />
+                <item
+                    android:id="@+id/sort_modified_time"
+                    android:title="@string/list_sort_modified_time" />
+            </group>
         </menu>
     </item>
 
     <item
         android:id="@+id/action_settings"
-        android:title="@string/menu_settings" />
+        android:title="@string/list_settings" />
 
     <item
         android:id="@+id/clear"
-        android:title="@string/clear" />
+        android:title="@string/list_clear" />
 
 </menu>

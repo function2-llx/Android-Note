@@ -1,8 +1,8 @@
 package com.se.npe.androidnote.models;
 
-import android.view.View;
-
 import com.se.npe.androidnote.interfaces.IData;
+
+import java.util.Objects;
 
 /**
  * Sound data <-> a EditText in the editor it is a piece of continuous text in
@@ -18,18 +18,36 @@ public class TextData implements IData {
         this.text = text;
     }
 
+    @Override
     public String getText() {
         return text;
     }
 
     @Override
-    public boolean equals(Object another) {
-        return another.getClass() == this.getClass()
-                && this.text.equals(((TextData) another).text);
+    public String getPath() {
+        return "";
+    }
+
+    @Override
+    public String getType() {
+        return "Text";
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        TextData textData = (TextData) o;
+        return Objects.equals(text, textData.text);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(text);
     }
 
     @Override
     public String toString() {
-        return "Text" + "asdfg" + text;
+        return "Text" + TableConfig.FileSave.LINE_SEPARATOR + text;
     }
 }

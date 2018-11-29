@@ -1,8 +1,8 @@
 package com.se.npe.androidnote.models;
 
-import android.view.View;
-
 import com.se.npe.androidnote.interfaces.IData;
+
+import java.util.Objects;
 
 /**
  * Sound data <-> a piece of sound and text in the editor
@@ -20,23 +20,37 @@ public class SoundData implements IData {
         this.text = text;
     }
 
-    public String getSoundPath() {
+    @Override
+    public String getType() {
+        return "Sound";
+    }
+
+    @Override
+    public String getPath() {
         return soundPath;
     }
 
+    @Override
     public String getText() {
         return text;
     }
 
     @Override
-    public boolean equals(Object another) {
-        return another.getClass() == this.getClass()
-                && this.soundPath.equals(((SoundData) another).soundPath)
-                && this.text.equals(((SoundData) another).text);
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        SoundData soundData = (SoundData) o;
+        return Objects.equals(soundPath, soundData.soundPath) &&
+                Objects.equals(text, soundData.text);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(soundPath, text);
     }
 
     @Override
     public String toString() {
-        return "Sound" + "asdfg" + soundPath + "asdfg" + text;
+        return "Sound" + TableConfig.FileSave.LINE_SEPARATOR + soundPath + TableConfig.FileSave.LINE_SEPARATOR + text;
     }
 }

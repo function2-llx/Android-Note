@@ -1,21 +1,14 @@
 package com.se.npe.androidnote.models;
 
 import android.support.annotation.NonNull;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 
 import com.se.npe.androidnote.interfaces.IData;
 
-import java.util.List;
+import java.io.Serializable;
 import java.util.ArrayList;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.FileNotFoundException;
-import java.io.InputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Note entity
@@ -25,182 +18,178 @@ import java.io.OutputStream;
  * @author MashPlant
  */
 
-public class Note {
+public class Note implements Serializable {
     public static class PreviewData {
         // using public field just for convenience
         public @NonNull
         String title;
         public @NonNull
         String text;
+
+        public @NonNull
+        String groupName;
+
         public @NonNull
         String picturePath;
+        public @NonNull
+        Date startTime;
+        public @NonNull
+        Date modifyTime;
 
-        public PreviewData(@NonNull String title, @NonNull String text, @NonNull String picturePath) {
+        public PreviewData(@NonNull String title, @NonNull String text, @NonNull String groupName, @NonNull String picturePath, @NonNull Date startTime, @NonNull Date modifyTime) {
             this.title = title;
             this.text = text;
+            this.groupName = groupName;
             this.picturePath = picturePath;
+            this.startTime = startTime;
+            this.modifyTime = modifyTime;
         }
     }
 
     private String title;
     private List<IData> content;
-
-    private int DBindex = -1;
+    private Date startTime = new Date(0);
+    private Date modifyTime = new Date(0);
+    private List<String> tag;
+    private int indexDB = -1;
+    private String groupName = "";
 
     public Note() {
-        this.title = "this is tile for " + DBindex;
-        this.content = new ArrayList<IData>();
+        this.title = "this is tile for " + indexDB;
+        this.content = new ArrayList<>();
+        this.tag = new ArrayList<>();
     }
 
     public Note(String title, List<IData> content) {
         this.title = title;
         this.content = content;
+        this.tag = new ArrayList<>();
     }
 
-    public Note(String title, List<IData> content, int index) {
-        this.DBindex = index;
+    public Note(String title, List<IData> content, List<String> tag) {
         this.title = title;
         this.content = content;
+        this.tag = tag;
+    }
+
+    public Note(String title, List<IData> content, List<String> tag, String groupName) {
+        this.title = title;
+        this.content = content;
+        this.tag = tag;
+        this.groupName = groupName;
+    }
+
+    public Note(String title, List<IData> content, int index, String timeStart, String timeModify, List<String> tag, String groupName) {
+        this.indexDB = index;
+        this.title = title;
+        this.content = content;
+        this.tag = tag;
+        this.startTime.setTime(Long.parseLong(timeStart));
+        this.modifyTime.setTime(Long.parseLong(timeModify));
+        this.groupName = groupName;
     }
 
     public String getTitle() {
         return title;
     }
 
-    public void setindex(int index) {
-        DBindex = index;
+    public void setTitle(String title) {
+        this.title = title;
     }
 
-    public int getIndex() {
-        return DBindex;
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 
     public List<IData> getContent() {
         return content;
     }
 
+    public void setContent(List<IData> content) {
+        this.content = content;
+    }
+
+    public Date getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(Date time) {
+        startTime = time;
+    }
+
+    public Date getModifyTime() {
+        return modifyTime;
+    }
+
+    public void setModifyTime(Date time) {
+        modifyTime = time;
+    }
+
+    public List<String> getTag() {
+        return tag;
+    }
+
+    public void setTag(List<String> tag) {
+        this.tag = tag;
+    }
+
+    public int getIndex() {
+        return indexDB;
+    }
+
+    public void setIndex(int index) {
+        indexDB = index;
+    }
+
     public PreviewData getPreview() {
         String text = null;
-        String picpath = null;
-        List<IData> templist = getContent();
-        for (int i = 0; i < templist.size(); i++) {
-            if (picpath == null && templist.get(i).toString().charAt(0) == 'P') {
-                picpath = templist.get(i).toString().split("asdfg")[1];
-            } else if (text == null && templist.get(i).toString().charAt(0) == 'T') {
-                text = templist.get(i).toString().split("asdfg")[1];
+        String picPath = null;
+        List<IData> contentList = getContent();
+        for (int i = 0; i < contentList.size(); i++) {
+            if (picPath == null && contentList.get(i).toString().charAt(0) == 'P') {
+                picPath = contentList.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
+            } else if (text == null && contentList.get(i).toString().charAt(0) == 'T') {
+                text = contentList.get(i).toString().split(TableConfig.FileSave.LINE_SEPARATOR)[1];
             }
         }
-        if (text == null) text = "无预览文字";
-        if (picpath == null) picpath = "";
-        Note.PreviewData previewData = new Note.PreviewData(title, text, picpath);
-        return previewData;
-    }
-
-    public void loadFromFile(String fileName) {
-        File file = new File(fileName);
-        InputStream inputStream = null;
-        try {
-            inputStream = new FileInputStream(file);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return ;
-        }
-
-        byte b[] = new byte[(int)file.length()];
-        try{
-            int len = inputStream.read(b);
-            if(len == -1)return ;
-        }
-        catch(Exception e){
-            System.out.println("Wrong!");
-        }
-
-        String tempcontent = new String(b);
-        String[] StrArray = tempcontent.split("qwert");
-
-        title = StrArray[0];
-
-        content = new ArrayList<IData>();
-
-        for (int i = 1; i < StrArray.length; i++) {
-            if (StrArray[i].charAt(0) == 'S') {
-                String[] tempArray = StrArray[i].split("asdfg");
-                SoundData tempSoundData = new SoundData(tempArray[1], tempArray[2]);
-                content.add(tempSoundData);
-            } else if (StrArray[i].charAt(0) == 'T') {
-                String[] tempArray = StrArray[i].split("asdfg");
-                TextData tempTextData = new TextData(tempArray[1]);
-                content.add(tempTextData);
-            } else if (StrArray[i].charAt(0) == 'V') {
-                String[] tempArray = StrArray[i].split("asdfg");
-                VideoData tempVideoData = new VideoData(tempArray[1]);
-                content.add(tempVideoData);
-            } else if (StrArray[i].charAt(0) == 'P') {
-                String[] tempArray = StrArray[i].split("asdfg");
-                Bitmap mBitmap = BitmapFactory.decodeFile(StrArray[1]);
-                PictureData tempPictureData = new PictureData(tempArray[1], mBitmap);
-                content.add(tempPictureData);
-            }
-        }
-
-        try {
-            inputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void saveToFile(String fileName) {
-        File file = new File(fileName);
-        if (!file.exists()) {
-            try {
-                file.createNewFile();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        OutputStream outputStream = null;
-        try {
-            outputStream = new FileOutputStream(file);
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            return ;
-        }
-        String string = getTitle() + "qwert";
-        List<IData> templist = getContent();
-
-        for (int i = 0; i < templist.size(); i++) {
-            string = string + templist.get(i).toString() + "qwert";
-        }
-
-        byte[] bs = string.getBytes();
-        try {
-            outputStream.write(bs);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        try {
-            outputStream.close();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        if (text == null) text = "";
+        if (picPath == null) picPath = "";
+        return new Note.PreviewData(title, text, groupName, picPath, startTime, modifyTime);
     }
 
     @Override
-    public boolean equals(Object another) {
-        // Identify note by its DBindex
-        return this.DBindex == ((Note) another).DBindex;
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Note note = (Note) o;
+        return indexDB == note.indexDB &&
+                Objects.equals(title, note.title) &&
+                Objects.equals(content, note.content) &&
+                Objects.equals(startTime, note.startTime) &&
+                Objects.equals(modifyTime, note.modifyTime) &&
+                Objects.equals(tag, note.tag) &&
+                Objects.equals(groupName, note.groupName);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(title, content, startTime, modifyTime, tag, indexDB, groupName);
     }
 
     @Override
     public String toString() {
-        String string = "Title:"+getTitle()+"\nContents:";
-        List<IData> templist = getContent();
-        for(int i = 0;i < templist.size();i ++)
-        {
-            string = string + "\n" + templist.get(i).toString();
+        String string = "Title:" + getTitle() + "\nContents:";
+        List<IData> tempList = getContent();
+        StringBuilder sb = new StringBuilder();
+        sb.append(string);
+        for (int i = 0; i < tempList.size(); i++) {
+            sb.append('\n');
+            sb.append(tempList.get(i).toString());
         }
-        return string;
+        return sb.toString();
     }
 }

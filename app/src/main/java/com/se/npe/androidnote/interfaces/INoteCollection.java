@@ -12,19 +12,21 @@ import java.util.List;
  */
 
 public interface INoteCollection {
-    List<Note> getAllNotes();
+    List<Note> getAllNotes(String groupName, List<String> tagList);
 
-    List<Note> getSearchResult(String parameter);
+    List<Note> fuzzySearch(String parameter, String groupName, List<String> tagList);
+
+    void addGroup(String groupName);
+
+    void removeGroup(String groupName);
+
+    List<String> getAllGroups();
 
     void addNote(Note note);
 
-    Note getNoteAt(int index);
+    void setNote(Note note);
 
-    void setNoteAt(int index, Note note);
+    void removeNote(Note note);
 
-    void removeNoteAt(int index);
-
-    void loadFromFile(String fileName);
-
-    void saveToFile(String fileName);
+    void removeAllNotes();
 }

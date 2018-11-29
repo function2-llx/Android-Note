@@ -4,6 +4,8 @@ import android.media.AudioFormat;
 import android.media.AudioRecord;
 import android.media.MediaRecorder;
 
+import com.se.npe.androidnote.util.Logger;
+
 import java.io.BufferedOutputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -11,14 +13,16 @@ import java.io.IOException;
 import java.io.OutputStream;
 
 public class AudioUtil {
+    private static final String LOG_TAG = AudioUtil.class.getSimpleName();
+
     private static final int AUDIO_SOURCE = MediaRecorder.AudioSource.MIC;
-    //录音的采样频率
+    // 录音的采样频率
     private static final int AUDIO_RATE = 16000;
-    //录音的声道，单声道
+    // 录音的声道，单声道
     private static final int AUDIO_CHANNEL = AudioFormat.CHANNEL_IN_MONO;
-    //量化的深度
+    // 量化的深度
     private static final int AUDIO_FORMAT = AudioFormat.ENCODING_PCM_16BIT;
-    //缓存的大小
+    // 缓存的大小
     private static final int BUFFER_SIZE = AudioRecord.getMinBufferSize(AUDIO_RATE, AUDIO_CHANNEL, AUDIO_FORMAT);
 
     private static final long BYTE_RATE = 16 * AUDIO_RATE / 8;
@@ -31,7 +35,7 @@ public class AudioUtil {
         private AudioRecord recorder;
         private String pcmPath;
 
-        public AudioRecordThread(String pcmPath) {
+        AudioRecordThread(String pcmPath) {
             this.recorder = new AudioRecord(AUDIO_SOURCE, AUDIO_RATE, AUDIO_CHANNEL, AUDIO_FORMAT, BUFFER_SIZE);
             this.pcmPath = pcmPath;
             recorder.startRecording();
@@ -55,7 +59,7 @@ public class AudioUtil {
                     }
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                Logger.log(LOG_TAG, e);
             }
         }
     }
@@ -81,7 +85,8 @@ public class AudioUtil {
         }
     }
 
-    private static void pcmToFile(OutputStream os, byte[] data, int srate, int channel, int format) throws IOException {
+    private static void pcmToFile(OutputStream os, byte[] data, int srate,
+                                  int channel /* = 1 */, int format /* = 16 */) throws IOException {
         byte[] header = new byte[44];
 
         long totalDataLen = data.length + 36L;

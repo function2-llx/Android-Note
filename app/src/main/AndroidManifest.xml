@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.se.npe.androidnote">
 
     <!--连接网络权限，用于执行云端语音能力 -->
@@ -8,10 +9,12 @@
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <!--读取网络信息状态 -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <!--获取当前wifi状态 -->
+    <!--获取当前WiFi状态 -->
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <!--允许程序改变网络连接状态 -->
     <uses-permission android:name="android.permission.CHANGE_NETWORK_STATE" />
+    <!--允许程序改变WiFi连接状态-->
+    <uses-permission android:name="android.permission.CHANGE_WIFI_STATE" />
     <!--读取手机信息权限 -->
     <uses-permission android:name="android.permission.READ_PHONE_STATE" />
     <!--读取联系人权限，上传联系人需要用到此权限 -->
@@ -20,9 +23,11 @@
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <!--外存储读权限，构建语法需要用到此权限 -->
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-    <!--配置权限，用来记录应用配置信息 -->
-    <!--Permission is only granted to system apps -->
-    <!--<uses-permission android:name="android.permission.WRITE_SETTINGS" />-->
+
+    <!--获取账户信息，用于分享功能-->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <!--改变账户信息，用于分享功能-->
+    <uses-permission android:name="android.permission.MANAGE_ACCOUNTS" />
     <!--手机定位信息，用来为语义等功能提供定位，提供更精准的服务-->
     <!--定位信息是敏感信息，可通过Setting.setLocationEnable(false)关闭定位请求 -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
@@ -41,28 +46,70 @@
             android:name="android.test.runner"
             android:required="false" />
 
-        <activity android:name=".MainActivity">
+        <activity android:name=".SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
+            <intent-filter tools:ignore="AppLinkUrlError">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:mimeType="*/*" />
+            </intent-filter>
+            <!--add static shortcut-->
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/static_shortcut" />
         </activity>
+
         <activity android:name=".EditorActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
+
         </activity>
         <activity android:name=".ListActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
+
         <activity android:name=".SoundRecorderActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
         </activity>
 
-        <service android:name=".sound.RecordingService" />
+        <!-- MobSDK有关分享的activity -->
+        <activity
+            android:name="com.mob.tools.MobUIShell"
+            android:configChanges="keyboardHidden|orientation|screenSize"
+            android:theme="@android:style/Theme.Translucent.NoTitleBar"
+            android:windowSoftInputMode="stateHidden|adjustResize" />
+        <!-- 填写您从Mob开发者后台中得到的AppKey和AppSecret -->
+        <meta-data
+            android:name="Mob-AppKey"
+            android:value="28765cffe4a40" />
+        <meta-data
+            android:name="Mob-AppSecret"
+            android:value="5f3c3c3c32e727d3fb2c874f7446150a" />
+
+        <!--aFileChooser有关打开文件的activity-->
+        <activity
+            android:name="com.ipaulpro.afilechooser.FileChooserActivity"
+            android:enabled="@bool/use_activity"
+            android:exported="true"
+            android:icon="@drawable/ic_chooser"
+            android:label="@string/choose_file">
+            <intent-filter>
+                <action android:name="android.intent.action.GET_CONTENT" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.OPENABLE" />
+
+                <data android:mimeType="*/*" />
+            </intent-filter>
+        </activity>
+
     </application>
 </manifest>
